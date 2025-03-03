@@ -6,7 +6,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Interest extends Model {
     static associate(models) {
-              
+      
       Interest.belongsTo(models.EquipmentSheet, {
         foreignKey: 'equipmentSheetID',
         as: 'equipmentSheet',
@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       });
+
     }
   }
   
