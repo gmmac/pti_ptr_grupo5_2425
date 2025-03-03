@@ -1,7 +1,8 @@
 'use strict';
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('Clients', [
       {
         nic: '123456789',
@@ -32,31 +33,9 @@ module.exports = {
         updatedAt: new Date()
       }
     ], {});
-    
-    await queryInterface.bulkInsert('FolderInterests', [
-      {
-        name: 'Smartphones',
-        clientNIC: '123456789',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: 'Laptops',
-        clientNIC: '987654321',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: 'Tablets',
-        clientNIC: '123456789',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ], {});
   },
 
-  down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('FolderInterests', null, {});
+  async down (queryInterface, Sequelize) {
     await queryInterface.bulkDelete('Clients', null, {});
   }
 };
