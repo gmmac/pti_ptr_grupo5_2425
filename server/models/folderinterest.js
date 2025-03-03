@@ -6,14 +6,6 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class FolderInterest extends Model {
     static associate(models) {
-      
-      Interest.belongsTo(models.Client, {
-        foreignKey: 'clientNIC',
-        as: 'client',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-      });
-
       FolderInterest.hasMany(models.Interest, { // Uma FolderInterest pode ter muitos Interests
         foreignKey: 'folderInterestID',
         as: 'interests',
