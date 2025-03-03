@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AutenticationPage from "./pages/AutenticationPage";
+import Teste from "./pages/Teste";
 
 export default function Router() {
 	return (
@@ -10,6 +11,7 @@ export default function Router() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/register" element={<AutenticationPage />} />
+                <Route path="/teste" element={<Teste />} />
 
             </Routes>
 
