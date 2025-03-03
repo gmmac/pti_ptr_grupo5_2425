@@ -13,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
         as: "client",
       });
       
-
       FolderInterest.hasMany(models.Interest, { // Uma FolderInterest pode ter muitos Interests
         foreignKey: 'folderInterestID',
         as: 'interests',

@@ -1,26 +1,12 @@
-import React, { useEffect, useState } from "react";
-import api from "../utils/axios";
+import React from 'react'
+import { useAuth0 } from "@auth0/auth0-react";
+import { Container } from "react-bootstrap"
 
 export default function AuthenticationPage() {
-  const [equipmentStatus, setEquipmentStatus] = useState([]); 
-
-  useEffect(() => {
-    api.get("/api/equipmentStatus")
-      .then(res => setEquipmentStatus(res.data))
-      .catch(error => console.error(error.message));
-  }, []);
-
-
-  useEffect(() => {
-    console.log(equipmentStatus)
-  }, [equipmentStatus])
-
+  const { loginWithRedirect, logout } = useAuth0();
   return (
-    <div>
-      {equipmentStatus &&
-        equipmentStatus.map((es, index) => (
-          <div key={index}>{es.state}</div>
-        ))}
-    </div>
-  );
+  <Container>
+    <button onClick={() => loginWithRedirect()}>Log In</button>
+    <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>Log Out</button>
+  </Container>);
 }
