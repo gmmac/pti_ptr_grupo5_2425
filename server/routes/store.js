@@ -1,30 +1,76 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const models = require('../models')
+const models = require("../models");
 
-router.get("/", (req, res) => {
-
+router.get("/", async (req, res) => {
+	try {
+		const stores = await Store.findAll();
+		res.json(stores);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
 });
 
-router.post("/", (req, res) => {
-
+router.post("/", async (req, res) => {
+	try {
+		const store = await Store.create(req.body);
+		res.status(201).json(store);
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
 });
 
-router.get("/:NIPC", (req, res) => {
-
+router.get("/:NIPC", async (req, res) => {
+	try {
+		const store = await Store.findByPk(req.params.NIPC);
+		if (!store) {
+			return res.status(404).json({ error: "Store not found" });
+		}
+		res.json(store);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
 });
 
-router.put("/:NIPC", (req, res) => {
-
+router.put("/:NIPC", async (req, res) => {
+	try {
+		const store = await Store.findByPk(req.params.NIPC);
+		if (!store) {
+			return res.status(404).json({ error: "Store not found" });
+		}
+		await store.update(req.body);
+		res.json(store);
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
 });
 
-router.delete("/:NIPC", (req, res) => {
-
+router.delete("/:NIPC", async (req, res) => {
+	try {
+		const store = await Store.findByPk(req.params.NIPC);
+		if (!store) {
+			return res.status(404).json({ error: "Store not found" });
+		}
+		await store.destroy();
+		res.status(204).send();
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
 });
 
-router.get("/:NIPC/employees", (req, res) => {
-    
+router.get("/:NIPC/employees", async (req, res) => {
+	try {
+		const store = await Store.findByPk(req.params.NIPC);
+		if (!store) {
+			return res.status(404).json({ error: "Store not found" });
+		}
+		const employees = await Employee.findAll({
+			where: { storeNIPC: req.params.NIPC },
+		});
+		res.json(employees);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
 });
-
 
 module.exports = router;
