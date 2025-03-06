@@ -8,48 +8,39 @@ http://localhost:4005/api/interestsFolder/?name=&clientNIC=&orderBy=createdAt&or
 router.get("/", async (req, res) => {
   try {
     const { name, clientNIC, page = 1, pageSize = 10, orderBy, orderDirection } = req.query;
-
     const where = {};
+    
     if (name) {
-      where.name = {
-        [Op.like]: `%${name}%`
-      };
+      where.name = { [Op.like]: `%${name}%` };
     }
-    const clientCondition = clientNIC ? { nic: clientNIC } : {}; // Filtra por clientNIC
+
+    const clientCondition = clientNIC ? { nic: clientNIC } : {};
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
-    // Definição dinâmica da ordenação. Ex.: /api/interestsFolder?orderBy=name,createdAt&orderDirection=ASC,DESC
     let order = [];
-    if (orderBy) {
-      const orderFields = orderBy.split(",");
-      const orderDirections = orderDirection ? orderDirection.split(",") : [];
-
-      order = orderFields.map((field, index) => [
-        field.trim(),
-        orderDirections[index] ? orderDirections[index].trim().toUpperCase() : "ASC"
-      ]);
+    if (orderBy && orderDirection) {
+      order = [[orderBy, orderDirection.toUpperCase()]];
     } else {
-      // Ordem padrão se nada for passado na query
-      order = [
-        ["createdAt", "DESC"]
-      ];
+      order = [["createdAt", "DESC"]];
     }
+
+    console.log("Order applied:", order);
 
     const { count, rows } = await models.FolderInterest.findAndCountAll({
       where,
       attributes: {
-        exclude: ['clientNIC'],
+        exclude: ["clientNIC"],
       },
       include: [
         {
           model: models.Client,
           as: "client",
           where: clientCondition,
-          attributes: ["nic", "name"]
+          attributes: ["nic", "name"],
         },
       ],
       limit: parseInt(pageSize),
-      offset: offset,
+      offset,
       order,
     });
 
@@ -60,21 +51,24 @@ router.get("/", async (req, res) => {
       pageSize: parseInt(pageSize),
       data: rows,
     });
-
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching interest folders:", error);
     res.status(500).json({ error: "Error fetching interest folders." });
   }
 });
 
 
 
-  
-
 router.post("/", async (req, res) => {
     try {
+      console.log(req.body)
         const { name, clientNIC } = req.body;
-        const folder = await models.FolderInterest.create({ name, clientNIC });
+        const folder = await models.FolderInterest.create({
+          name, 
+          clientNIC,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+      });
         res.status(201).json(folder);
     } catch (error) {
         res.status(400).json({ error: "Error creating interest folder." });
