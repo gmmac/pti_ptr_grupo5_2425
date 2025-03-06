@@ -15,7 +15,7 @@ router.delete("/:NIC", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-    
+    console.log(req.body);
 });
 
 
