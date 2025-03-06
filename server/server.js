@@ -41,6 +41,7 @@ const store = require('./routes/store');
 const storePurchase = require('./routes/storePurchase');
 const usedEquipment = require('./routes/usedEquipment');
 const warehouse = require('./routes/wharehouse');
+const employeeRole = require('./routes/employeeRole');
 
 // Definição de endpoints --> rotas
 app.use('/api/address', address);
@@ -64,6 +65,7 @@ app.use('/api/store', store);
 app.use('/api/storePurchase', storePurchase);
 app.use('/api/usedEquipment', usedEquipment);
 app.use('/api/warehouse', warehouse);
+app.use("/api/employeeRole", employeeRole)
 
 app.get('/status', (req, res) => {
 	res.json({

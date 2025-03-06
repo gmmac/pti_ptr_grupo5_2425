@@ -1,24 +1,36 @@
-import React from 'react'
+import React from 'react';
 import InterestFolderCard from './InterestFolderCard';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { PaginationProvider } from '../../../contexts/PaginationContext';
+import FolderInterestFilter from './FolderInterestFilter';
+import { useModal } from '../../../contexts/ModalContext';
+import CreateInterestModal from './CreateInterestModal';
 
-export default function InterestFolderCatalog({folders}) {
-    return (
-        <Container>
-          <Row className='d-flex flex-md-row flex-column justify-content-center'>
-            {folders.map((f, index) => (
-              <Col
-                key={index}
-                xs={12} sm={6} md={4} lg={3}
-                className="d-flex"
-              >
-                <PaginationProvider>
-                  <InterestFolderCard index={index} iFolder={f} />
-                </PaginationProvider>
-              </Col>
-            ))}
-          </Row>
-        </Container>
-      );
+export default function InterestFolderCatalog({ folders, handleRefresh }) {
+  const { show, handleShow, handleClose } = useModal();
+
+  return (
+    <Container className="py-4">
+      <FolderInterestFilter folders={folders} />
+      
+      <div className="d-flex justify-content-center my-3">
+        <Button variant="primary" size="lg" className="shadow-sm" onClick={handleShow}>
+          + Create New Folder
+        </Button>
+      </div>
+      
+      <CreateInterestModal show={show} handleClose={handleClose} handleRefresh={handleRefresh} />
+
+      <Row className='d-flex flex-wrap justify-content-center'>
+        {folders.map((f, index) => (
+          <Col key={index} xs={12} sm={6} md={4} lg={3} className="d-flex mb-3">
+            <PaginationProvider>
+              <InterestFolderCard index={index} iFolder={f} />
+            </PaginationProvider>
+          </Col>
+        ))}
+      </Row>
+    </Container>
+  );
 }
+
