@@ -2,8 +2,13 @@ const express = require('express');
 const router = express.Router();
 const models = require('../models')
 
-router.get("/", (req, res) => {
-
+router.get("/", async (req, res) => {
+    try {
+        const equipmentSheet = await models.EquipmentSheet.findAll();
+        res.status(200).json(equipmentSheet);
+    } catch (error) {
+        res.status(500).json({ message: 'Error.' });
+    }
 });
 
 router.post("/", (req, res) => {
