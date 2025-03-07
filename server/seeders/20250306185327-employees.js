@@ -6,6 +6,7 @@ module.exports = {
         nic: '123456789',
         nif: '987654321',
         internNum: '123456',
+        storeNIPC: "123456789",
         birthDate: new Date('1990-05-15'), 
         gender: 'M', // 'M' para masculino, 'F' para feminino
         name: 'João Silva',
@@ -21,6 +22,7 @@ module.exports = {
       {
         nic: '234567890',
         nif: '876543210',
+        storeNIPC: "123456789",
         internNum: '654321',
         birthDate: new Date('1985-09-25'), 
         gender: 'F', // 'F' para feminino
@@ -38,6 +40,7 @@ module.exports = {
         nic: '345678901',
         nif: '765432109',
         internNum: '987654',
+        storeNIPC: "123456789",
         birthDate: new Date('1992-12-10'), 
         gender: 'M', // 'M' para masculino
         name: 'Carlos Sousa',
@@ -54,6 +57,7 @@ module.exports = {
         nic: '456789012',
         nif: '654321098',
         internNum: '246810',
+        storeNIPC: "123456789",
         birthDate: new Date('1988-07-30'), 
         gender: 'F', // 'F' para feminino
         name: 'Ana Costa',
@@ -70,6 +74,7 @@ module.exports = {
         nic: '567890123',
         nif: '543210987',
         internNum: '135791',
+        storeNIPC: "123456789",
         birthDate: new Date('1995-02-20'), 
         gender: 'M', // 'M' para masculino
         name: 'Pedro Oliveira',

@@ -4,10 +4,9 @@ import api from '../utils/axios';
 
 export default function StorePurchasePage() {
     const [form, setForm] = useState({
-        status: '',
+        statusID: '',
         price: '',
         equipmentId: '',
-        timestamp: '' // Novo campo para armazenar o timestamp
     });
 
     const [statusList, setStatusList] = useState([]);
@@ -63,28 +62,17 @@ export default function StorePurchasePage() {
             return;
         }
 
-        const timestamp = new Date().toISOString();
-        console.log("Timestamp gerado: ", timestamp);
+        // // Enviar dados para o backend
+        // const formData = {
+        //     statusID: form.status,
+        //     price: form.price,
+        //     equipmentId: form.equipmentId,
+        // };
 
-
-        // Adicionar o timestamp ao formulário
-        setForm(prevState => ({
-            ...prevState,
-            timestamp: new Date().toISOString() 
-        }));
-
-        // Enviar dados para o backend
-        const formData = {
-            status: form.status,
-            price: form.price,
-            equipmentId: form.equipmentId,
-            purchaseDate: timestamp 
-        };
-
-        console.log("Dados enviados: ", formData);
+        // console.log("Dados enviados: ", formData);
 
         
-        api.post('/api/storePurchase', formData)
+        api.post('/api/storePurchase', form)
         .then(response => {
             setSuccessMessage("Venda registada com sucesso!");
             setError("");
@@ -92,10 +80,9 @@ export default function StorePurchasePage() {
             setTimeout(() => {
                 setSuccessMessage("");
                 setForm({
-                    status: '',
+                    statusID: '',
                     price: '',
                     equipmentId: '',
-                    timestamp: '' 
                 });
             }, 3000);
         })
@@ -120,8 +107,8 @@ export default function StorePurchasePage() {
                     <Form.Label>Estado do Equipamento</Form.Label>
                     <Form.Control
                         as="select"
-                        name="status"
-                        value={form.status}
+                        name="statusID"
+                        value={form.statusID}
                         onChange={handleChange}
                         required
                     >

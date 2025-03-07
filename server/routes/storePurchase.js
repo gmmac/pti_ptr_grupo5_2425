@@ -3,30 +3,36 @@ const router = express.Router();
 const models = require('../models');
 
 router.post("/", async (req, res) => {
-    const { status, price, equipmentId, purchaseDate } = req.body;
-    
-
-    if (!status || !price || !equipmentId || !purchaseDate) { 
-        return res.status(400).json({ message: "Todos os campos são obrigatórios." });
-    }
 
     try {
-        // Query para inserir na tabela StorePurchases
-        await db.query(
-            'INSERT INTO StorePurchases (storeID, clientNIC, employeeID, purchasePrice, usedEquipmentID) VALUES (123456789, 123456789, 123456789, ?, ?)',
-            [price, equipmentId]
-        );
 
-        // Query para inserir na tabela UsedEquipments
-        await db.query(
-            'INSERT INTO UsedEquipments (statusID, price, saleDate, purchaseDate, equipmentId) VALUES (?, ?, null, ?, ?)',
-            [status, price, purchaseDate, equipmentId] 
-        );
+        const {statusID, price, equipmentId} = req.body;
+        // const {statusID, price, equipmentId, clientNIC} = req.body; //tem de receber do frontend
 
-        res.status(201).json({ message: "Venda registada com sucesso!" });
+        // console.log(req.body);
+        
+
+        // const employeeUser = session.get(employeeUser)
+        // const employeeID = employeeUser.internNum
+        // const storeID = employeeUser.storeNIPC
+
+        const storeID = "123456789"
+        const clientNIC = "123456789"
+        const employeeID = "123456789"
+
+
+        const usedEquipment = await models.UsedEquipment.create({ statusID: statusID, price: price, purchaseDate: new Date(), equipmentId: equipmentId, createdAt: new Date(), updatedAt: new Date() });
+
+        // só cria a compra da loja, caso o equipamento usado exista (tenha sido criado)
+        if(usedEquipment){
+            const storePurchases = await models.StorePurchase.create({ storeID, clientNIC, employeeID, purchasePrice: price, usedEquipmentID: usedEquipment.id, createdAt: new Date(), updatedAt: new Date() });
+            res.status(201).json(storePurchases);
+        } else{
+            res.status(400).json({ error: "Error." });
+        }
+
     } catch (error) {
-        console.error("Erro ao registar venda:", error);
-        res.status(500).json({ message: "Erro interno no servidor." });
+        res.status(400).json({ error: "Error." });
     }
 });
 
