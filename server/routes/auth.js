@@ -5,8 +5,9 @@ require("dotenv").config();
 
 const router = express.Router();
 
-router.post("/register", async (req, res) => {
+router.post("/generateAuthToken", async (req, res) => {
   try {
+    // Request an access token from Auth0
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
       client_id: process.env.AUTH0_CLIENT_ID,
       client_secret: process.env.AUTH0_CLIENT_SECRET,
@@ -21,17 +22,17 @@ router.post("/register", async (req, res) => {
     const token = response.data.access_token;
     const encryptedToken = CryptoJS.AES.encrypt(token, process.env.CIPHER_SECRET_KEY).toString();
 
-    // Define o cookie HTTP-only
+    // Set an HTTP-only cookie to store the encrypted token
     res.cookie("attk", encryptedToken, {
-      httpOnly: true, // Impede acesso via JavaScript no navegador
-      sameSite: "Strict", // Proteção contra CSRF
-      maxAge: 86400000 , // Tempo de vida do cookie (24 horas)
+      httpOnly: true, // Prevents access via JavaScript in the browser
+      sameSite: "Strict", // Protects against CSRF attacks
+      maxAge: 86400000 , // Cookie lifespan (24 hours)
     });
 
-    res.json({ message: "Token armazenado com sucesso!" });
+    // Send a success response
+    res.sendStatus(201);
   } catch (error) {
-    console.error("Erro ao obter token:", error.response?.data || error.message);
-    res.status(500).json({ error: "Erro ao obter token" });
+    res.status(500);
   }
 });
 
