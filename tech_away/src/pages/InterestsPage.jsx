@@ -1,74 +1,82 @@
 import React, { useEffect, useState } from 'react';
 import InterestFolderCatalog from '../components/interests/folder/InterestFolderCatalog';
 import api from '../utils/axios';
-import { useLocation } from 'react-router-dom';
-import sliceQueryPageURL from '../utils/sliceQueryPageURL';
 import PaginationControl from '../components/pagination/PaginationControl';
-import { Container } from 'react-bootstrap';
+import { Col, Container, Nav, Row, Tab } from 'react-bootstrap';
 import { ModalProvider } from '../contexts/ModalContext';
+import { useFilter } from '../contexts/InterestsFilterProvider';
 
 export default function InterestsPage() {
-    const [interestsFolder, setInterestsFolder] = useState([]); 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const itemsPerPage = 4;
+  const [interestsFolder, setInterestsFolder] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 4;
 
-    const [query, setQuery] = useState();
+  const { filters } = useFilter();
+
+  useEffect(() => {}, [filters]);
+
+  const [refresh, setRefresh] = useState(false);
+
+  const handleRefresh = () => {
+    setRefresh(!refresh);
+  };
 
 
-    const [name, setName] = useState('');
-    const [clientNIC, setClientNIC] = useState('');
-    const [orderBy, setOrderBy] = useState('name,createdAt');
-    const [orderDirection, setOrderDirection] = useState('ASC,DESC');
+  useEffect(() => {
+    api
+      .get('/api/interestsFolder/', {
+        params: {
+          name: filters.name,
+          clientNIC: filters.clientNIC,
+          orderBy: filters.orderBy,
+          orderDirection: filters.orderDirection,
+          page: currentPage,
+          pageSize: itemsPerPage,
+        },
+      })
+      .then((res) => {
+        setInterestsFolder(res.data.data);
+        setTotalPages(res.data.totalPages);
+      })
+      .catch((error) => {
+        console.error('API error:', error.message);
+      });
+  }, [filters, currentPage, refresh]);
 
-    const location = useLocation();
-    const paramsArray = location.search.slice(1).split('&');
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
-    useEffect(() => { 
-        setQuery(sliceQueryPageURL(paramsArray));
-    }, [location.search]);
-
-    useEffect(() => {
-        if (query) {
-            setName(query.name || '');
-            setClientNIC(query.clientNIC || '');
-            setOrderBy(query.orderBy || 'name,createdAt');
-            setOrderDirection(query.orderDirection || 'ASC,DESC');
-        }
-    }, [query]);
-    
-    // como não vai ser uma página, n há necessidade de ir buscar à query do url. (clientNIC -> user loggedIn)
-    useEffect(() => {
-        api.get(`/api/interestsFolder/`, {
-            params: {
-                name: name,
-                clientNIC: clientNIC,
-                orderBy,
-                orderDirection,
-                page: currentPage,
-                pageSize: itemsPerPage
-            }
-        })
-        .then(res => {
-            setInterestsFolder(res.data.data);
-            setTotalPages(res.data.totalPages);
-        })
-        .catch(error => {
-            console.error('API error:', error.message);
-        });
-    }, [name, clientNIC, orderBy, orderDirection, currentPage]);
-    
-    
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
-
-    return (
-        <ModalProvider>
-            <Container>
-                <InterestFolderCatalog folders={interestsFolder} />
-                <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
-            </Container>
-        </ModalProvider>
-    );
+  return (
+    <ModalProvider>
+      <Container>
+        <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+          <Row>
+            <Col sm={3}>
+              <Nav variant="pills" className="flex-column">
+                <Nav.Item>
+                  <Nav.Link eventKey="first">Interests Catalog</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="second">Hello World</Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </Col>
+            <Col sm={9}>
+              <Tab.Content>
+                <Tab.Pane eventKey="first">
+                  <InterestFolderCatalog folders={interestsFolder} handleRefresh={handleRefresh} />
+                  <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
+                </Tab.Pane>
+                <Tab.Pane eventKey="second">
+                  <h1>Hello World</h1>
+                </Tab.Pane>
+              </Tab.Content>
+            </Col>
+          </Row>
+        </Tab.Container>
+      </Container>
+    </ModalProvider>
+  );
 }
