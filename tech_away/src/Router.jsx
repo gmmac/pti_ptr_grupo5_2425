@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import AutenticationPage from "./pages/AutenticationPage";
 import Teste from "./pages/Teste";
 import Register from "./pages/Register";
+import LoginPage from "./pages/LoginPage";
 
 export default function Router() {
 	return (
@@ -14,6 +15,7 @@ export default function Router() {
                 <Route path="/auth" element={<AutenticationPage />} />
                 <Route path="/teste" element={<Teste />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<LoginPage />} />
 
             </Routes>
 
