@@ -7,7 +7,7 @@ export function ModalProvider({ children }) {
 
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
-
+    
     return (
         <ModalContext.Provider value={{ show, handleShow, handleClose }}>
             {children}
