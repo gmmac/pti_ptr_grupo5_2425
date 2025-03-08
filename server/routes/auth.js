@@ -1,11 +1,23 @@
 const express = require("express");
 const axios = require("axios");
 const CryptoJS = require("crypto-js");
+const models = require('../models');
 require("dotenv").config();
-
 const router = express.Router();
 
-router.post("/generateAuthToken", async (req, res) => {
+// Function to encrypt the token
+const encryptToken = (token) => {
+  const encrypted = CryptoJS.AES.encrypt(token, process.env.CIPHER_SECRET_KEY).toString();
+  return encrypted;
+};
+
+// Function to decrypt the token
+const decryptToken = (encryptedToken) => {
+  const bytes = CryptoJS.AES.decrypt(encryptedToken, process.env.CIPHER_SECRET_KEY);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
+
+router.put("/generateAuthToken", async (req, res) => {
   try {
     // Request an access token from Auth0
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
@@ -20,19 +32,57 @@ router.post("/generateAuthToken", async (req, res) => {
     });
 
     const token = response.data.access_token;
-    const encryptedToken = CryptoJS.AES.encrypt(token, process.env.CIPHER_SECRET_KEY).toString();
 
-    // Set an HTTP-only cookie to store the encrypted token
-    res.cookie("attk", encryptedToken, {
-      httpOnly: true, // Prevents access via JavaScript in the browser
-      sameSite: "Strict", // Protects against CSRF attacks
-      maxAge: 86400000 , // Cookie lifespan (24 hours)
-    });
+    const [updated] = await models.Token.update(
+      {
+        token: encryptToken(token),
+        updatedAt: Date.now(),
+      },
+      {
+        where: {
+          name: "auth",
+        },
+      }
+    );
 
-    // Send a success response
-    res.sendStatus(201);
+    if(updated){
+      res.sendStatus(201);  // Send a success response
+    }
   } catch (error) {
     res.status(500);
+  }
+});
+
+router.post("/register", async (req, res) => {
+  try {
+    const token = await models.Token.findOne({ where: { name: "auth" } });
+    const desencriptedToken = decryptToken(token.dataValues.token);
+
+    // Request an access token from Auth0
+    const response = await axios.post(
+      process.env.AUTH0_API_URL + "/api/v2/users",
+      {
+        email: req.body.email,
+        password: req.body.password,
+        connection: "Username-Password-Authentication",
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + desencriptedToken,
+        },
+      }
+    );
+
+    // Send response
+    if (response) {
+      return res.sendStatus(201);
+    }
+
+    // If any other unexpected response status occurs
+    res.sendStatus(500);
+  } catch (error) {
+    console.error(error.status);
+    res.sendStatus(error.status); // Internal Server Error
   }
 });
 

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Form, Button } from "react-bootstrap";
+import React, { useState } from 'react';
+import { Container, Form, Button, Toast, ToastContainer } from "react-bootstrap";
 import api from '../utils/axios';
 
 export default function Register() {
@@ -7,7 +7,7 @@ export default function Register() {
         nic: '',
         nif: '',
         phone: '',
-        dob: '',
+        birthDate: '',
         gender: '',
         name: '',
         email: '',
@@ -18,12 +18,14 @@ export default function Register() {
         nic: '',
         nif: '',
         phone: '',
-        dob: '',
+        birthDate: '',
         gender: '',
         name: '',
         email: '',
         password: ''
     });
+
+    const [showToast, setShowToast] = useState(false);
 
     const validatePassword = (password) => {
         const errors = [];
@@ -73,16 +75,36 @@ export default function Register() {
         if (hasError) {
             return; // Impede o envio do formulário se houver erros
         }
-    
-        try {
-            const response = await api.post('/api/auth/register');
-            console.log("Token recebido:", response.data);
-            alert("Token gerado com sucesso!");
-        } catch (error) {
-            console.error("Erro ao gerar token:", error.response?.data || error.message);
-            alert("Erro ao gerar token, tente novamente.");
-        }
+
+        verifyData();
     };
+
+    const verifyData = async () => {
+        //const response = await api.put('/api/auth/generateAuthToken');
+        await api.post('/api/client/', {
+            nic: formData.nic, 
+            nif: formData.nif, 
+            birthDate: formData.birthDate, 
+            gender: formData.gender, 
+            name: formData.name, 
+            email: formData.email, 
+            phone: formData.phone, 
+            adress: null,
+            latitude: null,
+            longitude: null,
+        })
+        .then(async response => {
+            if(response.data.errorTag){
+                let newErrors = { ...errors };
+                newErrors[response.data.errorTag] = 'Já existe um utilizador com este ' + response.data.errorTag;
+                setErrors(newErrors);
+            }
+
+            await api.post('/api/auth/register', {email: formData.email, password: formData.password});
+            setShowToast(true);
+        })
+        .catch(error => {})
+    }
 
     const handleChange = (e) => {
         // Guarda o valor do input
@@ -181,17 +203,17 @@ export default function Register() {
                 </Form.Group>
             
                 {/* Date of Birth */}
-                <Form.Group className="mb-3" controlId="formBasicDateOfBirth">
+                <Form.Group className="mb-3" controlId="formBasicbirthDate">
                     <Form.Label>Date of Birth</Form.Label>
                     <Form.Control 
                         type="date"
-                        name="dob"
-                        value={formData.dob}
+                        name="birthDate"
+                        value={formData.birthDate}
                         onChange={handleChange}
-                        isInvalid={!!errors.dob}
+                        isInvalid={!!errors.birthDate}
                     />
                     <Form.Control.Feedback type="invalid">
-                        {errors.dob}
+                        {errors.birthDate}
                     </Form.Control.Feedback>
                 </Form.Group>
             
@@ -206,9 +228,9 @@ export default function Register() {
                         isInvalid={!!errors.gender}
                     >
                         <option value="">Choose your gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="O">Other</option>
                     </Form.Control>
                     <Form.Control.Feedback type="invalid">
                         {errors.gender}
@@ -268,6 +290,13 @@ export default function Register() {
                         
                 <Button variant="primary" type="submit">Save</Button>
             </Form>
+
+            {/* Toast Notification */}
+            <ToastContainer position="top-end">
+                <Toast show={showToast} onClose={() => setShowToast(false)} delay={3000} autohide>
+                    <Toast.Body>Utilizador registado com sucesso!</Toast.Body>
+                </Toast>
+            </ToastContainer>
         </Container>
     );
 }
