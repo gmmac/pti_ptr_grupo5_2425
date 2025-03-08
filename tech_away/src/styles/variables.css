@@ -1,0 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+:root {
+	/* Variaveis para cores: */
+	--dark-grey: #27272d;
+	--light-grey: #e7e7e7;
+	--variant-one: #708c7e;
+	--variant-two: #b5a8c9;
+	--white: #f9f9f9;
+
+	/* Fontes */
+	--title-font: "Alexandria", sans-serif;
+	--body-font: "Inter", sans-serif;
+
+	/* Shadow */
+	--shadow-default: 0px 4px 10px rgba(0, 0, 0, 0.1);
+
+	/* Border Radius */
+	--rounded-lg: 70px;
+}
