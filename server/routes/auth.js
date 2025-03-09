@@ -86,4 +86,33 @@ router.post("/register", async (req, res) => {
   }
 });
 
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Login User
+    const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
+      client_id: process.env.AUTH0_CLIENT_ID,
+      client_secret: process.env.AUTH0_CLIENT_SECRET,
+      audience: process.env.AUTH0_API_URL + "/api/v2/",
+      scope: "openid profile email",
+      realm: "Username-Password-Authentication",
+      grant_type: "password",
+      username: email,
+      password: password
+    });
+
+    // Send response
+    if (response) {
+      return res.sendStatus(201);
+    }
+
+    // If any other unexpected response status occurs
+    res.sendStatus(500);
+  } catch (error) {
+    console.error(error.status);
+    res.sendStatus(error.status); // Internal Server Error
+  }
+});
+
 module.exports = router;
