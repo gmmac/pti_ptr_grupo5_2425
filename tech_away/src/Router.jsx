@@ -8,7 +8,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import StorePurchasePage from "./pages/StorePurchasePage";
 import LayoutPage from "./pages/LayoutPage"; // Importe o Layout
-import RegisterFormsEmployee from "./components/authentication/RegisterFormsEmployee";
+import EmployeeAuthPage from "./pages/EmployeeAuthPage";
 
 export default function Router() {
     return (
@@ -19,7 +19,7 @@ export default function Router() {
                     <Route index element={<HomePage />} />
                     
                     <Route path="/auth" element={<AuthPage />} />
-                    <Route path="/auth/employee" element={<RegisterFormsEmployee />} />
+                    <Route path="/auth/employee" element={<EmployeeAuthPage />} />
 
                     <Route path="/teste" element={<Teste />} />
                     <Route path="/storePurchasePage" element={<StorePurchasePage />} />
@@ -30,8 +30,11 @@ export default function Router() {
                         </InterestsFilterProvider>
                     } />
                     
-                    <Route path="*" element={<NotFoundPage />} />
+
                 </Route>
+
+                <Route path="*" element={<NotFoundPage />} />
+
             </Routes>
         </BrowserRouter>
     );
