@@ -102,13 +102,12 @@ router.post("/login", async (req, res) => {
       password: password
     });
 
-    // Send response
-    if (response) {
-      return res.sendStatus(201);
-    }
+    const existingClient = await models.Client.findOne({where: {email: email}
+    });
 
-    // If any other unexpected response status occurs
-    res.sendStatus(500);
+    if(existingClient){
+      return res.status(201).json(existingClient.dataValues);
+    }
   } catch (error) {
     console.error(error.status);
     res.sendStatus(error.status); // Internal Server Error

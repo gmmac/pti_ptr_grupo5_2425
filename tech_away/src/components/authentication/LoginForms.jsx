@@ -48,11 +48,17 @@ export default function LoginForms({setShowToast}) {
             password: formData.password
         })
         .then(async response => {
-            console.log("Utilizador autenticado");
+            console.log(response);
+            sessionStorage.setItem('user', JSON.stringify(response.data));
         })
         .catch(error => {
-            newErrors.invalidCredentials = "Invalid credentials!";
-            setErrors(newErrors);
+            if(error.status == 403){
+                newErrors.invalidCredentials = "Invalid credentials!";
+                setErrors(newErrors);
+            }else if(error.status == 429){
+                newErrors.invalidCredentials = "Too many attempts. Try again later!";
+                setErrors(newErrors);
+            }
         })
     };
     

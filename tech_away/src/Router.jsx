@@ -1,26 +1,19 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import AutenticationPage from "./pages/AutenticationPage";
 import Teste from "./pages/Teste";
-import Register from "./pages/Register";
-import LoginPage from "./pages/LoginPage";
+import AuthPage from "./pages/AuthPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 export default function Router() {
 	return (
-		<BrowserRouter>
-			
+		<BrowserRouter>	
             <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/auth" element={<AutenticationPage />} />
+                <Route path="/auth" element={<AuthPage />} />
                 <Route path="/teste" element={<Teste />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/login" element={<LoginPage />} />
-
+                <Route path="*" element={<NotFoundPage />} />
             </Routes>
-
-
-
 		</BrowserRouter>
 	);
 }
