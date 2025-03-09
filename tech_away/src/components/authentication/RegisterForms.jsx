@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import api from '../../utils/axios';
+import '../../styles/index.css';
+import '../../styles/AuthPage.css';
 
-export default function RegisterForms({setShowToast}) {
+export default function RegisterForms({setShowToast, handleFormAction}) {
 
     const [formData, setFormData] = useState({
         nic: '',
@@ -136,16 +139,16 @@ export default function RegisterForms({setShowToast}) {
 
     
   return (
-    <div className='bg-success w-100 p-md-5 p-3 rounded' >
-        <h1>
-            Register
-        </h1>
+    <div className='bg-white w-100 px-md-5 p-3 pt-4 rounded-lg shadow-lg' >
+        <h1>Register</h1>
+
         <Form onSubmit={handleSubmit} >
 
             {/* Name */}
             <Form.Group className="mb-3" controlId="formBasicName">
                 <Form.Label>Name</Form.Label>
                 <Form.Control 
+                    className='auth-input'
                     type="text" 
                     placeholder="Enter your full name" 
                     name="name" 
@@ -164,6 +167,7 @@ export default function RegisterForms({setShowToast}) {
                     <Form.Group className="mb-3" controlId="formBasicGender">
                         <Form.Label>Gender</Form.Label>
                         <Form.Control 
+                            className='auth-input'
                             as="select" 
                             name="gender"
                             value={formData.gender}
@@ -187,6 +191,7 @@ export default function RegisterForms({setShowToast}) {
                     <Form.Group className="mb-3" controlId="formBasicbirthDate">
                         <Form.Label>Date of Birth</Form.Label>
                         <Form.Control 
+                            className='auth-input'
                             type="date"
                             name="birthDate"
                             value={formData.birthDate}
@@ -210,6 +215,7 @@ export default function RegisterForms({setShowToast}) {
                     <Form.Group className="mb-3" controlId="formBasicNIC">
                         <Form.Label>NIC (City Card Number)</Form.Label>
                         <Form.Control 
+                            className='auth-input'
                             type="text" 
                             placeholder="Enter your NIC" 
                             name="nic" 
@@ -229,6 +235,7 @@ export default function RegisterForms({setShowToast}) {
                     <Form.Group className="mb-3" controlId="formBasicNIF">
                         <Form.Label>NIF</Form.Label>
                         <Form.Control 
+                            className='auth-input'
                             type="number" 
                             maxLength="9"
                             placeholder="Enter your NIF" 
@@ -260,6 +267,7 @@ export default function RegisterForms({setShowToast}) {
             <Form.Group className="mb-3" controlId="formBasicPhone">
                 <Form.Label>Phone Number</Form.Label>
                 <Form.Control 
+                    className='auth-input'
                     type="text" 
                     maxLength="9"
                     placeholder="Enter your phone number" 
@@ -286,6 +294,7 @@ export default function RegisterForms({setShowToast}) {
             <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>Email</Form.Label>
                 <Form.Control 
+                    className='auth-input'
                     type="email" 
                     placeholder="Enter your email" 
                     name="email" 
@@ -302,6 +311,7 @@ export default function RegisterForms({setShowToast}) {
             <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Password</Form.Label>
                 <Form.Control 
+                    className='auth-input'
                     type="password" 
                     placeholder="Enter your password" 
                     name="password" 
@@ -314,17 +324,12 @@ export default function RegisterForms({setShowToast}) {
                 </Form.Control.Feedback>
             </Form.Group>
                     
-            <Button 
-            type="submit"
-            className='w-100 bg-warning rounded-pill'
-            >
-                Register
-            </Button>
+            <Button type="submit"className='w-100 rounded-pill forms-btn shadow-lg'>Register</Button>
 
         </Form>
         <div className='d-flex flex-align-items justify-content-end m-2'>
             <p>Already a member? </p>
-            <Link to='/login'>Sign in</Link>
+            <p className='text-black ms-2' onClick={handleFormAction}>Sign in</p>
         </div>
 
     </div>

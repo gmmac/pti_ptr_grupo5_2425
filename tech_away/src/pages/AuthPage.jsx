@@ -11,8 +11,12 @@ const mobileSize = 768;
 
 export default function AuthPage() {
     const [showToast, setShowToast] = useState(false);
-    const [userLoggedIn, setUserLoggedIn] = useState(false);
+    const [authAction, setAuthAction] = useState("login");
     const [isMobile, setIsMobile] = useState(window.innerWidth < mobileSize);
+
+    const handleChangeLoginRegister = () => {
+        authAction === "login" ? setAuthAction("register") : setAuthAction("login")
+    }
 
     useEffect(() => {
 		const handleResize = () => {
@@ -21,13 +25,13 @@ export default function AuthPage() {
 
 		window.addEventListener("resize", handleResize);
 
-        getLoggedUser() ? setUserLoggedIn(true) : setUserLoggedIn(false);
+        //getLoggedUser() ? setUserLoggedIn(true) : setUserLoggedIn(false);
 
 		return () => window.removeEventListener("resize", handleResize);
 	}, []);
 
     return (
-        <Stack className='d-flex flex-column min-vh-100'>
+        <Stack className='d-flex flex-column min-vh-100' style={{backgroundColor: "var(--light-grey)"}}>
             
             <div style={{backgroundColor: "var(--light-grey)", color: "var(--dark-grey)",}}>
                 {isMobile ? <SmNavbar /> : <InitialNavBar />}
@@ -48,7 +52,7 @@ export default function AuthPage() {
 
                     <Col xs={12} md={4} className='m-3 h-100 pt-3'>
                         <div>
-                            {userLoggedIn ? <RegisterForms setShowToast={setShowToast} /> : <LoginForms setShowToast={setShowToast}/>}
+                            {authAction === "register" ? <RegisterForms setShowToast={setShowToast} handleFormAction={handleChangeLoginRegister}/> : <LoginForms setShowToast={setShowToast} handleFormAction={handleChangeLoginRegister}/>}
                         </div>
                     </Col>
                 </Row>

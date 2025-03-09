@@ -5,7 +5,7 @@ import api from '../../utils/axios';
 import '../../styles/index.css';
 import '../../styles/AuthPage.css';
 
-export default function LoginForms({setShowToast}) {
+export default function LoginForms({setShowToast, handleFormAction}) {
 
     const [formData, setFormData] = useState({
         email: '',
@@ -140,7 +140,7 @@ export default function LoginForms({setShowToast}) {
         </Form>
         <div className='d-flex flex-align-items justify-content-end m-2'>
             <p>Don't have an account?</p>
-            <Link to='/register' className='text-black ms-2'>Sign up</Link>
+            <p className='text-black ms-2' onClick={handleFormAction}>Sign up</p>
         </div>
     </div>
    
