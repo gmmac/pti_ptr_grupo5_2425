@@ -4,6 +4,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+require("dotenv").config();
 
 
 const app = express();
@@ -15,7 +16,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 
 const port = 4005; // usar .env?
 
@@ -41,6 +41,7 @@ const store = require('./routes/store');
 const storePurchase = require('./routes/storePurchase');
 const usedEquipment = require('./routes/usedEquipment');
 const warehouse = require('./routes/wharehouse');
+const auth = require('./routes/auth');
 const employeeRole = require('./routes/employeeRole');
 
 // Definição de endpoints --> rotas
@@ -65,6 +66,7 @@ app.use('/api/store', store);
 app.use('/api/storePurchase', storePurchase);
 app.use('/api/usedEquipment', usedEquipment);
 app.use('/api/warehouse', warehouse);
+app.use('/api/auth', auth);
 app.use("/api/employeeRole", employeeRole)
 
 app.get('/status', (req, res) => {
