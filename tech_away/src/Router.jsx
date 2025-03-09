@@ -9,21 +9,23 @@ import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import StorePurchasePage from "./pages/StorePurchasePage";
 
 export default function Router() {
-	return (
-		<BrowserRouter>	
-            <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/teste" element={<Teste />} />
-                <Route path="/storePurchasePage" element={<StorePurchasePage />} />
-                <Route
-                  path="/interests"
-                  element={
-                    <InterestsFilterProvider> {/* Fazer o filtro */}
-                      <InterestsPage />
-                    </InterestsFilterProvider>
-                  }
-                />
-                <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-});
+  return (
+    <BrowserRouter>	
+      <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/teste" element={<Teste />} />
+          <Route path="/storePurchasePage" element={<StorePurchasePage />} />
+          <Route
+            path="/interests"
+            element={
+              <InterestsFilterProvider>
+                <InterestsPage />
+              </InterestsFilterProvider>
+            }
+          />
+          <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
