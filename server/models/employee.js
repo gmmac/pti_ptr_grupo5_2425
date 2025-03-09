@@ -11,6 +11,13 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       });
+
+      Employee.belongsTo(models.Store, {
+        foreignKey: 'storeNIPC',
+        targetKey: 'nipc',
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      });
     }
   }
   Employee.init({
@@ -29,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(6),
       unique: true,
       allowNull: true
+    },
+    storeNIPC: {
+      type: DataTypes.STRING(9),
+      allowNull: false,
     },
     birthDate: {
       type: DataTypes.DATE,

@@ -18,6 +18,16 @@ module.exports = {
         autoIncrement: false,
         unique: true
       },
+      storeNIPC:{
+        type: Sequelize.STRING(9),
+        allowNull: false,
+        references: {
+          model: 'Stores',
+          key: 'nipc',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
       birthDate: {
         type: Sequelize.DATE
       },

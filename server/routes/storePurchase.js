@@ -1,30 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const models = require('../models')
+const models = require('../models');
 
-router.get("/", (req, res) => {
+router.post("/", async (req, res) => {
 
+    try {
+
+        const {statusID, price, equipmentId} = req.body;
+        // const {statusID, price, equipmentId, clientNIC} = req.body; //tem de receber do frontend
+
+        // console.log(req.body);
+        
+
+        // const employeeUser = session.get(employeeUser)
+        // const employeeID = employeeUser.internNum
+        // const storeID = employeeUser.storeNIPC
+
+        const storeID = "123456789"
+        const clientNIC = "123456789"
+        const employeeID = "123456789"
+
+
+        const usedEquipment = await models.UsedEquipment.create({ statusID: statusID, price: price, purchaseDate: new Date(), equipmentId: equipmentId, createdAt: new Date(), updatedAt: new Date() });
+
+        // só cria a compra da loja, caso o equipamento usado exista (tenha sido criado)
+        if(usedEquipment){
+            const storePurchases = await models.StorePurchase.create({ storeID, clientNIC, employeeID, purchasePrice: price, usedEquipmentID: usedEquipment.id, createdAt: new Date(), updatedAt: new Date() });
+            res.status(201).json(storePurchases);
+        } else{
+            res.status(400).json({ error: "Error." });
+        }
+
+    } catch (error) {
+        res.status(400).json({ error: "Error." });
+    }
 });
-
-router.post("/", (req, res) => {
-
-});
-
-router.get("/:ID", (req, res) => {
-    
-});
-
-router.put("/:ID", (req, res) => {
-
-});
-
-router.delete("/:ID", (req, res) => {
-
-});
-
-router.get("/usedEquipment/:ID", (req, res) => {
-    
-});
-
 
 module.exports = router;
