@@ -4,57 +4,67 @@ import SearchBar from "../searchBar/SearchBar";
 
 export default function StoreFilter({ setFilters }) {
     const [localFilters, setLocalFilters] = useState({
+        nipc: "",
         name: "",
         email: "",
         phone: "",
         openTime: "",
         closeTime: "",
-        orderBy: "createdAt",
-        orderDirection: "DESC"
+        address: "",
+        // latitude: "",
+        // longitude: "",
+        orderBy: "nipc",
+        orderDirection: "ASC"
     });
     
-    const [orderField, setOrderField] = useState("createdAt");
-    const [orderDirection, setOrderDirection] = useState("DESC");
+    const [orderField, setOrderField] = useState("nipc");
+    const [orderDirection, setOrderDirection] = useState("ASC");
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLocalFilters((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleOrderSelection = (field, direction) => {
-        if (orderField === field && orderDirection === direction) {
-            setOrderField("createdAt");
-            setOrderDirection("DESC");
-        } else {
-            setOrderField(field);
-            setOrderDirection(direction);
-        }
-    };
+    // const handleOrderSelection = (field, direction) => {
+    //     if (orderField === field && orderDirection === direction) {
+    //         setOrderField("createdAt");
+    //         setOrderDirection("DESC");
+    //     } else {
+    //         setOrderField(field);
+    //         setOrderDirection(direction);
+    //     }
+    // };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setFilters({
-            ...localFilters,
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            ...localFilters, // Atualiza os filtros
             orderBy: orderField,
             orderDirection: orderDirection,
-        });
+        }));
     };
+    
 
     const handleClear = () => {
         const clearedFilters = {
+            nipc: "",
             name: "",
             email: "",
             phone: "",
             openTime: "",
             closeTime: "",
-            orderBy: "createdAt",
-            orderDirection: "DESC"
+            address: "",
+            // latitude: "",
+            // longitude: "",
+            orderBy: "nipc",
+            orderDirection: "ASC"
         };
 
         setLocalFilters(clearedFilters);
         setFilters(clearedFilters);
-        setOrderField("createdAt");
-        setOrderDirection("DESC");
+        setOrderField("nipc");
+        setOrderDirection("ASC");
     };
 
     return (
@@ -65,11 +75,21 @@ export default function StoreFilter({ setFilters }) {
                     <Accordion.Body>
                         <Form onSubmit={handleSubmit}>
                             <Row className="gy-3 d-block d-flex flex-md-row">
+
+                                <Col xs={12} md={6}>
+                                    <SearchBar 
+                                        type="number"
+                                        value={localFilters.nipc} 
+                                        onChange={handleChange}
+                                        name="NIPC"
+                                        placeholder="Search by NIPC"
+                                    />
+                                </Col>
                                 <Col xs={12} md={6}>
                                     <SearchBar 
                                         value={localFilters.name} 
                                         onChange={handleChange}
-                                        name="name"
+                                        name="Name"
                                         placeholder="Search by Name"
                                     />
                                 </Col>
@@ -77,16 +97,16 @@ export default function StoreFilter({ setFilters }) {
                                     <SearchBar 
                                         value={localFilters.email} 
                                         onChange={handleChange}
-                                        name="email"
+                                        name="Email"
                                         placeholder="Search by Email"
                                     />
                                 </Col>
                                 <Col xs={12} md={6}>
                                     <SearchBar 
-                                        value={localFilters.phone} 
+                                        value={localFilters.address} 
                                         onChange={handleChange}
-                                        name="phone"
-                                        placeholder="Search by Phone"
+                                        name="Address"
+                                        placeholder="Search by Address"
                                     />
                                 </Col>
                             </Row>

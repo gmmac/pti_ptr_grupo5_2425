@@ -1,21 +1,37 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
+const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
 	try {
-	  const { name, email, phone, page = 1, pageSize = 10, orderBy, orderDirection } = req.query;
-	  const where = {};
-  
-	  if (name) {
-		where.name = { [Op.like]: `%${name}%` };
-	  }
-	  if (email) {
-		where.email = { [Op.like]: `%${email}%` };
-	  }
-	  if (phone) {
-		where.phone = { [Op.like]: `%${phone}%` };
-	  }
+		const {
+			nipc,
+			name,
+			email,
+			phone,
+			openTime,
+			closeTime,
+			address,
+			latitude,
+			longitude,
+			page = 1,
+			pageSize = 10,
+			orderBy,
+			orderDirection,
+		  } = req.query;
+	  
+		  const where = {};
+	  
+		  if (nipc) where.nipc = { [Op.like]: `${nipc}%` };
+		  if (name) where.name = { [Op.like]: `%${name}%` };
+		  if (email) where.email = { [Op.like]: `%${email}%` };
+		  if (phone) where.phone = { [Op.like]: `%${phone}%` };
+		//   if (openTime) where.openTime = { [Op.eq]: parseInt(openTime) };
+		//   if (closeTime) where.closeTime = { [Op.eq]: parseInt(closeTime) };
+		  if (address) where.address = { [Op.like]: `%${address}%` };
+		//   if (latitude) where.latitude = { [Op.like]: `%${latitude}%` };
+		//   if (longitude) where.longitude = { [Op.like]: `%${longitude}%` };
   
 	  const offset = (parseInt(page) - 1) * parseInt(pageSize);
   
@@ -23,7 +39,7 @@ router.get("/", async (req, res) => {
 	  if (orderBy && orderDirection) {
 		order = [[orderBy, orderDirection.toUpperCase()]];
 	  } else {
-		order = [["createdAt", "DESC"]];
+		order = [["nipc", "ASC"]];
 	  }
   
 	  console.log("Order applied:", order);

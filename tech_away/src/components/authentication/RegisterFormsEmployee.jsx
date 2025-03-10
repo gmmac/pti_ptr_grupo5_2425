@@ -29,9 +29,13 @@ function RegisterFormsEmployee() {
   
 
   const handleSelectStore = (store) => {
-    setEmployeeData({ ...employeeData, storeNIPC: store.nipc });
+    setEmployeeData(prev => ({
+      ...prev,
+      storeNIPC: store ? store.nipc : ''
+    }));
     setShowModal(false);
   };
+  
 
   useEffect(() => {
     api.get("api/employeeRole")
@@ -109,6 +113,10 @@ function RegisterFormsEmployee() {
     // }
   };
 
+  useEffect(() => {
+    console.log(errors)
+  }, [errors])
+
   return (
     <div className='bg-white w-100 p-md-5 p-3 rounded' >
       <h2>Create Employee</h2>
@@ -175,37 +183,12 @@ function RegisterFormsEmployee() {
                 value={employeeData.nif}
                 onChange={handleChange}
                 className='auth-input'
+                isInvalid={!!errors.nif}
 
               />
+              <Form.Control.Feedback type="invalid">{errors.nif}</Form.Control.Feedback>
+
             </Form.Group>
-          </Col>
-        </Row>
-
-        <Row className="mb-3">
-          <Col sm={12} md={6}>
-            <Form.Group controlId="storeNIPC">
-              <Form.Label>Store NIPC</Form.Label>
-              <Form.Control
-                type="text"
-                name="storeNIPC"
-                value={employeeData.storeNIPC}
-                onChange={handleChange}
-                isInvalid={!!errors.storeNIPC}
-                className='auth-input'
-                disabled
-
-              />
-              <Form.Control.Feedback type="invalid">{errors.storeNIPC}</Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-
-          <Col sm={12} md={6} className='d-flex align-items-end justify-content-start'>
-            <Button 
-            onClick={() => setShowModal(true)}
-            className='w-100 rounded-pill forms-btn shadow-lg'
-            >
-              Choose Store
-            </Button>
           </Col>
         </Row>
 
@@ -260,6 +243,35 @@ function RegisterFormsEmployee() {
             />
             <Form.Control.Feedback type="invalid">{errors.phone}</Form.Control.Feedback>
           </Form.Group>
+        </Row>
+
+
+        <Row className="mb-3">
+          <Col sm={12} md={6}>
+            <Form.Group controlId="storeNIPC">
+              <Form.Label>Store NIPC</Form.Label>
+              <Form.Control
+                type="text"
+                name="storeNIPC"
+                value={employeeData.storeNIPC}
+                onChange={handleChange}
+                isInvalid={!!errors.storeNIPC}
+                className='auth-input'
+                disabled
+
+              />
+              <Form.Control.Feedback type="invalid">{errors.storeNIPC}</Form.Control.Feedback>
+            </Form.Group>
+          </Col>
+
+          <Col sm={12} md={6} className='d-flex align-items-end justify-content-start'>
+            <Button 
+            onClick={() => setShowModal(true)}
+            className='w-100 rounded-pill forms-btn shadow-lg'
+            >
+              Choose Store
+            </Button>
+          </Col>
         </Row>
 
         <Row className="mb-3">
