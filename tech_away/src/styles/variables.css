@@ -17,4 +17,13 @@
 
 	/* Border Radius */
 	--rounded-lg: 70px;
+	--rounded-sm: 40px;
+}
+
+.rounded-lg {
+	border-radius: var(--rounded-lg);
+}
+
+.rounded-sm {
+	border-radius: var(--rounded-sm);
 }

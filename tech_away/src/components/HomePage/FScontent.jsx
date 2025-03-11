@@ -1,7 +1,9 @@
 import React from "react";
-import { Container, Stack, Image, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Container, Stack, Row, Col } from "react-bootstrap";
 import Swirl from "../svg/Swirl";
+import DivTelem from "./DivTelem";
+import DivJoin from "./DivJoin";
+import DivOurServices from "./DivourServices";
 
 export default function FScontent() {
 	return (
@@ -12,16 +14,15 @@ export default function FScontent() {
 					style={{
 						backgroundColor: "var(--white)",
 						boxShadow: "var(--shadow-default)",
-						borderRadius: "var(--rounded-lg)",
 						height: "250px",
 						WebkitMaskImage: "inset(0 round var(--rounded-lg))",
 						maskImage: "inset(0 round var(--rounded-lg))",
 					}}
-					className="justify-content-between overflow-hidden"
+					className="justify-content-between overflow-hidden rounded-lg"
 				>
 					<Swirl
-						w="253"
-						h="389"
+						w="18%"
+						h="200%"
 						vb="0 0 253 389"
 						d="M240.566 22.7001C218.287 8.41487 166.444 5.04993 152.063 32.1988C133.394 67.4432 142.824 118.261 178.926 139.197C190.295 145.789 203.799 149.326 215.163 140.831C222.521 135.332 219.221 124.208 215.485 117.576C206.414 101.471 180.357 91.002 163.506 87.7744C132.58 81.8509 101.705 98.9624 84.3824 123.507C51.629 169.916 70.3166 250.048 129.66 262.772C141.037 265.212 157.358 260.82 160.724 248.012C164.571 233.372 151.3 215.161 140.56 206.823C102.823 177.531 46.0862 197.861 22.8449 235.403C-5.47404 281.147 25.5272 338.999 53.6548 376.63"
 						color="var(--variant-one)"
@@ -32,6 +33,7 @@ export default function FScontent() {
 						style={{
 							fontSize: "64px",
 						}}
+						className="text-center"
 					>
 						Second{" "}
 						<span
@@ -61,236 +63,13 @@ export default function FScontent() {
 				</Stack>
 			</Row>
 			<Row style={{ fontFamily: "var(--body-font)" }} className="mt-3">
-				<Col
-					lg={5}
-					style={{
-						backgroundColor: "var(--white)",
-						boxShadow: "var(--shadow-default)",
-						borderRadius: "var(--rounded-lg)",
-						WebkitMaskImage: "inset(0 round var(--rounded-lg))",
-						maskImage: "inset(0 round var(--rounded-lg))",
-						position: "relative",
-						overflow: "hidden",
-					}}
-				>
-					{/* Background */}
-					<div style={{ position: "absolute", width: "100%", height: "100%" }}>
-						{/* SVG no fundo */}
-						<Swirl
-							w="559"
-							h="554"
-							vb="0 0 559 554"
-							d="M31.0907 11.8915C16.2225 71.7413 0.113726 131.302 22.8298 187.875C46.2484 246.198 95.6589 280.411 163.087 261.617C204.366 250.111 240.888 217.379 253.421 176.213C258.834 158.431 259.246 140.37 247.635 127.094C237.331 115.31 219.239 135.035 212.026 143.591C176.874 185.291 164.459 234.932 160.572 285.598C155.612 350.268 168.376 410.887 223.789 445.93C300.758 494.606 448.962 501.693 507.136 400.946C522.825 373.775 546.956 333.667 536.026 303.199C529.022 283.676 511.582 274.846 489.63 281.907C458.842 291.809 433.644 327.527 421.169 354.955C404.584 391.418 400.882 437.318 422.167 468.662C438.731 493.055 514.063 544.436 546.614 542.427"
-							color="var(--variant-two)"
-							strokeWidth="23"
-							style={{
-								position: "absolute",
-								top: "-10",
-								left: "10",
-								width: "100%",
-								height: "100%",
-								zIndex: "1",
-							}}
-						/>
-
-						{/* Imagem sobreposta ao SVG */}
-						<Image
-							src="../../public/assets/telemovel.png"
-							style={{
-								position: "absolute",
-								top: "75%",
-								left: "50%",
-								transform: "translate(-50%, -50%)",
-								maxWidth: "80%",
-								zIndex: "2",
-							}}
-						/>
-					</div>
-
-					{/* Links*/}
-					<Stack
-						direction="horizontal"
-						gap={3}
-						style={{
-							position: "relative",
-							zIndex: "3",
-							width: "100%",
-							height: "539px",
-						}}
-						className="px-5 py-4 justify-content-end align-items-end"
-					>
-						<Link
-							screen="store"
-							style={{
-								backgroundColor: "var(--variant-two)",
-								boxShadow: "var(--shadow-default)",
-								textDecoration: "none",
-								color: "var(--dark-grey)",
-								height: "50px",
-							}}
-							className="px-4 rounded-pill d-flex justify-content-center align-items-center"
-						>
-							Check our store
-						</Link>
-						<Link
-							style={{
-								backgroundColor: "var(--variant-one)",
-								boxShadow: "var(--shadow-default)",
-								textDecoration: "none",
-								color: "var(--dark-grey)",
-								width: "50px",
-								height: "50px",
-							}}
-							className="rounded-circle d-flex justify-content-center align-items-center"
-						>
-							{/* seta */}
-							<svg
-								width="20"
-								height="20"
-								viewBox="0 0 20 20"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M1.40029 18.4003L18.373 1.42763M18.373 1.42763L6.40251 2.5973M18.373 1.42763L17.2033 13.3981"
-									stroke="#27272D"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-						</Link>
-					</Stack>
+				<Col lg={5}>
+					<DivTelem />
 				</Col>
 				<Col lg={7}>
 					<Stack direction="vertical" gap={3} className="h-100">
-						<Stack
-							style={{
-								backgroundColor: "var(--variant-one)",
-								boxShadow: "var(--shadow-default)",
-								borderRadius: "var(--rounded-lg)",
-							}}
-							className="justify-content-center align-items-center"
-						>
-							<p style={{ fontSize: "32px" }}>
-								100k + people joined the plataform
-							</p>
-							<Link style={{ textDecoration: "none" }}>
-								<Stack
-									direction="horizontal"
-									gap={2}
-									style={{
-										backgroundColor: "var(--dark-grey)",
-										color: "var(--dark-grey)",
-										fontSize: "20px",
-									}}
-									className="px-4 py-1 rounded-pill justify-content-center align-items-center"
-								>
-									<p
-										className="m-0"
-										style={{
-											color: "var(--light-grey",
-										}}
-									>
-										Join
-									</p>
-									<svg
-										width="18"
-										height="12"
-										viewBox="0 0 18 12"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M1 6H16.5M16.5 6L10.5 1M16.5 6L10.5 11"
-											stroke="#E7E7E7"
-											stroke-width="2"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										/>
-									</svg>
-								</Stack>
-							</Link>
-						</Stack>
-
-						<Stack
-							style={{
-								backgroundColor: "var(--white)",
-								boxShadow: "var(--shadow-default)",
-								borderRadius: "var(--rounded-lg)",
-							}}
-							className="justify-content-center align-items-center"
-							gap={4}
-							direction="vertical"
-						>
-							<h3
-								style={{
-									fontSize: "32px",
-									fontWeight: "bold",
-								}}
-								className="m-0 mt-5"
-							>
-								Our Services
-							</h3>
-							<Stack gap={3}>
-								<Stack
-									direction="horizontal"
-									gap={3}
-									className="justify-content-center"
-								>
-									<Link
-										style={{
-											textDecoration: "none",
-											color: "var(--dark-grey)",
-											fontSize: "20px",
-											backgroundColor: "var(--variant-two)",
-										}}
-										className="rounded-pill px-4 py-2"
-									>
-										Sell and Buy Equipment
-									</Link>
-									<Link
-										style={{
-											textDecoration: "none",
-											color: "var(--dark-grey)",
-											fontSize: "20px",
-											backgroundColor: "var(--variant-one)",
-										}}
-										className="rounded-pill px-4 py-2"
-									>
-										Request Equipment Repair
-									</Link>
-								</Stack>
-								<Stack
-									direction="horizontal"
-									gap={3}
-									className="justify-content-center"
-								>
-									<Link
-										style={{
-											textDecoration: "none",
-											color: "var(--dark-grey)",
-											fontSize: "20px",
-											backgroundColor: "var(--variant-one)",
-										}}
-										className="rounded-pill px-4 py-2"
-									>
-										Create Beneficiary Project
-									</Link>
-									<Link
-										style={{
-											textDecoration: "none",
-											color: "var(--dark-grey)",
-											fontSize: "20px",
-											backgroundColor: "var(--variant-two)",
-										}}
-										className="rounded-pill px-4 py-2"
-									>
-										Donate Equipment
-									</Link>
-								</Stack>
-							</Stack>
-						</Stack>
+						<DivJoin />
+						<DivOurServices />
 					</Stack>
 				</Col>
 			</Row>

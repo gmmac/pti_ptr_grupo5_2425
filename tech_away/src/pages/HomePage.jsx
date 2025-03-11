@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/variables.css";
 import FScontent from "../components/HomePage/FScontent";
+import SMcontent from "../components/HomePage/SMcontent";
 
 const mobileSize = 768;
 
@@ -22,7 +23,11 @@ export default function HomePage() {
 				color: "var(--dark-grey)",
 			}}
 		>
-			<FScontent />
+			{isMobile ? (
+				<SMcontent isMobile={isMobile} />
+			) : (
+				<FScontent isMobile={isMobile} />
+			)}
 		</div>
 	);
 }
