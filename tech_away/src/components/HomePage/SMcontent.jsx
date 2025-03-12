@@ -7,8 +7,8 @@ import DivOurServices from "./DivourServices";
 
 export default function SMcontent(isMobile) {
 	return (
-		<Container className="mb-3">
-			<Stack gap={4}>
+		<Container >
+			<Stack gap={4} 	>
 				<Stack
 					direction="horizontal"
 					style={{
@@ -51,7 +51,8 @@ export default function SMcontent(isMobile) {
 
 				<DivTelem />
 				<DivJoin />
-				<DivOurServices />
+				<DivOurServices  />
+				<div style={{height:"75px"}} ></div>
 			</Stack>
 		</Container>
 	);
