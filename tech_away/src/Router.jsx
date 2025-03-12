@@ -9,33 +9,36 @@ import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import StorePurchasePage from "./pages/StorePurchasePage";
 import LayoutPage from "./pages/LayoutPage"; // Importe o Layout
 import EmployeeAuthPage from "./pages/EmployeeAuthPage";
+import RegisterFormsEmployee from "./components/authentication/RegisterFormsEmployee";
+import StorePage from "./pages/StorePage";
+
 
 export default function Router() {
-    return (
-        <BrowserRouter>    
-            <Routes>
+	return (
+		<BrowserRouter>
+			<Routes>
+				<Route path="/" element={<LayoutPage />}>
+					<Route index element={<HomePage />} />
 
-                <Route path="/" element={<LayoutPage />}>
-                    <Route index element={<HomePage />} />
-                    
-                    <Route path="/auth" element={<AuthPage />} />
-                    <Route path="/auth/employee" element={<EmployeeAuthPage />} />
+					<Route path="/auth" element={<AuthPage />} />
+					<Route path="/auth/employee" element={<RegisterFormsEmployee />} />
 
-                    <Route path="/teste" element={<Teste />} />
-                    <Route path="/storePurchasePage" element={<StorePurchasePage />} />
-                    
-                    <Route path="/interests" element={
-                        <InterestsFilterProvider> 
-                            <InterestsPage />
-                        </InterestsFilterProvider>
-                    } />
-                    
+					<Route path="/teste" element={<Teste />} />
+					<Route path="/storePurchasePage" element={<StorePurchasePage />} />
 
-                </Route>
+					<Route path="/store" element={<StorePage />} />
 
-                <Route path="*" element={<NotFoundPage />} />
-
-            </Routes>
-        </BrowserRouter>
-    );
+					<Route
+						path="/interests"
+						element={
+							<InterestsFilterProvider>
+								<InterestsPage />
+							</InterestsFilterProvider>
+						}
+					/>
+				</Route>
+				<Route path="*" element={<NotFoundPage />} />
+			</Routes>
+		</BrowserRouter>
+	);
 }

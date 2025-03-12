@@ -46,7 +46,6 @@ export default function InitialNavBar() {
 								key={index}
 								style={{
 									fontFamily: "var(--body-font)",
-
 									color: "var(--dark-grey)",
 									fontWeight: "bold",
 								}}
