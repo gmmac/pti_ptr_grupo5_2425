@@ -9,6 +9,7 @@ import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import StorePurchasePage from "./pages/StorePurchasePage";
 import LayoutPage from "./pages/LayoutPage"; // Importe o Layout
 import RegisterFormsEmployee from "./components/authentication/RegisterFormsEmployee";
+import StorePage from "./pages/StorePage";
 
 export default function Router() {
 	return (
@@ -22,6 +23,8 @@ export default function Router() {
 
 					<Route path="/teste" element={<Teste />} />
 					<Route path="/storePurchasePage" element={<StorePurchasePage />} />
+
+					<Route path="/store" element={<StorePage />} />
 
 					<Route
 						path="/interests"

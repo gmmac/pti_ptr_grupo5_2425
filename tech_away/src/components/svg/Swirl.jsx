@@ -12,8 +12,8 @@ export default function Swirl({ w, h, vb, d, color, strokeWidth }) {
 			<path
 				d={d}
 				stroke={color}
-				stroke-width={strokeWidth}
-				stroke-linecap="round"
+				strokeWidth={strokeWidth}
+				strokeLinecap="round"
 			/>
 		</svg>
 	);

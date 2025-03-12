@@ -13,8 +13,8 @@ export default function Icon({ d }) {
 			<path
 				d={d}
 				stroke="var(--dark-grey)"
-				stroke-width="2"
-				stroke-linecap="round"
+				strokeWidth="2"
+				strokeLinecap="round"
 			/>
 		</svg>
 	);
