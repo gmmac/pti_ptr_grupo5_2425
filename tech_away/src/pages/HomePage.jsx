@@ -1,20 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, {useContext } from "react";
 import "../styles/variables.css";
 import FScontent from "../components/HomePage/FScontent";
 import SMcontent from "../components/HomePage/SMcontent";
+import { IsMobileContext } from "../contexts/IsMobileContext";
 
-const mobileSize = 768;
 
 export default function HomePage() {
-	const [isMobile, setIsMobile] = useState(window.innerWidth < mobileSize);
-	useEffect(() => {
-		const handleResize = () => {
-			setIsMobile(window.innerWidth < mobileSize);
-		};
-
-		window.addEventListener("resize", handleResize);
-		return () => window.removeEventListener("resize", handleResize);
-	}, []);
+	const isMobile = useContext(IsMobileContext);
 
 	return (
 		<div
@@ -24,9 +16,9 @@ export default function HomePage() {
 			}}
 		>
 			{isMobile ? (
-				<SMcontent isMobile={isMobile} />
+				<SMcontent />
 			) : (
-				<FScontent isMobile={isMobile} />
+				<FScontent  />
 			)}
 		</div>
 	);

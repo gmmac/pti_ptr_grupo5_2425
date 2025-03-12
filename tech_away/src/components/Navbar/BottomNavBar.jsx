@@ -30,13 +30,13 @@ export default function BottomNavBar() {
 	return (
 		<Navbar
 			fixed="bottom"
-			className="rounded-pill m-3 d-flex justify-content-center align-items-center"
-			style={{
+			className=" m-3 d-flex justify-content-center align-items-center"
+			
+		>
+			<Nav  className="p-2 rounded-pill justify-content-center align-items-center" style={{
 				backgroundColor: "var(--white)",
 				boxShadow: "var(--shadow-default)",
-			}}
-		>
-			<Nav  className="p-2 justify-content-center align-items-center">
+			}}>
 				{navItems.map((item, index) => {
 					const isActive = location.pathname === item.path;
 					return (
