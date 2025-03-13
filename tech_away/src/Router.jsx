@@ -26,4 +26,6 @@ export default function Router() {
                 />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
-});
+    </BrowserRouter>	
+
+)};
