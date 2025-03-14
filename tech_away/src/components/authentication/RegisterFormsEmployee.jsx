@@ -33,6 +33,12 @@ function RegisterFormsEmployee() {
       ...prev,
       storeNIPC: store ? store.nipc : ''
     }));
+    
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      storeNIPC: store ? '' : 'Este campo é obrigatório' // Remove o erro se houver uma loja selecionada
+    }));
+    
     setShowModal(false);
   };
   
@@ -49,35 +55,39 @@ function RegisterFormsEmployee() {
 
 
   const handleChange = (e) => {
-
-    // Guarda o valor do input
     const { name, value } = e.target;
     setEmployeeData({ ...employeeData, [name]: value });
-
+  
     let newErrors = { ...errors };
-
+  
     if (!value) {
       newErrors[name] = 'Este campo é obrigatório';
-    } else if (name === 'email') {
+    } 
+    else if (name === 'email') {
       const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      
       if (!emailPattern.test(value)) {
         newErrors[name] = 'O email deve ser válido';
       } else {
         newErrors[name] = '';
       }
-    } else if (name === 'phone') {
-      const phonePattern = /^\d{9}$/; // Exemplo de validação simples de telefone com 9 dígitos
-      if (!phonePattern.test(value)) {
-        newErrors[name] = 'O número de telefone deve ter 9 dígitos';
+    } 
+    else if (name === 'phone' || name === 'nif' || name === 'nic') {
+      const nineDigitPattern = /^\d{9}$/; // Validação para exatamente 9 dígitos
+      
+      if (!nineDigitPattern.test(value)) {
+        newErrors[name] = 'O valor deve ter exatamente 9 dígitos';
       } else {
         newErrors[name] = '';
       }
-    } else {
-      newErrors[name] = ''; // Limpa erro se o campo não estiver vazio
+    } 
+    else {
+      newErrors[name] = '';
     }
-
+  
     setErrors(newErrors);
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,20 +112,28 @@ function RegisterFormsEmployee() {
         return; // Impede o envio do formulário se houver erros
     }
 
-    console.log("Employee criado.")
-    // try {
-    //   const response = await api.post('api/employee', employeeData);
-    //   alert('Employee created successfully');
-    //   console.log(response.data); // Pode ser usado para depuração
-    // } catch (error) {
-    //   console.error('Error creating employee!', error);
-    //   alert('Error creating employee');
-    // }
+    
+    await api.post('api/employee', employeeData)
+    .then(async response => {
+      if(response.data.errorTag){
+          let newErrors = { ...errors };
+          newErrors[response.data.errorTag] = 'Já existe um employee com este ' + response.data.errorTag;
+          setErrors(newErrors);
+      }
+
+    return console.log("Employee criado.")
+
+  })
+
   };
 
-  useEffect(() => {
-    console.log(errors)
-  }, [errors])
+  // useEffect(() => {
+  //   console.log(employeeData)
+  // }, [employeeData])
+
+  // useEffect(() => {
+  //   console.log(errors)
+  // }, [errors])
 
   return (
     <div className='bg-white w-100 p-md-5 p-3 rounded' >
@@ -266,7 +284,7 @@ function RegisterFormsEmployee() {
 
           <Col sm={12} md={6} className='d-flex align-items-end justify-content-start'>
             <Button 
-            onClick={() => setShowModal(true)}
+            onClick={() => {setShowModal(true)}}
             className='w-100 rounded-pill forms-btn shadow-lg'
             >
               Choose Store

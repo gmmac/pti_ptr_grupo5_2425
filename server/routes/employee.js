@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
+const { Op } = require('sequelize');
 
 router.get("/:internNum", async (req, res) => {
 	try {
@@ -54,33 +55,56 @@ router.delete("/:internNum", async (req, res) => {
 
 router.post("/", async (req, res) => {
 	try {
-		console.log(req.body)
+		console.log(req.body);
+		const { nic, nif, storeNIPC, birthDate, gender, name, email, phone, role } = req.body
 
-		// nic: '',
-		// nif: '',
-		// internNum: '',
-		// storeNIPC: '',
-		// birthDate: '',
-		// gender: '',
-		// name: '',
-		// email: '',
-		// phone: '',
-		// role: '',
 
-		const employee = await models.Employee.create({
-			nic: req.body.nic,
-            nif: req.body.nif,
-            internNum: req.body.internNum,
-            storeNIPC: req.body.storeNIPC,
-            birthDate: req.body.birthDate,
-            gender: req.body.gender,
-            name: req.body.name,
-            email: req.body.email,
-            phone: req.body.phone,
-            role: req.body.role,
+		const existingEmployee = await models.Employee.findOne({
+			where: {
+				[Op.or]: [
+					{ nic: nic },
+					{ nif: nif },
+					{ phone: phone },
+					{ email: email }
+				]
+			}
+		});
+
+		console.log("ASSS " + existingEmployee.email)
+		console.log("FFF " + email)
+
+		if (existingEmployee) {
+			let errorTag = "";
+			if (existingEmployee.nic == nic) {
+				errorTag = "nic"
+			} else if (existingEmployee.nif == nif) {
+				errorTag = "nif"
+			} else if (existingEmployee.phone == phone) {
+				errorTag = "phone"
+			}else if (existingEmployee.email == email) {
+				errorTag = "email"
+			}
+
+			return res.status(200).json({ errorTag: errorTag});
+		}
+
+		console.log("DSDSDSDSD")
+
+
+		const employee = await models.Employee.create({ /* Adicionar autoincrement no internNum */ 
+			nic:nic,
+            nif:nif,
+            storeNIPC:storeNIPC,
+            birthDate:birthDate,
+            gender:gender,
+            name:name,
+            email:email,
+            phone:phone,
+            role:role,
 			createdAt: Date.now(),
 			updatedAt: Date.now()
 		});
+
 		res.status(201).json(employee);
 	} catch (error) {
 		res.status(400).json({ error: error.message });
