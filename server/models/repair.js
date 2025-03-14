@@ -26,12 +26,6 @@ module.exports = (sequelize, DataTypes) => {
   }
   Repair.init(
     {
-      repairNumber: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-        autoIncrement: true,
-      },
       statusID: {
         type: DataTypes.INTEGER,
         allowNull: false,
