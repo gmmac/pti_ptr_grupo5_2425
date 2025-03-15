@@ -111,27 +111,33 @@ export default function RegisterForms({setShowToast, handleFormAction}) {
 
 
     const handleChange = (e) => {
-        // Guarda o valor do input
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-
-        // Avalia se o valor do input está válido
+    
         let newErrors = { ...errors };
-
-        // Verifica campos se os campos estão vazios ou inválidos
+    
         if (!value) {
             newErrors[name] = 'Este campo é obrigatório';
         } else if (name === 'email') {
             const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            if (!emailPattern.test(value)) {
-                newErrors[name] = 'O email deve ser válido';
-            }else{
-                newErrors[name] = '';
-            }
+            newErrors[name] = emailPattern.test(value) ? '' : 'O email deve ser válido';
         } else if (name === 'password') {
             newErrors[name] = validatePassword(value);
+        } else if (name === 'birthDate') {
+            const birthDate = new Date(value);
+            const today = new Date();
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const isBirthdayPassed =
+                today.getMonth() > birthDate.getMonth() ||
+                (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+    
+            if (age < 16 || (age === 16 && !isBirthdayPassed)) {
+                newErrors[name] = 'Deves ter pelo menos 16 anos para criar uma conta.';
+            } else {
+                newErrors[name] = '';
+            }
         } else {
-            newErrors[name] = ''; // Limpa erro se o campo não estiver vazio
+            newErrors[name] = '';
         }
 
         setErrors(newErrors);
