@@ -329,7 +329,7 @@ export default function RegisterForms({setShowToast, handleFormAction}) {
         </Form>
         <div className='d-flex flex-align-items justify-content-end m-2'>
             <p>Already a member? </p>
-            <p className='text-black ms-2' onClick={handleFormAction}>Sign in</p>
+            <p className='ms-2 underText' onClick={handleFormAction}>Sign in</p>
         </div>
 
     </div>

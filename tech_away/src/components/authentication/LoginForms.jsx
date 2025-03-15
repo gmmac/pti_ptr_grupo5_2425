@@ -140,7 +140,7 @@ export default function LoginForms({setShowToast, handleFormAction}) {
         </Form>
         <div className='d-flex flex-align-items justify-content-end m-2'>
             <p>Don't have an account?</p>
-            <p className='text-black ms-2' onClick={handleFormAction}>Sign up</p>
+            <p className='ms-2 underText' onClick={handleFormAction}>Sign up</p>
         </div>
     </div>
    
