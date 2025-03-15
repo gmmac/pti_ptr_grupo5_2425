@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Button, Form, FormGroup } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Button, Form } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import api from '../../utils/axios';
 import '../../styles/index.css';
 import '../../styles/AuthPage.css';
 
-export default function LoginForms({setShowToast, handleFormAction}) {
+export default function LoginForms() {
 
     const [formData, setFormData] = useState({
         email: '',
@@ -17,6 +17,12 @@ export default function LoginForms({setShowToast, handleFormAction}) {
         password: '',
         invalidCredentials: ''
     });
+
+    const navigate = useNavigate();
+
+    const ChangeToRegister = () => {
+        navigate('/register');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -140,7 +146,7 @@ export default function LoginForms({setShowToast, handleFormAction}) {
         </Form>
         <div className='d-flex flex-align-items justify-content-end m-2'>
             <p>Don't have an account?</p>
-            <p className='ms-2 underText' onClick={handleFormAction}>Sign up</p>
+            <p className='ms-2 underText' onClick={ChangeToRegister}>Sign up</p>
         </div>
     </div>
    

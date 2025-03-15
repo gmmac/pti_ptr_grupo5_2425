@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import { Button, Col, Form, Row } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import api from '../../utils/axios';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/index.css';
 import '../../styles/AuthPage.css';
 
-export default function RegisterForms({setShowToast, handleFormAction}) {
-
+export default function RegisterForms() {
     const [formData, setFormData] = useState({
         nic: '',
         nif: '',
@@ -29,6 +28,11 @@ export default function RegisterForms({setShowToast, handleFormAction}) {
         password: ''
     });
 
+    const navigate = useNavigate();
+
+    const ChangeToLogin = () => {
+        navigate('/login');
+    };
 
     const validatePassword = (password) => {
         const errors = [];
@@ -104,7 +108,6 @@ export default function RegisterForms({setShowToast, handleFormAction}) {
             }
 
             await api.post('/api/auth/register', {email: formData.email, password: formData.password});
-            setShowToast(true);
         })
         .catch(error => {})
     }
@@ -335,7 +338,7 @@ export default function RegisterForms({setShowToast, handleFormAction}) {
         </Form>
         <div className='d-flex flex-align-items justify-content-end m-2'>
             <p>Already a member? </p>
-            <p className='ms-2 underText' onClick={handleFormAction}>Sign in</p>
+            <p className='ms-2 underText' onClick={ChangeToLogin}>Sign in</p>
         </div>
 
     </div>
