@@ -12,8 +12,18 @@ const navItems = [
 
 export default function InitialNavBar() {
   const location = useLocation();
-  const [isRegisterPage, setIsRegisterPage] = useState();
+  const [isRegisterPage, setIsRegisterPage] = useState(false);
   const navigate = useNavigate();
+
+  // Verifica a URL e define o estado isRegisterPage
+  useEffect(() => {
+      if (location.pathname === '/register') {
+          setIsRegisterPage(true);
+      } else if (location.pathname === '/login') {
+          setIsRegisterPage(false);
+      }
+  }, [location]);
+
 
   // Função para redirecionar para a página de login ou registro
   const handleNavigation = (formType) => {

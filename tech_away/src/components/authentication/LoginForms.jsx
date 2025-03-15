@@ -53,7 +53,8 @@ export default function LoginForms() {
         let newErrors = { ...errors };
         await api.post('/api/auth/login', {
             email: formData.email,
-            password: formData.password
+            password: formData.password,
+            userType: "client"
         })
         .then(async response => {
             console.log(response);

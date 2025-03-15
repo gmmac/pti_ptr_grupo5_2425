@@ -5,37 +5,12 @@ import RegisterForms from '../../components/authentication/RegisterForms';
 const mobileSize = 768;
 
 export default function RegisterPageClient() {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < mobileSize);
-
-    useEffect(() => {
-		const handleResize = () => {
-			setIsMobile(window.innerWidth < mobileSize);
-		};
-
-		window.addEventListener("resize", handleResize);
-
-        //getLoggedUser() ? setUserLoggedIn(true) : setUserLoggedIn(false);
-
-		return () => window.removeEventListener("resize", handleResize);
-	}, []);
 
     return (
-        <div className='d-flex flex-grow-1 align-items-center justify-content-center'>
-            <Row className='w-100 d-flex justify-content-center'>
-                <Col xs={12} md={4} className='bg-warning d-flex align-items-center justify-content-center m-3 h-100'>
-                    <Container>
-                        IMAGE
-                    </Container>
-                </Col>
-
-                <Col xs={12} md={1}>
-
-                </Col>
-
-                <Col xs={12} md={4} className='m-3 h-100 pt-3'>
-                    <RegisterForms/>
-                </Col>
-            </Row>
+        <div className="d-flex align-items-center justify-content-center overflow-hidden mt-3">
+            <div style={{ width: "700px", maxWidth: "100%", padding: "20px" }}>
+                <RegisterForms />
+            </div>
         </div>
     );
 }
