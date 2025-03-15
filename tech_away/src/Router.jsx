@@ -8,7 +8,8 @@ import NotFoundPage from "./pages/NotFoundPage";
 import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import StorePurchasePage from "./pages/StorePurchasePage";
 import LayoutPage from "./pages/LayoutPage"; // Importe o Layout
-import EmployeeAuthPage from "./pages/EmployeeAuthPage";
+import EmployeeRegisterPage from "./pages/EmployeeRegisterPage";
+import EmployeeLoginPage from "./pages/EmployeeLoginPage";
 
 export default function Router() {
     return (
@@ -19,7 +20,8 @@ export default function Router() {
                     <Route index element={<HomePage />} />
                     
                     <Route path="/auth" element={<AuthPage />} />
-                    <Route path="/auth/employee" element={<EmployeeAuthPage />} />
+                    <Route path="/register/employee" element={<EmployeeRegisterPage />} />
+                    <Route path="/login/employee/" element={<EmployeeLoginPage />} />
 
                     <Route path="/teste" element={<Teste />} />
                     <Route path="/storePurchasePage" element={<StorePurchasePage />} />

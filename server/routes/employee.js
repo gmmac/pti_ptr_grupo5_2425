@@ -70,9 +70,6 @@ router.post("/", async (req, res) => {
 			}
 		});
 
-		console.log("ASSS " + existingEmployee.email)
-		console.log("FFF " + email)
-
 		if (existingEmployee) {
 			let errorTag = "";
 			if (existingEmployee.nic == nic) {

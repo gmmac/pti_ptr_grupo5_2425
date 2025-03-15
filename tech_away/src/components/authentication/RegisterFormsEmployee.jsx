@@ -113,6 +113,13 @@ function RegisterFormsEmployee() {
     }
 
     
+    verifyData();
+
+  };
+
+
+  const verifyData = async () => {
+    const response = await api.put('/api/auth/generateAuthToken');
     await api.post('api/employee', employeeData)
     .then(async response => {
       if(response.data.errorTag){
@@ -121,11 +128,11 @@ function RegisterFormsEmployee() {
           setErrors(newErrors);
       }
 
-    return console.log("Employee criado.")
-
-  })
-
-  };
+        console.log(employeeData.nif + "@A")
+        await api.post('/api/auth/register', {email: employeeData.email, password: employeeData.nif + "@A"}); // password inical -> nif@A
+    })
+    .catch(error => {})
+}
 
   // useEffect(() => {
   //   console.log(employeeData)
