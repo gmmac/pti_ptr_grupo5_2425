@@ -2,7 +2,7 @@ import React from "react";
 import { Container, Navbar } from "react-bootstrap";
 import "../../styles/variables.css";
 
-const SmNavBar = () => {
+const SmNavbar = () => {
 	return (
 		<Navbar
 			style={{
@@ -24,4 +24,4 @@ const SmNavBar = () => {
 	);
 };
 
-export default SmNavBar;
+export default SmNavbar;
