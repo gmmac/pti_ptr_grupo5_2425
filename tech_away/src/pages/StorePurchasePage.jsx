@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Alert, Row, Col } from 'react-bootstrap';
 import api from '../utils/axios';
-import ClientCatalogModal from '../components/store/clientCatalogModal'
+import ClientCatalogModal from '../components/storePurchase/clientCatalogModal'
 ;
 
 export default function StorePurchasePage() {
@@ -55,11 +55,39 @@ export default function StorePurchasePage() {
     };
 
     const handleSelectClient = (client) => {
-        setClientData(prev => ({
-          ...prev,
-          clientNIC: client ? client.nic : ''
-        }));
-        setShowModal(false);
+        if (client) {
+            setClientData({
+                nic: client.nic,
+                nif: client.nif,
+                birthDate: client.birthDate,
+                gender: client.gender,
+                name: client.name,
+                email: client.email,
+                phone: client.phone
+            });
+    
+            setForm((prevForm) => ({
+                ...prevForm,
+                clientNic: client.nic // <-- Atualiza o campo clientNic do form
+            }));
+        } else {
+            setClientData({
+                nic: '',
+                nif: '',
+                birthDate: '',
+                gender: '',
+                name: '',
+                email: '',
+                phone: ''
+            });
+    
+            setForm((prevForm) => ({
+                ...prevForm,
+                clientNic: ''
+            }));
+        }
+    
+        setShowModal(false); 
     };
 
     const handleChange = (event) => {
