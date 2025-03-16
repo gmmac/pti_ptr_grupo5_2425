@@ -3,55 +3,75 @@ const router = express.Router();
 const models = require("../models");
 const { Op } = require('sequelize');
 
-router.get("/:internNum", async (req, res) => {
-	try {
+router.get("/", async (req, res) => {
+    try {
+        const {
+            nic,
+            nif,
+            internNum,
+            storeNIPC,
+            name,
+            email,
+            phone,
+            address,
+            role,
+            page = 1,
+            pageSize = 10,
+            orderBy,
+            orderDirection,
+        } = req.query;
 
-		const employee = await models.Employee.findOne({
-			where: { internNum: req.params.internNum },
-		});
+        const where = {};
 
-		if (!employee) {
-			return res.status(404).json({ error: "Employee not found" });
-		}
-		res.json(employee);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+        if (nic) where.nic = { [Op.like]: `${nic}%` };
+        if (nif) where.nif = { [Op.like]: `${nif}%` };
+        if (internNum) where.internNum = { [Op.like]: `${internNum}%` };
+        if (storeNIPC) where.storeNIPC = { [Op.eq]: storeNIPC };
+        if (name) where.name = { [Op.like]: `%${name}%` };
+        if (email) where.email = { [Op.like]: `%${email}%` };
+        if (phone) where.phone = { [Op.like]: `%${phone}%` };
+        if (address) where.address = { [Op.like]: `%${address}%` };
+        if (role) where.role = { [Op.eq]: role };
+
+        const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+        let order = [];
+        if (orderBy && orderDirection) {
+            order = [[orderBy, orderDirection.toUpperCase()]];
+        } else {
+            order = [["nic", "ASC"]];
+        }
+
+        const { count, rows } = await models.Employee.findAndCountAll({
+            where,
+			attributes:{
+				exclude: ["role"]
+			},
+			include: [
+                {
+                  model: models.EmployeeRole,
+                  attributes: ["id", "role"],
+                }
+              ],
+            limit: parseInt(pageSize),
+            offset,
+            order,
+        });
+
+        res.json({
+            totalItems: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: parseInt(page),
+            pageSize: parseInt(pageSize),
+            data: rows,
+        });
+    } catch (error) {
+        console.error("Error fetching employees:", error);
+        res.status(500).json({ error: "Error fetching employees." });
+    }
 });
 
-router.put("/:internNum", async (req, res) => {
-	try {
 
-		const employee = await models.Employee.findOne({
-			where: { internNum: req.params.internNum },
-		});
-		
-		if (!employee) {
-			return res.status(404).json({ error: "Employee not found" });
-		}
-		await employee.update(req.body);
-		res.json(employee);
-	} catch (error) {
-		res.status(400).json({ error: error.message });
-	}
-});
-
-router.delete("/:internNum", async (req, res) => {
-	try {
-		
-		const employee = await models.Employee.findOne({
-			where: { internNum: req.params.internNum },
-		});
-		
-		if (!employee) {
-			return res.status(404).json({ error: "Employee not found" });
-		}
-		await employee.destroy();
-		res.status(204).send();
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
-});
 
 router.post("/", async (req, res) => {
 	try {
@@ -105,6 +125,57 @@ router.post("/", async (req, res) => {
 		res.status(201).json(employee);
 	} catch (error) {
 		res.status(400).json({ error: error.message });
+	}
+});
+
+
+router.get("/:internNum", async (req, res) => {
+	try {
+
+		const employee = await models.Employee.findOne({
+			where: { internNum: req.params.internNum },
+		});
+
+		if (!employee) {
+			return res.status(404).json({ error: "Employee not found" });
+		}
+		res.json(employee);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+});
+
+router.put("/:internNum", async (req, res) => {
+	try {
+
+		const employee = await models.Employee.findOne({
+			where: { internNum: req.params.internNum },
+		});
+		
+		if (!employee) {
+			return res.status(404).json({ error: "Employee not found" });
+		}
+		await employee.update(req.body);
+		res.json(employee);
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
+});
+
+router.delete("/:internNum", async (req, res) => {
+	try {
+		
+		const employee = await models.Employee.findOne({
+			where: { internNum: req.params.internNum },
+		});
+		
+		if (!employee) {
+			return res.status(404).json({ error: "Employee not found" });
+		}
+		await employee.destroy();
+		res.status(204).send();
+	} catch (error) {
+		res.status(500).json({ error: error.message });
 	}
 });
 

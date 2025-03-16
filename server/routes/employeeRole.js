@@ -10,9 +10,8 @@ router.get("/", async (req, res) => {
       console.error(error);
       res.status(500).json({ message: "Erroe fetching roles." });
     }
-  });
+});
   
-  // Rota para criar um novo EmployeeRole
   router.post("/", async (req, res) => {
     try {
       const newEmployeeRole = await models.EmployeeRole.create({
@@ -28,9 +27,22 @@ router.get("/", async (req, res) => {
     }
   });
 
-router.get("/:ID", (req, res) => {
-
-});
+  router.get("/:ID", async (req, res) => {
+    try {
+      const { ID } = req.params;
+      const employeeRole = await models.EmployeeRole.findByPk(ID);
+  
+      if (!employeeRole) {
+        return res.status(404).json({ message: "Role not found." });
+      }
+  
+      res.json(employeeRole);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error fetching role." });
+    }
+  });
+  
 
 router.put("/:ID", (req, res) => {
 

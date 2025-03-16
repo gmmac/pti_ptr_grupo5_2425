@@ -10,6 +10,8 @@ import StorePurchasePage from "./pages/StorePurchasePage";
 import LayoutPage from "./pages/LayoutPage"; // Importe o Layout
 import EmployeeRegisterPage from "./pages/EmployeeRegisterPage";
 import EmployeeLoginPage from "./pages/EmployeeLoginPage";
+import EmployeeProtectedRoute from "./contexts/protectedRoutes/EmployeeProtectedRoute";
+import EmployeeHomePage from "./pages/EmployeeHomePage";
 
 export default function Router() {
     return (
@@ -19,19 +21,31 @@ export default function Router() {
                 <Route path="/" element={<LayoutPage />}>
                     <Route index element={<HomePage />} />
                     
-                    <Route path="/auth" element={<AuthPage />} />
-                    <Route path="/register/employee" element={<EmployeeRegisterPage />} />
-                    <Route path="/login/employee/" element={<EmployeeLoginPage />} />
+                    <Route path="auth" element={<AuthPage />} />
+                    {/* <Route path="/register/employee" element={<EmployeeRegisterPage />} />
+                    <Route path="/login/employee/" element={<EmployeeLoginPage />} /> */}
 
-                    <Route path="/teste" element={<Teste />} />
-                    <Route path="/storePurchasePage" element={<StorePurchasePage />} />
+                    <Route path="teste" element={<Teste />} />
+                    <Route path="storePurchasePage" element={<StorePurchasePage />} />
                     
-                    <Route path="/interests" element={
+                    <Route path="interests" element={
                         <InterestsFilterProvider> 
                             <InterestsPage />
                         </InterestsFilterProvider>
                     } />
                     
+
+                    <Route path="employee">
+
+                        {/* Rotas públicas */}
+                        <Route path="login" element={<EmployeeLoginPage />} />
+
+                        {/* Rotas protegidas */}
+                        {/* <Route element={<EmployeeProtectedRoute />}> */}
+                            <Route index element={<EmployeeHomePage />} />
+                            <Route path="register" element={<EmployeeRegisterPage />} />
+                        {/* </Route> */}
+                    </Route>
 
                 </Route>
 

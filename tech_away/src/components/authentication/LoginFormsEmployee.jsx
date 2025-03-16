@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Form, FormGroup } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import api from '../../utils/axios';
+// import { useNavigate } from 'react-router-dom';
+import { getLoggedUser } from '../../utils/auth';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginFormsEmployee() {
 
@@ -15,6 +17,18 @@ export default function LoginFormsEmployee() {
         password: '',
         invalidCredentials: ''
     });
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const user = getLoggedUser();
+        if (user) {
+            navigate("/employee")
+        } else{
+            sessionStorage.removeItem('selectedTab'); // dá reset da tab atual
+        }
+    }, [])
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -39,6 +53,7 @@ export default function LoginFormsEmployee() {
         }
 
         verifyData();
+
     };
 
     const verifyData = async () => {
@@ -50,7 +65,8 @@ export default function LoginFormsEmployee() {
         })
         .then(async response => {
             console.log(response);
-            sessionStorage.setItem('user', JSON.stringify(response.data));
+            sessionStorage.setItem('user', JSON.stringify(response.data))
+            navigate("/employee")
         })
         .catch(error => {
             if(error.status == 403){
@@ -134,10 +150,7 @@ export default function LoginFormsEmployee() {
                 <Button type="submit"className='w-100 bg-warning rounded-pill'>Login</Button>
             </Form.Group>
         </Form>
-        <div className='d-flex flex-align-items justify-content-end m-2'>
-            <p>Don't have an account?</p>
-            <Link to='/register'>Sign up</Link>
-        </div>
+
     </div>
    
   )

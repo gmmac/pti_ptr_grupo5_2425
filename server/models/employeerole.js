@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
   EmployeeRole.init({
     role: {
       type: DataTypes.STRING(20),
-      allowNull: true
+      allowNull: false,
+      unique: true
     }
   }, {
     sequelize,
