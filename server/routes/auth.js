@@ -95,7 +95,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  // try {
+  try {
     const { email, password, userType } = req.body;
 
     // Login User
@@ -128,10 +128,10 @@ router.post("/login", async (req, res) => {
       }
     }
 
-  // } catch (error) {
-  //   console.error(error.status);
-  //   res.sendStatus(error.status); // Internal Server Error
-  // }
+  } catch (error) {
+    console.error(error.status);
+    res.sendStatus(error.status); // Internal Server Error
+  }
 });
 
 router.post("/changePassword", async (req, res) => {
