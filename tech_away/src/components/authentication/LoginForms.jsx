@@ -5,7 +5,7 @@ import api from '../../utils/axios';
 import '../../styles/index.css';
 import '../../styles/AuthPage.css';
 
-export default function LoginForms() {
+export default function LoginForms({handle}) {
 
     const [formData, setFormData] = useState({
         email: '',
@@ -57,8 +57,8 @@ export default function LoginForms() {
             userType: "client"
         })
         .then(async response => {
-            console.log(response);
             sessionStorage.setItem('user', JSON.stringify(response.data));
+            handle(true);
         })
         .catch(error => {
             if(error.status == 403){

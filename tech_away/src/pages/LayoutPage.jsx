@@ -1,13 +1,19 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import SmNavbar from "../components/Navbar/SmNavbar";
+import SmNavBar from "../components/Navbar/SmNavBar";
 import InitialNavBar from "../components/Navbar/InitialNavBar";
 import { Stack } from "react-bootstrap";
 import { IsMobileContext } from "../contexts/IsMobileContext";
 import BottomNavBar from "../components/Navbar/BottomNavBar";
+import LoggedInNavBar from "../components/Navbar/LoggedInNavBar";
+import { getLoggedUser,  removeLoggedUser} from "../utils/auth";
 
-function LayoutPage() {
+function LayoutPage({isUserLoggedIn, handle}) {
 	const isMobile = useContext(IsMobileContext);
+
+	useEffect(()=>{
+		console.log("Logado" + isUserLoggedIn)
+	},[isUserLoggedIn])
 
 	return (
 		<Stack className="dvh-100">
@@ -19,11 +25,13 @@ function LayoutPage() {
 			>
 				{isMobile ? (
 					<>
-						<SmNavbar />
+						<SmNavBar />
 						<BottomNavBar />
 					</>
+				) : isUserLoggedIn ? (
+					<LoggedInNavBar handle={handle}/>
 				) : (
-					<InitialNavBar />
+					<InitialNavBar handleLogout={handle}/>
 				)}
 			</div>
 
