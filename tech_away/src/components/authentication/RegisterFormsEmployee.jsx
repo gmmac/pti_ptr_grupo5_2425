@@ -56,35 +56,45 @@ function RegisterFormsEmployee() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEmployeeData({ ...employeeData, [name]: value });
-  
     let newErrors = { ...errors };
-  
+
+    // Atualiza os dados do funcionário
+    setEmployeeData({ ...employeeData, [name]: value });
+
+    // Validação de campos obrigatórios
     if (!value) {
       newErrors[name] = 'Este campo é obrigatório';
-    } 
-    else if (name === 'email') {
-      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      
-      if (!emailPattern.test(value)) {
-        newErrors[name] = 'O email deve ser válido';
-      } else {
-        newErrors[name] = '';
-      }
-    } 
-    else if (name === 'phone' || name === 'nif' || name === 'nic') {
-      const nineDigitPattern = /^\d{9}$/; // Validação para exatamente 9 dígitos
-      
-      if (!nineDigitPattern.test(value)) {
-        newErrors[name] = 'O valor deve ter exatamente 9 dígitos';
-      } else {
-        newErrors[name] = '';
-      }
-    } 
-    else {
+    } else {
       newErrors[name] = '';
     }
-  
+
+    // Validação do email
+    if (name === 'email') {
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      newErrors[name] = emailPattern.test(value) ? '' : 'O email deve ser válido';
+    }
+
+    // Validação de número de telefone, NIF e NIC (exatamente 9 dígitos)
+    if (['phone', 'nif', 'nic'].includes(name)) {
+      const nineDigitPattern = /^\d{9}$/;
+      newErrors[name] = nineDigitPattern.test(value) ? '' : 'O valor deve ter exatamente 9 dígitos';
+    }
+
+    if (name === 'birthDate') {
+      const birthDate = new Date(value);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+
+      if (
+        age < 16 ||
+        (age === 16 && (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())))
+      ) {
+        newErrors[name] = 'Employee must be at least 16 years old';
+      } else {
+        newErrors[name] = '';
+      }
+    }
+
     setErrors(newErrors);
   };
   
@@ -185,7 +195,7 @@ function RegisterFormsEmployee() {
         <Row className="mb-3">
           <Col sm={12} md={6}>
             <Form.Group controlId="nic">
-              <Form.Label>NIC (Primary Key)</Form.Label>
+              <Form.Label>NIC</Form.Label>
               <Form.Control
                 type="number"
                 name="nic"

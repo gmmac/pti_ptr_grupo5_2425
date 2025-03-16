@@ -14,8 +14,8 @@ module.exports = {
         unique: true
       },
       internNum: {
-        type: Sequelize.STRING(6),
-        autoIncrement: false,
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
         unique: true
       },
       storeNIPC:{

@@ -44,12 +44,54 @@ router.get("/", async (req, res) => {
   });
   
 
-router.put("/:ID", (req, res) => {
+router.put("/:ID", async (req, res) => {
+  try {
+      const { ID } = req.params;
+      const { role } = req.body;
 
+      const employeeRole = await models.EmployeeRole.findByPk(ID);
+      if (!employeeRole) {
+          return res.status(404).json({ message: "Role not found." });
+      }
+
+      await employeeRole.update({
+          role,
+          updatedAt: new Date()
+      });
+
+      res.json({ message: "Role updated successfully.", role: employeeRole });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error updating role." });
+  }
 });
 
-router.delete("/:ID", (req, res) => {
-    
+router.delete("/:ID", async (req, res) => {
+  try {
+    const { ID } = req.params;
+
+    // verifies if role is used
+    const employeesWithRole = await models.Employee.count({ where: { role: ID } });
+
+    if (employeesWithRole > 0) {
+      return res.status(400).json({ 
+        message: "Cannot delete role. There are employees assigned to this role." 
+      });
+    }
+
+    // delete role
+    const employeeRole = await models.EmployeeRole.findByPk(ID);
+    if (!employeeRole) {
+      return res.status(404).json({ message: "Role not found." });
+    }
+
+    await employeeRole.destroy();
+    res.json({ message: "Role deleted successfully." });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error deleting role." });
+  }
 });
 
 

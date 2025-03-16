@@ -26,6 +26,7 @@ export default function LoginFormsEmployee() {
             navigate("/employee")
         } else{
             sessionStorage.removeItem('selectedTab'); // dá reset da tab atual
+            sessionStorage.removeItem('profile'); // dá set por default da tab profile
         }
     }, [])
 

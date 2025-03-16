@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
             name,
             email,
             phone,
-            address,
+            // address,
             role,
             page = 1,
             pageSize = 10,
@@ -21,16 +21,19 @@ router.get("/", async (req, res) => {
             orderDirection,
         } = req.query;
 
+
+		console.log(req.query)
+		console.log("SSDSD" + req.query.internNum)
         const where = {};
 
         if (nic) where.nic = { [Op.like]: `${nic}%` };
         if (nif) where.nif = { [Op.like]: `${nif}%` };
-        if (internNum) where.internNum = { [Op.like]: `${internNum}%` };
+        if (internNum) where.internNum = { [Op.eq]: `${parseInt(internNum)}` };
         if (storeNIPC) where.storeNIPC = { [Op.eq]: storeNIPC };
         if (name) where.name = { [Op.like]: `%${name}%` };
         if (email) where.email = { [Op.like]: `%${email}%` };
         if (phone) where.phone = { [Op.like]: `%${phone}%` };
-        if (address) where.address = { [Op.like]: `%${address}%` };
+        // if (address) where.address = { [Op.like]: `%${address}%` };
         if (role) where.role = { [Op.eq]: role };
 
         const offset = (parseInt(page) - 1) * parseInt(pageSize);
@@ -45,13 +48,17 @@ router.get("/", async (req, res) => {
         const { count, rows } = await models.Employee.findAndCountAll({
             where,
 			attributes:{
-				exclude: ["role"]
+				exclude: ["role", "storeNIPC"]
 			},
 			include: [
                 {
                   model: models.EmployeeRole,
                   attributes: ["id", "role"],
-                }
+                },                
+				{
+					model: models.Store,
+					attributes: ["nipc", "name", "address"],
+				  }
               ],
             limit: parseInt(pageSize),
             offset,
@@ -104,9 +111,6 @@ router.post("/", async (req, res) => {
 
 			return res.status(200).json({ errorTag: errorTag});
 		}
-
-		console.log("DSDSDSDSD")
-
 
 		const employee = await models.Employee.create({ /* Adicionar autoincrement no internNum */ 
 			nic:nic,

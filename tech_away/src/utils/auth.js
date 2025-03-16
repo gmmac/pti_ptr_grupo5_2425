@@ -6,14 +6,15 @@ export const getLoggedUser = () => {
 };
 
 
-export const checkIfAdmin = async (user) => {
+export const checkIfAdmin = async () => {
+    const user = getLoggedUser();
     if (!user) return false;
-
+    
     try {
         const res = await api.get(`/api/employeeRole/${user?.role}`);
-        return res.data.role === "Admin"; // Retorna true se for Admin
+        return res.data.role === "Admin";
     } catch (error) {
         console.error("Erro ao verificar admin:", error.message);
-        return false; // Em caso de erro, assume que não é admin
+        return false;
     }
 };

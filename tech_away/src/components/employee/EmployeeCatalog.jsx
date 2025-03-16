@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { PaginationProvider } from '../../contexts/PaginationContext';
 
-import EmployeeTable from './EmployeeTable';
 import api from '../../utils/axios';
 import PaginationControl from '../pagination/PaginationControl';
+import EmployeeCardView from './EmployeeCardView';
+import EmployeesTableView from './EmployeeTableView';
+import EmployeeFilter from './EmployeeFilter';
 
 export default function EmployeeCatalog() {
   const [employees, setEmployees] = useState([]);
@@ -12,6 +14,25 @@ export default function EmployeeCatalog() {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 4;
 
+  const [filters, setFilters] = useState({
+    nic: "",
+    nif: "",
+    internNum: "",
+    storeNIPC: "",
+    name: "",
+    email: "",
+    phone: "",
+    // address: "",
+    role: "",
+    // orderBy: 'id',
+    orderDirection: 'ASC',
+    
+  });
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -21,10 +42,17 @@ export default function EmployeeCatalog() {
     api
       .get('/api/employee/', {
         params: {
-        //   name: filters.name,
-        //   clientNIC: filters.clientNIC,
-        //   orderBy: filters.orderBy,
-        //   orderDirection: filters.orderDirection,
+          nic: filters.nic,
+          nif: filters.nif,
+          internNum: filters.internNum,
+          storeNIPC: filters.storeNIPC,
+          name: filters.name,
+          email: filters.email,
+          phone: filters.phone,
+          // address: filters.address,
+          role: filters.role,
+          orderBy: filters.orderBy,
+          orderDirection: filters.orderDirection,
           page: currentPage,
           pageSize: itemsPerPage,
         },
@@ -36,23 +64,21 @@ export default function EmployeeCatalog() {
       .catch((error) => {
         console.error('API error:', error.message);
       });
-  }, [currentPage]);
+  }, [currentPage, filters]);
 
   return (
     <Container className="py-4">
-      {/* <EmployeeFilter folders={folders} /> */}
+      <EmployeeFilter filters={filters} onFilterChange={handleFilterChange} />
       
-      {/* <div className="d-flex justify-content-center my-3">
-        <Button variant="primary" size="lg" className="shadow-sm" onClick={handleShow}>
-          + Create New Folder
+      <div className="d-flex justify-content-center my-3">
+        <Button variant="primary" size="lg" className="shadow-sm" >
+          + Create New Employee
         </Button>
-      </div> */}
+      </div>
       
-      {/* <CreateInterestModal show={show} handleClose={handleClose} handleRefresh={handleRefresh} /> */}
-
-
         <PaginationProvider>
-                <EmployeeTable employees={employees} />
+            <EmployeesTableView employees={employees} /> { /* Ecrãs grandes */}
+            <EmployeeCardView employees={employees} /> { /* Ecrãs pequenos */}
         </PaginationProvider>
 
         <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />

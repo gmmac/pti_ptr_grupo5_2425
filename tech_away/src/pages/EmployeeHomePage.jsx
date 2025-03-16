@@ -9,20 +9,33 @@ import EmployeeCatalog from '../components/employee/EmployeeCatalog';
 export default function EmployeeHomePage() {
     const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'home');
     const [isAuthenticated, setIsAuthenticated] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         const user = getLoggedUser();
         setIsAuthenticated(user);
-
+    
         if (!user) {
             navigate("/employee/login");
+            return;
         }
-
-        setIsAdmin(checkIfAdmin());
-
+    
+        const checkAdminStatus = async () => {
+            const adminStatus = await checkIfAdmin();
+            setIsAdmin(adminStatus);
+        };
+    
+        checkAdminStatus();
+    
     }, [navigate]);
+    
+
+
+    useEffect(() => {
+        console.log(isAdmin)
+    }, [])
+
 
     useEffect(() => {
         sessionStorage.setItem('selectedTab', actualTab);
@@ -39,39 +52,39 @@ export default function EmployeeHomePage() {
     }
 
     return (
-        <Tab.Container activeKey={actualTab} onSelect={handleChangeTab}>
+        <Tab.Container activeKey={actualTab} onSelect={handleChangeTab}> 
             {/* Navegação das Abas */}
-            <Nav variant="tabs" className="mb-3">
-                <Nav.Item>
+            <Nav variant="tabs" className="mb-3 nav-fill">
+                <Nav.Item className='custom-tabs'>
                     <Nav.Link eventKey="home">Home</Nav.Link>
                 </Nav.Item>
-                <Nav.Item>
+                <Nav.Item className='custom-tabs'>
                     <Nav.Link eventKey="sells">Sells</Nav.Link>
                 </Nav.Item>
-                <Nav.Item>
+                <Nav.Item className='custom-tabs'> 
                     <Nav.Link eventKey="purchases">Purchases</Nav.Link>
                 </Nav.Item>
-                <Nav.Item>
+                <Nav.Item className='custom-tabs'>
                     <Nav.Link eventKey="repairs">Repairs</Nav.Link>
                 </Nav.Item>
 
                 {isAdmin && (
                     <>
-                        <Nav.Item>
-                            <Nav.Link eventKey="roles">Roles</Nav.Link>
+                        <Nav.Item className='custom-tabs'>
+                            <Nav.Link eventKey="roles">Manage Roles</Nav.Link>
                         </Nav.Item>
-                        <Nav.Item>
+                        <Nav.Item className='custom-tabs'>
                             <Nav.Link eventKey="manage">Manage Employees</Nav.Link>
                         </Nav.Item>
                     </>
                 )}
 
-                <Nav.Item>
+                <Nav.Item className='custom-tabs'>
                     <Nav.Link eventKey="profile">Profile</Nav.Link>
                 </Nav.Item>
             </Nav>
 
-            <Tab.Content>
+            <Tab.Content className='custom-tab-content'>
                 <Tab.Pane eventKey="home">
                     <p>Tab content for Home</p>
                 </Tab.Pane>
