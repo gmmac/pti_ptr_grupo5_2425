@@ -5,6 +5,7 @@ import Teste from "./pages/Teste";
 import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPageClient from "./pages/Auth/RegisterPageClient";
 import LoginPageClient from "./pages/Auth/LoginPageClient";
+import ChangePasswordClient from "./pages/Auth/ChangePasswordClient";
 import LayoutPage from "./pages/LayoutPage";
 import { getLoggedUser } from "./utils/auth";
 
@@ -29,6 +30,7 @@ export default function Router() {
 
 					<Route path="/teste" element={<Teste />} />
 
+          <Route path="/changePassword" element={<ChangePasswordClient />} />
 
           <Route path="/register" element={<RegisterPageClient />} />
 

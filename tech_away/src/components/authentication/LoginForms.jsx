@@ -24,6 +24,10 @@ export default function LoginForms({handle}) {
         navigate('/register');
     };
 
+    const ChangeToChangePassword = () => {
+        navigate('/changePassword');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
     
@@ -138,6 +142,11 @@ export default function LoginForms({handle}) {
                 <Form.Control.Feedback type="invalid">
                     {errors.password}
                 </Form.Control.Feedback>
+            </Form.Group>
+
+            {/* Reset Password link */}
+            <Form.Group className="mb-3 text-end">
+                <p className="underText" onClick={ChangeToChangePassword}>Reset Password</p>
             </Form.Group>
 
             <Form.Group>

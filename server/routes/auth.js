@@ -134,4 +134,22 @@ router.post("/login", async (req, res) => {
   // }
 });
 
+router.post("/changePassword", async (req, res) => {
+  // try {
+    const { email } = req.body;
+
+    // Change password
+    const response = await axios.post(process.env.AUTH0_API_URL + "/dbconnections/change_password", {
+      client_id: process.env.AUTH0_CLIENT_ID,
+      connection: "Username-Password-Authentication",
+      email: email,
+    });
+    
+    res.status(201).json("Email enviado");
+  // } catch (error) {
+  //   console.error(error.status);
+  //   res.sendStatus(error.status); // Internal Server Error
+  // }
+});
+
 module.exports = router;
