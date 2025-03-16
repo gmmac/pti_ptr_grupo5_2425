@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import InitialNavBar from "../components/Navbar/InitialNavBar";
 import "../styles/variables.css";
-import SmNavbar from "../components/Navbar/SmNavbar";
 import FScontent from "../components/HomePage/FScontent";
 
 const mobileSize = 768;
@@ -24,7 +22,6 @@ export default function HomePage() {
 				color: "var(--dark-grey)",
 			}}
 		>
-			{isMobile ? <SmNavbar /> : <InitialNavBar />}
 			<FScontent />
 		</div>
 	);

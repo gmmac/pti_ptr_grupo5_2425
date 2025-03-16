@@ -33,21 +33,29 @@ router.put("/generateAuthToken", async (req, res) => {
 
     const token = response.data.access_token;
 
-    const [updated] = await models.Token.update(
-      {
-        token: encryptToken(token),
-        updatedAt: Date.now(),
-      },
-      {
-        where: {
-          name: "auth",
-        },
-      }
-    );
+    const tokenAuth = await models.Token.findOne({ where: { name: "auth" } });
 
-    if(updated){
-      res.sendStatus(201);  // Send a success response
+    if(tokenAuth){ //token exists
+      const [updated] = await models.Token.update(
+        {
+          token: encryptToken(token),
+          updatedAt: Date.now(),
+        },
+        {
+          where: {
+            name: "auth",
+          },
+        }
+      );
+
+      if(updated){
+        res.sendStatus(201);
+      }
     }
+    else{ //token do not exists
+      await models.Token.create({name: "auth", token: encryptToken(token), createdAt: Date.now(), updatedAt: Date.now()});
+    }
+
   } catch (error) {
     res.status(500);
   }
@@ -87,8 +95,8 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  // try {
+    const { email, password, userType } = req.body;
 
     // Login User
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
@@ -102,16 +110,46 @@ router.post("/login", async (req, res) => {
       password: password
     });
 
-    const existingClient = await models.Client.findOne({where: {email: email}
-    });
-
-    if(existingClient){
-      return res.status(201).json(existingClient.dataValues);
+    if(userType === "client"){
+      const existingClient = await models.Client.findOne({where: {email: email}
+      });
+  
+      if(existingClient){
+        return res.status(201).json(existingClient.dataValues);
+      }
     }
-  } catch (error) {
-    console.error(error.status);
-    res.sendStatus(error.status); // Internal Server Error
-  }
+
+    if(userType === "employee"){
+      const existingEmployee = await models.Employee.findOne({where: {email: email}
+      });
+  
+      if(existingEmployee){
+        return res.status(201).json(existingEmployee.dataValues);
+      }
+    }
+
+  // } catch (error) {
+  //   console.error(error.status);
+  //   res.sendStatus(error.status); // Internal Server Error
+  // }
+});
+
+router.post("/changePassword", async (req, res) => {
+  // try {
+    const { email } = req.body;
+
+    // Change password
+    const response = await axios.post(process.env.AUTH0_API_URL + "/dbconnections/change_password", {
+      client_id: process.env.AUTH0_CLIENT_ID,
+      connection: "Username-Password-Authentication",
+      email: email,
+    });
+    
+    res.status(201).json("Email enviado");
+  // } catch (error) {
+  //   console.error(error.status);
+  //   res.sendStatus(error.status); // Internal Server Error
+  // }
 });
 
 module.exports = router;
