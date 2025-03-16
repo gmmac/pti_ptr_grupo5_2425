@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Container, Alert, Row } from 'react-bootstrap';
+import { Form, Button, Container, Alert, Row, Col } from 'react-bootstrap';
 import api from '../utils/axios';
+import ClientCatalogModal from '../components/store/clientCatalogModal'
+;
 
 export default function StorePurchasePage() {
     const [form, setForm] = useState({
@@ -15,6 +17,17 @@ export default function StorePurchasePage() {
     const [clientList, setClientList] = useState([]); // Lista de NICs de clientes válidos
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [clientData, setClientData] = useState({
+        nic: '',
+        nif: '',
+        birthDate: '',
+        gender: '',
+        name: '',
+        email: '',
+        phone: '',
+      });
+
+    const [showModal, setShowModal] = useState(false);
 
     // Buscar estados do equipamento
     useEffect(() => {
@@ -37,8 +50,22 @@ export default function StorePurchasePage() {
             .catch(error => console.error('Erro ao buscar NICs:', error.message));
     }, []);
 
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
+
+    const handleSelectClient = (client) => {
+        setClientData(prev => ({
+          ...prev,
+          clientNIC: client ? client.nic : ''
+        }));
+        setShowModal(false);
+    };
+
     const handleChange = (event) => {
         const { name, value } = event.target;
+
+        setClientData({ ...clientData, [name]: value });
 
         if (name === "equipmentId") {
             if (!/^\d*$/.test(value)) {
@@ -50,15 +77,6 @@ export default function StorePurchasePage() {
             }
         }
 
-        setForm(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    const handleChangeNIC = (event) => {
-        const { name, value } = event.target;
-
         if (name === "clientNic") {
             if (!/^\d*$/.test(value)) {
                 setError("O NIC do cliente deve conter apenas números.");
@@ -68,6 +86,12 @@ export default function StorePurchasePage() {
                 setError("");
             }
         }
+
+        setForm(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+
         setForm(prevState => ({
             ...prevState,
             [name]: value
@@ -163,31 +187,53 @@ export default function StorePurchasePage() {
                 </Row>
 
                 <Row className="mb-3">
-                    <Form.Group controlId="formClientNic">
-                        <Form.Label>NIC do cliente</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="clientNic"
-                            value={form.clientNic}
-                            onChange={handleChangeNIC}
-                            placeholder="Digite o NIC do cliente"
-                            required
-                        />
-                    </Form.Group>
+                    <Col sm={12} md={6}>
+                        <Form.Group controlId="formClientNic">
+                            <Form.Label>NIC do cliente</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="clientNic"
+                                value={form.clientNic}
+                                onChange={handleChange}
+                                placeholder="Digite o NIC do cliente"
+                                required
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col sm={12} md={6} className='d-flex align-items-end justify-content-start'>
+                        <Button 
+                        onClick={() => setShowModal(true)}
+                        className='w-100 rounded-pill forms-btn shadow-lg'
+                        >
+                        Procurar cliente
+                        </Button>
+                    </Col>
                 </Row>
 
                 <Row className="mb-3">
-                    <Form.Group controlId="formIdEquipamento">
-                        <Form.Label>ID do Equipamento</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="equipmentId"
-                            value={form.equipmentId}
-                            onChange={handleChange}
-                            placeholder="Digite o ID do equipamento"
-                            required
-                        />
-                    </Form.Group>
+                    <Col sm={12} md={6}>
+                        <Form.Group controlId="formIdEquipamento">
+                            <Form.Label>ID do Equipamento</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="equipmentId"
+                                value={form.equipmentId}
+                                onChange={handleChange}
+                                placeholder="Digite o ID do equipamento"
+                                required
+                            />
+                        </Form.Group>
+                    </Col>
+
+                    <Col sm={12} md={6} className='d-flex align-items-end justify-content-start'>
+                        <Button 
+                        onClick={() => setShowModal(true)}
+                        className='w-100 rounded-pill forms-btn shadow-lg'
+                        >
+                        Procurar equipamento
+                        </Button>
+                    </Col>
                 </Row>
 
 
@@ -201,6 +247,8 @@ export default function StorePurchasePage() {
                     Registar Venda
                 </Button>
             </Form>
+
+            <ClientCatalogModal show={showModal} handleClose={handleCloseModal} handleSelectClient={handleSelectClient} selectedClient={clientData.nic} />
         </Container>
     );
     
