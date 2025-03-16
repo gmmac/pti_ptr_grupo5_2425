@@ -3,11 +3,11 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Repairs', {
-      repairNumber: {
+      id: {
         allowNull: false,
-        autoIncrement: false,
+        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.STRING(6)
+        type: Sequelize.INTEGER
       },
       statusID: {
         type: Sequelize.INTEGER,
