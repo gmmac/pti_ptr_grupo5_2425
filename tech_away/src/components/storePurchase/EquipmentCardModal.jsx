@@ -2,16 +2,6 @@ import React from 'react'
 import { Button, Card } from 'react-bootstrap'
 
 export default function EquipmentCardModal({equipment, selectedEquipment, handleEquipmentSelection}) {
-    const [modelsList, setModelsList] = useState([]);
-    
-    // Buscar modelos do equipamento
-    useEffect(() => {
-        api.get(`/api/model/`)
-            .then(res => setModelsList(res.data))
-            .catch(error => console.error('Erro ao buscar modelos:', error.message));
-    }, []);
-
-    
     
   return (
     <Card className="mb-3 d-lg-none">
