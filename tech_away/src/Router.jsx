@@ -8,10 +8,6 @@ import LoginPageClient from "./pages/Auth/LoginPageClient";
 import StorePurchasePage from "./pages/StorePurchasePage";
 
 
-
-
-
-
 import LayoutPage from "./pages/LayoutPage";
 import EmployeeRegisterPage from "./pages/EmployeeRegisterPage";
 import EmployeeLoginPage from "./pages/EmployeeLoginPage";
