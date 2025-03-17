@@ -6,6 +6,7 @@ import EmployeeProfile from '../components/employee/EmployeeProfile';
 import { checkIfAdmin, getLoggedUser } from '../utils/auth';
 import EmployeeCatalog from '../components/employee/EmployeeCatalog';
 import api from '../utils/axios';
+import BottomNavBar from '../components/Navbar/BottomNavBar';
 
 export default function EmployeeHomePage() {
     const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'home');
@@ -13,7 +14,7 @@ export default function EmployeeHomePage() {
     const [isAdmin, setIsAdmin] = useState(null);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [passwordChanged, setPasswordChanged] = useState(false);
-    const [sentEmailMessage, setSentEmailMessage] = useState("");
+    const [emailMessage, setEmailMessage] = useState({ message: "", type: "" });
     const navigate = useNavigate();
 
     // veridies is user changed password
@@ -89,30 +90,28 @@ export default function EmployeeHomePage() {
                 return;
             }
     
-            await api.post("/api/auth/changePassword", {
-                email: user.email
-            });
+            await api.post("/api/auth/changePassword", { email: user.email });
     
-            setSentEmailMessage("Password reset email sent. Please check your email.");
+            setEmailMessage({ message: "Password reset email sent. Please check your email.", type: "success" });
     
-            let attempts = 0;
-            const interval = setInterval(async () => {
-                const updatedPasswordChanged = await checkPasswordStatus();
-    
-                if (updatedPasswordChanged || attempts >= 10) {
-                    clearInterval(interval);
-                    if (updatedPasswordChanged) {
-                        setTimeout(() => setShowPasswordModal(false), 3000);
-                    }
-                }
-    
-                attempts++;
-            }, 5000);
         } catch (error) {
             console.error("Error changing password:", error.response?.data || error.message);
+            setEmailMessage({ message: "Error sending password reset email. Try again later.", type: "danger" });
         }
     };
     
+    const handleIsPasswordChanged = async () => {
+        const updatedPasswordChanged = await checkPasswordStatus();
+    
+        if (updatedPasswordChanged) {
+            setPasswordChanged(true);
+            setShowPasswordModal(false);
+        } else {
+            setEmailMessage({ message: "Employee has not changed password. Please check your email.", type: "danger" });
+        }
+    };
+    
+
 
     return (
         <>
@@ -181,20 +180,15 @@ export default function EmployeeHomePage() {
             {/* Modal para alterar senha */}
             <Modal show={showPasswordModal} onHide={handleClosePasswordModal} backdrop="static" keyboard={false}>
                 <Modal.Header>
-                    <Modal.Title>Welcome </Modal.Title>
+                    <Modal.Title>Welcome</Modal.Title>
                 </Modal.Header>
 
-                {sentEmailMessage && (
-                    <Alert variant="success" onClose={() => setSentEmailMessage('')} className='text-center'>
-                        {sentEmailMessage}
+                {emailMessage.message && (
+                    <Alert variant={emailMessage.type} onClose={() => setEmailMessage({ message: "", type: "" })} className='text-center'>
+                        {emailMessage.message}
                     </Alert>
                 )}
 
-                {passwordChanged && (
-                    <Alert variant="success" className='text-center'>
-                        Password successfully changed! The modal will close shortly
-                    </Alert>
-                )}
 
                 {!passwordChanged && (
                     <Modal.Body>
@@ -204,12 +198,19 @@ export default function EmployeeHomePage() {
 
                 <Modal.Footer>
                     {!passwordChanged && (
-                        <Button variant="primary" onClick={handleChangePassword}>
-                            Change Password
-                        </Button>
+                        <>
+                            <Button variant="primary" onClick={handleChangePassword}>
+                                Change Password
+                            </Button>
+
+                            <Button variant="primary" onClick={handleIsPasswordChanged}>
+                                Next
+                            </Button>
+                        </>
                     )}
                 </Modal.Footer>
             </Modal>
+
         </>
     );
 }

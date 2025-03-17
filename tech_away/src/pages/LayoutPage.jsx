@@ -7,12 +7,35 @@ import { IsMobileContext } from "../contexts/IsMobileContext";
 import BottomNavBar from "../components/Navbar/BottomNavBar";
 import LoggedInNavBar from "../components/Navbar/LoggedInNavBar";
 
-function LayoutPage({isUserLoggedIn, handle}) {
+function LayoutPage({ isUserLoggedIn, handle }) {
 	const isMobile = useContext(IsMobileContext);
 
-	useEffect(()=>{
-		console.log("Logado" + isUserLoggedIn)
-	},[isUserLoggedIn])
+	useEffect(() => {
+		console.log("Usuário logado:", isMobile);
+	}, [isMobile]);
+
+	// Definição do Navbar com base no estado do usuário e do tamanho da tela
+	const renderNavBar = () => {
+		if (isUserLoggedIn) {
+			return isMobile ? (
+				<>
+					<SmNavBar />
+					<BottomNavBar />
+				</>
+			) : (
+				<LoggedInNavBar handle={handle} />
+			);
+		} else {
+			return isMobile ? (
+				<>
+					<SmNavBar />
+					<BottomNavBar />
+				</>
+			) : (
+				<InitialNavBar handleLogout={handle} />
+			);
+		}
+	};
 
 	return (
 		<Stack className="dvh-100">
@@ -22,16 +45,7 @@ function LayoutPage({isUserLoggedIn, handle}) {
 					color: "var(--dark-grey)",
 				}}
 			>
-				{isMobile ? (
-					<>
-						<SmNavBar />
-						<BottomNavBar />
-					</>
-				) : isUserLoggedIn ? (
-					<LoggedInNavBar handle={handle}/>
-				) : (
-					<InitialNavBar handleLogout={handle}/>
-				)}
+				{renderNavBar()}
 			</div>
 
 			<div>
