@@ -8,11 +8,6 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        role: 'Manager',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
         role: 'Employee',
         createdAt: new Date(),
         updatedAt: new Date(),

@@ -122,7 +122,7 @@ router.post("/login", async (req, res) => {
     if(userType === "employee"){
       const existingEmployee = await models.Employee.findOne({where: {email: email}
       });
-  
+      console.log(existingEmployee)
       if(existingEmployee){
         return res.status(201).json(existingEmployee.dataValues);
       }

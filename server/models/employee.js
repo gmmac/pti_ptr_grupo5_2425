@@ -78,7 +78,11 @@ module.exports = (sequelize, DataTypes) => {
     role: {
       type: DataTypes.INTEGER,
       allowNull: false
-    }
+    },
+    passwordReseted: {
+      type: DataTypes.STRING(1),
+    },
+    
   }, {
     sequelize,
     modelName: 'Employee',

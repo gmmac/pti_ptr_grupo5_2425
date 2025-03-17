@@ -48,7 +48,8 @@ router.get("/", async (req, res) => {
         const { count, rows } = await models.Employee.findAndCountAll({
             where,
 			attributes:{
-				exclude: ["role", "storeNIPC"]
+				exclude: ["role", "storeNIPC"],
+				include: ["passwordReseted"]
 			},
 			include: [
                 {
@@ -122,6 +123,7 @@ router.post("/", async (req, res) => {
             email:email,
             phone:phone,
             role:role,
+			passwordReseted: 0,
 			createdAt: Date.now(),
 			updatedAt: Date.now()
 		});

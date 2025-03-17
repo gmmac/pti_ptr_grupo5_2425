@@ -46,9 +46,9 @@ export default function Router() {
                         </Route>
 
                         {/* admin employee routes */}
-                        <Route element={<AdminProtectedRoute />}>
+                        {/* <Route element={<AdminProtectedRoute />}> */}
                             <Route path="register" element={<EmployeeRegisterPage />} />
-                        </Route>
+                        {/* </Route> */}
                     </Route>
 
                 </Route>

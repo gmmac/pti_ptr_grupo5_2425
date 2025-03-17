@@ -63,6 +63,9 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
+      passwordReseted:{
+        type: Sequelize.STRING(1)
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
