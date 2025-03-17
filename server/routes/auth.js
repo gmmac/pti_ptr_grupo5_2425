@@ -147,11 +147,42 @@ router.post("/changePassword", async (req, res) => {
       email: email,
     });
     
-    res.status(201).json("Email enviado");
+    res.status(201).json("Email Sent")
   // } catch (error) {
   //   console.error(error.status);
   //   res.sendStatus(error.status); // Internal Server Error
   // }
 });
+
+
+router.get("/getUserByEmail/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    // Buscar token armazenado no banco
+    const token = await models.Token.findOne({ where: { name: "auth" } });
+    if (!token) return res.status(500).json({ error: "Auth Token not found" });
+
+    const desencriptedToken = decryptToken(token.dataValues.token);
+
+    // Buscar usuário pelo email na API do Auth0
+    const response = await axios.get(`${process.env.AUTH0_API_URL}/api/v2/users-by-email?email=${encodeURIComponent(email)}`, {
+      headers: { Authorization: "Bearer " + desencriptedToken }
+    });
+
+    if (response.data.length === 0) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
+    res.status(200).json(response.data[0]); // Retorna o primeiro usuário encontrado
+
+  } catch (error) {
+    console.error("Erro ao buscar usuário:", error.response?.data || error.message);
+    res.status(500).json({ error: "Erro ao buscar usuário" });
+  }
+});
+
+
+
 
 module.exports = router;

@@ -1,44 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { Tab, Nav, Modal, Button } from 'react-bootstrap';
+import { Tab, Nav, Modal, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import EmployeeRolesCatalog from '../components/employee/employeeRoles/EmployeeRolesCatalog';
 import EmployeeProfile from '../components/employee/EmployeeProfile';
-import { checkIfAdmin, employeeChangedPassword, getLoggedUser } from '../utils/auth';
+import { checkIfAdmin, getLoggedUser } from '../utils/auth';
 import EmployeeCatalog from '../components/employee/EmployeeCatalog';
+import api from '../utils/axios';
 
 export default function EmployeeHomePage() {
     const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'home');
     const [isAuthenticated, setIsAuthenticated] = useState(null);
     const [isAdmin, setIsAdmin] = useState(null);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordChanged, setPasswordChanged] = useState(false);
+    const [sentEmailMessage, setSentEmailMessage] = useState("");
     const navigate = useNavigate();
+
+    // veridies is user changed password
+    const checkPasswordStatus = async () => {
+        try {
+            const response = await api.get(`/api/auth/getUserByEmail/${getLoggedUser().email}`);
+            
+            const passwordReset = !!response.data.last_password_reset;
+            setPasswordChanged(passwordReset);
+    
+            return passwordReset;
+        } catch (error) {
+            console.error("Error verifying password:", error.response?.data || error.message);
+            return false;
+        }
+    };
+    
+
+
+    useEffect(() => {
+        console.log("MUDOU PASS " + passwordChanged)
+    }, [passwordChanged])
 
     useEffect(() => {
         const checkUser = async () => {
             const user = getLoggedUser();
             setIsAuthenticated(user);
-    
+
             if (!user) {
                 navigate("/employee/login");
                 return;
             }
-    
-            console.log("Usuário logado:", user);
-    
-            const changedPassword = await employeeChangedPassword();
-            console.log("Senha alterada?", changedPassword);
-    
-            if (!changedPassword) {
+
+            console.log("ULoggedUser:", user);
+
+            const updatedPasswordChanged = await checkPasswordStatus();
+            console.log("Senha alterada?", updatedPasswordChanged);
+
+            if (!updatedPasswordChanged) {
                 setShowPasswordModal(true);
             }
-    
+
             const adminStatus = await checkIfAdmin();
             setIsAdmin(adminStatus);
         };
-    
+
         checkUser();
     }, [navigate]);
-    
 
     useEffect(() => {
         sessionStorage.setItem('selectedTab', actualTab);
@@ -58,9 +81,42 @@ export default function EmployeeHomePage() {
         return <div>Loading...</div>;
     }
 
+    const handleChangePassword = async () => {
+        try {
+            const user = getLoggedUser();
+            if (!user) {
+                console.error("Usuário não encontrado.");
+                return;
+            }
+    
+            await api.post("/api/auth/changePassword", {
+                email: user.email
+            });
+    
+            setSentEmailMessage("Password reset email sent. Please check your email.");
+    
+            let attempts = 0;
+            const interval = setInterval(async () => {
+                const updatedPasswordChanged = await checkPasswordStatus();
+    
+                if (updatedPasswordChanged || attempts >= 10) {
+                    clearInterval(interval);
+                    if (updatedPasswordChanged) {
+                        setTimeout(() => setShowPasswordModal(false), 3000);
+                    }
+                }
+    
+                attempts++;
+            }, 5000);
+        } catch (error) {
+            console.error("Error changing password:", error.response?.data || error.message);
+        }
+    };
+    
+
     return (
         <>
-            <Tab.Container activeKey={actualTab} onSelect={handleChangeTab}> 
+            <Tab.Container activeKey={actualTab} onSelect={handleChangeTab}>
                 <Nav variant="tabs" className="mb-3 nav-fill">
                     <Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="home">Home</Nav.Link>
@@ -68,7 +124,7 @@ export default function EmployeeHomePage() {
                     <Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="sells">Sells</Nav.Link>
                     </Nav.Item>
-                    <Nav.Item className='custom-tabs'> 
+                    <Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="purchases">Purchases</Nav.Link>
                     </Nav.Item>
                     <Nav.Item className='custom-tabs'>
@@ -127,13 +183,31 @@ export default function EmployeeHomePage() {
                 <Modal.Header>
                     <Modal.Title>Welcome </Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    <p>You need to change your password before proceeding.</p>
-                </Modal.Body>
+
+                {sentEmailMessage && (
+                    <Alert variant="success" onClose={() => setSentEmailMessage('')} className='text-center'>
+                        {sentEmailMessage}
+                    </Alert>
+                )}
+
+                {passwordChanged && (
+                    <Alert variant="success" className='text-center'>
+                        Password successfully changed! The modal will close shortly
+                    </Alert>
+                )}
+
+                {!passwordChanged && (
+                    <Modal.Body>
+                        <p>You need to change your password before proceeding.</p>
+                    </Modal.Body>
+                )}
+
                 <Modal.Footer>
-                    <Button variant="primary" onClick={() => navigate('/employee/change-password')}>
-                        Change Password
-                    </Button>
+                    {!passwordChanged && (
+                        <Button variant="primary" onClick={handleChangePassword}>
+                            Change Password
+                        </Button>
+                    )}
                 </Modal.Footer>
             </Modal>
         </>
