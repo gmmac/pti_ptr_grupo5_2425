@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Alert, Row, Col } from 'react-bootstrap';
 import api from '../utils/axios';
-import ClientCatalogModal from '../components/storePurchase/clientCatalogModal'
-;
+import ClientCatalogModal from '../components/storePurchase/clientCatalogModal';
+import EquipmentCatalogModal from '../components/storePurchase/EquipmentCatalogModal';
 
 export default function StorePurchasePage() {
     const [form, setForm] = useState({
@@ -25,7 +25,13 @@ export default function StorePurchasePage() {
         name: '',
         email: '',
         phone: '',
-      });
+    });
+
+    const [equipmentData, setEquipmentData] = useState({
+        barcode: '',
+        releaseYear: '',
+        type: ''
+    });
 
     const [showModal, setShowModal] = useState(false);
 
@@ -84,6 +90,36 @@ export default function StorePurchasePage() {
             setForm((prevForm) => ({
                 ...prevForm,
                 clientNic: ''
+            }));
+        }
+    
+        setShowModal(false); 
+    };
+
+    const handleSelectEquipment = (equipment) => {
+        if (equipment) {
+            setEquipmentData({
+                barcode: equipment.barcode,
+                model: equipment.model,
+                releaseYear: equipment.releaseYear,
+                type: equipment.type
+            });
+    
+            setForm((prevForm) => ({
+                ...prevForm,
+                equipmentId: equipment.barcode // <-- Atualiza o campo equipmentId do form
+            }));
+        } else {
+            setEquipmentData({
+                barcode: '',
+                model: '',
+                releaseYear: '',
+                type: ''
+            });
+    
+            setForm((prevForm) => ({
+                ...prevForm,
+                equipmentId: ''
             }));
         }
     
@@ -244,7 +280,7 @@ export default function StorePurchasePage() {
                         <Form.Group controlId="formIdEquipamento">
                             <Form.Label>ID do Equipamento</Form.Label>
                             <Form.Control
-                                type="text"
+                                type="number"
                                 name="equipmentId"
                                 value={form.equipmentId}
                                 onChange={handleChange}
@@ -277,6 +313,7 @@ export default function StorePurchasePage() {
             </Form>
 
             <ClientCatalogModal show={showModal} handleClose={handleCloseModal} handleSelectClient={handleSelectClient} selectedClient={clientData.nic} />
+            <EquipmentCatalogModal show={showModal} handleClose={handleCloseModal} handleSelectEquipment={handleSelectEquipment} selectedEquipment={equipmentData.barcode} />
         </Container>
     );
     
