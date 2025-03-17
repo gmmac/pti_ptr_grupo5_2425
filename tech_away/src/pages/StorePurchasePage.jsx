@@ -33,13 +33,23 @@ export default function StorePurchasePage() {
         type: ''
     });
 
+    const [modelsList, setModelsList] = useState([]);
+
     const [showModal, setShowModal] = useState(false);
+    const [showModalEq, setShowModalEq] = useState(false);
 
     // Buscar estados do equipamento
     useEffect(() => {
         api.get(`/api/equipmentStatus/`)
             .then(res => setStatusList(res.data))
             .catch(error => console.error('Erro ao buscar estados:', error.message));
+    }, []);
+
+    // Buscar modelos do equipamento
+    useEffect(() => {
+        api.get(`/api/model/`)
+            .then(res => setModelsList(res.data))
+            .catch(error => console.error('Erro ao buscar modelos:', error.message));
     }, []);
 
     // Buscar IDs válidos de equipamentos
@@ -58,6 +68,10 @@ export default function StorePurchasePage() {
 
     const handleCloseModal = () => {
         setShowModal(false);
+    };
+
+    const handleCloseModalEq = () => {
+        setShowModalEq(false);
     };
 
     const handleSelectClient = (client) => {
@@ -123,7 +137,8 @@ export default function StorePurchasePage() {
             }));
         }
     
-        setShowModal(false); 
+        setShowModalEq(false); 
+
     };
 
     const handleChange = (event) => {
@@ -182,6 +197,8 @@ export default function StorePurchasePage() {
             setError("Não existe nenhum cliente com o NIC fornecido.");
             return;
         }
+
+        console.log(modelsList);
         
         api.post('/api/storePurchase', form)
         .then(response => {
@@ -292,7 +309,7 @@ export default function StorePurchasePage() {
 
                     <Col sm={12} md={6} className='d-flex align-items-end justify-content-start'>
                         <Button 
-                        onClick={() => setShowModal(true)}
+                        onClick={() => setShowModalEq(true)}
                         className='w-100 rounded-pill forms-btn shadow-lg'
                         >
                         Procurar equipamento
@@ -313,7 +330,7 @@ export default function StorePurchasePage() {
             </Form>
 
             <ClientCatalogModal show={showModal} handleClose={handleCloseModal} handleSelectClient={handleSelectClient} selectedClient={clientData.nic} />
-            <EquipmentCatalogModal show={showModal} handleClose={handleCloseModal} handleSelectEquipment={handleSelectEquipment} selectedEquipment={equipmentData.barcode} />
+            <EquipmentCatalogModal show={showModalEq} handleClose={handleCloseModalEq} handleSelectEquipment={handleSelectEquipment} selectedEquipment={equipmentData.barcode} />
         </Container>
     );
     

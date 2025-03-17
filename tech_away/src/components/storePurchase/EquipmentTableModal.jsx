@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Table } from 'react-bootstrap'
 
 export default function EquipmentTableModal({equipments, selectedEquipment, handleEquipmentSelection}) {
+
   return (
     <Table responsive="sm" striped bordered hover className="d-none d-lg-table">
         <thead>

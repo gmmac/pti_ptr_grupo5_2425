@@ -7,6 +7,7 @@ import EquipmentTableModal from "./EquipmentTableModal";
 import EquipmentCardModal from "./EquipmentCardModal";
 
 export default function EquipmentCatalogModal({ show, handleClose, handleSelectEquipment, selectedEquipment }) {
+
     const [equipments, setEquipments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,6 +23,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
       type: "",
       orderDirection: "ASC"
     });
+
   
     useEffect(() => {
       const fetchEquipments= async () => {
