@@ -39,10 +39,12 @@ export default function InitialNavBar() {
 		>
 			<Container>
 				<Navbar.Brand
+					onClick={() => navigate("/")}
 					style={{
 						color: "var(--dark-grey)",
 						fontFamily: "var(--title-font)",
 						fontWeight: "bold",
+						cursor: "pointer"
 					}}
 					className="fs-3"
 				>
@@ -108,7 +110,7 @@ export default function InitialNavBar() {
 						className="px-4 rounded-pill fs-6"
 					>
 						<Nav.Link
-              onClick={() => handleNavigation("register")}
+              				onClick={() => handleNavigation("register")}
 							style={{
 								color: isRegisterPage ? "var(--white)" : "inherit",
 							}}
@@ -128,7 +130,7 @@ export default function InitialNavBar() {
 						className="px-4 rounded-pill fs-6"
 					>
 						<Nav.Link
-              onClick={() => handleNavigation("login")}
+              				onClick={() => handleNavigation("login")}
 							style={{ color: isRegisterPage ? "inherit" : "var(--white)" }}
 						>
 							Log in

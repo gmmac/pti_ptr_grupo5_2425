@@ -86,7 +86,6 @@ export default function Router() {
       </Routes>
     </BrowserRouter>
     </IsMobileProvider>
-
   );
 }
 
