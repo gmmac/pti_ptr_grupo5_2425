@@ -11,6 +11,7 @@ import LayoutPage from "./pages/LayoutPage";
 import InterestsPage from "./pages/InterestsPage";
 import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import { getLoggedUser } from "./utils/auth";
+import { IsMobileProvider } from "./contexts/IsMobileContext";
 
 export default function Router() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(getLoggedUser() != null);
@@ -26,6 +27,7 @@ export default function Router() {
     };
 
   return (
+    <IsMobileProvider>
     <BrowserRouter>	
       <Routes>
         <Route path="/" element={<LayoutPage isUserLoggedIn={isUserLoggedIn} handle={handleLoginLogout}/>}>
@@ -55,5 +57,6 @@ export default function Router() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
+    </IsMobileProvider>
   );
 }
