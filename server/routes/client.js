@@ -3,16 +3,13 @@ const router = express.Router();
 const models = require('../models')
 const { Op } = require('sequelize');
 
-router.get("/:NIC", async (req, res) => {
-	try {
-		const client = await Client.findByPk(req.params.NIC);
-		if (!client) {
-			return res.status(404).json({ error: "Client not found" });
-		}
-		res.json(client);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+router.get("/", async (req, res) => {
+    try {
+        const clients = await models.Client.findAll(); // Busca todos os clientes
+        res.json(clients);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 router.put("/:NIC", async (req, res) => {
