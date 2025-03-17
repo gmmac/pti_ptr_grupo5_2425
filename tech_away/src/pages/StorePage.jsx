@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import FilterSearch from "../components/StorePage/FilterSearch";
-import { useFilter } from "../contexts/FilterProvider";
+// import FilterSearch from "../components/StorePage/FilterSearch";
+// import { useFilter } from "../contexts/FilterProvider";
 
 import api from "../utils/axios";
 
@@ -8,17 +8,17 @@ export default function StorePage() {
 	const [equipmentModelCatalog, setEquipmentModelCatalog] = useState([]);
 	const [refresh, setRefresh] = useState(false);
 
-	const { filters } = useFilter();
+	// const { filters } = useFilter();
 
 	useEffect(() => {
-		api.get("/api/equipmentSheet/", {
-            
-        });
-	});
+		api.get("/api/equipmentSheet/").then((res) => {
+			setEquipmentModelCatalog(res.data);
+		});
+	}, []);
 
-	return (
-		<>
-			<FilterSearch></FilterSearch>
-		</>
-	);
+	useEffect(() => {
+		console.log(equipmentModelCatalog);
+	}, [equipmentModelCatalog]);
+
+	return <>{/* <FilterSearch></FilterSearch> */}</>;
 }

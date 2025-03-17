@@ -4,29 +4,45 @@
 module.exports = {
 	async up(queryInterface, Sequelize) {
 		await queryInterface.bulkInsert(
-			"ActualCartEquipments",
+			"Brands",
 			[
 				{
-					equipmentId: 1, // Ajuste conforme os IDs reais dos equipamentos
-					cartId: 1, // Ajuste conforme os IDs reais dos carrinhos
+					name: "Apple",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
 				{
-					equipmentId: 2,
-					cartId: 1,
+					name: "Samsung",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
 				{
-					equipmentId: 3,
-					cartId: 2,
+					name: "Sony",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
 				{
-					equipmentId: 4,
-					cartId: 2,
+					name: "Dell",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+				{
+					name: "HP",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+				{
+					name: "Lenovo",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+				{
+					name: "Asus",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+				{
+					name: "Microsoft",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
@@ -36,6 +52,6 @@ module.exports = {
 	},
 
 	async down(queryInterface, Sequelize) {
-		await queryInterface.bulkDelete("ActualCartEquipments", null, {});
+		await queryInterface.bulkDelete("Brands", null, {});
 	},
 };
