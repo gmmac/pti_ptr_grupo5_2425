@@ -1,18 +1,24 @@
+
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('EmployeeRoles', {
+    await queryInterface.createTable('ActualCarts', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      role: {
-        type: Sequelize.STRING(20),
+      clientNIC: {
+        type: Sequelize.STRING(9),
         allowNull: false,
-        unique: true
+        references: {
+          model: 'Clients',
+          key: 'nic',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
       createdAt: {
         allowNull: false,
@@ -25,6 +31,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('EmployeeRoles');
+    await queryInterface.dropTable('ActualCarts');
   }
 };

@@ -6,11 +6,20 @@ import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPageClient from "./pages/Auth/RegisterPageClient";
 import LoginPageClient from "./pages/Auth/LoginPageClient";
 import StorePurchasePage from "./pages/StorePurchasePage";
-import ChangePasswordClient from "./pages/Auth/ChangePasswordClient";
+
+
 import LayoutPage from "./pages/LayoutPage";
+import EmployeeRegisterPage from "./pages/EmployeeRegisterPage";
+import EmployeeLoginPage from "./pages/EmployeeLoginPage";
+import EmployeeProtectedRoute from "./contexts/protectedRoutes/EmployeeProtectedRoute";
+import EmployeeHomePage from "./pages/EmployeeHomePage";
+
+
+import ChangePasswordClient from "./pages/Auth/ChangePasswordClient";
 import InterestsPage from "./pages/InterestsPage";
 import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import { getLoggedUser } from "./utils/auth";
+import { IsMobileProvider } from "./contexts/IsMobileContext";
 
 export default function Router() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(getLoggedUser() != null);
@@ -26,10 +35,13 @@ export default function Router() {
     };
 
   return (
+    <IsMobileProvider>
     <BrowserRouter>	
       <Routes>
         <Route path="/" element={<LayoutPage isUserLoggedIn={isUserLoggedIn} handle={handleLoginLogout}/>}>
-					<Route index element={<HomePage />} />
+					{/* Cliente */}
+
+          <Route index element={<HomePage />} />
 
 					<Route path="/teste" element={<Teste />} />
 
@@ -40,6 +52,24 @@ export default function Router() {
           <Route path="/register" element={<RegisterPageClient />} />
 
           <Route path="/login" element={<LoginPageClient handle={handleLoginLogout}/>} />
+
+
+
+          <Route path="employee">
+            {/* public routes */}
+            <Route path="login" element={<EmployeeLoginPage />} />
+
+            {/* logged employee routes */}
+            <Route element={<EmployeeProtectedRoute />}>
+                <Route index element={<EmployeeHomePage />} />
+            </Route>
+
+            {/* admin employee routes */}
+            {/* <Route element={<AdminProtectedRoute />}> */}
+                <Route path="register" element={<EmployeeRegisterPage />} />
+            {/* </Route> */}
+          </Route>
+
 
           <Route
             path="/interests"
@@ -55,5 +85,8 @@ export default function Router() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
+    </IsMobileProvider>
+
   );
 }
+

@@ -4,7 +4,7 @@ const models = require("../models");
 
 router.get("/", async (req, res) => {
 	try {
-		const purchases = await ClientPurchase.findAll();
+		const purchases = await models.ClientPurchase.findAll();
 		res.json(purchases);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
 	try {
-		const purchase = await ClientPurchase.create(req.body);
+		const purchase = await models.ClientPurchase.create(req.body);
 		res.status(201).json(purchase);
 	} catch (error) {
 		res.status(400).json({ error: error.message });
@@ -22,7 +22,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:ID", async (req, res) => {
 	try {
-		const purchase = await ClientPurchase.findByPk(req.params.ID);
+		const purchase = await models.ClientPurchase.findByPk(req.params.ID);
 		if (!purchase) {
 			return res.status(404).json({ error: "Purchase not found" });
 		}
@@ -34,7 +34,7 @@ router.get("/:ID", async (req, res) => {
 
 router.put("/:ID", async (req, res) => {
 	try {
-		const purchase = await ClientPurchase.findByPk(req.params.ID);
+		const purchase = await models.ClientPurchase.findByPk(req.params.ID);
 		if (!purchase) {
 			return res.status(404).json({ error: "Purchase not found" });
 		}
@@ -47,7 +47,7 @@ router.put("/:ID", async (req, res) => {
 
 router.delete("/:ID", async (req, res) => {
 	try {
-		const purchase = await ClientPurchase.findByPk(req.params.ID);
+		const purchase = await models.ClientPurchase.findByPk(req.params.ID);
 		if (!purchase) {
 			return res.status(404).json({ error: "Purchase not found" });
 		}

@@ -2,28 +2,28 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('EquipmentSheets', {
-      barcode: {
+    await queryInterface.createTable('ActualCartEquipments', {
+      id: {
         allowNull: false,
-        autoIncrement: false,
+        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.STRING(20)
+        type: Sequelize.INTEGER
       },
-      model: {
+      equipmentId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'EquipmentModels',
+          model: 'UsedEquipments',
           key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
-      type: {
+      cartId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'EquipmentTypes',
+          model: 'ActualCarts',
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -40,6 +40,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('EquipmentSheets');
+    await queryInterface.dropTable('ActualCartEquipments');
   }
 };
