@@ -24,4 +24,10 @@ export const employeeChangedPassword = async () => {
     const user = getLoggedUser();
     if (!user) return false;
     return user?.passwordReseted == 1
+}
+
+export const removeLoggedUser = () => {
+    sessionStorage.removeItem("user");
+
+
 };

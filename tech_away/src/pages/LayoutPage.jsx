@@ -1,40 +1,45 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import SmNavbar from "../components/Navbar/SmNavbar";
+import SmNavBar from "../components/Navbar/SmNavBar";
 import InitialNavBar from "../components/Navbar/InitialNavBar";
 import { Stack } from "react-bootstrap";
+import { IsMobileContext } from "../contexts/IsMobileContext";
+import BottomNavBar from "../components/Navbar/BottomNavBar";
+import LoggedInNavBar from "../components/Navbar/LoggedInNavBar";
+import { getLoggedUser,  removeLoggedUser} from "../utils/auth";
 
-const mobileSize = 768;
+function LayoutPage({isUserLoggedIn, handle}) {
+	const isMobile = useContext(IsMobileContext);
 
-function LayoutPage() {
+	useEffect(()=>{
+		console.log("Logado" + isUserLoggedIn)
+	},[isUserLoggedIn])
 
-    const [isMobile, setIsMobile] = useState(window.innerWidth < mobileSize);
+	return (
+		<Stack className="dvh-100">
+			<div
+				style={{
+					backgroundColor: "var(--light-grey)",
+					color: "var(--dark-grey)",
+				}}
+			>
+				{isMobile ? (
+					<>
+						<SmNavBar />
+						<BottomNavBar />
+					</>
+				) : isUserLoggedIn ? (
+					<LoggedInNavBar handle={handle}/>
+				) : (
+					<InitialNavBar handleLogout={handle}/>
+				)}
+			</div>
 
-    useEffect(() => {
-		const handleResize = () => {
-			setIsMobile(window.innerWidth < mobileSize);
-		};
-
-		window.addEventListener("resize", handleResize);
-
-		return () => window.removeEventListener("resize", handleResize);
-	}, []);
-
-    return (
-        <Stack className='vh-100'> 
-            <div style={{backgroundColor: "var(--light-grey)", color: "var(--dark-grey)",}}>
-                {isMobile ? <SmNavbar /> : <InitialNavBar />}
-            </div>
-        
-            <div className="">
-                <Outlet />
-            </ div>
-
-        </Stack>
-    );
+			<div>
+				<Outlet />
+			</div>
+		</Stack>
+	);
 }
-
-
-
 
 export default LayoutPage;

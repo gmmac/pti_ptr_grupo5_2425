@@ -1,3 +1,7 @@
 body {
     background-color: var(--light-grey);
 }
+
+.rounded-lg {
+    border-radius: var(--rounded-lg);
+}

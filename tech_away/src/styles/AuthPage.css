@@ -21,4 +21,10 @@ form .auth-input {
 form .auth-input:focus {
     outline: none;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
+
+}
+
+.underText{
+    cursor: pointer;
+    text-decoration: underline;
 }
