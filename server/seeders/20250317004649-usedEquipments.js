@@ -17,6 +17,15 @@ module.exports = {
 				},
 				{
 					statusID: 2, // Referência ao status "usado" na tabela EquipmentStatuses
+					price: 749.99,
+					saleDate: null,
+					purchaseDate: new Date("2023-12-10"),
+					equipmentId: "12345678901234567890", // Referência ao barcode do equipamento "iPhone 15" na tabela EquipmentSheets
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+				{
+					statusID: 2, // Referência ao status "usado" na tabela EquipmentStatuses
 					price: 799.99,
 					saleDate: null,
 					purchaseDate: new Date("2023-12-12"),
