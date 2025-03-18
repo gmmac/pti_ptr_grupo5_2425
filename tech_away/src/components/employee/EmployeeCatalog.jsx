@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row, Stack } from 'react-bootstrap';
 import { PaginationProvider } from '../../contexts/PaginationContext';
 
 import api from '../../utils/axios';
@@ -45,6 +45,10 @@ export default function EmployeeCatalog() {
     navigate("register")
   };
 
+  const handleChangeEmployeeRole = () => {
+    console.log("Falta implementar")
+  }
+
   useEffect(() => {
     api
       .get('/api/employee/', {
@@ -83,15 +87,18 @@ export default function EmployeeCatalog() {
     <Container className="py-4">
       <EmployeeFilter filters={filters} onFilterChange={handleFilterChange} />
       
-      <div className="d-flex justify-content-center my-3">
+      <Stack direction='horizontal' gap={3} className="justify-content-center my-3">
         <Button variant="primary" size="lg" className="shadow-sm" onClick={handleCreateEmployee} >
           + Create New Employee
         </Button>
-      </div>
+        <Button variant="primary" size="lg" className="shadow-sm" onClick={handleChangeEmployeeRole} >
+          Change Employee Role
+        </Button>
+      </Stack>
       
         <PaginationProvider>
-            <EmployeesTableView employees={employees} /> { /* Ecrãs grandes */}
-            <EmployeeCardView employees={employees} /> { /* Ecrãs pequenos */}
+            <EmployeesTableView employees={employees} changeRole={handleChangeEmployeeRole} /> { /* Ecrãs grandes */}
+            <EmployeeCardView employees={employees} changeRole={handleChangeEmployeeRole} /> { /* Ecrãs pequenos */}
         </PaginationProvider>
 
         <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />

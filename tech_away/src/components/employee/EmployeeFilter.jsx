@@ -71,18 +71,6 @@ export default function EmployeeFilter({ filters, onFilterChange }) {
                   </Form.Group>
                 </Col>
                 <Col xs={12} md={6}>
-                  <Form.Group controlId="filterNIC">
-                    <Form.Label>NIC</Form.Label>
-                    <Form.Control type="text" name="nic" value={localFilters.nic} onChange={handleChange} />
-                  </Form.Group>
-                </Col>
-                <Col xs={12} md={6}>
-                  <Form.Group controlId="filterNIF">
-                    <Form.Label>NIF</Form.Label>
-                    <Form.Control type="text" name="nif" value={localFilters.nif} onChange={handleChange} />
-                  </Form.Group>
-                </Col>
-                <Col xs={12} md={6}>
                   <Form.Group controlId="filterInternNum">
                     <Form.Label>Intern Number</Form.Label>
                     <Form.Control 
@@ -111,22 +99,6 @@ export default function EmployeeFilter({ filters, onFilterChange }) {
                   <Form.Group controlId="filterPhone">
                     <Form.Label>Phone</Form.Label>
                     <Form.Control type="text" name="phone" value={localFilters.phone} onChange={handleChange} />
-                  </Form.Group>
-                </Col>
-                
-                {/* Novo filtro para Gênero */}
-                <Col xs={12} md={6}>
-                  <Form.Group controlId="filterGender">
-                    <Form.Label>Gender</Form.Label>
-                    <Form.Select 
-                      name="gender" 
-                      value={localFilters.gender} 
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="M">Male</option>
-                      <option value="F">Female</option>
-                    </Form.Select>
                   </Form.Group>
                 </Col>
               </Row>

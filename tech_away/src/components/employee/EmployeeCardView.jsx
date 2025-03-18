@@ -11,12 +11,12 @@ export default function EmployeeCardView({ employees }) {
               <Card.Title className="fw-bold">{employee.name}</Card.Title>
               <Card.Subtitle className="mb-2 text-muted">{employee.EmployeeRole.role}</Card.Subtitle>
               <Card.Text>
-                <strong>NIF:</strong> {employee.nif} <br />
-                <strong>NIC:</strong> {employee.nic} <br />
                 <strong>Intern Number:</strong> {employee.internNum} <br />
+                {/* <strong>NIF:</strong> {employee.nif} <br />
+                <strong>NIC:</strong> {employee.nic} <br /> */}
                 <strong>Store NIPC:</strong> {employee.Store.nipc} <br />
-                <strong>Birth Date:</strong> {new Date(employee.birthDate).toLocaleDateString()} <br />
-                <strong>Gender:</strong>{" "}
+                {/* <strong>Birth Date:</strong> {new Date(employee.birthDate).toLocaleDateString()} <br /> */}
+                {/* <strong>Gender:</strong>{" "} */}
                 <Badge bg={employee.gender === "M" ? "secondary" : "dark"}>
                   {employee.gender === "M" ? "Male" : "Female"}
                 </Badge>{" "}
