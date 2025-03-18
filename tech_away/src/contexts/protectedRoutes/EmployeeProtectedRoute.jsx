@@ -11,7 +11,7 @@ export default function EmployeeProtectedRoute() {
   useEffect(() => {
     const user = getLoggedUser();
     
-    if (!user) {
+    if (!user || !user.role ) {
       navigate("/employee/login"); // Redireciona para login se não estiver logado
     } else {
       setIsAuthenticated(true);

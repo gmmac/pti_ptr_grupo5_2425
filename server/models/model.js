@@ -26,7 +26,15 @@ module.exports = (sequelize, DataTypes) => {
     brand_id: {
       type: DataTypes.INTEGER,
       allowNull: false
-    }
+    },
+    releaseYear: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    price: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
   }, {
     sequelize,
     modelName: 'EquipmentModel',

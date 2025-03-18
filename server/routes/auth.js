@@ -18,7 +18,7 @@ const decryptToken = (encryptedToken) => {
 };
 
 router.put("/generateAuthToken", async (req, res) => {
-  try {
+  // try {
     // Request an access token from Auth0
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
       client_id: process.env.AUTH0_CLIENT_ID,
@@ -34,7 +34,6 @@ router.put("/generateAuthToken", async (req, res) => {
     const token = response.data.access_token;
 
     const tokenAuth = await models.Token.findOne({ where: { name: "auth" } });
-
     if(tokenAuth){ //token exists
       const [updated] = await models.Token.update(
         {
@@ -53,12 +52,13 @@ router.put("/generateAuthToken", async (req, res) => {
       }
     }
     else{ //token do not exists
+
       await models.Token.create({name: "auth", token: encryptToken(token), createdAt: Date.now(), updatedAt: Date.now()});
     }
 
-  } catch (error) {
-    res.status(500);
-  }
+  // } catch (error) {
+  //   res.status(500);
+  // }
 });
 
 router.post("/register", async (req, res) => {

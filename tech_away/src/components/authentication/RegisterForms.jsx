@@ -87,7 +87,7 @@ export default function RegisterForms() {
     };
 
     const verifyData = async () => {
-        //const response = await api.put('/api/auth/generateAuthToken');
+        const response = await api.put('/api/auth/generateAuthToken');
         await api.post('/api/client/', {
             nic: formData.nic, 
             nif: formData.nif, 

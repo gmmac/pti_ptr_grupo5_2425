@@ -3,7 +3,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('Employees', [
       {
-        nic: '12345678',
+        nic: '123456789',
         nif: '987654321',
         internNum: '123456',
         storeNIPC: "123456789",

@@ -32,17 +32,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       autoIncrement: false
     },
-    price: {
-      type: DataTypes.FLOAT,
-      allowNull: true
-    },
     model: {
       type: DataTypes.INTEGER,
       allowNull: false
-    },
-    releaseYear: {
-      type: DataTypes.INTEGER,
-      allowNull: true
     },
     type: {
       type: DataTypes.INTEGER,
