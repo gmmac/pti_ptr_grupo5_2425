@@ -13,6 +13,7 @@ router.get("/", async (req, res) => {
             name,
             email,
             phone,
+			gender,
             // address,
             role,
             page = 1,
@@ -33,6 +34,7 @@ router.get("/", async (req, res) => {
         if (name) where.name = { [Op.like]: `%${name}%` };
         if (email) where.email = { [Op.like]: `%${email}%` };
         if (phone) where.phone = { [Op.like]: `%${phone}%` };
+        if (gender) where.gender = { [Op.like]: `%${gender}%` };
         // if (address) where.address = { [Op.like]: `%${address}%` };
         if (role) where.role = { [Op.eq]: role };
 

@@ -62,13 +62,13 @@ export default function EmployeeProfile() {
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Name</Form.Label>
-                                        <Form.Control type="text" name="name" value={formData.name} disabled />
+                                        <Form.Control className="auth-input" type="text" name="name" value={formData.name} disabled />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Birth Date</Form.Label>
-                                        <Form.Control type="date" name="birthDate" value={formatDate(formData.birthDate)} disabled />
+                                        <Form.Control className="auth-input" type="date" name="birthDate" value={formatDate(formData.birthDate)} disabled />
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -77,13 +77,13 @@ export default function EmployeeProfile() {
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Phone</Form.Label>
-                                        <Form.Control type="tel" name="phone" value={formData.phone} disabled />
+                                        <Form.Control className="auth-input" type="tel" name="phone" value={formData.phone} disabled />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Email</Form.Label>
-                                        <Form.Control type="email" name="email" value={formData.email} disabled />
+                                        <Form.Control className="auth-input" type="email" name="email" value={formData.email} disabled />
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -92,13 +92,13 @@ export default function EmployeeProfile() {
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>NIC</Form.Label>
-                                        <Form.Control type="text" name="nic" value={formData.nic} disabled />
+                                        <Form.Control className="auth-input" type="text" name="nic" value={formData.nic} disabled />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>NIF</Form.Label>
-                                        <Form.Control type="text" name="nif" value={formData.nif} disabled />
+                                        <Form.Control className="auth-input" type="text" name="nif" value={formData.nif} disabled />
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -107,7 +107,7 @@ export default function EmployeeProfile() {
                                 <Col md={12}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Address</Form.Label>
-                                        <Form.Control type="text" name="address" value={formData.address || ""} disabled={!isEditable} onChange={handleChange} />
+                                        <Form.Control className="auth-input" type="text" name="address" value={formData.address || ""} disabled={!isEditable} onChange={handleChange} />
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -124,28 +124,29 @@ export default function EmployeeProfile() {
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Intern Number</Form.Label>
-                                        <Form.Control type="text" name="internNum" value={formData.internNum} disabled />
+                                        <Form.Control className="auth-input" type="text" name="internNum" value={formData.internNum} disabled />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Role</Form.Label>
-                                        <Form.Control type="text" name="role" value={userRole} disabled />
+                                        <Form.Control className="auth-input" type="text" name="role" value={userRole} disabled />
                                     </Form.Group>
                                 </Col>
                             </Row>
+                            <div className="border-top my-3"></div>
 
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Store Name</Form.Label>
-                                        <Form.Control type="text" value={employeeStore.name || "N/A"} disabled />
+                                        <Form.Control className="auth-input" type="text" value={employeeStore.name || "N/A"} disabled />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Store Address</Form.Label>
-                                        <Form.Control type="text" value={employeeStore.address || "N/A"} disabled />
+                                        <Form.Control className="auth-input" type="text" value={employeeStore.address || "N/A"} disabled />
                                     </Form.Group>
                                 </Col>
                             </Row>

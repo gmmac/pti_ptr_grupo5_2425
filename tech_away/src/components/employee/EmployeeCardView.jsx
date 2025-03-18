@@ -23,7 +23,6 @@ export default function EmployeeCardView({ employees }) {
                 <br />
                 <strong>Email:</strong> {employee.email} <br />
                 <strong>Phone:</strong> {employee.phone} <br />
-                <strong>Address:</strong> {employee.address} <br />
                 <strong>Created At:</strong> {new Date(employee.createdAt).toLocaleDateString()} <br />
               </Card.Text>
             </Card.Body>

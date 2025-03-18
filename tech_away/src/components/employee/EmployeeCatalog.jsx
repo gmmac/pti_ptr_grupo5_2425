@@ -7,12 +7,14 @@ import PaginationControl from '../pagination/PaginationControl';
 import EmployeeCardView from './EmployeeCardView';
 import EmployeesTableView from './EmployeeTableView';
 import EmployeeFilter from './EmployeeFilter';
+import { useNavigate } from 'react-router-dom';
 
 export default function EmployeeCatalog() {
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 4;
+  const navigate = useNavigate();
 
   const [filters, setFilters] = useState({
     nic: "",
@@ -22,6 +24,7 @@ export default function EmployeeCatalog() {
     name: "",
     email: "",
     phone: "",
+    gender: "",
     // address: "",
     role: "",
     // orderBy: 'id',
@@ -38,6 +41,10 @@ export default function EmployeeCatalog() {
     setCurrentPage(pageNumber);
   };
 
+  const handleCreateEmployee = () => {
+    navigate("register")
+  };
+
   useEffect(() => {
     api
       .get('/api/employee/', {
@@ -49,6 +56,7 @@ export default function EmployeeCatalog() {
           name: filters.name,
           email: filters.email,
           phone: filters.phone,
+          gender: filters.gender,
           // address: filters.address,
           role: filters.role,
           orderBy: filters.orderBy,
@@ -66,12 +74,17 @@ export default function EmployeeCatalog() {
       });
   }, [currentPage, filters]);
 
+
+  useEffect(() => {
+    console.log(filters)
+  }, [filters])
+
   return (
     <Container className="py-4">
       <EmployeeFilter filters={filters} onFilterChange={handleFilterChange} />
       
       <div className="d-flex justify-content-center my-3">
-        <Button variant="primary" size="lg" className="shadow-sm" >
+        <Button variant="primary" size="lg" className="shadow-sm" onClick={handleCreateEmployee} >
           + Create New Employee
         </Button>
       </div>

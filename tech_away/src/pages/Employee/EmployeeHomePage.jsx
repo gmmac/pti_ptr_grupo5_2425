@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Tab, Nav, Modal, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import EmployeeRolesCatalog from '../components/employee/employeeRoles/EmployeeRolesCatalog';
-import EmployeeProfile from '../components/employee/EmployeeProfile';
-import { checkIfAdmin, getLoggedUser } from '../utils/auth';
-import EmployeeCatalog from '../components/employee/EmployeeCatalog';
-import api from '../utils/axios';
-import BottomNavBar from '../components/Navbar/BottomNavBar';
+import EmployeeRolesCatalog from '../../components/employee/employeeRoles/EmployeeRolesCatalog';
+import EmployeeProfile from '../../components/employee/EmployeeProfile';
+import { checkIfAdmin, getLoggedUser } from '../../utils/auth';
+import EmployeeCatalog from '../../components/employee/EmployeeCatalog';
+import api from '../../utils/axios';
+import BottomNavBar from '../../components/Navbar/BottomNavBar';
+import EmployeeHomeDashboard from '../../components/employee/EmployeeHomeDashboard';
 
 export default function EmployeeHomePage() {
     const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'home');
@@ -121,7 +122,7 @@ export default function EmployeeHomePage() {
                         <Nav.Link eventKey="home">Home</Nav.Link>
                     </Nav.Item>
                     <Nav.Item className='custom-tabs'>
-                        <Nav.Link eventKey="sells">Sells</Nav.Link>
+                        <Nav.Link eventKey="sales">Sales</Nav.Link>
                     </Nav.Item>
                     <Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="purchases">Purchases</Nav.Link>
@@ -148,10 +149,10 @@ export default function EmployeeHomePage() {
 
                 <Tab.Content className='custom-tab-content'>
                     <Tab.Pane eventKey="home">
-                        <p>Tab content for Home</p>
+                        <EmployeeHomeDashboard />
                     </Tab.Pane>
-                    <Tab.Pane eventKey="sells">
-                        <p>Tab content for Sells</p>
+                    <Tab.Pane eventKey="sales">
+                        <p>Tab content for Sales</p>
                     </Tab.Pane>
                     <Tab.Pane eventKey="purchases">
                         <p>Tab content for Purchases</p>

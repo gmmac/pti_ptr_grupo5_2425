@@ -7,13 +7,12 @@ import RegisterPageClient from "./pages/Auth/RegisterPageClient";
 import LoginPageClient from "./pages/Auth/LoginPageClient";
 import StorePurchasePage from "./pages/StorePurchasePage";
 
-
-import LayoutPage from "./pages/LayoutPage";
-import EmployeeRegisterPage from "./pages/EmployeeRegisterPage";
-import EmployeeLoginPage from "./pages/EmployeeLoginPage";
+import LayoutPage from "./pages/Layout/LayoutPage";
+import EmployeeLayoutPage from "./pages/Layout/EmployeeLayoutPage";
+import EmployeeRegisterPage from "./pages/Employee/EmployeeRegisterPage";
+import EmployeeLoginPage from "./pages/Employee/EmployeeLoginPage";
 import EmployeeProtectedRoute from "./contexts/protectedRoutes/EmployeeProtectedRoute";
-import EmployeeHomePage from "./pages/EmployeeHomePage";
-
+import EmployeeHomePage from "./pages/Employee/EmployeeHomePage";
 
 import ChangePasswordClient from "./pages/Auth/ChangePasswordClient";
 import InterestsPage from "./pages/InterestsPage";
@@ -24,69 +23,48 @@ import { IsMobileProvider } from "./contexts/IsMobileContext";
 export default function Router() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(getLoggedUser() != null);
 
-    useEffect(()=>{
-        if(getLoggedUser()){
-        console.log("esta logado")
-        }
-    }, [isUserLoggedIn])
+  useEffect(() => {
+    if (getLoggedUser()) {
+      console.log("Está logado");
+    }
+  }, [isUserLoggedIn]);
 
-    const handleLoginLogout = (bool) => {
-        setIsUserLoggedIn(bool);
-    };
+  const handleLoginLogout = (bool) => {
+    setIsUserLoggedIn(bool);
+  };
 
   return (
     <IsMobileProvider>
-    <BrowserRouter>	
-      <Routes>
-        <Route path="/" element={<LayoutPage isUserLoggedIn={isUserLoggedIn} handle={handleLoginLogout}/>}>
-					{/* Cliente */}
-
-          <Route index element={<HomePage />} />
-
-					<Route path="/teste" element={<Teste />} />
-
-          <Route path="/changePassword" element={<ChangePasswordClient />} />
-            
-          <Route path="/storePurchasePage" element={<StorePurchasePage />} />
-
-          <Route path="/register" element={<RegisterPageClient />} />
-
-          <Route path="/login" element={<LoginPageClient handle={handleLoginLogout}/>} />
-
-
-
-          <Route path="employee">
-            {/* public routes */}
-            <Route path="login" element={<EmployeeLoginPage />} />
-
-            {/* logged employee routes */}
-            <Route element={<EmployeeProtectedRoute />}>
-                <Route index element={<EmployeeHomePage />} />
-            </Route>
-
-            {/* admin employee routes */}
-            {/* <Route element={<AdminProtectedRoute />}> */}
-                <Route path="register" element={<EmployeeRegisterPage />} />
-            {/* </Route> */}
-          </Route>
-
-
-          <Route
-            path="/interests"
-            element={
-              <InterestsFilterProvider> {/* Fazer o filtro */}
+      <BrowserRouter>
+        <Routes>
+          {/* Rotas do Cliente */}
+          <Route path="/" element={<LayoutPage isUserLoggedIn={isUserLoggedIn} handle={handleLoginLogout} />}>
+            <Route index element={<HomePage />} />
+            <Route path="/teste" element={<Teste />} />
+            <Route path="/changePassword" element={<ChangePasswordClient />} />
+            <Route path="/storePurchasePage" element={<StorePurchasePage />} />
+            <Route path="/register" element={<RegisterPageClient />} />
+            <Route path="/login" element={<LoginPageClient handle={handleLoginLogout} />} />
+            <Route path="/interests" element={
+              <InterestsFilterProvider>
                 <InterestsPage />
               </InterestsFilterProvider>
-            }
-           />
-					
-         </Route>
-        
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </BrowserRouter>
-    </IsMobileProvider>
+            } />
+          </Route>
 
+          {/* Rotas do Funcionário */}
+          <Route path="/employee" element={<EmployeeLayoutPage />}>
+            <Route path="login" element={<EmployeeLoginPage />} />
+            <Route element={<EmployeeProtectedRoute />}>
+              <Route index element={<EmployeeHomePage />} />
+            </Route>
+            <Route path="register" element={<EmployeeRegisterPage />} />
+          </Route>
+
+          {/* Página de erro */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </BrowserRouter>
+    </IsMobileProvider>
   );
 }
-

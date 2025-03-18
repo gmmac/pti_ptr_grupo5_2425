@@ -17,7 +17,6 @@ export default function EmployeesTableView({ employees }) {
               <th>Gender</th>
               <th>Email</th>
               <th>Phone</th>
-              <th>Address</th>
               <th>Role</th>
               <th>Created At</th>
             </tr>
@@ -38,7 +37,6 @@ export default function EmployeesTableView({ employees }) {
                 </td>
                 <td className="text-truncate" style={{ maxWidth: "200px" }}>{employee.email}</td>
                 <td>{employee.phone}</td>
-                <td>{employee.address}</td>
                 <td>
                   <Badge bg="muted" style={{ color: "#333" }}>{employee.EmployeeRole.role}</Badge>
                 </td>

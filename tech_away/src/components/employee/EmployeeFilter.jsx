@@ -41,7 +41,8 @@ export default function EmployeeFilter({ filters, onFilterChange }) {
       storeNIPC: "",
       email: "",
       phone: "",
-      role: ""
+      role: "",
+      gender: ""
     };
     setLocalFilters(clearedFilters);
     setErrors({});
@@ -103,13 +104,29 @@ export default function EmployeeFilter({ filters, onFilterChange }) {
                 <Col xs={12} md={6}>
                   <Form.Group controlId="filterEmail">
                     <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" name="email" value={localFilters.email} onChange={handleChange} />
+                    <Form.Control type="text" name="email" value={localFilters.email} onChange={handleChange} />
                   </Form.Group>
                 </Col>
                 <Col xs={12} md={6}>
                   <Form.Group controlId="filterPhone">
                     <Form.Label>Phone</Form.Label>
                     <Form.Control type="text" name="phone" value={localFilters.phone} onChange={handleChange} />
+                  </Form.Group>
+                </Col>
+                
+                {/* Novo filtro para Gênero */}
+                <Col xs={12} md={6}>
+                  <Form.Group controlId="filterGender">
+                    <Form.Label>Gender</Form.Label>
+                    <Form.Select 
+                      name="gender" 
+                      value={localFilters.gender} 
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="M">Male</option>
+                      <option value="F">Female</option>
+                    </Form.Select>
                   </Form.Group>
                 </Col>
               </Row>
