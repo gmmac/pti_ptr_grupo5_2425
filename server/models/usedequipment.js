@@ -18,6 +18,13 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       });
+
+      UsedEquipment.belongsTo(models.Store, {
+        foreignKey: 'storeId',
+        targetKey: 'nipc',
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      });
     }
   }
   UsedEquipment.init({
@@ -39,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     equipmentId: {
       type: DataTypes.STRING(20),
+      allowNull: false
+    },
+    storeId: {
+      type: DataTypes.INTEGER,
       allowNull: false
     }
   }, {
