@@ -3,7 +3,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('Employees', [
       {
-        nic: '123456789',
+        nic: '12345678',
         nif: '987654321',
         internNum: '123456',
         storeNIPC: "123456789",
@@ -49,7 +49,7 @@ module.exports = {
         address: 'Rua do Comércio, 55',
         latitude: '40.2056', 
         longitude: '-8.4196', 
-        role: 3,
+        role: 2,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -66,7 +66,7 @@ module.exports = {
         address: 'Avenida Central, 100',
         latitude: '37.0194', 
         longitude: '-7.9304', 
-        role: 4, 
+        role: 2, 
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -83,7 +83,7 @@ module.exports = {
         address: 'Rua das Palmeiras, 42',
         latitude: '41.1496', 
         longitude: '-8.6110', 
-        role: 5,
+        role: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -91,6 +91,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Employees', null, {});
+    // await queryInterface.bulkDelete('Employees', null, {});
   }
 };

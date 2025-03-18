@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
-import { Button, Form, FormGroup } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Button, Form } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import api from '../../utils/axios';
+import '../../styles/index.css';
+import '../../styles/AuthPage.css';
 
-export default function LoginForms({setShowToast}) {
+export default function LoginForms({handle}) {
 
     const [formData, setFormData] = useState({
         email: '',
@@ -15,6 +17,16 @@ export default function LoginForms({setShowToast}) {
         password: '',
         invalidCredentials: ''
     });
+
+    const navigate = useNavigate();
+
+    const ChangeToRegister = () => {
+        navigate('/register');
+    };
+
+    const ChangeToChangePassword = () => {
+        navigate('/changePassword');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -45,11 +57,12 @@ export default function LoginForms({setShowToast}) {
         let newErrors = { ...errors };
         await api.post('/api/auth/login', {
             email: formData.email,
-            password: formData.password
+            password: formData.password,
+            userType: "client"
         })
         .then(async response => {
-            console.log(response);
             sessionStorage.setItem('user', JSON.stringify(response.data));
+            handle(true);
         })
         .catch(error => {
             if(error.status == 403){
@@ -91,15 +104,17 @@ export default function LoginForms({setShowToast}) {
 
     
   return (
-    <div className='bg-success w-100 p-md-5 p-3 rounded' >
-        <h1>Login</h1>
-        <h6>Login to acess your account</h6>
+    <div className='bg-white w-100 p-md-5 p-3 rounded-lg shadow-lg'>
+
+        <h1 className='mb-3'>Login</h1>
+        <h5 className='mb-5'>Login to acess your account</h5>
 
         <Form onSubmit={handleSubmit} >
             {/* Email */}
             <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control 
+                <Form.Label className='fw-bold'>Email</Form.Label>
+                <Form.Control
+                    className='auth-input'
                     type="email" 
                     placeholder="Enter your email" 
                     name="email" 
@@ -114,8 +129,9 @@ export default function LoginForms({setShowToast}) {
 
             {/* Password */}
             <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control 
+                <Form.Label className='fw-bold'>Password</Form.Label>
+                <Form.Control
+                    className='auth-input'  
                     type="password" 
                     placeholder="Enter your password" 
                     name="password" 
@@ -128,14 +144,19 @@ export default function LoginForms({setShowToast}) {
                 </Form.Control.Feedback>
             </Form.Group>
 
+            {/* Reset Password link */}
+            <Form.Group className="mb-3 text-end">
+                <p className="underText" onClick={ChangeToChangePassword}>Reset Password</p>
+            </Form.Group>
+
             <Form.Group>
-                {errors.invalidCredentials && <p>{errors.invalidCredentials}</p>}
-                <Button type="submit"className='w-100 bg-warning rounded-pill'>Login</Button>
+                {errors.invalidCredentials && <p className='text-danger'>{errors.invalidCredentials}</p>}
+                <Button type="submit"className='w-100 rounded-pill forms-btn shadow-lg'>Login</Button>
             </Form.Group>
         </Form>
         <div className='d-flex flex-align-items justify-content-end m-2'>
             <p>Don't have an account?</p>
-            <Link to='/register'>Sign up</Link>
+            <p className='ms-2 underText' onClick={ChangeToRegister}>Sign up</p>
         </div>
     </div>
    

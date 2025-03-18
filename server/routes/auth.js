@@ -33,21 +33,29 @@ router.put("/generateAuthToken", async (req, res) => {
 
     const token = response.data.access_token;
 
-    const [updated] = await models.Token.update(
-      {
-        token: encryptToken(token),
-        updatedAt: Date.now(),
-      },
-      {
-        where: {
-          name: "auth",
-        },
-      }
-    );
+    const tokenAuth = await models.Token.findOne({ where: { name: "auth" } });
 
-    if(updated){
-      res.sendStatus(201);  // Send a success response
+    if(tokenAuth){ //token exists
+      const [updated] = await models.Token.update(
+        {
+          token: encryptToken(token),
+          updatedAt: Date.now(),
+        },
+        {
+          where: {
+            name: "auth",
+          },
+        }
+      );
+
+      if(updated){
+        res.sendStatus(201);
+      }
     }
+    else{ //token do not exists
+      await models.Token.create({name: "auth", token: encryptToken(token), createdAt: Date.now(), updatedAt: Date.now()});
+    }
+
   } catch (error) {
     res.status(500);
   }
@@ -88,7 +96,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, userType } = req.body;
 
     // Login User
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
@@ -102,16 +110,79 @@ router.post("/login", async (req, res) => {
       password: password
     });
 
-    const existingClient = await models.Client.findOne({where: {email: email}
-    });
-
-    if(existingClient){
-      return res.status(201).json(existingClient.dataValues);
+    if(userType === "client"){
+      const existingClient = await models.Client.findOne({where: {email: email}
+      });
+  
+      if(existingClient){
+        return res.status(201).json(existingClient.dataValues);
+      }
     }
+
+    if(userType === "employee"){
+      const existingEmployee = await models.Employee.findOne({where: {email: email}
+      });
+
+      if(existingEmployee){
+        return res.status(201).json(existingEmployee.dataValues);
+      }
+    }
+
+
   } catch (error) {
     console.error(error.status);
     res.sendStatus(error.status); // Internal Server Error
   }
+
 });
+
+router.post("/changePassword", async (req, res) => {
+  // try {
+    const { email } = req.body;
+
+    // Change password
+    const response = await axios.post(process.env.AUTH0_API_URL + "/dbconnections/change_password", {
+      client_id: process.env.AUTH0_CLIENT_ID,
+      connection: "Username-Password-Authentication",
+      email: email,
+    });
+    
+    res.status(201).json("Email Sent")
+  // } catch (error) {
+  //   console.error(error.status);
+  //   res.sendStatus(error.status); // Internal Server Error
+  // }
+});
+
+
+router.get("/getUserByEmail/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    // Buscar token armazenado no banco
+    const token = await models.Token.findOne({ where: { name: "auth" } });
+    if (!token) return res.status(500).json({ error: "Auth Token not found" });
+
+    const desencriptedToken = decryptToken(token.dataValues.token);
+
+    // Buscar usuário pelo email na API do Auth0
+    const response = await axios.get(`${process.env.AUTH0_API_URL}/api/v2/users-by-email?email=${encodeURIComponent(email)}`, {
+      headers: { Authorization: "Bearer " + desencriptedToken }
+    });
+
+    if (response.data.length === 0) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
+    res.status(200).json(response.data[0]); // Retorna o primeiro usuário encontrado
+
+  } catch (error) {
+    console.error("Erro ao buscar usuário:", error.response?.data || error.message);
+    res.status(500).json({ error: "Erro ao buscar usuário" });
+  }
+});
+
+
+
 
 module.exports = router;

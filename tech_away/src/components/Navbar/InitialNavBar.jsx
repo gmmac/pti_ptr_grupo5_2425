@@ -1,19 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { Container, Navbar, Nav } from "react-bootstrap";
 import { useLocation, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../../styles/variables.css";
 
 const navItems = [
-	{ name: "About Us", path: "/about" },
-	{ name: "Our Services", path: "/services" },
-	{ name: "Store", path: "/store" },
+  { name: "About Us", path: "/about" },
+  { name: "Our Services", path: "/services" },
+  { name: "Store", path: "/store" },
 ];
 
 export default function InitialNavBar() {
-	const location = useLocation();
-	const isRegisterPage = location.pathname === "/register";
+  const location = useLocation();
+  const [isRegisterPage, setIsRegisterPage] = useState(false);
+  const navigate = useNavigate();
 
-	return (
+  // Verifica a URL e define o estado isRegisterPage
+  useEffect(() => {
+      if (location.pathname === '/register') {
+          setIsRegisterPage(true);
+      } else if (location.pathname === '/login') {
+          setIsRegisterPage(false);
+      }
+  }, [location]);
+
+
+  // Função para redirecionar para a página de login ou registro
+  const handleNavigation = (formType) => {
+    setIsRegisterPage(formType === "register");
+    navigate("/" + formType);
+  };
+
+  return (
 		<Navbar
 			style={{
 				backgroundColor: "var(--light-grey)",
@@ -90,6 +108,7 @@ export default function InitialNavBar() {
 						className="px-4 rounded-pill fs-6"
 					>
 						<Nav.Link
+              onClick={() => handleNavigation("register")}
 							style={{
 								color: isRegisterPage ? "var(--white)" : "inherit",
 							}}
@@ -109,6 +128,7 @@ export default function InitialNavBar() {
 						className="px-4 rounded-pill fs-6"
 					>
 						<Nav.Link
+              onClick={() => handleNavigation("login")}
 							style={{ color: isRegisterPage ? "inherit" : "var(--white)" }}
 						>
 							Log in

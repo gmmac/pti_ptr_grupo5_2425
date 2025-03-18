@@ -1,0 +1,30 @@
+form .forms-btn {
+    background-color: var(--variant-two);
+    border: none;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+form .forms-btn:hover{
+    background-color: var(--dark-grey);
+}
+
+form .auth-input {
+    border-radius: 30px;
+    background-color: var(--light-grey); 
+    border: none; 
+    padding: 12px 16px; 
+    font-size: 16px; 
+    transition: all 0.3s ease-in-out;
+}
+
+form .auth-input:focus {
+    outline: none;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
+
+}
+
+.underText{
+    cursor: pointer;
+    text-decoration: underline;
+}

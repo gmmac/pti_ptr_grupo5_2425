@@ -9,9 +9,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.STRING(20)
       },
-      price: {
-        type: Sequelize.FLOAT
-      },
       model: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -21,9 +18,6 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
-      },
-      releaseYear: {
-        type: Sequelize.INTEGER
       },
       type: {
         type: Sequelize.INTEGER,

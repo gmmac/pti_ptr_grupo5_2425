@@ -33,9 +33,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     },
     internNum: {
-      type: DataTypes.STRING(6),
+      type: DataTypes.INTEGER,
       unique: true,
-      allowNull: true
+      allowNull: false,
+      autoIncrement: true
     },
     storeNIPC: {
       type: DataTypes.STRING(9),
@@ -77,7 +78,11 @@ module.exports = (sequelize, DataTypes) => {
     role: {
       type: DataTypes.INTEGER,
       allowNull: false
-    }
+    },
+    passwordReseted: {
+      type: DataTypes.STRING(1),
+    },
+    
   }, {
     sequelize,
     modelName: 'Employee',
