@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class EquipmentModel extends Model {
     /**
@@ -11,26 +9,37 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       EquipmentModel.belongsTo(models.Brand, {
-        foreignKey: 'brand_id',
-        targetKey: 'id',
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL'
+        foreignKey: "brand_id",
+        targetKey: "id",
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
       });
     }
   }
-  EquipmentModel.init({
-    name: {
-      type: DataTypes.STRING(50),
-      allowNull: true 
+  EquipmentModel.init(
+    {
+      name: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
+      brand_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      price: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+      },
+      releaseYear: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
-    brand_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
+    {
+      sequelize,
+      modelName: "EquipmentModel",
+      timestamps: true,
     }
-  }, {
-    sequelize,
-    modelName: 'EquipmentModel',
-    timestamps: true,
-  });
+  );
   return EquipmentModel;
 };

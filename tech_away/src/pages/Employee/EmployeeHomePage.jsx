@@ -8,6 +8,7 @@ import EmployeeCatalog from '../../components/employee/EmployeeCatalog';
 import api from '../../utils/axios';
 import BottomNavBar from '../../components/Navbar/BottomNavBar';
 import EmployeeHomeDashboard from '../../components/employee/EmployeeHomeDashboard';
+import EmployeeRepairs from '../../components/employee/EmployeeRepairs';
 
 export default function EmployeeHomePage() {
     const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'home');
@@ -158,7 +159,7 @@ export default function EmployeeHomePage() {
                         <p>Tab content for Purchases</p>
                     </Tab.Pane>
                     <Tab.Pane eventKey="repairs">
-                        <p>Tab content for Repairs</p>
+                        <EmployeeRepairs />
                     </Tab.Pane>
 
                     {isAdmin && (
