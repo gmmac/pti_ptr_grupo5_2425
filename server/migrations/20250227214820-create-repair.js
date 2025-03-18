@@ -25,7 +25,7 @@ module.exports = {
       budget: {
         type: Sequelize.FLOAT,
       },
-      completionDate: {
+      estimatedDeliverDate: {
         type: Sequelize.DATE,
       },
       employeeId: {

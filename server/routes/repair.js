@@ -4,9 +4,34 @@ const models = require("../models");
 
 router.get("/", async (req, res) => {
   try {
-    const repair = await models.Repair.findAll();
+    const { page = 1, pageSize = 10, orderBy, orderDirection } = req.query;
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+    let order = [];
+    if (orderBy && orderDirection) {
+      order = [[orderBy, orderDirection.toUpperCase()]];
+    } else {
+      order = [["id", "ASC"]];
+    }
+
+    const { count, rows } = await models.Repair.findAndCountAll({
+      include: [
+        {
+          model: models.RepairStatus,
+          attributes: ["id", "state"],
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset,
+      order,
+    });
     res.status(200).json({
-      data: repair,
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+      data: rows,
     });
   } catch (error) {
     res.status(500).json({ error: "Error fetching repairs." });
