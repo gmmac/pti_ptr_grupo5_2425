@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Image, Stack } from "react-bootstrap";
 import Icon from "../svg/Icon";
 import api from "../../utils/axios";
 
 export default function EquipmentSheetCard(eSheet) {
 	const [priceRange, setPriceRange] = useState("");
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		api
 			.get("/api/usedEquipment/price-range/" + eSheet?.eSheet?.barcode)
 			.then((res) => {
-				console.log(res.data);
+				
 				if ("price" in res.data) {
 					// Se for um único preço, salva como número
 
@@ -25,11 +27,12 @@ export default function EquipmentSheetCard(eSheet) {
 			});
 	}, [eSheet]);
 
-	useEffect(() => {
-		console.log(priceRange);
-	}, [eSheet]);
+	const createSlug = (name) => name.toLowerCase().replace(/\s+/g, "-");
 
-	useEffect(() => {}, [eSheet]);
+	const equipmentName = eSheet?.eSheet?.EquipmentModel?.name || "produto";
+	const equipmentBarcode = eSheet?.eSheet?.barcode;
+	const slug = createSlug(equipmentName);
+
 	return (
 		<Stack
 			direction="vertical"
@@ -38,8 +41,11 @@ export default function EquipmentSheetCard(eSheet) {
 				color: "var(--dark-grey)",
 				backgroundColor: "var(--white)",
 				boxShadow: "var(--shadow-default)",
+				cursor: "pointer"
 			}}
 			className="rounded-sm w-25 p-4"
+			onClick={() => navigate(`/store/${slug}`, { state: { barcode: equipmentBarcode} })}
+			
 		>
 			<Image
 				src="../../public/assets/pc.jpg"

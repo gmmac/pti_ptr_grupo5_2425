@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 router.get("/", async (req, res) => {
 	try {
@@ -10,6 +10,21 @@ router.get("/", async (req, res) => {
 	} catch (error) {
 		res.status(500).json({ message: "Error." });
 	}
+});
+
+router.get("/:ID", async (req, res) => {
+    try {
+        const { ID } = req.params;  // Corrigido para desestruturar o ID dos parâmetros
+
+        const usedEquipments = await models.UsedEquipment.findAll({
+            where: { equipmentId: ID }
+        });
+
+        res.json({ usedEquipments });
+    } catch (error) {
+        console.error("Error fetching used equipments:", error);
+        res.status(500).json({ error: "Error fetching used equipments." });
+    }
 });
 
 router.get("/price-range/:equipmentId", async (req, res) => {

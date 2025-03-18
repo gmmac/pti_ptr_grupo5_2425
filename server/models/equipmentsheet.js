@@ -21,6 +21,12 @@ module.exports = (sequelize, DataTypes) => {
 				onUpdate: "CASCADE",
 				onDelete: "SET NULL",
 			});
+
+			EquipmentSheet.hasMany(models.UsedEquipment, {
+				foreignKey: 'equipmentId',
+				onDelete: 'CASCADE',
+       			onUpdate: 'CASCADE'
+			  });
 		}
 	}
 	EquipmentSheet.init(
