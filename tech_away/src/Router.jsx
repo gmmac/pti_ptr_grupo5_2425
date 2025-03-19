@@ -11,6 +11,7 @@ import LayoutPage from "./pages/LayoutPage"; // Importe o Layout
 import RegisterFormsEmployee from "./components/authentication/RegisterFormsEmployee";
 import StorePage from "./pages/StorePage";
 import EquipmentSheetPage from "./pages/EquipmentSheetPage";
+import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 
 export default function Router() {
 	return (
@@ -27,6 +28,7 @@ export default function Router() {
 
 					<Route path="/store" element={<StorePage />} />
 					<Route path="/store/:equipmentSheetName" element={<EquipmentSheetPage />} />
+					<Route path="/store/:equipmentSheetName/:usedEquipmentID" element={<UsedEquipmentPage />} />
 
 					<Route
 						path="/interests"

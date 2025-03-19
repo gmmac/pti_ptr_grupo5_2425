@@ -7,22 +7,22 @@ module.exports = {
 			"EquipmentStatuses",
 			[
 				{
-					state: "novo",
+					state: "New",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
 				{
-					state: "usado",
+					state: "Used",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
 				{
-					state: "defeito",
+					state: "Damaged",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
 				{
-					state: "avariado",
+					state: "Broken",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
