@@ -13,18 +13,26 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:ID", async (req, res) => {
-    try {
-        const { ID } = req.params;  // Corrigido para desestruturar o ID dos parâmetros
+	try {
+		const { ID } = req.params;
 
-        const usedEquipments = await models.UsedEquipment.findAll({
-            where: { equipmentId: ID }
-        });
+		const usedEquipments = await models.UsedEquipment.findAll({
+			where: { equipmentId: ID },
+			include: [
+				{ model: models.Store, as: "Store", attributes: ["name"] },
+				{
+					model: models.EquipmentStatus,
+					as: "EquipmentStatus",
+					attributes: ["state"],
+				},
+			],
+		});
 
-        res.json({ usedEquipments });
-    } catch (error) {
-        console.error("Error fetching used equipments:", error);
-        res.status(500).json({ error: "Error fetching used equipments." });
-    }
+		res.json({ usedEquipments });
+	} catch (error) {
+		console.error("Error fetching used equipments:", error);
+		res.status(500).json({ error: "Error fetching used equipments." });
+	}
 });
 
 router.get("/price-range/:equipmentId", async (req, res) => {
