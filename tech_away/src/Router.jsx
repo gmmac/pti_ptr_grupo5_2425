@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import Teste from "./pages/Teste";
 import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPageClient from "./pages/Auth/RegisterPageClient";
 import LoginPageClient from "./pages/Auth/LoginPageClient";
-import StorePurchasePage from "./pages/StorePurchasePage";
 
 import LayoutPage from "./pages/Layout/LayoutPage";
 import EmployeeLayoutPage from "./pages/Layout/EmployeeLayoutPage";
@@ -18,7 +16,6 @@ import ChangePasswordClient from "./pages/Auth/ChangePasswordClient";
 import InterestsPage from "./pages/InterestsPage";
 import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import StorePurchasePage from "./pages/StorePurchasePage";
-import LayoutPage from "./pages/LayoutPage"; // Importe o Layout
 import StorePage from "./pages/StorePage";
 import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 import UsedEquipmentPage from "./pages/UsedEquipmentPage";
@@ -44,7 +41,6 @@ export default function Router() {
             <Route path="/store/:equipmentSheetName" element={<EquipmentSheetPage />} />
             <Route path="/store/:equipmentSheetName/:usedEquipmentID" element={<UsedEquipmentPage />} />
 
-            <Route path="/teste" element={<Teste />} />
             <Route path="/changePassword" element={<ChangePasswordClient />} />
             <Route path="/storePurchasePage" element={<StorePurchasePage />} />
             <Route path="/register" element={<RegisterPageClient />} />

@@ -48,9 +48,9 @@ function LayoutPage({ isUserLoggedIn, handle }) {
 				{renderNavBar()}
 			</div>
 
-			<div>
+			<>
 				<Outlet />
-			</div>
+			</>
 		</Stack>
 	);
 }

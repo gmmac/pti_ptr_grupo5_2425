@@ -23,9 +23,9 @@ function LayoutPage({ isUserLoggedIn, handle }) {
 			</div>
             <SmNavbar />
 
-			<div>
+			<>
 				<Outlet />
-			</div>
+			</>
 		</Stack>
 	);
 }
