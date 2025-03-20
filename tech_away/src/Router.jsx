@@ -17,17 +17,16 @@ import EmployeeHomePage from "./pages/Employee/EmployeeHomePage";
 import ChangePasswordClient from "./pages/Auth/ChangePasswordClient";
 import InterestsPage from "./pages/InterestsPage";
 import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
+import StorePurchasePage from "./pages/StorePurchasePage";
+import LayoutPage from "./pages/LayoutPage"; // Importe o Layout
+import StorePage from "./pages/StorePage";
+import EquipmentSheetPage from "./pages/EquipmentSheetPage";
+import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 import { getLoggedUser } from "./utils/auth";
 import { IsMobileProvider } from "./contexts/IsMobileContext";
 
 export default function Router() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(getLoggedUser() != null);
-
-  useEffect(() => {
-    if (getLoggedUser()) {
-      console.log("Está logado");
-    }
-  }, [isUserLoggedIn]);
 
   const handleLoginLogout = (bool) => {
     setIsUserLoggedIn(bool);
@@ -40,6 +39,11 @@ export default function Router() {
           {/* Rotas do Cliente */}
           <Route path="/" element={<LayoutPage isUserLoggedIn={isUserLoggedIn} handle={handleLoginLogout} />}>
             <Route index element={<HomePage />} />
+
+            <Route path="/store" element={<StorePage />} />
+            <Route path="/store/:equipmentSheetName" element={<EquipmentSheetPage />} />
+            <Route path="/store/:equipmentSheetName/:usedEquipmentID" element={<UsedEquipmentPage />} />
+
             <Route path="/teste" element={<Teste />} />
             <Route path="/changePassword" element={<ChangePasswordClient />} />
             <Route path="/storePurchasePage" element={<StorePurchasePage />} />

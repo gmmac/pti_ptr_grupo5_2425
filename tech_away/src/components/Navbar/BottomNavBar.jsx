@@ -25,18 +25,19 @@ const navItems = [
 	},
 ];
 
-
 export default function BottomNavBar() {
 	return (
 		<Navbar
 			fixed="bottom"
 			className=" m-3 d-flex justify-content-center align-items-center"
-			
 		>
-			<Nav  className="p-2 rounded-pill justify-content-center align-items-center" style={{
-				backgroundColor: "var(--white)",
-				boxShadow: "var(--shadow-default)",
-			}}>
+			<Nav
+				className="p-2 rounded-pill justify-content-center align-items-center"
+				style={{
+					backgroundColor: "var(--white)",
+					boxShadow: "var(--shadow-default)",
+				}}
+			>
 				{navItems.map((item, index) => {
 					const isActive = location.pathname === item.path;
 					return (
@@ -48,9 +49,13 @@ export default function BottomNavBar() {
 										: "transparent",
 								}}
 								className="px-4 rounded-pill"
-
 							>
-								<Icon d={item.svg} />
+								<Icon
+									d={item.svg}
+									w={"24"}
+									h={"24"}
+									color={"var(--dark-grey)"}
+								/>
 							</Nav.Link>
 						</Nav.Item>
 					);

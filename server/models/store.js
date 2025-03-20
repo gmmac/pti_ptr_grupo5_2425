@@ -5,6 +5,13 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Store extends Model {
     static associate(models) {
+
+      Store.hasMany(models.UsedEquipment, {
+        foreignKey: 'storeId',
+        as: 'usedEquipments',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      });
     }
   }
   Store.init({

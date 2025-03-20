@@ -38,6 +38,16 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
+      storeId: {
+        type: Sequelize.STRING(9),
+        allowNull: false,
+        references: {
+          model: 'Stores',
+          key: 'nipc',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
