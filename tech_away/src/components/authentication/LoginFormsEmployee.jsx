@@ -109,8 +109,8 @@ export default function LoginFormsEmployee() {
 
     
   return (
-    <div className='bg-success w-100 p-md-5 p-3 rounded' >
-        <h1>Login</h1>
+    <div className='bg-white w-100 p-md-5 p-3 rounded-lg shadow-lg' >
+        <h1>Employee Login</h1>
         <h6>Login to acess your account</h6>
 
         <Form onSubmit={handleSubmit} >
@@ -118,6 +118,7 @@ export default function LoginFormsEmployee() {
             <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>Email</Form.Label>
                 <Form.Control 
+                    className='auth-input'
                     type="email" 
                     placeholder="Enter your email" 
                     name="email" 
@@ -134,6 +135,7 @@ export default function LoginFormsEmployee() {
             <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Password</Form.Label>
                 <Form.Control 
+                    className='auth-input'
                     type="password" 
                     placeholder="Enter your password" 
                     name="password" 
@@ -148,7 +150,7 @@ export default function LoginFormsEmployee() {
 
             <Form.Group>
                 {errors.invalidCredentials && <p>{errors.invalidCredentials}</p>}
-                <Button type="submit"className='w-100 bg-warning rounded-pill'>Login</Button>
+                <Button type="submit"className='w-100 forms-btn rounded-pill'>Login</Button>
             </Form.Group>
         </Form>
 

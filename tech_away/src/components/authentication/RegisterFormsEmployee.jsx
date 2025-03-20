@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Stack } from 'react-bootstrap';
 import api from '../../utils/axios';
 import StoreCatalogModal from '../store/StoreCatalogModal';
 import "../../styles/AuthPage.css"
+import { useNavigate } from 'react-router-dom';
 
 function RegisterFormsEmployee() {
 
@@ -21,12 +22,15 @@ function RegisterFormsEmployee() {
     role: '',
   });
   const [errors, setErrors] = useState({});
-
+  const navigate = useNavigate();
 
   const handleCloseModal = () => {
     setShowModal(false);
   };
   
+  const handlePageChange = () => {
+    navigate("/employee")
+  };
 
   const handleSelectStore = (store) => {
     setEmployeeData(prev => ({
@@ -153,8 +157,12 @@ function RegisterFormsEmployee() {
   // }, [errors])
 
   return (
-    <div className='bg-white w-100 p-md-5 p-3 rounded' >
-      <h2>Create Employee</h2>
+    <div className='bg-white w-100 px-md-5 p-5 pt-4 rounded-lg shadow-lg' >
+
+      <Stack gap={4} direction='horizontal' className="align-items-center">
+        <Button onClick={handlePageChange}>Go back</Button>
+        <h2>Create Employee</h2>
+      </Stack>
 
       <Form onSubmit={handleSubmit} className='bg-white'>
 
