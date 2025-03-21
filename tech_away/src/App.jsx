@@ -1,15 +1,15 @@
-import AuthProvider from "./utils/AuthProvider";
+import AuthProvider from "./contexts/AuthProvider";
 import Router from "./Router";
 import { IsMobileProvider } from "./contexts/IsMobileContext"; // Importa o contexto
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
 	return (
-		// <AuthProvider>
+		<AuthProvider>
 			<IsMobileProvider>
 				<Router />
 			</IsMobileProvider>
-		// </AuthProvider>
+		</AuthProvider>
 	);
 }
 

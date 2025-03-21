@@ -61,7 +61,6 @@ export default function LoginForms({handle}) {
             userType: "client"
         })
         .then(async response => {
-            sessionStorage.setItem('user', JSON.stringify(response.data));
             handle(true);
         })
         .catch(error => {

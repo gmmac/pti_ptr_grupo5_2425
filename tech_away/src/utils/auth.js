@@ -1,8 +1,11 @@
 import api from './axios';
 
 
-export const getLoggedUser = () => {
-    return JSON.parse(sessionStorage.getItem("user"));
+export const getLoggedUser = async () => {
+    const res = await api.get("/api/auth/user-info", {
+        withCredentials: true, // Garante que os cookies sejam enviados
+    });
+    return res
 };
 
 

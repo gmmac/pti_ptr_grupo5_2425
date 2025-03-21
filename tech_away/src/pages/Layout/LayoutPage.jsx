@@ -10,10 +10,6 @@ import LoggedInNavBar from "../../components/Navbar/LoggedInNavBar";
 function LayoutPage({ isUserLoggedIn, handle }) {
 	const isMobile = useContext(IsMobileContext);
 
-	useEffect(() => {
-		console.log("Usuário logado:", isMobile);
-	}, [isMobile]);
-
 	// Definição do Navbar com base no estado do usuário e do tamanho da tela
 	const renderNavBar = () => {
 		if (isUserLoggedIn) {

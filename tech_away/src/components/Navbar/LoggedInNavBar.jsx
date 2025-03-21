@@ -11,13 +11,13 @@ const navItems = [
   { name: "Store", path: "/store" },
 ];
 
-export default function LoggedInNavBar({handle}) {
+export default async function LoggedInNavBar({handle}) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const user = getLoggedUser();
-  const userName = user ? user.firstName : "Utilizador";
-
+  //const user = getLoggedUser();
+  //const userName = user ? user.firstName : "Utilizador";
+  const userName = "Utilizador"
 
   // Função para logout
   const handleLogout = () => {
