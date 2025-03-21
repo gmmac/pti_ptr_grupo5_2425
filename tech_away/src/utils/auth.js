@@ -1,4 +1,8 @@
 
 export const getLoggedUser = () => {
-    return sessionStorage.getItem("user");
+    return JSON.parse(sessionStorage.getItem("user"));
+};
+
+export const removeLoggedUser = () => {
+    sessionStorage.removeItem("user");
 };

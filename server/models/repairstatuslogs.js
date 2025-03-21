@@ -1,15 +1,17 @@
 "use strict";
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
-  class RepairStatusLogs extends Model {
+  class RepairStatusLog extends Model {
     static associate(models) {
-      RepairStatusLogs.belongsTo(models.RepairStatus, {
+      RepairStatusLog.belongsTo(models.RepairStatus, {
         foreignKey: "statusId",
         targetKey: "id",
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       });
-      RepairStatusLogs.belongsTo(models.Repair, {
+      
+      RepairStatusLog.belongsTo(models.Repair, {
         foreignKey: "repairId",
         targetKey: "id",
         onUpdate: "CASCADE",
@@ -17,8 +19,15 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  RepairStatusLogs.init(
+
+  RepairStatusLog.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       statusId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -27,12 +36,20 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
     },
     {
       sequelize,
-      modelName: "RepairStatusLogs",
       timestamps: true,
     }
   );
-  return RepairStatusLogs;
+
+  return RepairStatusLog;
 };

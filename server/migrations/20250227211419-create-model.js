@@ -11,12 +11,6 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING(50)
-      },      
-      price: {
-        type: Sequelize.FLOAT
-      },      
-      releaseYear: {
-        type: Sequelize.INTEGER
       },
       brand_id: {
         type: Sequelize.INTEGER,
