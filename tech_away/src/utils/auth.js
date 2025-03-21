@@ -6,6 +6,13 @@ export const getLoggedUser = () => {
 };
 
 
+export const removeLoggedUser = () => {
+    sessionStorage.removeItem("user");
+};
+
+
+// Employee
+
 export const checkIfAdmin = async () => {
     const user = getLoggedUser();
     if (!user) return false;
@@ -26,8 +33,3 @@ export const employeeChangedPassword = async () => {
     return user?.passwordReseted == 1
 }
 
-export const removeLoggedUser = () => {
-    sessionStorage.removeItem("user");
-
-
-};
