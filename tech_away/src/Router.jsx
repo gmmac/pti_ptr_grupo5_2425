@@ -21,6 +21,7 @@ import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 import { getLoggedUser } from "./utils/auth";
 import { IsMobileProvider } from "./contexts/IsMobileContext";
+import TestPage from "./pages/TestPage";
 
 export default function Router() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(getLoggedUser() != null);
@@ -34,26 +35,47 @@ export default function Router() {
       <BrowserRouter>
         <Routes>
           {/* Rotas do Cliente */}
-          <Route path="/" element={<LayoutPage isUserLoggedIn={isUserLoggedIn} handle={handleLoginLogout} />}>
+          <Route
+            path="/"
+            element={
+              <LayoutPage
+                isUserLoggedIn={isUserLoggedIn}
+                handle={handleLoginLogout}
+              />
+            }
+          >
             <Route index element={<HomePage />} />
 
             <Route path="/store" element={<StorePage />} />
-            <Route path="/store/:equipmentSheetName" element={<EquipmentSheetPage />} />
-            <Route path="/store/:equipmentSheetName/:usedEquipmentID" element={<UsedEquipmentPage />} />
+            <Route
+              path="/store/:equipmentSheetName"
+              element={<EquipmentSheetPage />}
+            />
+            <Route
+              path="/store/:equipmentSheetName/:usedEquipmentID"
+              element={<UsedEquipmentPage />}
+            />
 
             <Route path="/changePassword" element={<ChangePasswordClient />} />
             <Route path="/storePurchasePage" element={<StorePurchasePage />} />
             <Route path="/register" element={<RegisterPageClient />} />
-            <Route path="/login" element={<LoginPageClient handle={handleLoginLogout} />} />
-            <Route path="/interests" element={
-              <InterestsFilterProvider>
-                <InterestsPage />
-              </InterestsFilterProvider>
-            } />
+            <Route
+              path="/login"
+              element={<LoginPageClient handle={handleLoginLogout} />}
+            />
+            <Route
+              path="/interests"
+              element={
+                <InterestsFilterProvider>
+                  <InterestsPage />
+                </InterestsFilterProvider>
+              }
+            />
           </Route>
 
           {/* Rotas do Funcionário */}
           <Route path="/employee" element={<EmployeeLayoutPage />}>
+            <Route path="teste" element={<TestPage />} />
             <Route path="login" element={<EmployeeLoginPage />} />
             <Route element={<EmployeeProtectedRoute />}>
               <Route index element={<EmployeeHomePage />} />

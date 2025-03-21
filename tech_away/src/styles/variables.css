@@ -29,3 +29,7 @@
 .rounded-sm {
 	border-radius: var(--rounded-sm);
 }
+
+.background-white {
+	background-color: var(--white);
+}
