@@ -8,7 +8,7 @@ export default function EmployeeCardView({ employees }) {
         <Col key={index} xs={12}>
           <Card className="shadow-sm rounded p-3">
             <Card.Body>
-              <Card.Title className="fw-bold">{employee.name}</Card.Title>
+              <Card.Title className="fw-bold">{employee.firstName} {employee.lastName}</Card.Title>
               <Card.Subtitle className="mb-2 text-muted">{employee.EmployeeRole.role}</Card.Subtitle>
               <Card.Text>
                 <strong>Intern Number:</strong> {employee.internNum} <br />

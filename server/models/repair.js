@@ -16,6 +16,14 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       });
+
+      Repair.belongsTo(models.Client, {
+        foreignKey: "clientId",
+        targetKey: "nic",
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      });
+
       Repair.belongsTo(models.UsedEquipment, {
         foreignKey: "usedEquipmentId",
         targetKey: "id",
@@ -43,6 +51,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       employeeId: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+      },
+      clientId: {
         type: DataTypes.STRING(20),
         allowNull: false,
       },

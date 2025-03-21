@@ -17,7 +17,7 @@ export default function ClientTableModal({clients, selectedClient, handleClientS
         {clients.map((client) => (
             <tr key={client.nic}>
             <td>{client.nic}</td>
-            <td>{client.name}</td>
+            <td>{client.firstName} {client.lastName}</td>
             <td>{client.email}</td>
             <td>{client.phone}</td>
             <td>

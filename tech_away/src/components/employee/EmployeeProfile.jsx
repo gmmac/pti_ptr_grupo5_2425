@@ -61,8 +61,15 @@ export default function EmployeeProfile() {
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Name</Form.Label>
-                                        <Form.Control className="auth-input" type="text" name="name" value={formData.name} disabled />
+                                        <Form.Label>First Name</Form.Label>
+                                        <Form.Control className="auth-input" type="text" name="firstName" value={formData.firstName} disabled />
+                                    </Form.Group>
+                                </Col>
+
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Last Name</Form.Label>
+                                        <Form.Control className="auth-input" type="text" name="lastName" value={formData.lastName} disabled />
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>

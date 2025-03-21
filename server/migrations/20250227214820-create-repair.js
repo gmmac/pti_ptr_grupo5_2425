@@ -38,6 +38,16 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
+      clientId: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
+        references: {
+          model: "Clients",
+          key: "nic",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
       usedEquipmentId: {
         type: Sequelize.INTEGER,
         allowNull: false,

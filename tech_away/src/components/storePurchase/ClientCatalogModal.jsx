@@ -17,7 +17,8 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
     
     const [filters, setFilters] = useState({
       nic: "",
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       phone: "",
       orderDirection: "ASC"

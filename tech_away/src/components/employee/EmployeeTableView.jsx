@@ -21,7 +21,7 @@ export default function EmployeesTableView({ employees, changeRole=false }) {
             {employees.map((employee, index) => (
               <tr key={index} className="align-middle" style={{ backgroundColor: "#ffffff" }}>
                 <td>{employee.internNum}</td>
-                <td className="text-truncate" style={{ maxWidth: "150px" }}><strong>{employee.name}</strong></td>
+                <td className="text-truncate" style={{ maxWidth: "150px" }}><strong>{employee.firstName} {employee.lastName}</strong></td>
                 <td>{employee.Store.nipc}</td>
                 <td className="text-truncate" style={{ maxWidth: "200px" }}>{employee.email}</td>
                 <td>{employee.phone}</td>

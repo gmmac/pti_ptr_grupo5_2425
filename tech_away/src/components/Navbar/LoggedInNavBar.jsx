@@ -16,7 +16,7 @@ export default function LoggedInNavBar({handle}) {
   const navigate = useNavigate();
 
   const user = getLoggedUser();
-  const userName = user ? user.name : "Utilizador";
+  const userName = user ? user.firstName : "Utilizador";
 
 
   // Função para logout

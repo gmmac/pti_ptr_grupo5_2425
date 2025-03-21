@@ -22,7 +22,8 @@ export default function StorePurchasePage() {
         nif: '',
         birthDate: '',
         gender: '',
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         phone: '',
     });
@@ -81,7 +82,8 @@ export default function StorePurchasePage() {
                 nif: client.nif,
                 birthDate: client.birthDate,
                 gender: client.gender,
-                name: client.name,
+                firstName: client.firstName,
+                lastName: client.lastName,
                 email: client.email,
                 phone: client.phone
             });
@@ -96,7 +98,8 @@ export default function StorePurchasePage() {
                 nif: '',
                 birthDate: '',
                 gender: '',
-                name: '',
+                firstName: '',
+                lastName: '',
                 email: '',
                 phone: ''
             });

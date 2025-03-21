@@ -5,7 +5,7 @@ export default function ClientCardModal({client, selectedClient, handleClientSel
   return (
     <Card className="mb-3 d-lg-none">
         <Card.Body>
-        <Card.Title>{client.name}</Card.Title>
+        <Card.Title>{client.firstName} {client.lastName}</Card.Title>
         <Card.Text>
             <strong>NIC:</strong> {client.nic}<br />
             <strong>Email:</strong> {client.email}<br />

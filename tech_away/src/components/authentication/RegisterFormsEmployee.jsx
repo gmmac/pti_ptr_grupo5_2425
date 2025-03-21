@@ -16,7 +16,8 @@ function RegisterFormsEmployee() {
     storeNIPC: '',
     birthDate: '',
     gender: '',
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     role: '',
@@ -169,17 +170,33 @@ function RegisterFormsEmployee() {
         <Row className="mb-3">
           <Col sm={12} md={6}>
             <Form.Group controlId="name">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>First Name</Form.Label>
               <Form.Control
                 type="text"
-                name="name"
-                value={employeeData.name}
+                name="firstName"
+                value={employeeData.firstName}
                 onChange={handleChange}
-                isInvalid={!!errors.name}
+                isInvalid={!!errors.firstName}
                 className='auth-input'
 
               />
-              <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{errors.firstName}</Form.Control.Feedback>
+            </Form.Group>
+          </Col>
+
+          <Col sm={12} md={6}>
+            <Form.Group controlId="name">
+              <Form.Label>Last Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="lastName"
+                value={employeeData.lastName}
+                onChange={handleChange}
+                isInvalid={!!errors.lastName}
+                className='auth-input'
+
+              />
+              <Form.Control.Feedback type="invalid">{errors.lastName}</Form.Control.Feedback>
             </Form.Group>
           </Col>
 

@@ -50,8 +50,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(1),
       allowNull: true
     },
-    name: {
-      type: DataTypes.STRING(100),
+    firstName: {
+      type: DataTypes.STRING(50),
+      allowNull: true
+    },
+    lastName: {
+      type: DataTypes.STRING(50),
       allowNull: true
     },
     email: {

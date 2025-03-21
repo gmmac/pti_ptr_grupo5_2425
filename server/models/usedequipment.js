@@ -24,6 +24,14 @@ module.exports = (sequelize, DataTypes) => {
 				onUpdate: "CASCADE",
 				onDelete: "SET NULL",
 			});
+
+
+			UsedEquipment.belongsToMany(models.CharityProject, {
+				through: models.UsedEquipmentCharityProject,
+				foreignKey: 'usedEquipmentId',
+				otherKey: 'charityProjectId'
+			});
+			
 		}
 	}
 	UsedEquipment.init(
@@ -36,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.FLOAT,
 				allowNull: true,
 			},
-			saleDate: {
+			putOnSaleDate: {
 				type: DataTypes.DATE,
 				allowNull: true,
 			},
@@ -49,8 +57,11 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: false,
 			},
 			storeId: {
-				type: DataTypes.INTEGER,
+				type: DataTypes.STRING(9),
 				allowNull: false,
+			},
+			action: {
+				type: DataTypes.STRING(1), // "D" -> Donation ou "S" -> Sale
 			},
 		},
 		{

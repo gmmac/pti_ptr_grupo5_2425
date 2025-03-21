@@ -14,19 +14,28 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       });
+      
       CharityProject.belongsTo(models.ProjectStatus, {
         foreignKey: 'status',
         targetKey: 'id',
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       });
-      CharityProject.belongsTo(models.Wharehouse, {
-        foreignKey: 'wharehouseID',
+      
+      CharityProject.belongsTo(models.Warehouse, {
+        foreignKey: 'warehouseID',
         targetKey: 'id',
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       });
-    }
+      
+      CharityProject.belongsToMany(models.UsedEquipment, {
+        through: models.UsedEquipmentCharityProject,
+        foreignKey: 'charityProjectId',
+        otherKey: 'usedEquipmentId'
+      });
+      
+      }
   }
 
   CharityProject.init({
@@ -46,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    wharehouseID: {
+    warehouseID: {
       type: DataTypes.INTEGER,
       allowNull: false
     },

@@ -34,7 +34,8 @@ export default function EmployeeFilter({ filters, onFilterChange }) {
 
   const handleClear = () => {
     const clearedFilters = {
-      name: "",
+      firstName: "",
+      lastName: "",
       nic: "",
       nif: "",
       internNum: "",
@@ -57,17 +58,32 @@ export default function EmployeeFilter({ filters, onFilterChange }) {
           <Accordion.Body>
             <Form onSubmit={handleSubmit}>
               <Row className="gy-3">
+
                 <Col xs={12} md={6}>
                   <Form.Group controlId="filterName">
-                    <Form.Label>Name</Form.Label>
+                    <Form.Label>First Name</Form.Label>
                     <Form.Control 
                       type="text" 
-                      name="name" 
-                      value={localFilters.name} 
+                      name="firstName" 
+                      value={localFilters.firstName} 
                       onChange={handleChange} 
-                      isInvalid={!!errors.name}
+                      isInvalid={!!errors.firstName}
                     />
-                    <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">{errors.firstName}</Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                <Col xs={12} md={6}>
+                  <Form.Group controlId="filterName">
+                    <Form.Label> Last Name</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="lastName" 
+                      value={localFilters.lastName} 
+                      onChange={handleChange} 
+                      isInvalid={!!errors.lastName}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.lastName}</Form.Control.Feedback>
                   </Form.Group>
                 </Col>
                 <Col xs={12} md={6}>

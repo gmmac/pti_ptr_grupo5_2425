@@ -5,7 +5,8 @@ import SearchBar from "../searchBar/SearchBar";
 export default function ClientFilter({ setFilters }) {
     const [localFilters, setLocalFilters] = useState({
         nic: "",
-        name: "",
+        firstname: "",
+        lastName: "",
         email: "",
         phone: "",
         orderBy: "nic",
@@ -34,7 +35,8 @@ export default function ClientFilter({ setFilters }) {
     const handleClear = () => {
         const clearedFilters = {
             nic: "",
-            name: "",
+            firstName: "",
+            lastName: "",
             email: "",
             phone: "",
             orderBy: "nic",
@@ -67,7 +69,15 @@ export default function ClientFilter({ setFilters }) {
                                 </Col>
                                 <Col xs={12} md={6}>
                                     <SearchBar 
-                                        value={localFilters.name} 
+                                        value={localFilters.firstName} 
+                                        onChange={handleChange}
+                                        name="Name"
+                                        placeholder="Search by Name"
+                                    />
+                                </Col>
+                                <Col xs={12} md={6}>
+                                    <SearchBar 
+                                        value={localFilters.lastName} 
                                         onChange={handleChange}
                                         name="Name"
                                         placeholder="Search by Name"

@@ -34,8 +34,11 @@ module.exports = {
       gender: {
         type: Sequelize.STRING(1)
       },
-      name: {
-        type: Sequelize.STRING(100)
+      firstName: {
+        type: Sequelize.STRING(50)
+      },
+      lastName: {
+        type: Sequelize.STRING(50)
       },
       email: {
         type: Sequelize.STRING,

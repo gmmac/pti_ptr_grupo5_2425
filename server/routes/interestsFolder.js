@@ -36,7 +36,7 @@ router.get("/", async (req, res) => {
           model: models.Client,
           as: "client",
           where: clientCondition,
-          attributes: ["nic", "name"],
+          attributes: ["nic", "firstName", "lastName"],
         },
       ],
       limit: parseInt(pageSize),

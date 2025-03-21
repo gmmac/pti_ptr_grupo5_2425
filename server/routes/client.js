@@ -54,6 +54,9 @@ router.delete("/:NIC", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+
+	console.log(req.body)
+	
 	try {
 		const client = await models.Client.create(req.body);
 		res.status(201).json(client);
@@ -66,7 +69,8 @@ router.post("/", async (req, res) => {
 			nif,
 			birthDate,
 			gender,
-			name,
+			firstName,
+			lastName,
 			email,
 			phone,
 			adress,
@@ -104,7 +108,8 @@ router.post("/", async (req, res) => {
 			nif,
 			birthDate,
 			gender,
-			name,
+			firstName,
+			lastName,
 			email,
 			phone,
 			adress,

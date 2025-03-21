@@ -10,7 +10,8 @@ router.get("/", async (req, res) => {
             nif,
             internNum,
             storeNIPC,
-            name,
+            firstName,
+            lastName,
             email,
             phone,
 			gender,
@@ -31,7 +32,8 @@ router.get("/", async (req, res) => {
         if (nif) where.nif = { [Op.like]: `${nif}%` };
         if (internNum) where.internNum = { [Op.eq]: `${parseInt(internNum)}` };
         if (storeNIPC) where.storeNIPC = { [Op.eq]: storeNIPC };
-        if (name) where.name = { [Op.like]: `%${name}%` };
+        if (firstName) where.firstName = { [Op.like]: `%${firstName}%` };
+        if (lastName) where.lastName = { [Op.like]: `%${lastName}%` };
         if (email) where.email = { [Op.like]: `%${email}%` };
         if (phone) where.phone = { [Op.like]: `%${phone}%` };
         if (gender) where.gender = { [Op.like]: `%${gender}%` };
@@ -86,7 +88,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
 	try {
 		console.log(req.body);
-		const { nic, nif, storeNIPC, birthDate, gender, name, email, phone, role } = req.body
+		const { nic, nif, storeNIPC, birthDate, gender, firstName, lastName, email, phone, role } = req.body
 
 
 		const existingEmployee = await models.Employee.findOne({
@@ -121,7 +123,8 @@ router.post("/", async (req, res) => {
             storeNIPC:storeNIPC,
             birthDate:birthDate,
             gender:gender,
-            name:name,
+            firstName:firstName,
+            lastName:lastName,
             email:email,
             phone:phone,
             role:role,
