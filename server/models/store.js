@@ -32,14 +32,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     phone: {
       type: DataTypes.STRING(9),
-      allowNull: true
+      allowNull: true,
+      unique: true
     },
     openTime: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(5),
       allowNull: true
     },
     closeTime: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(5),
       allowNull: true
     },
     address: {

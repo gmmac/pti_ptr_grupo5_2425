@@ -17,13 +17,14 @@ module.exports = {
         unique: true
       },
       phone: {
-        type: Sequelize.STRING(9)
+        type: Sequelize.STRING(9),
+        unique: true
       },
       openTime: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING(5)  // HH:MM
       },
       closeTime: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING(5) // HH:MM
       },
       address: {
         type: Sequelize.STRING(50)

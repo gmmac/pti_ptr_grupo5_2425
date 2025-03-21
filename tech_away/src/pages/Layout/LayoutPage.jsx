@@ -48,9 +48,14 @@ function LayoutPage({ isUserLoggedIn, handle }) {
 				{renderNavBar()}
 			</div>
 
-			<>
+			<div 				
+				style={{
+					backgroundColor: "var(--light-grey)",
+					color: "var(--dark-grey)",
+				}}>
+					
 				<Outlet />
-			</>
+			</div>
 		</Stack>
 	);
 }

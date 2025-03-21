@@ -22,7 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     telemovel: {
       type: DataTypes.STRING(9),
-      allowNull: true
+      allowNull: true,
+      unique: true
+
     },
     nome: {
       type: DataTypes.STRING(50),
@@ -31,7 +33,8 @@ module.exports = (sequelize, DataTypes) => {
     email: {
       type: DataTypes.STRING,
       unique: true,
-      allowNull: true
+      allowNull: true,
+      unique: true
     }
   }, {
     sequelize,
