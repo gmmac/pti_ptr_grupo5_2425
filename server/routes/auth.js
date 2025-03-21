@@ -195,5 +195,15 @@ router.get("/user-info", (req, res) => {
   return res.status(200).json({ userInfo: userInfo });
 });
 
+router.get('/logout', (req, res) => {
+  res.clearCookie("clientInfo", {
+    httpOnly: true,
+    secure: false, // Deve bater com a flag usada na criação do cookie
+    sameSite: "Lax"
+  });
+
+  return res.status(200).json({ message: 'Logout realizado com sucesso.' });
+});
+
 
 module.exports = router;

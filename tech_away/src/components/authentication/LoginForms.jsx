@@ -4,8 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../utils/axios';
 import '../../styles/index.css';
 import '../../styles/AuthPage.css';
+import { useAuth } from '../../contexts/AuthProvider';
 
-export default function LoginForms({handle}) {
+export default function LoginForms() {
+
+	const { loginAction } = useAuth();
+
 
     const [formData, setFormData] = useState({
         email: '',
@@ -50,30 +54,9 @@ export default function LoginForms({handle}) {
             return; // Impede o envio do formulário se houver erros
         }
 
-        verifyData();
+        newErrors = { ...errors };
+        loginAction(formData, setErrors);
     };
-
-    const verifyData = async () => {
-        let newErrors = { ...errors };
-        await api.post('/api/auth/login', {
-            email: formData.email,
-            password: formData.password,
-            userType: "client"
-        })
-        .then(async response => {
-            handle(true);
-        })
-        .catch(error => {
-            if(error.status == 403){
-                newErrors.invalidCredentials = "Invalid credentials!";
-                setErrors(newErrors);
-            }else if(error.status == 429){
-                newErrors.invalidCredentials = "Too many attempts. Try again later!";
-                setErrors(newErrors);
-            }
-        })
-    };
-    
 
 
     const handleChange = (e) => {
@@ -150,7 +133,7 @@ export default function LoginForms({handle}) {
 
             <Form.Group>
                 {errors.invalidCredentials && <p className='text-danger'>{errors.invalidCredentials}</p>}
-                <Button type="submit"className='w-100 rounded-pill forms-btn shadow-lg'>Login</Button>
+                <Button type="submit" className='w-100 rounded-pill forms-btn shadow-lg'>Login</Button>
             </Form.Group>
         </Form>
         <div className='d-flex flex-align-items justify-content-end m-2'>

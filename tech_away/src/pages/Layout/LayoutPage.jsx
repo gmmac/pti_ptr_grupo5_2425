@@ -6,20 +6,22 @@ import { Stack } from "react-bootstrap";
 import { IsMobileContext } from "../../contexts/IsMobileContext";
 import BottomNavBar from "../../components/Navbar/BottomNavBar";
 import LoggedInNavBar from "../../components/Navbar/LoggedInNavBar";
+import { useAuth } from "../../contexts/AuthProvider";
 
-function LayoutPage({ isUserLoggedIn, handle }) {
+function LayoutPage() {
 	const isMobile = useContext(IsMobileContext);
+	const { isUserLoggedIn } = useAuth();
 
 	// Definição do Navbar com base no estado do usuário e do tamanho da tela
 	const renderNavBar = () => {
-		if (isUserLoggedIn) {
+		if (isUserLoggedIn()) {
 			return isMobile ? (
 				<>
 					<SmNavBar />
 					<BottomNavBar />
 				</>
 			) : (
-				<LoggedInNavBar handle={handle} />
+				<LoggedInNavBar />
 			);
 		} else {
 			return isMobile ? (
@@ -28,7 +30,7 @@ function LayoutPage({ isUserLoggedIn, handle }) {
 					<BottomNavBar />
 				</>
 			) : (
-				<InitialNavBar handleLogout={handle} />
+				<InitialNavBar />
 			);
 		}
 	};

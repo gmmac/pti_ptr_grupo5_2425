@@ -1,38 +1,38 @@
 import api from './axios';
 
 
-export const getLoggedUser = async () => {
-    const res = await api.get("/api/auth/user-info", {
-        withCredentials: true, // Garante que os cookies sejam enviados
-    });
-    return res
+export const getLoggedUser = () => {
+    // const res = api.get("/api/auth/user-info", {
+    //     withCredentials: true, // Garante que os cookies sejam enviados
+    // });
+    // return res
 };
 
 
 export const removeLoggedUser = () => {
-    sessionStorage.removeItem("user");
+
 };
 
 
 // Employee
 
 export const checkIfAdmin = async () => {
-    const user = getLoggedUser();
-    if (!user) return false;
+    // const user = getLoggedUser();
+    // if (!user) return false;
     
-    try {
-        const res = await api.get(`/api/employeeRole/${user?.role}`);
-        return res.data.role === "Admin";
-    } catch (error) {
-        console.error("Erro ao verificar admin:", error.message);
-        return false;
-    }
+    // try {
+    //     const res = await api.get(`/api/employeeRole/${user?.role}`);
+    //     return res.data.role === "Admin";
+    // } catch (error) {
+    //     console.error("Erro ao verificar admin:", error.message);
+    //     return false;
+    // }
 };
 
 
 export const employeeChangedPassword = async () => {
-    const user = getLoggedUser();
-    if (!user) return false;
-    return user?.passwordReseted == 1
+    // const user = getLoggedUser();
+    // if (!user) return false;
+    // return user?.passwordReseted == 1
 }
 
