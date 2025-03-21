@@ -1,43 +1,33 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Carts', {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('Interests', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      clientNIC: {
-        type: Sequelize.STRING(9),
+      equipmentSheetID: {
+        type: Sequelize.STRING(20),
         allowNull: false,
         references: {
-          model: 'Clients',
-          key: 'nic',
+          model: 'EquipmentSheets',
+          key: 'barcode',
         },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE', // Ao apagar o equipamento, apaga o interesse
       },
-      clientPurchaseID: {
+      folderInterestID: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'ClientPurchases',
+          model: 'FolderInterests',
           key: 'id',
         },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-      },
-      usedEquipmentID: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'UsedEquipments',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE', // Ao apagar a pasta de interesses, apaga o interesse
       },
       createdAt: {
         allowNull: false,
@@ -49,7 +39,7 @@ module.exports = {
       }
     });
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Carts');
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Interests');
   }
 };

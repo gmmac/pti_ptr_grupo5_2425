@@ -22,7 +22,7 @@ module.exports = {
       price: {
         type: Sequelize.FLOAT
       },
-      saleDate: {
+      putOnSaleDate: {
         type: Sequelize.DATE
       },
       purchaseDate: {
@@ -37,6 +37,19 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
+      },
+      storeId: {
+        type: Sequelize.STRING(9),
+        allowNull: false,
+        references: {
+          model: 'Stores',
+          key: 'nipc',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
+      action: {
+        type: Sequelize.STRING(1),
       },
       createdAt: {
         allowNull: false,

@@ -16,13 +16,20 @@ export default function LoggedInNavBar({handle}) {
   const navigate = useNavigate();
 
   const user = getLoggedUser();
-  const userName = user ? user.name : "Utilizador";
+  const userName = user ? user.firstName : "Utilizador";
+
 
   // Função para logout
   const handleLogout = () => {
+
     handle(false);
     removeLoggedUser();
-    navigate("/login");
+    //ver se user é employee
+    // if(user?.role){
+    //   navigate("/employee/login");
+    // }else{
+      navigate("/login");
+    // }
   };
 
   return (

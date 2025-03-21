@@ -40,7 +40,7 @@ const repairStatus = require('./routes/repairStatus');
 const store = require('./routes/store');
 const storePurchase = require('./routes/storePurchase');
 const usedEquipment = require('./routes/usedEquipment');
-const warehouse = require('./routes/wharehouse');
+const warehouse = require('./routes/warehouse');
 const auth = require('./routes/auth');
 const employeeRole = require('./routes/employeeRole');
 

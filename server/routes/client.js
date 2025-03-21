@@ -1,11 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const models = require('../models')
-const { Op } = require('sequelize');
+const models = require("../models");
+const { Op } = require("sequelize");
+
+router.get("/", async (req, res) => {
+	try {
+		const client = await models.Client.findAll();
+		if (!client) {
+			return res.status(404).json({ error: "Clients not found" });
+		}
+		res.json(client);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+});
 
 router.get("/:NIC", async (req, res) => {
 	try {
-		const client = await Client.findByPk(req.params.NIC);
+		const client = await models.Client.findByPk(req.params.NIC);
 		if (!client) {
 			return res.status(404).json({ error: "Client not found" });
 		}
@@ -17,7 +29,7 @@ router.get("/:NIC", async (req, res) => {
 
 router.put("/:NIC", async (req, res) => {
 	try {
-		const client = await Client.findByPk(req.params.NIC);
+		const client = await models.Client.findByPk(req.params.NIC);
 		if (!client) {
 			return res.status(404).json({ error: "Client not found" });
 		}
@@ -30,7 +42,7 @@ router.put("/:NIC", async (req, res) => {
 
 router.delete("/:NIC", async (req, res) => {
 	try {
-		const client = await Client.findByPk(req.params.NIC);
+		const client = await models.Client.findByPk(req.params.NIC);
 		if (!client) {
 			return res.status(404).json({ error: "Client not found" });
 		}
@@ -42,54 +54,75 @@ router.delete("/:NIC", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    try{
-        const { nic, nif, birthDate, gender, name, email, phone, adress, latitude, longitude} = req.body;
 
-        const existingClient = await models.Client.findOne({
-            where: {
-                [Op.or]: [
-                    { nic: nic },
-                    { nif: nif },
-                    { phone: phone },
-                    { email: email }
-                ]
-            }
-        });
+	console.log(req.body)
+	
+	try {
+		const client = await models.Client.create(req.body);
+		res.status(201).json(client);
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
+	try {
+		const {
+			nic,
+			nif,
+			birthDate,
+			gender,
+			firstName,
+			lastName,
+			email,
+			phone,
+			adress,
+			latitude,
+			longitude,
+		} = req.body;
 
-        if (existingClient) {
-            let errorTag = "";
-            if (existingClient.nic == nic) {
-                errorTag = "nic"
-            } else if (existingClient.nif == nif) {
-                errorTag = "nif"
-            } else if (existingClient.phone == phone) {
-                errorTag = "phone"
-            }else if (existingClient.email == email) {
-                errorTag = "email"
-            }
-            return res.status(200).json({ errorTag: errorTag});
-        }
+		const existingClient = await models.Client.findOne({
+			where: {
+				[Op.or]: [
+					{ nic: nic },
+					{ nif: nif },
+					{ phone: phone },
+					{ email: email },
+				],
+			},
+		});
 
+		if (existingClient) {
+			let errorTag = "";
+			if (existingClient.nic == nic) {
+				errorTag = "nic";
+			} else if (existingClient.nif == nif) {
+				errorTag = "nif";
+			} else if (existingClient.phone == phone) {
+				errorTag = "phone";
+			} else if (existingClient.email == email) {
+				errorTag = "email";
+			}
+			return res.status(200).json({ errorTag: errorTag });
+		}
 
-        const client = await models.Client.create({
-            nic,
-            nif,
-            birthDate,
-            gender,
-            name,
-            email,
-            phone,
-            adress,
-            latitude,
-            longitude,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-        res.status(201).json(client);
-    } catch (error) {
-        console.log(error)
-        res.status(400);
-    }
+		const client = await models.Client.create({
+			nic,
+			nif,
+			birthDate,
+			gender,
+			firstName,
+			lastName,
+			email,
+			phone,
+			adress,
+			latitude,
+			longitude,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
+		res.status(201).json(client);
+	} catch (error) {
+		console.log(error);
+		res.status(400);
+	}
 });
 
 module.exports = router;

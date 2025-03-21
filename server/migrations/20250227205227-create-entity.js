@@ -11,6 +11,7 @@ module.exports = {
       },
       telemovel: {
         type: Sequelize.STRING(9),
+        unique: true
       },
       nome: {
         type: Sequelize.STRING(50)

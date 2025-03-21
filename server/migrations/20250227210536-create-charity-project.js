@@ -35,11 +35,11 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
-      wharehouseID: {
+      warehouseID: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Wharehouses',
+          model: 'Warehouses',
           key: 'id',
         },
         onUpdate: 'CASCADE',

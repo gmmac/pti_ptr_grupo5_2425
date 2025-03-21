@@ -14,7 +14,6 @@ yarn-error.log*
 # Build directories
 dist/
 build/
-public/
 
 # OS files
 .DS_Store
@@ -32,3 +31,4 @@ yarn.lock
 *.tmp
 *.bak
 *.swp
+

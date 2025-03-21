@@ -19,15 +19,19 @@ module.exports = {
       gender: {
         type: Sequelize.STRING(1)
       },
-      name: {
-        type: Sequelize.STRING(100)
+      firstName: {
+        type: Sequelize.STRING(50)
+      },
+      lastName: {
+        type: Sequelize.STRING(50)
       },
       email: {
         type: Sequelize.STRING,
         unique: true
       },
       phone: {
-        type: Sequelize.STRING(9)
+        type: Sequelize.STRING(9),
+        unique: true
       },
       address: {
         type: Sequelize.STRING(50)

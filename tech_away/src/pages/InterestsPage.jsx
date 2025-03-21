@@ -23,26 +23,26 @@ export default function InterestsPage() {
   };
 
 
-  useEffect(() => {
-    api
-      .get('/api/interestsFolder/', {
-        params: {
-          name: filters.name,
-          clientNIC: filters.clientNIC,
-          orderBy: filters.orderBy,
-          orderDirection: filters.orderDirection,
-          page: currentPage,
-          pageSize: itemsPerPage,
-        },
-      })
-      .then((res) => {
-        setInterestsFolder(res.data.data);
-        setTotalPages(res.data.totalPages);
-      })
-      .catch((error) => {
-        console.error('API error:', error.message);
-      });
-  }, [filters, currentPage, refresh]);
+  // useEffect(() => {
+  //   api
+  //     .get('/api/interestsFolder/', {
+  //       params: {
+  //         name: filters.name,
+  //         clientNIC: filters.clientNIC,
+  //         orderBy: filters.orderBy,
+  //         orderDirection: filters.orderDirection,
+  //         page: currentPage,
+  //         pageSize: itemsPerPage,
+  //       },
+  //     })
+  //     .then((res) => {
+  //       setInterestsFolder(res.data.data);
+  //       setTotalPages(res.data.totalPages);
+  //     })
+  //     .catch((error) => {
+  //       console.error('API error:', error.message);
+  //     });
+  // }, [filters, currentPage, refresh]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
