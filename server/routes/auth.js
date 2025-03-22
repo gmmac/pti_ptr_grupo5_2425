@@ -115,6 +115,13 @@ router.post("/login", async (req, res) => {
       });
   
       if(existingClient){
+        res.cookie("clientInfo", existingClient.dataValues, {
+          httpOnly: true,    
+          secure: false, // Permite o cookie em HTTP durante o desenvolvimento
+          sameSite: "Lax", // Mais flexível que "Strict" para testes locais
+          maxAge: 24 * 60 * 60 * 1000 // 1 dia
+        });
+        
         return res.status(201).json(existingClient.dataValues);
       }
     }
@@ -182,7 +189,21 @@ router.get("/getUserByEmail/:email", async (req, res) => {
   }
 });
 
+router.get("/user-info", (req, res) => {
+  const userInfo = req.cookies.clientInfo;
 
+  return res.status(200).json({ userInfo: userInfo });
+});
+
+router.get('/logout', (req, res) => {
+  res.clearCookie("clientInfo", {
+    httpOnly: true,
+    secure: false, // Deve bater com a flag usada na criação do cookie
+    sameSite: "Lax"
+  });
+
+  return res.status(200).json({ message: 'Logout realizado com sucesso.' });
+});
 
 
 module.exports = router;
