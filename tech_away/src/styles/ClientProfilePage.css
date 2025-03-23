@@ -1,0 +1,10 @@
+.bg-variant-two {
+    background-color: var(--variant-two);
+    border-radius: var(--rounded-sm);
+    color: black;
+}
+
+.bg-variant-two:hover{
+    background-color: var(--dark-grey);
+    color: white;
+}

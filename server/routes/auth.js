@@ -182,7 +182,4 @@ router.get("/getUserByEmail/:email", async (req, res) => {
   }
 });
 
-
-
-
 module.exports = router;

@@ -21,6 +21,7 @@ import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 import { getLoggedUser } from "./utils/auth";
 import { IsMobileProvider } from "./contexts/IsMobileContext";
+import ProfilePageClient from "./pages/Auth/ProfilePageClient";
 
 export default function Router() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(getLoggedUser() != null);
@@ -45,6 +46,7 @@ export default function Router() {
             <Route path="/storePurchasePage" element={<StorePurchasePage />} />
             <Route path="/register" element={<RegisterPageClient />} />
             <Route path="/login" element={<LoginPageClient handle={handleLoginLogout} />} />
+            <Route path="/profile" element={<ProfilePageClient />} />
             <Route path="/interests" element={
               <InterestsFilterProvider>
                 <InterestsPage />
