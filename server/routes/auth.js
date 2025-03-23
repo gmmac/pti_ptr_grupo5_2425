@@ -198,7 +198,7 @@ router.get("/user-info", (req, res) => {
 router.get('/logout', (req, res) => {
   res.clearCookie("clientInfo", {
     httpOnly: true,
-    secure: false, // Deve bater com a flag usada na criação do cookie
+    secure: false, 
     sameSite: "Lax"
   });
 
