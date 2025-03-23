@@ -35,11 +35,6 @@ export default function EmployeeHomePage() {
     };
     
 
-
-    useEffect(() => {
-        console.log("MUDOU PASS " + passwordChanged)
-    }, [passwordChanged])
-
     useEffect(() => {
         const checkUser = async () => {
             const user = getLoggedUser();
