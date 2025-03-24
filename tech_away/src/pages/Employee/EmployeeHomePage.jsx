@@ -10,6 +10,7 @@ import EmployeeHomeDashboard from '../../components/HomePageEmployee/EmployeeHom
 import EmployeeRepairs from '../../components/HomePageEmployee/EmployeeRepairs';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
 import { IsMobileContext } from '../../contexts/IsMobileContext';
+import "../../styles/pageElements.css"
 
 
 export default function EmployeeHomePage() {
@@ -106,7 +107,7 @@ export default function EmployeeHomePage() {
         <>
             <Container fluid className="vh-100">
                 <Tab.Container activeKey={actualTab} onSelect={handleChangeTab}>
-                    {/* <Container fluid className="vh-100"> */}
+                    <Container fluid className="vh-100">
                         <Row className="h-100">
                             <Col
                                 xs={isMobile ? 12 : 2}
@@ -115,24 +116,27 @@ export default function EmployeeHomePage() {
                                 className="bg-light border-end p-0"
                                 style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.3)', zIndex: 1 }}
                             >
-                                <h2 className="mb-4 p-3" style={{fontWeight: "bold"}}>TechAway</h2>
+                                <h2 className="mb-4 p-3 fs-2" style={{fontWeight: "bold"}}>TechAway</h2>
                                 <Nav variant="pills" className="flex-column">
-                                    <Nav.Item className="custom-tabs">
+                                    <Nav.Item className="custom-tabs fs-5">
                                         <Nav.Link eventKey="dashboard">Dashboard</Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item className="custom-tabs">
+                                    <Nav.Item className="custom-tabs fs-5">
                                         <Nav.Link eventKey="purchases">Purchases</Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item className="custom-tabs">
+                                    <Nav.Item className="custom-tabs fs-5">
                                         <Nav.Link eventKey="repairs">Repairs</Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item className="custom-tabs">
+                                    <Nav.Item className="custom-tabs fs-5">
                                         <Nav.Link eventKey="sales">Sales</Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item className="custom-tabs">
+                                    {isAdmin && <Nav.Item className="custom-tabs fs-5">
+                                        <Nav.Link eventKey="admin">Admin</Nav.Link>
+                                    </Nav.Item>}
+                                    <Nav.Item className="custom-tabs fs-5">
                                         <Nav.Link eventKey="profile">Profile</Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item className="mt-3 custom-tabs">
+                                    <Nav.Item className="mt-3 custom-tabs fs-5">
                                         <Nav.Link className="text-danger" onClick={logOut}>Logout</Nav.Link>
                                     </Nav.Item>
                                 </Nav>
@@ -145,25 +149,29 @@ export default function EmployeeHomePage() {
                                 className="p-3 overflow-auto"
                             >
                                 <Tab.Content className="custom-tab-content">
-                                    <Tab.Pane eventKey="dashboard">
+                                    <Tab.Pane eventKey="dashboard" className='p-4'>
                                         <EmployeeHomeDashboard />
                                     </Tab.Pane>
-                                    <Tab.Pane eventKey="purchases">
+                                    <Tab.Pane eventKey="purchases" className='p-4'>
                                         <h5>Purchases Content</h5>
                                     </Tab.Pane>
-                                    <Tab.Pane eventKey="repairs">
+                                    <Tab.Pane eventKey="repairs" className='p-4'>
                                         <h5>Repairs Content</h5>
                                     </Tab.Pane>
-                                    <Tab.Pane eventKey="sales">
+                                    <Tab.Pane eventKey="sales" className='p-4'>
                                         <h5>Sales Content</h5>
                                     </Tab.Pane>
-                                    <Tab.Pane eventKey="profile">
+                                    <Tab.Pane eventKey="profile" className='p-4'>
                                         <EmployeeProfile />
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="admin" className='p-4'>
+                                        {/* <EmployeeProfile /> */}
+                                        AAAAAAAAAAAAA
                                     </Tab.Pane>
                                 </Tab.Content>
                             </Col>
                         </Row>
-                    {/* </Container> */}
+                    </Container>
                 </Tab.Container>
             </Container>
 
