@@ -4,12 +4,14 @@ const models = require('../models');
 
 router.post("/", async (req, res) => {
 
-    try {
+    // try {
         const {statusID, price, clientNic, equipmentBarcode} = req.body;        
 
         // const employeeUser = session.get(employeeUser)
         // const employeeID = employeeUser.internNum
         // const storeID = employeeUser.storeNIPC
+
+        console.log(req.body)
 
         const storeID = "123456789"
         const employeeID = "123456789"
@@ -25,9 +27,9 @@ router.post("/", async (req, res) => {
             res.status(400).json({ error: "Error." });
         }
 
-    } catch (error) {
-        res.status(400).json({ error: "Error." });
-    }
+    // } catch (error) {
+    //     res.status(400).json({ error: "Error." });
+    // }
 });
 
 module.exports = router;
