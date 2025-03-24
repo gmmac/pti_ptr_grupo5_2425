@@ -9,7 +9,7 @@ export default function StorePurchasePage() {
         statusID: '',
         price: '',
         clientNic:'',
-        equipmentId: '',
+        equipmentBarcode: '',
     });
 
     const [statusList, setStatusList] = useState([]);
@@ -124,7 +124,7 @@ export default function StorePurchasePage() {
     
             setForm((prevForm) => ({
                 ...prevForm,
-                equipmentId: equipment.barcode // <-- Atualiza o campo equipmentId do form
+                equipmentBarcode: equipment.barcode // <-- Atualiza o campo equipmentBarcode do form
             }));
         } else {
             setEquipmentData({
@@ -136,7 +136,7 @@ export default function StorePurchasePage() {
     
             setForm((prevForm) => ({
                 ...prevForm,
-                equipmentId: ''
+                equipmentBarcode: ''
             }));
         }
     
@@ -149,11 +149,11 @@ export default function StorePurchasePage() {
 
         setClientData({ ...clientData, [name]: value });
 
-        if (name === "equipmentId") {
+        if (name === "equipmentBarcode") {
             if (!/^\d*$/.test(value)) {
-                setError("O ID do equipamento deve conter apenas números.");
-            } else if (value.length > 12) {
-                setError("O ID do equipamento deve ter 12 algarismos.");
+                setError("O Código de barras do equipamento deve conter apenas números.");
+            } else if (value.length > 20) {
+                setError("O Código de barras do equipamento deve ter 20 algarismos.");
             } else {
                 setError("");
             }
@@ -162,7 +162,7 @@ export default function StorePurchasePage() {
         if (name === "clientNic") {
             if (!/^\d*$/.test(value)) {
                 setError("O NIC do cliente deve conter apenas números.");
-            } else if (value.length > 12) {
+            } else if (value.length > 9) {
                 setError("O NIC do cliente deve ter 9 algarismos.");
             } else {
                 setError("");
@@ -180,18 +180,18 @@ export default function StorePurchasePage() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Verifica se o ID do equipamento é válido
-        if (form.equipmentId.length !== 12) {
-            setError("O ID do equipamento deve ter exatamente 12 algarismos.");
+        // Verifica se o Código de barras do equipamento é válido
+        if (form.equipmentBarcode.length !== 20) {
+            setError("O Código de barras do equipamento deve ter exatamente 20 algarismos.");
             return;
         }
 
         // Verifica se o equipamento existe
-        if (!equipmentList.includes(form.equipmentId)) {
-            setError("Não existe nenhum equipamento com o ID fornecido.");
+        if (!equipmentList.includes(form.equipmentBarcode)) {
+            setError("Não existe nenhum equipamento com o Código de barras fornecido.");
             return;
         }
 
@@ -201,9 +201,9 @@ export default function StorePurchasePage() {
             return;
         }
 
-        console.log(modelsList);
+        console.log(form);
         
-        api.post('/api/storePurchase', form)
+        await api.post('/api/storePurchase', form)
         .then(response => {
             setSuccessMessage("Venda registada com sucesso!");
             setError("");
@@ -214,7 +214,7 @@ export default function StorePurchasePage() {
                     statusID: '',
                     price: '',
                     clientNic: '',
-                    equipmentId: '',
+                    equipmentBarcode: '',
                 });
             }, 3000);
         })
@@ -297,14 +297,14 @@ export default function StorePurchasePage() {
 
                 <Row className="mb-3">
                     <Col sm={12} md={6}>
-                        <Form.Group controlId="formIdEquipamento">
-                            <Form.Label>ID do Equipamento</Form.Label>
+                        <Form.Group controlId="formBarcodeEquipamento">
+                            <Form.Label>Código de barras do Equipamento</Form.Label>
                             <Form.Control
                                 type="number"
-                                name="equipmentId"
-                                value={form.equipmentId}
+                                name="equipmentBarcode"
+                                value={form.equipmentBarcode}
                                 onChange={handleChange}
-                                placeholder="Digite o ID do equipamento"
+                                placeholder="Digite o Código de barras do equipamento"
                                 required
                             />
                         </Form.Group>

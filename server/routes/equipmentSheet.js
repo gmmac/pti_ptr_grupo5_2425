@@ -6,7 +6,7 @@ const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
 	try {
-		const EquipmentSheets = await models.User.findAll();
+		const EquipmentSheets = await models.EquipmentSheet.findAll();
 		res.json(EquipmentSheets);
 	} catch (error) {
 		console.error("Error fetching equipment sheets:", error);
