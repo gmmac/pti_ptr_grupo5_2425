@@ -8,3 +8,11 @@
     background-color: var(--dark-grey);
     color: white;
 }
+
+form .card-header{
+    background-color: var(--variant-two); 
+}
+
+div .custom-tabs .nav-link{
+    background-color: var(--variant-two);
+}
