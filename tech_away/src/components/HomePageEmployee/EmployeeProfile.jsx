@@ -6,54 +6,53 @@ import { getLoggedUser } from '../../utils/auth';
 import "../../styles/pageElements.css";
 
 export default function EmployeeProfile() {
-    const user = getLoggedUser();
-    const [formData, setFormData] = useState(user);
-    const [userRole, setUserRole] = useState("");
-    const [employeeStore, setEmployeeStore] = useState({});
-    const [isEditable, setIsEditable] = useState(false);
+    // const user = getLoggedUser();
+    // const [formData, setFormData] = useState(user);
+    // const [userRole, setUserRole] = useState("");
+    // const [employeeStore, setEmployeeStore] = useState({});
+    // const [isEditable, setIsEditable] = useState(false);
 
-    useEffect(() => {
-        if (user?.role) {
-            api.get(`/api/employeeRole/${user.role}`)
-                .then(res => setUserRole(res.data.role))
-                .catch(error => console.error(error.message));
-        }
+    // useEffect(() => {
+    //     if (user?.role) {
+    //         api.get(`/api/employeeRole/${user.role}`)
+    //             .then(res => setUserRole(res.data.role))
+    //             .catch(error => console.error(error.message));
+    //     }
 
-        if (user?.storeNIPC) {
-            api.get(`/api/store/${user.storeNIPC}`)
-                .then(res => setEmployeeStore(res.data))
-                .catch(error => console.error(error.message));
-        }
-    }, [user?.role, user?.storeNIPC]);
+    //     if (user?.storeNIPC) {
+    //         api.get(`/api/store/${user.storeNIPC}`)
+    //             .then(res => setEmployeeStore(res.data))
+    //             .catch(error => console.error(error.message));
+    //     }
+    // }, [user?.role, user?.storeNIPC]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormData({ ...formData, [name]: value });
+    // };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await api.put(`/api/employee/${user.internNum}`, formData);
-            alert("Profile updated successfully!");
-            sessionStorage.setItem("user", JSON.stringify(response.data));
-            setFormData(response.data);
-            setIsEditable(false);
-        } catch (error) {
-            console.error("Error updating profile:", error);
-        }
-    };
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         const response = await api.put(`/api/employee/${user.internNum}`, formData);
+    //         alert("Profile updated successfully!");
+    //         sessionStorage.setItem("user", JSON.stringify(response.data));
+    //         setFormData(response.data);
+    //         setIsEditable(false);
+    //     } catch (error) {
+    //         console.error("Error updating profile:", error);
+    //     }
+    // };
 
-    const handleEdit = () => {
-        setIsEditable(!isEditable);
-    };
+    // const handleEdit = () => {
+    //     setIsEditable(!isEditable);
+    // };
 
     return (
         <Container>
             <h2 className="my-4 text-center">Employee Profile</h2>
-            <Form onSubmit={handleSubmit}>
+            {/* <Form onSubmit={handleSubmit}>
                 
-                {/* Informações Pessoais */}
                 <Accordion defaultActiveKey="0" className="mb-3 custom-accordion">
                     <Accordion.Item eventKey="0">
                         <Accordion.Header>Personal Information</Accordion.Header>
@@ -122,7 +121,6 @@ export default function EmployeeProfile() {
                     </Accordion.Item>
                 </Accordion>
 
-                {/* Informações Profissionais */}
                 <Accordion defaultActiveKey="0" className="mb-3 custom-accordion">
                     <Accordion.Item eventKey="0">
                         <Accordion.Header>Professional Information</Accordion.Header>
@@ -161,7 +159,6 @@ export default function EmployeeProfile() {
                     </Accordion.Item>
                 </Accordion>
 
-                {/* Botões de Ação */}
                 <Stack direction='horizontal' gap={3} className="mt-3">
                     <Button variant="secondary" onClick={handleEdit}>
                         {isEditable ? "Lock" : "Edit"}
@@ -169,7 +166,7 @@ export default function EmployeeProfile() {
                     <Button variant="primary" type="submit" disabled={!isEditable}>Submit</Button>
                 </Stack>
 
-            </Form>
+            </Form> */}
         </Container>
     );
 }

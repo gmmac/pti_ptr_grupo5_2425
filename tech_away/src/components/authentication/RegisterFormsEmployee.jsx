@@ -106,6 +106,7 @@ function RegisterFormsEmployee() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
 
     // Verificar campos vazios
     let newErrors = { ...errors };

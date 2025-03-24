@@ -29,27 +29,26 @@
 }
 
     .custom-tabs .nav-link {
-        background-color: var(--variant-one);
+        /* background-color: var(--variant-one); */
         color: var(--dark-grey);
         font-weight: bold;
     }
     
         .custom-tabs .nav-link:hover {
-            background-color: var(--dark-grey);
-            color: var(--white);
-            text-decoration: none;
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
         }
 
             
         /* selected tab */
         .custom-tabs.nav-item .nav-link.active,
         .custom-tabs .nav-link[aria-selected="true"] {
-            background-color: var(--dark-grey);
-            color: var(--white);
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
         }
 
 .custom-tab-content{
     margin: 10px;
 }
-
-

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../utils/axios';
 import '../../styles/index.css';
 import '../../styles/AuthPage.css';
-import { useAuth } from '../../contexts/AuthProvider';
+import { useAuth } from '../../contexts/AuthenticationProviders/AuthProvider';
 
 export default function LoginForms() {
 

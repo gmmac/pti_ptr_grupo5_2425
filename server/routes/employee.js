@@ -140,6 +140,26 @@ router.post("/", async (req, res) => {
 });
 
 
+router.get("/user-info", (req, res) => {
+	const employeeInfo = req.cookies.employeeInfo;
+
+	console.log(employeeInfo)
+
+	return res.status(200).json({ employeeInfo: employeeInfo });
+  });
+  
+router.get('/logout', (req, res) => {
+	res.clearCookie("employeeInfo", {
+	  httpOnly: true,
+	  secure: false, // Deve bater com a flag usada na criação do cookie
+	  sameSite: "Lax"
+	});
+  
+	return res.status(200).json({ message: 'Logout realizado com sucesso.' });
+});
+
+
+
 router.get("/:internNum", async (req, res) => {
 	try {
 
@@ -189,5 +209,6 @@ router.delete("/:internNum", async (req, res) => {
 		res.status(500).json({ error: error.message });
 	}
 });
+
 
 module.exports = router;

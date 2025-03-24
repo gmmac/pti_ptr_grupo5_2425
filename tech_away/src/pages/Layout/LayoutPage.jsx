@@ -6,7 +6,7 @@ import { Stack } from "react-bootstrap";
 import { IsMobileContext } from "../../contexts/IsMobileContext";
 import BottomNavBar from "../../components/Navbar/BottomNavBar";
 import LoggedInNavBar from "../../components/Navbar/LoggedInNavBar";
-import { useAuth } from "../../contexts/AuthProvider";
+import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 
 function LayoutPage() {
 	const isMobile = useContext(IsMobileContext);
