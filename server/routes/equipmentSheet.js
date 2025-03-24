@@ -15,91 +15,109 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/in-stock", async (req, res) => {
-    // try {
-        const {
-            modelId,
-            typeId,
-            page = 1,
-            pageSize = 6,
-            orderBy = "createdAt",  // Valor padrão
-            orderDirection = "DESC",  // Valor padrão
-            brandId,
-        } = req.query;
+	// try {
+	const {
+		modelId,
+		typeId,
+		page = 1,
+		pageSize = 6,
+		orderBy = "createdAt", // Valor padrão
+		orderDirection = "DESC", // Valor padrão
+		brandId,
+	} = req.query;
 
-        // Construção do objeto 'where' dinamicamente
-        const where = {};
+	// Construção do objeto 'where' dinamicamente
+	const where = {};
 
-        const modelCondition = modelId ? { id: modelId } : {};
-        const typeCondition = typeId ? { id: typeId } : {};
-        const brandCondition = brandId ? { id: brandId } : {};
+	const modelCondition = modelId ? { id: modelId } : {};
+	const typeCondition = typeId ? { id: typeId } : {};
+	const brandCondition = brandId ? { id: brandId } : {};
 
-        // Calculando o offset com base na página
-        const offset = (parseInt(page) - 1) * parseInt(pageSize);
+	// Calculando o offset com base na página
+	const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
-        // Construindo a ordenação
-        const order = [[orderBy, orderDirection.toUpperCase()]];
+	// Construindo a ordenação
+	const order = [[orderBy, orderDirection.toUpperCase()]];
 
-        // Consulta ao banco de dados
-        const { count, rows } = await models.EquipmentSheet.findAndCountAll({
-            where,
-            include: [
-                // {
-                //     model: models.UsedEquipment,  // Inclui os equipamentos usados
-                //     as: "UsedEquipments",  // Alias para o relacionamento
-                //     required: true,  // Isso garante que só as EquipmentSheet com UsedEquipments associados sejam retornadas
-                // },
-                {
-                    model: models.EquipmentModel,
-                    as: "EquipmentModel",
-                    where: modelCondition,
-                    attributes: ["name", "price", "releaseYear"],
-                    include: [
-                        {
-                            model: models.Brand,
-                            as: "Brand",
-                            where: brandCondition,
-                            attributes: ["name"],
-                        },
-                    ],
-                },
-                {
-                    model: models.EquipmentType,
-                    as: "EquipmentType",
-                    where: typeCondition,
-                    attributes: ["name"],
-                },
-            ],
-            attributes: ["barcode"],
-            limit: parseInt(pageSize),
-            offset,
-            order,
-        });
+	// Consulta ao banco de dados
+	const { count, rows } = await models.EquipmentSheet.findAndCountAll({
+		where,
+		include: [
+			// {
+			//     model: models.UsedEquipment,  // Inclui os equipamentos usados
+			//     as: "UsedEquipments",  // Alias para o relacionamento
+			//     required: true,  // Isso garante que só as EquipmentSheet com UsedEquipments associados sejam retornadas
+			// },
+			{
+				model: models.EquipmentModel,
+				as: "EquipmentModel",
+				where: modelCondition,
+				attributes: ["name", "price", "releaseYear"],
+				include: [
+					{
+						model: models.Brand,
+						as: "Brand",
+						where: brandCondition,
+						attributes: ["name"],
+					},
+				],
+			},
+			{
+				model: models.EquipmentType,
+				as: "EquipmentType",
+				where: typeCondition,
+				attributes: ["name"],
+			},
+		],
+		attributes: ["barcode"],
+		limit: parseInt(pageSize),
+		offset,
+		order,
+	});
 
-        // Retorno da resposta com a paginação
-        res.json({
-            totalItems: count,
-            totalPages: Math.ceil(count / pageSize),
-            currentPage: parseInt(page),
-            pageSize: parseInt(pageSize),
-            data: rows,
-        });
-    // } catch (error) {
-    //     console.error("Error fetching equipment sheets:", error);
-    //     res.status(500).json({ error: "Error fetching equipment sheets." });
-    // }
+	// Retorno da resposta com a paginação
+	res.json({
+		totalItems: count,
+		totalPages: Math.ceil(count / pageSize),
+		currentPage: parseInt(page),
+		pageSize: parseInt(pageSize),
+		data: rows,
+	});
+	// } catch (error) {
+	//     console.error("Error fetching equipment sheets:", error);
+	//     res.status(500).json({ error: "Error fetching equipment sheets." });
+	// }
 });
 
-router.post("/", (req, res) => {});
+router.post("/", async (req, res) => {
+	try {
+		console.log(req.body);
+
+		const { barcode, model, type } = req.body;
+
+		const newEquipmentSheet = await models.EquipmentSheet.create({
+			barcode: barcode,
+			model: model,
+			type: type,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
+		res.status(201).json(newEquipmentSheet);
+	} catch (error) {
+		console.error("Error creating equipment sheet:", error);
+		res.status(500).json({ error: "Error creating equipment sheet." });
+	}
+});
 
 router.get("/:ID", async (req, res) => {
 	try {
 		const { modelId, typeId, brandId } = req.query;
-		const { ID } = req.params; 
+		const { ID } = req.params;
 
 		const modelCondition = modelId ? { id: modelId } : {};
 		const typeCondition = typeId ? { id: typeId } : {};
 		const brandCondition = brandId ? { id: brandId } : {};
-		
+
 		const equipmentSheet = await models.EquipmentSheet.findOne({
 			where: { barcode: ID },
 			include: [
