@@ -1,13 +1,55 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-
 const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
 	try {
-		const EquipmentSheets = await models.User.findAll();
-		res.json(EquipmentSheets);
+		const {
+			barcode,
+			model,
+			type,
+			createdFrom,
+			createdTo,
+			updatedFrom,
+			updatedTo,
+		} = req.query;
+
+		const filters = {};
+
+		if (barcode) {
+			filters.barcode = barcode;
+		}
+
+		if (model) {
+			filters.model = model;
+		}
+
+		if (type) {
+			filters.type = type;
+		}
+
+		if (createdFrom || createdTo) {
+			filters.createdAt = {};
+			if (createdFrom) filters.createdAt[Op.gte] = new Date(createdFrom);
+			if (createdTo) filters.createdAt[Op.lte] = new Date(createdTo);
+		}
+
+		if (updatedFrom || updatedTo) {
+			filters.updatedAt = {};
+			if (updatedFrom) filters.updatedAt[Op.gte] = new Date(updatedFrom);
+			if (updatedTo) filters.updatedAt[Op.lte] = new Date(updatedTo);
+		}
+
+		const equipmentSheets = await models.EquipmentSheet.findAll({
+			attributes: ["barcode", "createdAt", "updatedAt"],
+			where: filters,
+			include: [
+				{ model: models.EquipmentModel, attributes: ["id", "name"] },
+				{ model: models.EquipmentType, attributes: ["id", "name"] },
+			],
+		});
+		res.json(equipmentSheets);
 	} catch (error) {
 		console.error("Error fetching equipment sheets:", error);
 		res.status(500).json({ error: "Error fetching equipment sheets." });
@@ -156,9 +198,30 @@ router.get("/:ID", async (req, res) => {
 	}
 });
 
-router.put("/:ID", (req, res) => {});
+router.put("/:ID", async (req, res) => {
+	const { barcode, model, type } = req.body;
+	const equipmentSheet = await models.EquipmentSheet.findByPk(req.params.ID);
+	if (!equipmentSheet) {
+		return res.status(404).json({ error: "EquipmentSheet not found." });
+	}
 
-router.delete("/:ID", (req, res) => {});
+	await equipmentSheet.update({ barcode, model, type });
+	res.json(equipmentSheet);
+});
+
+router.delete("/:ID", async (req, res) => {
+	try {
+		const equipmentSheet = await models.EquipmentSheet.findByPk(req.params.ID);
+		if (!equipmentSheet) {
+			return res.status(404).json({ error: "EquipmentSheet not found." });
+		}
+		await equipmentSheet.destroy();
+		res.status(204).send();
+	} catch (error) {
+		console.error("Error deleting equipment sheet:", error);
+		res.status(500).json({ error: "Error deleting equipment sheet." });
+	}
+});
 
 router.get("/:ID/part", (req, res) => {});
 
