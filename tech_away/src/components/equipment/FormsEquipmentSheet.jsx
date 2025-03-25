@@ -9,6 +9,8 @@ export default function FormsEquipmentSheet({ showModal, closeModal }) {
 
 	const [equipmentSheet, setEquipmentSheet] = useState({
 		barcode: "",
+		modelId: "",
+		typeId: "",
 		model: "",
 		type: "",
 	});
@@ -36,12 +38,12 @@ export default function FormsEquipmentSheet({ showModal, closeModal }) {
 	};
 
 	// Função para atualizar os campos com os valores do modal
-	const handleSelectModel = (selectedName) => {
-		setEquipmentSheet((prev) => ({ ...prev, model: selectedName }));
+	const handleSelectModel = ({ id, name }) => {
+		setEquipmentSheet((prev) => ({ ...prev, model: name, modelId: id }));
 	};
 
-	const handleSelectType = (selectedName) => {
-		setEquipmentSheet((prev) => ({ ...prev, type: selectedName }));
+	const handleSelectType = ({ id, name }) => {
+		setEquipmentSheet((prev) => ({ ...prev, type: name, typeId: id }));
 	};
 
 	// Post de uma nova equipmentSheet
@@ -62,10 +64,15 @@ export default function FormsEquipmentSheet({ showModal, closeModal }) {
 		setErrors(newErrors);
 		if (hasError) return;
 
-		console.log(equipmentSheet);
+		const dataToSubmit = {
+			barcode: equipmentSheet.barcode,
+			model: equipmentSheet.modelId,
+			type: equipmentSheet.typeId,
+		};
+		console.log(dataToSubmit);
 
 		await api
-			.post("api/equipmentSheet/", equipmentSheet)
+			.post("api/equipmentSheet/", dataToSubmit)
 			.then(() => {
 				handleRefresh();
 				closeModal();
@@ -117,7 +124,13 @@ export default function FormsEquipmentSheet({ showModal, closeModal }) {
 							readOnly
 							className="rounded-pill me-2"
 						/>
-						<Button onClick={() => setShowModelModal(true)}>Select</Button>
+						<Button
+							className="rounded-pill"
+							style={{ backgroundColor: "var(--variant-two", border: "none" }}
+							onClick={() => setShowModelModal(true)}
+						>
+							Select
+						</Button>
 					</div>
 					<Form.Control.Feedback type="invalid">
 						{errors.model}
@@ -135,15 +148,25 @@ export default function FormsEquipmentSheet({ showModal, closeModal }) {
 							readOnly
 							className="rounded-pill me-2"
 						/>
-						<Button onClick={() => setShowTypeModal(true)}>Select</Button>
+						<Button
+							className="rounded-pill"
+							style={{ backgroundColor: "var(--variant-two", border: "none" }}
+							onClick={() => setShowTypeModal(true)}
+						>
+							Select
+						</Button>
 					</div>
 					<Form.Control.Feedback type="invalid">
 						{errors.type}
 					</Form.Control.Feedback>
 				</Form.Group>
 
-				<Form.Group className="mt-4">
-					<Button className="w-100" onClick={handleSubmit}>
+				<Form.Group className="mt-4 ">
+					<Button
+						className="w-100 rounded-pill"
+						style={{ backgroundColor: "var(--variant-two", border: "none" }}
+						onClick={handleSubmit}
+					>
 						Add Equipment Sheet
 					</Button>
 				</Form.Group>

@@ -46,13 +46,13 @@ export default function ModalToSelect({
 
 	const handleConfirm = () => {
 		if (selectedRow) {
-			onSelect(selectedRow.id);
+			onSelect({ id: selectedRow.id, name: selectedRow.name });
 			closeModal();
 		}
 	};
 
 	return (
-		<Modal show={showModal} onHide={closeModal}>
+		<Modal show={showModal} onHide={closeModal} size="lg">
 			<Modal.Header closeButton>
 				<Modal.Title>{title}</Modal.Title>
 			</Modal.Header>
@@ -62,10 +62,10 @@ export default function ModalToSelect({
 					placeholder="Search..."
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
-					className="mb-3"
+					className="mb-3 rounded-pill"
 				/>
 				{list.length > 0 ? (
-					<Table striped bordered hover>
+					<Table bordered hover responsive="sm">
 						<thead>
 							<tr>
 								{columns.map((col, index) => (
@@ -75,17 +75,21 @@ export default function ModalToSelect({
 						</thead>
 						<tbody>
 							{list.map((item, rowIndex) => (
-								<tr
-									key={rowIndex}
-									onClick={() => handleRowClick(item)}
-									style={{
-										cursor: "pointer",
-										backgroundColor:
-											selectedRow?.id === item.id ? "#d3d3d3" : "transparent",
-									}}
-								>
+								<tr key={rowIndex} onClick={() => handleRowClick(item)}>
 									{columns.map((col, colIndex) => (
-										<td key={colIndex}>{item[col]}</td>
+										<td
+											key={colIndex}
+											style={{
+												cursor: "pointer",
+												backgroundColor:
+													selectedRow?.id === item.id
+														? "var(--variant-one)"
+														: "transparent", // Cor de fundo para a linha selecionada
+												color: selectedRow?.id === item.id ? "#fff" : "inherit", // Cor do texto na linha selecionada
+											}}
+										>
+											{item[col]}
+										</td>
 									))}
 								</tr>
 							))}
@@ -96,13 +100,22 @@ export default function ModalToSelect({
 				)}
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="secondary" onClick={closeModal}>
+				<Button
+					variant="secondary"
+					className="rounded-pill px-4"
+					onClick={closeModal}
+				>
 					Cancel
 				</Button>
 				<Button
 					variant="primary"
 					onClick={handleConfirm}
 					disabled={!selectedRow}
+					className="rounded-pill px-4"
+					style={{
+						backgroundColor: "var(--variant-one)",
+						border: "none",
+					}}
 				>
 					Select
 				</Button>

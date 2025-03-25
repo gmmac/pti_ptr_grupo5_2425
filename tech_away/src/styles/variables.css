@@ -41,5 +41,6 @@
 
 .btn-variant-two {
 	background-color: var(--variant-two);
+	border: none;
 	color: var(--white);
 }
