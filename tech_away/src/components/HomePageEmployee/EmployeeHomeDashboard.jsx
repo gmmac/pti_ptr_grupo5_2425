@@ -25,17 +25,13 @@ export default function EmployeeHomeDashboard() {
 
     return (
         <Container fluid className="py-4">
-            {/* Top Cards */}
                 <DashboardTopCard />
 
-            {/* Main Content */}
             <Row>
-                {/* Manage Section */}
                 <Col xl={8} lg={12} md={12} >
                     <DashboardGrid sections={sections}/>
                 </Col>
 
-                {/* Analytics Section */}
                 <Col xl={4} lg={12} md={12} className='pt-4 pt-xl-0 gx-xl-5' >
                     <DashboardVerticalSection />
                 </Col>
