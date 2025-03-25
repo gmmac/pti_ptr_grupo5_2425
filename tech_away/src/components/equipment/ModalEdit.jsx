@@ -1,59 +1,66 @@
 import React, { useState, useEffect } from "react";
 import api from "../../utils/axios";
 import { Modal, Button, Form, Stack } from "react-bootstrap";
+import ModalToSelect from "./ModalToSelect"; // Componente para selecionar EquipmentModel e EquipmentType
 
 export default function ModalEdit({
 	show,
 	handleClose,
 	modelToEdit,
-	id,
 	attributesToEdit,
 	onSave,
+	objectToChange,
 }) {
 	const [formData, setFormData] = useState({});
 	const [errors, setErrors] = useState({});
-	const [modals, setModals] = useState({}); // Gerencia quais modais de seleção estão abertos
+	const [modals, setModals] = useState({
+		EquipmentModel: false,
+		EquipmentType: false,
+	});
+	const id = objectToChange.barcode;
 
-	// Buscar os dados do item ao abrir o modal
 	useEffect(() => {
-		if (id && show) {
-			api
-				.get(`api/${modelToEdit}/${id}`)
-				.then((res) => {
-					setFormData(res.data);
-				})
-				.catch((error) => console.error("Erro ao buscar dados:", error));
+		if (objectToChange) {
+			setFormData({
+				...objectToChange,
+				EquipmentModel: objectToChange.EquipmentModel?.id || null,
+				EquipmentType: objectToChange.EquipmentType?.id || null,
+			});
 		}
-	}, [id, modelToEdit, show]);
+	}, [objectToChange]);
 
 	// Atualiza os valores do formulário
 	const handleChange = (e) => {
 		const { name, value } = e.target;
-		setFormData((prev) => ({ ...prev, [name]: value }));
+		setFormData((prev) => ({
+			...prev,
+			[name]: value,
+		}));
 
-		// Validação básica
 		let newErrors = { ...errors };
 		newErrors[name] = value ? "" : "Este campo é obrigatório";
 		setErrors(newErrors);
 	};
 
-	const handleSelectValue = (attribute, { id, name }) => {
+	// Função para selecionar valores nos modais
+	const handleSelectValue = (attribute, selectedItem) => {
+
 		setFormData((prev) => ({
 			...prev,
-			[attribute]: name,
-			[`${attribute}Id`]: id,
+			[attribute]: selectedItem.id, // Armazena o ID para envio ao servidor
+			[`${attribute}Name`]: selectedItem.name, // Armazena o nome para exibição
 		}));
-		setModals((prev) => ({ ...prev, [attribute]: false }));
+
+		setModals((prev) => ({ ...prev, [attribute]: false })); // Fecha o modal
 	};
 
 	// Enviar os dados atualizados
 	const handleSubmit = async () => {
-		// Validação antes do envio
 		let hasError = false;
 		let newErrors = {};
 
 		attributesToEdit.forEach((attribute) => {
-			if (!formData[attribute]) {
+			if (!formData[attribute] && !formData[`${attribute}Name`]) {
 				newErrors[attribute] = "Este campo é obrigatório";
 				hasError = true;
 			}
@@ -62,41 +69,58 @@ export default function ModalEdit({
 		setErrors(newErrors);
 		if (hasError) return;
 
-		const dataToSubmit = { ...formData };
-		delete dataToSubmit.createdAt;
-		delete dataToSubmit.updatedAt;
-
 		try {
-			await api.put(`api/${modelToEdit}/${id}`, dataToSubmit);
-			onSave(); // Atualiza a lista na tabela
-			handleClose(); // Fecha o modal
+			const payload = {
+				barcode: id,
+				model: formData.EquipmentModel || null,
+				type: formData.EquipmentType || null,
+			};
+
+			await api.put(`api/${modelToEdit}/${id}`, payload);
+			onSave();
+			handleClose();
 		} catch (error) {
 			console.error("Erro ao atualizar:", error);
 		}
 	};
 
+
 	return (
 		<Modal show={show} onHide={handleClose}>
 			<Modal.Header closeButton>
-				<Modal.Title>Editar {modelToEdit}</Modal.Title>
+				<Modal.Title>
+					Editar {modelToEdit}
+					<br />
+					{id}
+				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{attributesToEdit
 					.filter(
 						(attr) =>
 							attr !== "id" && attr !== "createdAt" && attr !== "updatedAt"
-					) // Remove campos desnecessários
+					)
 					.map((attribute, index) => (
 						<Form.Group key={index} className="mb-3">
 							<Form.Label>{attribute}</Form.Label>
-							{attribute.toLowerCase().includes("id") ? (
-								// Se for um campo de ID, exibe um botão de seleção
+							{attribute === "barcode" ? (
+								<Form.Control
+									type="text"
+									name={attribute}
+									value={id || ""}
+									disabled
+									className="rounded-pill"
+								/>
+							) : ["EquipmentModel", "EquipmentType"].includes(attribute) ? (
 								<div className="d-flex">
 									<Form.Control
 										type="text"
 										name={attribute}
-										value={formData[attribute] || ""}
-										isInvalid={!!errors[attribute]}
+										value={
+											formData[`${attribute}Name`] ||
+											objectToChange?.[attribute]?.name ||
+											""
+										}
 										readOnly
 										className="rounded-pill me-2"
 									/>
@@ -130,7 +154,7 @@ export default function ModalEdit({
 					))}
 				<Stack gap={2} direction="horizontal" className="justify-content-end">
 					<Button
-						className=" rounded-pill"
+						className="rounded-pill"
 						variant="secondary"
 						onClick={handleClose}
 					>
@@ -146,18 +170,23 @@ export default function ModalEdit({
 				</Stack>
 			</Modal.Body>
 
-			{/* Modais de seleção para atributos do tipo ID */}
-			{attributesToEdit
-				.filter((attr) => attr.toLowerCase().includes("id"))
-				.map((attr, index) => (
-					<ModalToSelect
-						key={index}
-						show={modals[attr]}
-						closeModal={() => setModals((prev) => ({ ...prev, [attr]: false }))}
-						title={attr}
-						onSelect={(selected) => handleSelectValue(attr, selected)}
-					/>
-				))}
+			{/* Modais de seleção para EquipmentModel e EquipmentType */}
+			<ModalToSelect
+				showModal={modals.EquipmentModel}
+				closeModal={() =>
+					setModals((prev) => ({ ...prev, EquipmentModel: false }))
+				}
+				title="model"
+				onSelect={(selected) => handleSelectValue("EquipmentModel", selected)}
+			/>
+			<ModalToSelect
+				showModal={modals.EquipmentType}
+				closeModal={() =>
+					setModals((prev) => ({ ...prev, EquipmentType: false }))
+				}
+				title="type"
+				onSelect={(selected) => handleSelectValue("EquipmentType", selected)}
+			/>
 		</Modal>
 	);
 }

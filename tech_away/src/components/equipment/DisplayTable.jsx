@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import api from "../../utils/axios";
 import { Table, Button, Stack, Modal } from "react-bootstrap";
 import ModalEdit from "./ModalEdit"; // Importando o modal de edição
@@ -7,7 +7,7 @@ export default function DisplayTable({ model, params = "" }) {
 	const [data, setData] = useState([]);
 	const [columns, setColumns] = useState([]);
 	const [showModal, setShowModal] = useState(false);
-	const [selectedId, setSelectedId] = useState(null);
+	const [selectedObj, setSelectedObj] = useState([]);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [deleteId, setDeleteId] = useState(null);
 
@@ -33,8 +33,8 @@ export default function DisplayTable({ model, params = "" }) {
 	}, [model, params]);
 
 	// Função para abrir modal de edição
-	const handleEdit = (id) => {
-		setSelectedId(id);
+	const handleEdit = (item) => {
+		setSelectedObj(item);
 		setShowModal(true);
 	};
 
@@ -54,7 +54,6 @@ export default function DisplayTable({ model, params = "" }) {
 			})
 			.catch((error) => console.error("Erro ao excluir:", error));
 	};
-
 	return (
 		<>
 			<Table striped bordered hover>
@@ -89,7 +88,7 @@ export default function DisplayTable({ model, params = "" }) {
 											backgroundColor: "var(--variant-one)",
 											border: "none",
 										}}
-										onClick={() => handleEdit(item.barcode)} // Abre modal ao clicar
+										onClick={() => handleEdit(item)}
 									>
 										Editar
 									</Button>
@@ -113,7 +112,7 @@ export default function DisplayTable({ model, params = "" }) {
 				show={showModal}
 				handleClose={() => setShowModal(false)}
 				modelToEdit={model}
-				id={selectedId}
+				objectToChange={selectedObj}
 				attributesToEdit={columns} // Passa apenas os atributos filtrados
 				onSave={() => {
 					setShowModal(false);

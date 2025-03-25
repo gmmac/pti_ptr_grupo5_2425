@@ -45,8 +45,16 @@ router.get("/", async (req, res) => {
 			attributes: ["barcode", "createdAt", "updatedAt"],
 			where: filters,
 			include: [
-				{ model: models.EquipmentModel, attributes: ["id", "name"] },
-				{ model: models.EquipmentType, attributes: ["id", "name"] },
+				{
+					model: models.EquipmentModel,
+					attributes: ["id", "name"],
+					alias: "model",
+				},
+				{
+					model: models.EquipmentType,
+					attributes: ["id", "name"],
+					alias: "type",
+				},
 			],
 		});
 		res.json(equipmentSheets);
