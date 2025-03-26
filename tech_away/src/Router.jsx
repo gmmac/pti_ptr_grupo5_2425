@@ -22,8 +22,9 @@ import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 
 import { IsMobileProvider } from "./contexts/IsMobileContext";
-import AuthProvider from "./contexts/AuthenticationProviders/AuthProvider";
-import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAuthProvider";
+import AuthProvider from "./contexts/AuthProvider";
+import EmployeeAuthProvider from "./contexts/EmployeeAuthProvider";
+import ProfilePageClient from "./pages/Auth/ProfilePageClient";
 
 export default function Router() {
   return (
@@ -50,6 +51,7 @@ export default function Router() {
             <Route path="storePurchasePage" element={<StorePurchasePage />} />
             <Route path="register" element={<RegisterPageClient />} />
             <Route path="login" element={<LoginPageClient />} />
+            <Route path="/profile" element={<ProfilePageClient />} />
             <Route
               path="interests"
               element={

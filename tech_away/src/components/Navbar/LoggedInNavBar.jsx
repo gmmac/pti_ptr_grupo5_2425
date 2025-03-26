@@ -18,25 +18,17 @@ export default function LoggedInNavBar() {
 
 	const { user, logOut } = useAuth();
 
-  //const user = getLoggedUser();
-  //const userName = user ? user.firstName : "Utilizador";
-  // const userName = "Utilizador"
-
   // Função para logout
   const handleLogout = () => {
-
-    // handle(false);
-
     if(user){
       logOut();
     }
-    // removeLoggedUser();
-    //ver se user é employee
-    // if(user?.role){
-    //   navigate("/employee/login");
-    // }else{
-      navigate("/login");
-    // }
+    
+    navigate("/login");
+  };
+
+  const handleProfile = () => {
+    navigate("/profile");
   };
 
   return (
@@ -95,7 +87,7 @@ export default function LoggedInNavBar() {
         {/* Dropdown com nome do usuário e logout */}
         <Nav>
           <NavDropdown title={<span style={{ marginRight: '20px' }}>{user.firstName}</span>} className="rounded-pill px-3 fs-6" style={{ backgroundColor: "var(--variant-two)", fontWeight: "bold" }}>
-            <NavDropdown.Item >Perfil</NavDropdown.Item>
+            <NavDropdown.Item onClick={handleProfile}>Perfil</NavDropdown.Item>
             <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
           </NavDropdown>
         </Nav>
