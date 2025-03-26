@@ -13,7 +13,6 @@ export default function TestPage() {
 		<Container>
 			<Stack gap={3} className="justify-content-center align-items-center">
 				<h2>Test Page</h2>
-
 				<Button variant="primary" onClick={handleShow}>
 					Criar EquipmentSheet
 				</Button>
