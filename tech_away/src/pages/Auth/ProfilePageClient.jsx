@@ -7,7 +7,7 @@ import "../../styles/ClientProfilePage.css"
 export default function ProfilePageClient() {
 	return (
 		<Container>
-			<Tab.Container>
+			<Tab.Container defaultActiveKey="profile">
                 <Nav variant="tabs" className="mb-3 nav-fill">
 					<Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="profile">Profile</Nav.Link>
