@@ -25,6 +25,8 @@ import { IsMobileProvider } from "./contexts/IsMobileContext";
 import AuthProvider from "./contexts/AuthenticationProviders/AuthProvider";
 import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAuthProvider";
 
+import TestPage from "./pages/TestPage";
+
 export default function Router() {
   return (
     <IsMobileProvider>
@@ -73,7 +75,7 @@ export default function Router() {
             <Route element={<EmployeeProtectedRoute />}>
               <Route index element={<EmployeeHomePage />} />
             </Route>
-
+            <Route path="teste" element={<TestPage />} />
             <Route path="login" element={<EmployeeLoginPage />} />
             <Route path="register" element={<EmployeeRegisterPage />} />
 

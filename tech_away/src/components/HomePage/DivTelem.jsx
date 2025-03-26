@@ -38,7 +38,7 @@ export default function DivTelem(isMobile) {
 
 				{/* Imagem sobreposta ao SVG */}
 				<Image
-					src="../../public/assets/telemovel.png"
+					src="assets/telemovel.png"
 					style={{
 						position: "absolute",
 						top: "75%",
