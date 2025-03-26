@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Container, Row, Col, Card } from 'react-bootstrap';
-import { Pencil, Check } from 'react-bootstrap-icons';
+import { PencilSquare, XCircleFill } from 'react-bootstrap-icons';
 import api from '../../utils/axios';
 import "../../styles/ClientProfilePage.css"
 
@@ -17,9 +17,9 @@ export default function ClientProfile() {
         gender: ""
     });
 
-    const [originalData, setOriginalData] = useState({}); // Estado para armazenar os dados originais
-    const [isEditing, setIsEditing] = useState(false); // Estado para controlar a edição
-    const [changedFields, setChangedFields] = useState([]); // Estado para armazenar os campos alterados
+    const [originalData, setOriginalData] = useState({});
+    const [isEditing, setIsEditing] = useState(false);
+    const [changedFields, setChangedFields] = useState([]);
 
     useEffect(() => {
         async function fetchClientData() {
@@ -48,27 +48,29 @@ export default function ClientProfile() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-
+    
         // Verifica se o valor alterado é diferente do original
         if (value !== originalData[name]) {
-            // Adiciona o campo à lista de campos alterados, se ainda não estiver na lista
-            if (!changedFields.includes(name)) {
-                setChangedFields([...changedFields, name]);
-            }
+            setChangedFields({ ...changedFields, [name]: value }); // Armazena campo e valor
         } else {
-            // Se o valor voltar ao original, remove o campo da lista de alterados
-            setChangedFields(changedFields.filter(field => field !== name));
+            // Remove o campo se voltar ao valor original
+            const updatedFields = { ...changedFields };
+            delete updatedFields[name];
+            setChangedFields(updatedFields);
         }
     };
-
+    
     const handleSaveChanges = () => {
-        // Aqui você pode enviar para o backend apenas os campos que foram alterados
-        console.log("Campos alterados:", changedFields);
-        // Exemplo de envio dos campos alterados (isso depende da lógica de seu backend)
-        // api.put("/api/auth/update-client", { changedFields })
-        // Após salvar, podemos resetar os campos alterados
+        api.put(`/api/client/${formData.nic}`, changedFields)
+            .then((res) => {
+                setOriginalData({ ...originalData, ...changedFields });
+                setChangedFields([]);
+            })
+            .catch((error) => {
+                console.error("Erro ao atualizar os dados:", error.message);
+            });
+    
         setIsEditing(false);
-        setChangedFields([]); // Limpa a lista de campos alterados após salvar
     };
 
     return (
@@ -85,11 +87,11 @@ export default function ClientProfile() {
                             onClick={handleEditClick}
                         >
                             {isEditing ? (
-                                <Check 
-                                    style={{ color: '#28a745', fontWeight: 'bold', fontSize: '2rem' }} // Ícone de check maior e com cor verde
+                                <XCircleFill  
+                                    style={{ color: 'red', fontWeight: 'bold', fontSize: '1.5rem' }} // Ícone de check maior e com cor verde
                                 />  
                             ) : (
-                                <Pencil 
+                                <PencilSquare 
                                     style={{ fontSize: '1.5rem' }} // Tamanho do ícone de lápis
                                 />
                             )}
@@ -101,7 +103,7 @@ export default function ClientProfile() {
                                 <Form.Group className="mb-3">
                                     <Form.Label>First Name</Form.Label>
                                     <Form.Control 
-                                        className="auth-input" 
+                                        className="profile-input" 
                                         type="text" 
                                         name="firstName" 
                                         value={formData.firstName || ""} 
@@ -114,7 +116,7 @@ export default function ClientProfile() {
                                 <Form.Group className="mb-3">
                                     <Form.Label>Last Name</Form.Label>
                                     <Form.Control 
-                                        className="auth-input" 
+                                        className="profile-input" 
                                         type="text" 
                                         name="lastName" 
                                         value={formData.lastName || ""} 
@@ -127,7 +129,7 @@ export default function ClientProfile() {
                                 <Form.Group className="mb-3">
                                     <Form.Label>Birth Date</Form.Label>
                                     <Form.Control 
-                                        className="auth-input" 
+                                        className="profile-input" 
                                         type="date" 
                                         name="birthDate" 
                                         value={formData.birthDate ? formData.birthDate.split('T')[0] : ""} 
@@ -142,7 +144,7 @@ export default function ClientProfile() {
                                 <Form.Group className="mb-3">
                                     <Form.Label>Phone</Form.Label>
                                     <Form.Control 
-                                        className="auth-input" 
+                                        className="profile-input" 
                                         type="tel" 
                                         name="phone" 
                                         value={formData.phone || ""} 
@@ -155,11 +157,11 @@ export default function ClientProfile() {
                                 <Form.Group className="mb-3">
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control 
-                                        className="auth-input" 
+                                        className="profile-input" 
                                         type="email" 
                                         name="email" 
                                         value={formData.email || ""} 
-                                        disabled={!isEditing} 
+                                        disabled
                                         onChange={handleInputChange}
                                     />
                                 </Form.Group>
@@ -170,11 +172,11 @@ export default function ClientProfile() {
                                 <Form.Group className="mb-3">
                                     <Form.Label>NIC</Form.Label>
                                     <Form.Control 
-                                        className="auth-input" 
+                                        className="profile-input" 
                                         type="text" 
                                         name="nic" 
                                         value={formData.nic || ""} 
-                                        disabled={!isEditing} 
+                                        disabled
                                         onChange={handleInputChange}
                                     />
                                 </Form.Group>
@@ -183,7 +185,7 @@ export default function ClientProfile() {
                                 <Form.Group className="mb-3">
                                     <Form.Label>NIF</Form.Label>
                                     <Form.Control 
-                                        className="auth-input" 
+                                        className="profile-input" 
                                         type="text" 
                                         name="nif" 
                                         value={formData.nif || ""} 
@@ -198,7 +200,7 @@ export default function ClientProfile() {
                                 <Form.Group className="mb-3">
                                     <Form.Label>Address</Form.Label>
                                     <Form.Control 
-                                        className="auth-input" 
+                                        className="profile-input" 
                                         type="text" 
                                         name="address" 
                                         value={formData.address || ""} 
@@ -211,17 +213,16 @@ export default function ClientProfile() {
                     </Card.Body>
                 </Card>
 
-                {isEditing && (
-                    <div className="text-center">
-                        <button 
-                            type="button" 
-                            className="btn btn-success"
-                            onClick={handleSaveChanges}
-                        >
-                            Save Changes
-                        </button>
-                    </div>
-                )}
+                <div className="text-center">
+                    <button 
+                        type="button" 
+                        className="btn btn-success"
+                        onClick={handleSaveChanges}
+                        disabled={changedFields.length == 0} // Desativa o botão se não houver mudanças
+                    >
+                        Save Changes
+                    </button>
+                </div>
             </Form>
         </Container>
     );
