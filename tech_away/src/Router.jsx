@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -8,7 +8,6 @@ import LoginPageClient from "./pages/Auth/LoginPageClient";
 import ChangePasswordClient from "./pages/Auth/ChangePasswordClient";
 
 import LayoutPage from "./pages/Layout/LayoutPage";
-import EmployeeLayoutPage from "./pages/Layout/EmployeeLayoutPage";
 
 import EmployeeRegisterPage from "./pages/Employee/EmployeeRegisterPage";
 import EmployeeLoginPage from "./pages/Employee/EmployeeLoginPage";
@@ -23,8 +22,8 @@ import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 
 import { IsMobileProvider } from "./contexts/IsMobileContext";
-import AuthProvider from "./contexts/AuthProvider";
-import EmployeeAuthProvider from "./contexts/EmployeeAuthProvider";
+import AuthProvider from "./contexts/AuthenticationProviders/AuthProvider";
+import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAuthProvider";
 
 export default function Router() {
   return (
@@ -66,15 +65,18 @@ export default function Router() {
             path="/employee"
             element={
               <EmployeeAuthProvider>
-                <EmployeeLayoutPage />
+                <Outlet />
               </EmployeeAuthProvider>
             }
           >
-            <Route path="login" element={<EmployeeLoginPage />} />
-            <Route path="register" element={<EmployeeRegisterPage />} />
+          
             <Route element={<EmployeeProtectedRoute />}>
               <Route index element={<EmployeeHomePage />} />
             </Route>
+
+            <Route path="login" element={<EmployeeLoginPage />} />
+            <Route path="register" element={<EmployeeRegisterPage />} />
+
           </Route>
         </Routes>
       </BrowserRouter>

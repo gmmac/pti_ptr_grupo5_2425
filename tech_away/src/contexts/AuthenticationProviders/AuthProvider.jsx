@@ -1,5 +1,5 @@
 import { useContext, createContext, useState, useEffect } from 'react';
-import api from '../utils/axios';
+import api from '../../utils/axios';
 
 const AuthContext = createContext();
 
@@ -34,7 +34,6 @@ const AuthProvider = ({ children }) => {
         })
         .then(async response => {
             setRefresh(true);
-
         })
         .catch(error => {
             if(error.status == 403){
