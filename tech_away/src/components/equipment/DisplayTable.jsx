@@ -46,6 +46,9 @@ export default function DisplayTable({ model, params = "" }) {
 
 	// Função para deletar e atualizar a tabela
 	const handleDelete = () => {
+		console.log(deleteId);
+		console.log(model);
+
 		api
 			.delete(`api/${model}/${deleteId}`)
 			.then(() => {

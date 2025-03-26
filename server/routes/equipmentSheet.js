@@ -223,6 +223,11 @@ router.delete("/:ID", async (req, res) => {
 		if (!equipmentSheet) {
 			return res.status(404).json({ error: "EquipmentSheet not found." });
 		}
+
+		await models.UsedEquipment.destroy({
+			where: { equipmentId: req.params.ID },
+		});
+
 		await equipmentSheet.destroy();
 		res.status(204).send();
 	} catch (error) {
