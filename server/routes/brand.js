@@ -44,7 +44,9 @@ router.post("/", async (req, res) => {
       where: { name },
     });
     if (exists) {
-      return res.status(400).json({ error: "A brand with this name already exists." });
+      return res
+        .status(400)
+        .json({ error: "A brand with this name already exists." });
     }
     const brand = await models.Brand.create({
       name,
@@ -82,8 +84,19 @@ router.get("/name", async (req, res) => {
 //   }
 // });
 
-router.put("/:id", (req, res) => {});
+router.put("/:id", async (req, res) => {});
 
-router.delete("/:id", (req, res) => {});
+router.delete("/:id", async (req, res) => {
+  try {
+    const brand = await models.Brand.findByPk(req.params.id);
+    if (!brand) {
+      return res.status(404).json({ error: "Brand not found" });
+    }
+    await brand.destroy();
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router;

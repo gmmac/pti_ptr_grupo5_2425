@@ -61,8 +61,8 @@ export default function DisplayTable({ model, params = "" }) {
 	};
 
 	// Função para abrir modal de confirmação antes de deletar
-	const handleDeleteConfirmation = (id) => {
-		setDeleteId(id);
+	const handleDeleteConfirmation = (item) => {
+		setDeleteId(item[columns[0]]); // Selecionar a primeira coluna para funcionar com o id e com o barcode
 		setShowDeleteModal(true);
 	};
 
@@ -142,7 +142,7 @@ export default function DisplayTable({ model, params = "" }) {
 									</Button>
 									<Button
 										className="rounded-pill px-3"
-										onClick={() => handleDeleteConfirmation(item.barcode)}
+										onClick={() => handleDeleteConfirmation(item)}
 										size="sm"
 										style={{ backgroundColor: "var(--danger)", border: "none" }}
 									>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Form, Modal, Button } from "react-bootstrap";
 import api from "../../utils/axios";
 
-export default function FormsNewBrand({ showModal, closeModal }) {
+export default function FormsNewBrand({ showModal, closeModal, refreshTable}) {
 
 	const [brand, setBrand] = useState({
 		name: "",
@@ -51,6 +51,7 @@ export default function FormsNewBrand({ showModal, closeModal }) {
 			.post("api/brand/", dataToSubmit)
 			.then(() => {
 				handleRefresh();
+				refreshTable();
 				closeModal();
 			})
 			.catch((error) => {

@@ -5,9 +5,14 @@ import FormsNewBrand from "../components/brands/FormsNewBrand";
 
 export default function TestPage() {
 	const [show, setShow] = useState(false);
+	const [refreshKey, setRefreshKey] = useState(0);
 
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
+
+	const refreshTable = () => {
+        setRefreshKey((prevKey) => prevKey + 1);
+    };
 
 	return (
 		<Container>
@@ -17,10 +22,10 @@ export default function TestPage() {
 					Criar Brand
 				</Button>
 
-				<DisplayTable model="brand" params="" />
+				<DisplayTable model="brand" params="" key={refreshKey} />
 			</Stack>
 
-			<FormsNewBrand showModal={show} closeModal={handleClose} />
+			<FormsNewBrand showModal={show} closeModal={handleClose} refreshTable={refreshTable} />
 		</Container>
 	);
 }
