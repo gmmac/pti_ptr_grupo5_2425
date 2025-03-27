@@ -44,7 +44,6 @@ export default function ModalEdit({
 
 	// Função para selecionar valores nos modais
 	const handleSelectValue = (attribute, selectedItem) => {
-
 		setFormData((prev) => ({
 			...prev,
 			[attribute]: selectedItem.id, // Armazena o ID para envio ao servidor
@@ -83,7 +82,6 @@ export default function ModalEdit({
 			console.error("Erro ao atualizar:", error);
 		}
 	};
-
 
 	return (
 		<Modal show={show} onHide={handleClose}>

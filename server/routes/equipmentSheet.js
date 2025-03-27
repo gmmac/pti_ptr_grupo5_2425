@@ -7,57 +7,84 @@ router.get("/", async (req, res) => {
 	try {
 		const {
 			barcode,
-			model,
-			type,
+			modelId,
+			typeId,
+			brandId,
 			createdFrom,
 			createdTo,
 			updatedFrom,
 			updatedTo,
+			page = 1,
+			pageSize = 6,
+			orderBy = "createdAt",
+			orderDirection = "DESC",
 		} = req.query;
 
-		const filters = {};
+		// Construção do objeto 'where' dinamicamente
+		const where = {};
 
-		if (barcode) {
-			filters.barcode = barcode;
-		}
-
-		if (model) {
-			filters.model = model;
-		}
-
-		if (type) {
-			filters.type = type;
-		}
-
+		if (barcode) where.barcode = barcode;
 		if (createdFrom || createdTo) {
-			filters.createdAt = {};
-			if (createdFrom) filters.createdAt[Op.gte] = new Date(createdFrom);
-			if (createdTo) filters.createdAt[Op.lte] = new Date(createdTo);
+			where.createdAt = {};
+			if (createdFrom) where.createdAt[Op.gte] = new Date(createdFrom);
+			if (createdTo) where.createdAt[Op.lte] = new Date(createdTo);
 		}
-
 		if (updatedFrom || updatedTo) {
-			filters.updatedAt = {};
-			if (updatedFrom) filters.updatedAt[Op.gte] = new Date(updatedFrom);
-			if (updatedTo) filters.updatedAt[Op.lte] = new Date(updatedTo);
+			where.updatedAt = {};
+			if (updatedFrom) where.updatedAt[Op.gte] = new Date(updatedFrom);
+			if (updatedTo) where.updatedAt[Op.lte] = new Date(updatedTo);
 		}
 
-		const equipmentSheets = await models.EquipmentSheet.findAll({
-			attributes: ["barcode", "createdAt", "updatedAt"],
-			where: filters,
+		// Condições para relacionamentos
+		const modelCondition = modelId ? { id: modelId } : {};
+		const typeCondition = typeId ? { id: typeId } : {};
+		const brandCondition = brandId ? { id: brandId } : {};
+
+		// Paginação
+		const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+		// Ordenação
+		const order = [[orderBy, orderDirection.toUpperCase()]];
+
+		// Busca com contagem para paginação
+		const { count, rows } = await models.EquipmentSheet.findAndCountAll({
+			where,
 			include: [
 				{
 					model: models.EquipmentModel,
+					as: "EquipmentModel",
+					where: modelCondition,
 					attributes: ["id", "name"],
-					alias: "model",
+					include: [
+						{
+							model: models.Brand,
+							as: "Brand",
+							where: brandCondition,
+							attributes: ["id", "name"],
+						},
+					],
 				},
 				{
 					model: models.EquipmentType,
+					as: "EquipmentType",
+					where: typeCondition,
 					attributes: ["id", "name"],
-					alias: "type",
 				},
 			],
+			attributes: ["barcode", "createdAt", "updatedAt"],
+			limit: parseInt(pageSize),
+			offset,
+			order,
 		});
-		res.json(equipmentSheets);
+
+		// Retorno da resposta formatada
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: rows,
+		});
 	} catch (error) {
 		console.error("Error fetching equipment sheets:", error);
 		res.status(500).json({ error: "Error fetching equipment sheets." });
