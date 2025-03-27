@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Container, Stack } from "react-bootstrap";
-import FormsEquipmentSheet from "../components/equipment/FormsEquipmentSheet";
 import DisplayTable from "../components/equipment/DisplayTable";
+import FormsNewBrand from "../components/brands/FormsNewBrand";
 
 export default function TestPage() {
 	const [show, setShow] = useState(false);
@@ -15,13 +15,13 @@ export default function TestPage() {
 				<h2>Test Page</h2>
 
 				<Button variant="primary" onClick={handleShow}>
-					Criar EquipmentSheet
+					Criar Brand
 				</Button>
 
-				<DisplayTable model="equipmentSheet" params="" />
+				<DisplayTable model="brand" params="" />
 			</Stack>
 
-			<FormsEquipmentSheet showModal={show} closeModal={handleClose} />
+			<FormsNewBrand showModal={show} closeModal={handleClose} />
 		</Container>
 	);
 }

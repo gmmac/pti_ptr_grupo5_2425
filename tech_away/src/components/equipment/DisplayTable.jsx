@@ -16,12 +16,12 @@ export default function DisplayTable({ model, params = "" }) {
 		api
 			.get(`api/${model}`, { params })
 			.then((res) => {
-				if (res.data.length > 0) {
+				if (res.data.data.length > 0) {
 					// Filtrar colunas removendo 'createdAt' e 'updatedAt'
-					const allColumns = Object.keys(res.data[0]).filter(
+					const allColumns = Object.keys(res.data.data[0]).filter(
 						(column) => column !== "createdAt" && column !== "updatedAt"
-					);
-					setData(res.data);
+					);	
+					setData(res.data.data);
 					setColumns(allColumns);
 				}
 			})
