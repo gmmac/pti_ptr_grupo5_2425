@@ -17,7 +17,7 @@ export default function ModalEdit({
 		EquipmentModel: false,
 		EquipmentType: false,
 	});
-	const id = objectToChange.barcode;
+	const id = Object.values(objectToChange)[0];
 
 	useEffect(() => {
 		if (objectToChange) {
@@ -58,28 +58,33 @@ export default function ModalEdit({
 		let hasError = false;
 		let newErrors = {};
 
+		const payload = {};
+
 		attributesToEdit.forEach((attribute) => {
 			if (!formData[attribute] && !formData[`${attribute}Name`]) {
 				newErrors[attribute] = "Este campo é obrigatório";
 				hasError = true;
 			}
+			payload[attribute] = formData[attribute] || null;
 		});
 
 		setErrors(newErrors);
 		if (hasError) return;
 
 		try {
-			const payload = {
-				barcode: id,
-				model: formData.EquipmentModel || null,
-				type: formData.EquipmentType || null,
-			};
-
 			await api.put(`api/${modelToEdit}/${id}`, payload);
 			onSave();
 			handleClose();
 		} catch (error) {
-			console.error("Erro ao atualizar:", error);
+			if (error.response && error.response.status === 400) {
+				setErrors((prevErrors) => ({
+					...prevErrors,
+					exist: error.response.data.error // Ver se o exist aqui não gera erro
+				}));
+			} 
+			else{
+				console.error("Erro ao atualizar:", error);
+			}
 		}
 	};
 
@@ -150,6 +155,11 @@ export default function ModalEdit({
 							</Form.Control.Feedback>
 						</Form.Group>
 					))}
+					{errors.exist && (
+                        <div className="text-danger mb-3">
+                            {errors.exist}
+                        </div>
+                     )}
 				<Stack gap={2} direction="horizontal" className="justify-content-end">
 					<Button
 						className="rounded-pill"

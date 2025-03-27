@@ -84,7 +84,30 @@ router.get("/name", async (req, res) => {
 //   }
 // });
 
-router.put("/:id", async (req, res) => {});
+router.put("/:id", async (req, res) => {
+  try {
+    const { name } = req.body;
+    const brand = await models.Brand.findByPk(req.params.id);
+    if (!brand) {
+      return res.status(404).json({ error: "Brand not found" });
+    }
+    const exists = await models.Brand.findOne({
+      where: { name },
+    });
+    if (exists) {
+      return res
+        .status(400)
+        .json({ error: "A brand with this name already exists." });
+    }
+    await brand.update({
+      name,
+      updatedAt: new Date(),
+    });
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: "Error updating brand." });
+  }
+});
 
 router.delete("/:id", async (req, res) => {
   try {
