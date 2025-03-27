@@ -17,9 +17,9 @@ export default function EquipmentTableModal({equipments, selectedEquipment, hand
         {equipments.map((equipment) => (
             <tr key={equipment.barcode}>
             <td>{equipment.barcode}</td>
-            <td>{equipment.model}</td>
-            <td>{equipment.releaseYear}</td>
-            <td>{equipment.type}</td>
+            <td>{equipment.EquipmentModel.name}</td>
+            <td>{equipment.EquipmentModel.releaseYear}</td>
+            <td>{equipment.EquipmentType.name}</td>
             <td>
                 <Button 
                 variant={selectedEquipment === equipment.barcode ? "secondary" : "primary"} 

@@ -5,14 +5,27 @@ const models = require("../models");
 const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
-	try {
-		const EquipmentSheets = await models.EquipmentSheet.findAll();
-		res.json(EquipmentSheets);
-	} catch (error) {
-		console.error("Error fetching equipment sheets:", error);
-		res.status(500).json({ error: "Error fetching equipment sheets." });
-	}
+    // try {
+        const EquipmentSheets = await models.EquipmentSheet.findAll({
+            include: [
+                {
+                    model: models.EquipmentModel,
+                    attributes: ["name", "releaseYear"],
+                },
+                {
+                    model: models.EquipmentType,
+                    attributes: ["name"],
+                }
+            ],
+        });
+        res.json(EquipmentSheets);
+        
+    // } catch (error) {
+    //     console.error("Error fetching equipment sheets:", error);
+    //     res.status(500).json({ error: "Error fetching equipment sheets." });
+    // }
 });
+
 
 router.get("/in-stock", async (req, res) => {
     // try {

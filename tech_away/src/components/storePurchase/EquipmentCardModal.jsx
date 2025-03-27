@@ -6,12 +6,12 @@ export default function EquipmentCardModal({equipment, selectedEquipment, handle
   return (
     <Card className="mb-3 d-lg-none">
         <Card.Body>
-        <Card.Title>{equipment.model}</Card.Title>
+        <Card.Title>{equipment.EquipmentModel.name}</Card.Title>
         <Card.Text>
             <strong>Barcode:</strong> {equipment.barcode}<br />
-            <strong>Model:</strong> {equipment.model}<br />
-            <strong>Release Year:</strong> {equipment.releaseYear}<br />
-            <strong>Type:</strong> {equipment.type}
+            <strong>Model:</strong> {equipment.EquipmentModel.name}<br />
+            <strong>Release Year:</strong> {equipment.EquipmentModel.releaseYear}<br />
+            <strong>Type:</strong> {equipment.EquipmentType.name}
         </Card.Text>
         <Button 
             variant={selectedEquipment === equipment.barcode ? "secondary" : "primary"} 

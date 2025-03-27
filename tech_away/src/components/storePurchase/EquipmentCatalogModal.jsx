@@ -39,6 +39,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
             });
             setEquipments(response.data || []);
             setTotalPages(response.data.totalPages);
+            console.log(response.data)
           } catch (err) {
             setError("Erro ao carregar os equipamentos");
           }
