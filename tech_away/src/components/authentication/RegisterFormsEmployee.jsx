@@ -41,7 +41,7 @@ function RegisterFormsEmployee() {
     
     setErrors(prevErrors => ({
       ...prevErrors,
-      storeNIPC: store ? '' : 'Este campo é obrigatório' // Remove o erro se houver uma loja selecionada
+      storeNIPC: store ? '' : 'This input is required'
     }));
     
     setShowModal(false);
@@ -68,7 +68,7 @@ function RegisterFormsEmployee() {
 
     // Validação de campos obrigatórios
     if (!value) {
-      newErrors[name] = 'Este campo é obrigatório';
+      newErrors[name] = 'This field is required';
     } else {
       newErrors[name] = '';
     }
@@ -76,13 +76,13 @@ function RegisterFormsEmployee() {
     // Validação do email
     if (name === 'email') {
       const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      newErrors[name] = emailPattern.test(value) ? '' : 'O email deve ser válido';
+      newErrors[name] = emailPattern.test(value) ? '' : 'Email must be valid';
     }
 
     // Validação de número de telefone, NIF e NIC (exatamente 9 dígitos)
     if (['phone', 'nif', 'nic'].includes(name)) {
       const nineDigitPattern = /^\d{9}$/;
-      newErrors[name] = nineDigitPattern.test(value) ? '' : 'O valor deve ter exatamente 9 dígitos';
+      newErrors[name] = nineDigitPattern.test(value) ? '' : 'Value must have exactly 9 digits';
     }
 
     if (name === 'birthDate') {
@@ -140,7 +140,7 @@ function RegisterFormsEmployee() {
     .then(async response => {
       if(response.data.errorTag){
           let newErrors = { ...errors };
-          newErrors[response.data.errorTag] = 'Já existe um employee com este ' + response.data.errorTag;
+          newErrors[response.data.errorTag] = 'A employee with this ' + response.data.errorTag + ' already exists';
           setErrors(newErrors);
       }
 
@@ -149,14 +149,6 @@ function RegisterFormsEmployee() {
     })
     .catch(error => {})
 }
-
-  // useEffect(() => {
-  //   console.log(employeeData)
-  // }, [employeeData])
-
-  // useEffect(() => {
-  //   console.log(errors)
-  // }, [errors])
 
   return (
     <div className='bg-white w-100 px-md-5 p-5 pt-4 rounded-lg shadow-lg' >
@@ -201,7 +193,7 @@ function RegisterFormsEmployee() {
             </Form.Group>
           </Col>
 
-          <Col sm={12} md={6}>
+          <Col sm={12} md={12}>
             <Form.Group controlId="email">
               <Form.Label>Email</Form.Label>
               <Form.Control

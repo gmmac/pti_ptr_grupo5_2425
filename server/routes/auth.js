@@ -206,7 +206,14 @@ router.get("/getUserByEmail/:email", async (req, res) => {
 });
 
 router.get("/user-info", (req, res) => {
-  const userInfo = req.cookies.clientInfo;
+
+  let userInfoName = "clientInfo"
+  if(req.query.userType === 'employee'){
+    userInfoName = "employeeInfo";
+  }
+  
+  let userInfo = req.cookies.employeeInfo;
+
 
   return res.status(200).json({ userInfo: userInfo });
 });

@@ -22,8 +22,8 @@ import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 
 import { IsMobileProvider } from "./contexts/IsMobileContext";
-import AuthProvider from "./contexts/AuthProvider";
-import EmployeeAuthProvider from "./contexts/EmployeeAuthProvider";
+import AuthProvider from "./contexts/AuthenticationProviders/AuthProvider";
+import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAuthProvider";
 import ProfilePageClient from "./pages/Auth/ProfilePageClient";
 
 export default function Router() {

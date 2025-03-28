@@ -62,14 +62,6 @@ export default function EmployeeHomePage() {
     }, [navigate, employee]);
 
 
-    // useEffect(() => {
-    //     if(checkIsAdmin()){
-    //         console.log("YEEES")
-    //     }
-    //     else{
-    //         console.log("NOOOO")
-    //     }
-    // }, [employee])
 
     useEffect(() => {
         sessionStorage.setItem('selectedTab', actualTab);
@@ -165,8 +157,6 @@ export default function EmployeeHomePage() {
                                         <EmployeeProfile />
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="admin" className='p-4'>
-                                        {/* <EmployeeProfile /> */}
-                                        AAAAAAAAAAAAA
                                     </Tab.Pane>
                                 </Tab.Content>
                             </Col>
