@@ -51,12 +51,10 @@ export default function EmployeeProfile() {
         async function fetchEmployeeData() {
             try{
                 await api.get(`/api/employeeRole/${formData?.role}`).then((res) => {
-                    // console.log("ASASAS " + res.data.role)
                     setRoleName(res.data.role)
                 })
 
                 await api.get(`/api/store/${formData?.storeNIPC}`).then((res) => {
-                    // console.log("ASASAS " + res.data.role)
                     setStoreName(res.data.name)
                 })
 

@@ -11,6 +11,7 @@ import EmployeeRepairs from '../../components/HomePageEmployee/EmployeeRepairs';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
 import { IsMobileContext } from '../../contexts/IsMobileContext';
 import "../../styles/pageElements.css"
+import EmployeeAdmin from '../../components/HomePageEmployee/EmployeeAdmin';
 
 
 export default function EmployeeHomePage() {
@@ -157,6 +158,7 @@ export default function EmployeeHomePage() {
                                         <EmployeeProfile />
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="admin" className='p-4'>
+                                        <EmployeeAdmin />
                                     </Tab.Pane>
                                 </Tab.Content>
                             </Col>
