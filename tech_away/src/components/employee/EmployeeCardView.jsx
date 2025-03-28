@@ -3,7 +3,7 @@ import { Card, Row, Col, Badge } from "react-bootstrap";
 
 export default function EmployeeCardView({ employees }) {
   return (
-    <Row className="g-3 d-md-none">
+    <Row className="g-3 d-lg-none">
       {employees.map((employee, index) => (
         <Col key={index} xs={12}>
           <Card className="shadow-sm rounded p-3">

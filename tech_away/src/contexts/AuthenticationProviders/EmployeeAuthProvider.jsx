@@ -10,6 +10,9 @@ const EmployeeAuthProvider = ({ children }) => {
 
     const [refresh, setRefresh] = useState(false);
 
+
+    // const [isAdmin, setIsAdmin] = useState(false);
+
     useEffect(() => {
         const fetchUser = async () => {
             try {

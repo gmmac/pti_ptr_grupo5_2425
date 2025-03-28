@@ -25,6 +25,8 @@ import { IsMobileProvider } from "./contexts/IsMobileContext";
 import AuthProvider from "./contexts/AuthenticationProviders/AuthProvider";
 import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAuthProvider";
 import ProfilePageClient from "./pages/Auth/ProfilePageClient";
+import EmployeeLayoutPage from "./pages/Layout/EmployeeLayoutPage";
+import EmployeeManagePage from "./pages/Employee/EmployeeManagePage";
 
 export default function Router() {
   return (
@@ -72,8 +74,10 @@ export default function Router() {
             }
           >
           
-            <Route element={<EmployeeProtectedRoute />}>
+            <Route element={<EmployeeLayoutPage />}>
               <Route index element={<EmployeeHomePage />} />
+              <Route path="manage" element={<EmployeeManagePage />} />
+
             </Route>
 
             <Route path="login" element={<EmployeeLoginPage />} />

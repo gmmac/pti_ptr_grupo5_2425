@@ -1,9 +1,26 @@
 import React from "react";
 import { Card } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardGridCard({ section }) {
+  
+  const navigate = useNavigate();
+
+
+  const handleOnclick = () => {
+    navigate("manage", {
+      state: {
+        componentKey: section.key,
+        title: section.title,
+      },
+    });
+  };
+  
+  
+
   return (
     <Card
+      onClick={handleOnclick}
       className="h-100 d-flex flex-column justify-content-center align-items-center text-center p-5"
       style={{
         borderRadius: "25px",
