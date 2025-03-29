@@ -17,6 +17,14 @@ export default function ClientProfile() {
         gender: ""
     });
 
+    const [errors, setErrors] = useState({
+        nif: '',
+        phone: '',
+        birthDate: '',
+        firstName: '',
+        lastName: '',
+    });
+
     const [originalData, setOriginalData] = useState({});
     const [isEditing, setIsEditing] = useState(false);
     const [changedFields, setChangedFields] = useState([]);
@@ -38,9 +46,9 @@ export default function ClientProfile() {
 
     const handleEditClick = () => {
         if (isEditing) {
-            // Se o usuário clicar no check enquanto estiver editando, as alterações são descartadas
-            setFormData({ ...originalData });  // Reseta os campos para os dados originais
+            setFormData({ ...originalData });  // Volta a colocar os valores originais nos inputs
             setChangedFields([]); // Limpa a lista de campos alterados
+            setErrors({}); // Remove os erros dos inputs
         }
         setIsEditing(!isEditing);  // Alterna o estado de edição
     };
@@ -58,6 +66,28 @@ export default function ClientProfile() {
             delete updatedFields[name];
             setChangedFields(updatedFields);
         }
+
+        let newErrors = { ...errors };
+        if (!value) {
+            newErrors[name] = 'Este campo é obrigatório';
+        } else if (name === 'birthDate') {
+            const birthDate = new Date(value);
+            const today = new Date();
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const isBirthdayPassed =
+                today.getMonth() > birthDate.getMonth() ||
+                (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+    
+            if (age < 16 || (age === 16 && !isBirthdayPassed)) {
+                newErrors[name] = 'Deves ter pelo menos 16 anos para criar uma conta.';
+            } else {
+                newErrors[name] = '';
+            }
+        } else {
+            newErrors[name] = '';
+        }
+
+        setErrors(newErrors);
     };
     
     const handleSaveChanges = () => {
@@ -109,7 +139,11 @@ export default function ClientProfile() {
                                         value={formData.firstName || ""} 
                                         disabled={!isEditing}  // Controla se o campo é editável
                                         onChange={handleInputChange}
+                                        isInvalid={!!errors.firstName}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.firstName}
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
@@ -122,7 +156,11 @@ export default function ClientProfile() {
                                         value={formData.lastName || ""} 
                                         disabled={!isEditing} 
                                         onChange={handleInputChange}
+                                        isInvalid={!!errors.lastName}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.lastName}
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
@@ -135,7 +173,11 @@ export default function ClientProfile() {
                                         value={formData.birthDate ? formData.birthDate.split('T')[0] : ""} 
                                         disabled={!isEditing} 
                                         onChange={handleInputChange}
+                                        isInvalid={!!errors.birthDate}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.birthDate}
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
                         </Row>
@@ -150,7 +192,11 @@ export default function ClientProfile() {
                                         value={formData.phone || ""} 
                                         disabled={!isEditing} 
                                         onChange={handleInputChange}
+                                        isInvalid={!!errors.phone}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.phone}
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
@@ -191,7 +237,11 @@ export default function ClientProfile() {
                                         value={formData.nif || ""} 
                                         disabled={!isEditing} 
                                         onChange={handleInputChange}
+                                        isInvalid={!!errors.nif}
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.nif}
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                             </Col>
                         </Row>
