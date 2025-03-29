@@ -58,6 +58,38 @@
 /*                Navs                  */
 /* ------------------------------------ */
 
+.employee-custom-tabs{
+    margin: 10px;
+}
+
+    .employee-custom-tabs .nav-link {
+        /* background-color: var(--variant-one); */
+
+            /* background-color: var(--variant-one); */
+        color: var(--dark-grey);
+        font-weight: bold;
+    }
+    
+        .employee-custom-tabs .nav-link:hover {
+            background-color: var(--variant-one);
+        
+            color: var(--dark-grey);
+            font-weight: bold;
+        }
+
+            
+        /* selected tab */
+        .employee-custom-tabs.nav-item .nav-link.active,
+        .employee-custom-tabs .nav-link[aria-selected="true"] {
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
+        }
+
+.employee-custom-tab-content{
+    margin: 10px;
+}
+
 
 
 /* ------------------------------------ */
