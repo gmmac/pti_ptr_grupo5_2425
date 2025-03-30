@@ -1,219 +1,152 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { Button } from "primereact/button";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Menu } from "primereact/menu";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { FilterMatchMode } from "primereact/api";
 import api from "../../utils/axios";
-import { Table, Button, Stack, Modal, Pagination } from "react-bootstrap";
 import ModalEdit from "./ModalEdit";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
 
-export default function DisplayTable({ model, params = "" }) {
+export default function DisplayTable({ model }) {
 	const [data, setData] = useState([]);
 	const [columns, setColumns] = useState([]);
-	const [showModal, setShowModal] = useState(false);
 	const [selectedObj, setSelectedObj] = useState(null);
-	const [showDeleteModal, setShowDeleteModal] = useState(false);
-	const [deleteId, setDeleteId] = useState(null);
+	const [showModal, setShowModal] = useState(false);
+	const menuRefs = useRef([]);
+	const [globalFilterValue, setGlobalFilterValue] = useState("");
+	const [queryParams, setQueryParams] = useState({
+		filters: {},
+		sortField: null,
+		sortOrder: null,
+		page: 1,
+		pageSize: 6,
+	});
 
-	// Estado da paginação
-	const [currentPage, setCurrentPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
-	const [totalItems, setTotalItems] = useState(0);
-	const [pageSize] = useState(6); // Número fixo, pode ser alterado depois
+	const [filters, setFilters] = useState({
+		global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+	});
 
-	// Estado da ordenação
-	const [orderBy, setOrderBy] = useState("createdAt");
-	const [orderDirection, setOrderDirection] = useState("DESC");
-
-	// Buscar dados da API com paginação e ordenação
 	const fetchData = () => {
-		api
-			.get(`api/${model}`, {
-				params: {
-					...params,
-					page: currentPage,
-					pageSize,
-					orderBy,
-					orderDirection,
-				},
-			})
-			.then((res) => {
-				if (res.data.data.length > 0) {
-					const allColumns = Object.keys(res.data.data[0]).filter(
-						(col) => col !== "createdAt" && col !== "updatedAt"
-					);
-					setData(res.data.data);
-					setColumns(allColumns);
-					setTotalPages(res.data.totalPages);
-					setTotalItems(res.data.totalItems);
-				}
-			})
-			.catch((error) => console.error("Erro ao buscar dados:", error));
+		api.get(`api/${model}`, { params: queryParams }).then((res) => {
+			if (res.data.data.length > 0) {
+				const allColumns = Object.keys(res.data.data[0]).filter(
+					(col) => col !== "CreatedAt" && col !== "UpdatedAt"
+				);
+				setData(res.data.data);
+				setColumns(allColumns);
+			}
+		});
 	};
 
 	useEffect(() => {
 		fetchData();
-	}, [model, params, currentPage, orderBy, orderDirection]);
+	}, [model, queryParams]);
 
-	useEffect(() => {
-		console.log(data);
-	}, [data]);
-	// Função para abrir modal de edição
+	const onGlobalFilterChange = (e) => {
+		const value = e.target.value;
+		setFilters({
+			...filters,
+			global: { value, matchMode: FilterMatchMode.CONTAINS },
+		});
+		setGlobalFilterValue(value);
+	};
+
+	const confirmDelete = (id) => {
+		confirmDialog({
+			message: "Are you sure you want to delete this item?",
+			header: "Confirmation",
+			icon: "pi pi-exclamation-triangle",
+			accept: () => handleDelete(id),
+		});
+	};
+
 	const handleEdit = (item) => {
 		setSelectedObj(item);
 		setShowModal(true);
 	};
 
-	// Função para abrir modal de confirmação antes de deletar
-	const handleDeleteConfirmation = (id) => {
-		setDeleteId(id);
-		setShowDeleteModal(true);
+	const handleDelete = (id) => {
+		api.delete(`api/${model}/${id}`).then(() => fetchData());
 	};
-
-	// Função para deletar e atualizar a tabela
-	const handleDelete = () => {
-		api
-			.delete(`api/${model}/${deleteId}`)
-			.then(() => {
-				setShowDeleteModal(false);
-				fetchData();
-			})
-			.catch((error) => console.error("Erro ao excluir:", error));
-	};
-
-	// Alternar direção da ordenação ao clicar no cabeçalho
-	const handleSort = (column) => {
-		if (orderBy === column) {
-			setOrderDirection(orderDirection === "ASC" ? "DESC" : "ASC");
-		} else {
-			setOrderBy(column);
-			setOrderDirection("ASC");
-		}
-	};
-
-	useEffect(() => {
-		console.log(selectedObj);
-	}, [selectedObj]);
 
 	return (
 		<>
-			<Table striped bordered hover>
-				<thead>
-					<tr>
-						{columns.map((column, index) => (
-							<th
-								key={index}
-								onClick={() => handleSort(column)}
-								style={{ cursor: "pointer" }}
-							>
-								{column}{" "}
-								{orderBy === column
-									? orderDirection === "ASC"
-										? "🔼"
-										: "🔽"
-									: ""}
-							</th>
-						))}
-						<th>Ações</th>
-					</tr>
-				</thead>
-				<tbody>
-					{data.map((item, rowIndex) => (
-						<tr key={rowIndex}>
-							{columns.map((column, colIndex) => (
-								<td key={colIndex}>
-									{typeof item[column] === "object" && item[column] !== null
-										? item[column].name || JSON.stringify(item[column])
-										: item[column]}
-								</td>
-							))}
-							<td>
-								<Stack
-									direction="horizontal"
-									gap={2}
-									className="justify-content-center align-items-center"
-								>
-									<Button
-										className="rounded-pill px-3"
-										size="sm"
-										style={{
-											backgroundColor: "var(--variant-one)",
-											border: "none",
-										}}
-										onClick={() => handleEdit(item)}
-									>
-										Editar
-									</Button>
-									<Button
-										className="rounded-pill px-3"
-										onClick={() => handleDeleteConfirmation(item.barcode)}
-										size="sm"
-										style={{ backgroundColor: "var(--danger)", border: "none" }}
-									>
-										Excluir
-									</Button>
-								</Stack>
-							</td>
-						</tr>
+			<ConfirmDialog />
+			<div className="">
+				<DataTable
+					value={data}
+					paginator
+					rows={6}
+					stripedRows
+					globalFilterFields={columns}
+					removableSort
+				>
+					{columns.map((column, index) => (
+						<Column
+							key={index}
+							field={column}
+							header={column}
+							sortable
+							body={(rowData) => {
+								const value = rowData[column];
+								return typeof value === "object" && value !== null
+									? value.name || "N/A"
+									: value;
+							}}
+						/>
 					))}
-				</tbody>
-			</Table>
-
-			{/* Paginação */}
-			{totalPages > 1 && (
-				<Pagination className="justify-content-center">
-					<Pagination.Prev
-						disabled={currentPage === 1}
-						onClick={() => setCurrentPage(currentPage - 1)}
+					<Column
+						header=""
+						body={(rowData, options) => {
+							const menuItems = [
+								{
+									label: "Editar",
+									icon: "pi pi-pencil",
+									command: () => handleEdit(rowData.id),
+								},
+								{
+									label: "Excluir",
+									icon: "pi pi-trash",
+									command: () => confirmDelete(rowData.id),
+								},
+							];
+							return (
+								<>
+									<Menu
+										model={menuItems}
+										popup
+										ref={(el) => (menuRefs.current[options.rowIndex] = el)}
+									/>
+									<Button
+										icon="pi pi-ellipsis-v"
+										text
+										severity="secondary"
+										onClick={(e) =>
+											menuRefs.current[options.rowIndex].toggle(e)
+										}
+										className="rounded-5"
+									/>
+								</>
+							);
+						}}
 					/>
-					{Array.from({ length: totalPages }, (_, i) => (
-						<Pagination.Item
-							key={i}
-							active={i + 1 === currentPage}
-							onClick={() => setCurrentPage(i + 1)}
-						>
-							{i + 1}
-						</Pagination.Item>
-					))}
-					<Pagination.Next
-						disabled={currentPage === totalPages}
-						onClick={() => setCurrentPage(currentPage + 1)}
-					/>
-				</Pagination>
-			)}
-
-			{/* Modal de edição */}
+				</DataTable>
+			</div>
 			<ModalEdit
 				show={showModal}
 				handleClose={() => setShowModal(false)}
 				modelToEdit={model}
-				objectToChange={selectedObj || {}} // Garante que não será null
+				objectToChange={selectedObj || {}}
 				attributesToEdit={columns}
 				onSave={() => {
 					setShowModal(false);
 					fetchData();
 				}}
 			/>
-
-			{/* Modal de Confirmação de Exclusão */}
-			<Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-				<Modal.Header closeButton>
-					<Modal.Title>Confirmar Exclusão</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>Tem certeza que deseja excluir este item?</Modal.Body>
-				<Modal.Footer>
-					<Button
-						variant="secondary"
-						className="rounded-pill px-3"
-						onClick={() => setShowDeleteModal(false)}
-					>
-						Cancelar
-					</Button>
-					<Button
-						className="rounded-pill px-3"
-						style={{ backgroundColor: "var(--danger)", border: "none" }}
-						onClick={handleDelete}
-					>
-						Excluir
-					</Button>
-				</Modal.Footer>
-			</Modal>
 		</>
 	);
 }

@@ -22,8 +22,8 @@ export default function TestPage() {
 				<Button variant="primary" onClick={handleShow}>
 					Criar EquipmentSheet
 				</Button>
-				<FiltersBarEquipmentSheet paramsTofilter={handleFilterSet} />
-				<DisplayTable model="equipmentSheet" params={paramsTofilter} />
+
+				<DisplayTable model="equipmentSheet" />
 			</Stack>
 
 			<FormsEquipmentSheet showModal={show} closeModal={handleClose} />

@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
 	try {
-		const { search } = req.query;
+		const { search, page = 1, pageSize = 6 } = req.query;
 
 		const whereCondition = search
 			? {
@@ -15,6 +15,9 @@ router.get("/", async (req, res) => {
 					],
 			  }
 			: {};
+
+		// Calculando o offset com base na página
+		const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
 		const equipmentModels = await models.EquipmentModel.findAll({
 			attributes: ["id", "name", "price", "releaseYear"],
