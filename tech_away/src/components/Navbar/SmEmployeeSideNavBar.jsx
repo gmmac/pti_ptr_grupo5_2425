@@ -6,33 +6,35 @@ import EmployeeSideBar from './EmployeeSideNavbar';
 export default function SmEmployeeSideNavBar({ actualTab, handleChangeTab, logOut }) {
   const [show, setShow] = useState(false);
 
-  const toggleMenu = () => setShow(!show);
-  const closeMenu = () => setShow(false);
+  // Handlers
+  const handleToggleMenu = () => setShow(prev => !prev);
+  
+  const handleCloseMenu = () => setShow(false);
+
+  const handleTabChange = (selectedTab) => {
+    handleChangeTab(selectedTab);
+    handleCloseMenu();
+  };
+  const handleLogout = () => {
+    logOut();
+    handleCloseMenu();
+  };
 
   return (
     <>
-      {/* Botão do menu hambúrguer */}
-      <Button variant="light" onClick={toggleMenu} className="m-2">
-        <List size={30} />
-      </Button>
+      <div className="d-lg-none">
+        <Button variant="light" onClick={handleToggleMenu} className="m-2">
+          <List size={30} />
+        </Button>
+      </div>
 
-      <Offcanvas show={show} onHide={closeMenu} responsive="md">
-
-        <Offcanvas.Header closeButton>
-        </Offcanvas.Header>
-
+      <Offcanvas show={show} onHide={handleCloseMenu} placement="start">
+        <Offcanvas.Header closeButton />
         <Offcanvas.Body>
           <EmployeeSideBar
             actualTab={actualTab}
-            handleChangeTab={(selected) => {
-              handleChangeTab(selected);
-              closeMenu(); // fecha o menu após clique
-            }}
-            logOut={() => {
-              logOut();
-              closeMenu(); // fecha o menu ao deslogar
-            }}
-            isMobile={true}
+            handleChangeTab={handleTabChange}
+            logOut={handleLogout}
           />
         </Offcanvas.Body>
       </Offcanvas>

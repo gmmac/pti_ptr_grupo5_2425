@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Nav } from 'react-bootstrap';
+import { Nav } from 'react-bootstrap';
 import {
   HouseDoorFill,
   CurrencyDollar,
@@ -7,64 +7,89 @@ import {
   BarChartLine,
   PersonFill,
   BoxArrowRight,
-  PeopleFill,
-  GearFill
+  PeopleFill
 } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
 
-export default function EmployeeSideBar({ actualTab, handleChangeTab, logOut, isMobile }) {
-    return (
-        <
-            // xs={isMobile ? 12 : 2}
-            // md={isMobile ? 12 : 2}
-            // lg={isMobile ? 12 : 2}
-            // className="bg-light border-end p-0"
-            // style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.3)', zIndex: 1 }}
-        >
-            <h2 className="mb-4 p-3 fs-2" style={{ fontWeight: "bold" }}>TechAway</h2>
-            <Nav variant="pills" className="flex-column" activeKey={actualTab} onSelect={handleChangeTab}>
-                
-                <Nav.Item className="employee-custom-tabs fs-5">
-                    <Nav.Link eventKey="dashboard">
-                        <HouseDoorFill className="me-2" /> Dashboard
-                    </Nav.Link>
-                </Nav.Item>
+export default function EmployeeSideBar({ actualTab, handleChangeTab, logOut }) {
+  const navigate = useNavigate();
 
-                <Nav.Item className="employee-custom-tabs fs-5">
-                    <Nav.Link eventKey="purchases">
-                        <CurrencyDollar className="me-2" /> Purchases
-                    </Nav.Link>
-                </Nav.Item>
+  const handleTabClick = (tab, path) => {
+    handleChangeTab(tab);
+    navigate("/employee");
+  };
 
-                <Nav.Item className="employee-custom-tabs fs-5">
-                    <Nav.Link eventKey="sales">
-                        <BarChartLine className="me-2" /> Sales
-                    </Nav.Link>
-                </Nav.Item>
+  const handleLogOut = () => {
+    logOut();
+    navigate("/employee/login", { replace: true });
+  };
 
-                <Nav.Item className="employee-custom-tabs fs-5">
-                    <Nav.Link eventKey="repairs">
-                        <Wrench className="me-2" /> Repairs
-                    </Nav.Link>
-                </Nav.Item>
+  return (
+    <>
+      <h2 className="mb-4 p-3 fs-2" style={{ fontWeight: "bold" }}>TechAway</h2>
+      <Nav className="flex-column">
 
-                <Nav.Item className="employee-custom-tabs fs-5">
-                    <Nav.Link eventKey="charityproject">
-                        <PeopleFill className="me-2" /> Charity Projects
-                    </Nav.Link>
-                </Nav.Item>
+        <Nav.Item className="employee-custom-tabs fs-5">
+          <Nav.Link
+            onClick={() => handleTabClick('dashboard')}
+            className={actualTab === 'dashboard' ? 'active-manual' : ''}
+          >
+            <HouseDoorFill className="me-2" /> Dashboard
+          </Nav.Link>
+        </Nav.Item>
 
-                <Nav.Item className="employee-custom-tabs fs-5">
-                    <Nav.Link eventKey="profile">
-                        <PersonFill className="me-2" /> Profile
-                    </Nav.Link>
-                </Nav.Item>
+        <Nav.Item className="employee-custom-tabs fs-5">
+          <Nav.Link
+            onClick={() => handleTabClick('purchases')}
+            className={actualTab === 'purchases' ? 'active-manual' : ''}
+          >
+            <CurrencyDollar className="me-2" /> Purchases
+          </Nav.Link>
+        </Nav.Item>
 
-                <Nav.Item className="mt-3 employee-custom-tabs fs-5">
-                    <Nav.Link className="text-danger" onClick={logOut}>
-                        <BoxArrowRight className="me-2" /> Logout
-                    </Nav.Link>
-                </Nav.Item>
-            </Nav>
-        </>
-    );
+        <Nav.Item className="employee-custom-tabs fs-5">
+          <Nav.Link
+            onClick={() => handleTabClick('sales')}
+            className={actualTab === 'sales' ? 'active-manual' : ''}
+          >
+            <BarChartLine className="me-2" /> Sales
+          </Nav.Link>
+        </Nav.Item>
+
+        <Nav.Item className="employee-custom-tabs fs-5">
+          <Nav.Link
+            onClick={() => handleTabClick('repairs')}
+            className={actualTab === 'repairs' ? 'active-manual' : ''}
+          >
+            <Wrench className="me-2" /> Repairs
+          </Nav.Link>
+        </Nav.Item>
+
+        <Nav.Item className="employee-custom-tabs fs-5">
+          <Nav.Link
+            onClick={() => handleTabClick('charityproject')}
+            className={actualTab === 'charityproject' ? 'active-manual' : ''}
+          >
+            <PeopleFill className="me-2" /> Charity Projects
+          </Nav.Link>
+        </Nav.Item>
+
+        <Nav.Item className="employee-custom-tabs fs-5">
+          <Nav.Link
+            onClick={() => handleTabClick('profile')}
+            className={actualTab === 'profile' ? 'active-manual' : ''}
+          >
+            <PersonFill className="me-2" /> Profile
+          </Nav.Link>
+        </Nav.Item>
+
+        <Nav.Item className="mt-3 employee-custom-tabs fs-5">
+          <Nav.Link className="text-danger" onClick={handleLogOut}>
+            <BoxArrowRight className="me-2" /> Logout
+          </Nav.Link>
+        </Nav.Item>
+
+      </Nav>
+    </>
+  );
 }

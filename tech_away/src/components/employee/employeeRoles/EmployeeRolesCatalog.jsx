@@ -72,15 +72,11 @@ export default function EmployeeRolesCatalog() {
     return (
         <Container className="mt-4">
             <Row className="mb-3">
-                <Col>
-                    <h2 className="text-center">Employee Roles</h2>
-                </Col>
                 <Col className="text-end">
                     <Button variant="success" onClick={handleAddRole}>Add Role</Button>
                 </Col>
             </Row>
 
-            {/* Exibe a mensagem de erro, se houver */}
             {errorMessage && (
                 <Alert variant="danger" onClose={() => setErrorMessage('')} dismissible>
                     {errorMessage}

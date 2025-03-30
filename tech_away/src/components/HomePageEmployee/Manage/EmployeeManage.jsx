@@ -1,7 +1,10 @@
 import React from 'react'
+import EmployeeCatalog from '../../employee/EmployeeCatalog'
 
 export default function EmployeeManage() {
   return (
-    <div>EmployeeManage</div>
+    <div>
+      <EmployeeCatalog />
+    </div>
   )
 }

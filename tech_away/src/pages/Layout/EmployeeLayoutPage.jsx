@@ -1,61 +1,53 @@
-import React, { useContext, useState } from 'react'
-import { Outlet } from 'react-router-dom'
-import EmployeeSideBar from '../../components/Navbar/EmployeeSideNavbar'
-import { Col, Container, Row, Tab } from 'react-bootstrap'
-import { IsMobileContext } from '../../contexts/IsMobileContext';
-import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
+import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import { Col, Container, Row, Tab } from 'react-bootstrap';
+import EmployeeSideBar from '../../components/Navbar/EmployeeSideNavbar';
 import SmEmployeeSideNavBar from '../../components/Navbar/SmEmployeeSideNavBar';
+import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
 
 export default function EmployeeLayoutPage() {
-    const isMobile = useContext(IsMobileContext);
-    const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'dashboard');
-    const { employee, checkPasswordStatus, changePassword, checkIsAdmin, logOut } = useAuthEmployee();
+  const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'dashboard');
+  const { logOut } = useAuthEmployee();
 
-    const handleChangeTab = (tab) => {
-        if (tab) {
-            setActualTab(tab);
-        }
-    };
+  const handleChangeTab = (tab) => {
+    if (tab) {
+      setActualTab(tab);
+      sessionStorage.setItem('selectedTab', tab);
+    }
+  };
 
-    return (
+  return (
+    <Container fluid className="vh-100">
+      <Tab.Container activeKey={actualTab} onSelect={handleChangeTab}>
+        {/* Sempre renderiza o componente com Offcanvas controlado internamente */}
+        <SmEmployeeSideNavBar
+          actualTab={actualTab}
+          handleChangeTab={handleChangeTab}
+          logOut={logOut}
+        />
+
         <Container fluid className="vh-100">
-            <Tab.Container activeKey={actualTab} onSelect={handleChangeTab}>
-                <Container fluid className="vh-100">
-                    <Row className="h-100">
+          <Row className="h-100">
+            {/* Sidebar fixa apenas para telas lg+ */}
+            <Col
+              lg={2}
+              className="bg-light border-end d-none d-lg-block p-0"
+              style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.3)', zIndex: 1 }}
+            >
+              <EmployeeSideBar
+                actualTab={actualTab}
+                handleChangeTab={handleChangeTab}
+                logOut={logOut}
+              />
+            </Col>
 
-                        {/* Sidebar dentro de Col */}
-                        <Col
-                            xs={isMobile ? 12 : 2}
-                            md={isMobile ? 12 : 2}
-                            lg={isMobile ? 12 : 2}
-                            className="bg-light border-end p-0"
-                            style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.3)', zIndex: 1 }}
-                        >
-                            {isMobile ? (
-                                <SmEmployeeSideNavBar
-                                    actualTab={actualTab}
-                                    handleChangeTab={handleChangeTab}
-                                    logOut={logOut}
-                                    isMobile={isMobile}
-                                />
-                            ) : (
-                                <EmployeeSideBar
-                                    actualTab={actualTab}
-                                    handleChangeTab={handleChangeTab}
-                                    logOut={logOut}
-                                    isMobile={isMobile}
-                                />
-                            )}
-                        </Col>
-
-                        {/* Conteúdo principal */}
-                        <Col>
-                            <Outlet />
-                        </Col>
-
-                    </Row>
-                </Container>
-            </Tab.Container>
+            <Col>
+              <Outlet />
+            </Col>
+            
+          </Row>
         </Container>
-    )
+      </Tab.Container>
+    </Container>
+  );
 }

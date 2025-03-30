@@ -177,32 +177,34 @@ router.get("/:internNum", async (req, res) => {
 });
 
 router.put("/:internNum", async (req, res) => {
-	// try {
-
+	try {
 		const employee = await models.Employee.findOne({
 			where: { internNum: req.params.internNum },
 		});
 		if (!employee) {
 			return res.status(404).json({ error: "Employee not found" });
 		}
+
 		await employee.update(req.body);
 
-		console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA")
-		console.log(employee)
+		// Verifica se existe um cookie de employeeInfo e se é o mesmo internNum
+		const currentEmployee = req.cookies.employeeInfo;
+		if (currentEmployee && currentEmployee.internNum === req.params.internNum) {
+			res.cookie("employeeInfo", employee.dataValues, {
+				httpOnly: true,
+				secure: false,
+				sameSite: "Lax",
+				maxAge: 24 * 60 * 60 * 1000, // 1 dia
+			});
+		}
 
-
-		res.cookie("employeeInfo", employee.dataValues, {
-			httpOnly: true,
-			secure: false,
-			sameSite: "Lax",
-			maxAge: 24 * 60 * 60 * 1000 // 1 dia
-		});
 		res.json(employee);
 
-	// } catch (error) {
-	// 	res.status(400).json({ error: error.message });
-	// }
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
 });
+
 
 router.delete("/:internNum", async (req, res) => {
 	try {
@@ -211,6 +213,9 @@ router.delete("/:internNum", async (req, res) => {
 			where: { internNum: req.params.internNum },
 		});
 		
+		console.log("AAAAAAAAA")
+		console.log(employee)
+
 		if (!employee) {
 			return res.status(404).json({ error: "Employee not found" });
 		}

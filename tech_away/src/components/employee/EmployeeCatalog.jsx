@@ -8,6 +8,7 @@ import EmployeeCardView from './EmployeeCardView';
 import EmployeesTableView from './EmployeeTableView';
 import EmployeeFilter from './EmployeeFilter';
 import { useNavigate } from 'react-router-dom';
+import EmployeeEditModal from './EmployeeEditModal';
 
 export default function EmployeeCatalog() {
   const [employees, setEmployees] = useState([]);
@@ -15,6 +16,12 @@ export default function EmployeeCatalog() {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 4;
   const navigate = useNavigate();
+  
+  const [refresh, setRefresh] = useState(false)
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
 
   const [filters, setFilters] = useState({
     nic: "",
@@ -43,11 +50,15 @@ export default function EmployeeCatalog() {
   };
 
   const handleCreateEmployee = () => {
-    navigate("register")
+    navigate("/employee/register")
   };
 
   const handleChangeEmployeeRole = () => {
     console.log("Falta implementar")
+  }
+
+  const togleRefresh = () => {
+    setRefresh(!refresh)
   }
 
   useEffect(() => {
@@ -78,12 +89,37 @@ export default function EmployeeCatalog() {
       .catch((error) => {
         console.error('API error:', error.message);
       });
-  }, [currentPage, filters]);
-
-
-  useEffect(() => {
-    console.log(filters)
-  }, [filters])
+  }, [currentPage, filters, refresh]);
+  
+  const handleEditEmployee = (employee) => {
+    setSelectedEmployee(employee);
+    setShowEditModal(true);
+  };
+  
+  const handleSaveEditedEmployee = (id, updatedData) => {
+    api.put(`/api/employee/${id}`, updatedData)
+      .then(() => {
+        setShowEditModal(false);
+        setSelectedEmployee(null);
+        togleRefresh();
+      })
+      .catch((err) => console.error("Edit error:", err.message));
+  };
+  
+  
+  const handleDeleteEmployee = (employeeId) => {
+    if (window.confirm("Are you sure you want to delete this employee?")) {
+      api.delete(`/api/employee/${employeeId}`)
+        .then(() => {
+          setEmployees((prev) => prev.filter((emp) => emp.id !== employeeId));
+          togleRefresh();
+        })
+        .catch((error) => {
+          console.error("Delete error:", error.message);
+        });
+    }
+  };
+  
 
   return (
     <Container className="py-4">
@@ -93,14 +129,35 @@ export default function EmployeeCatalog() {
         <Button variant="primary" size="lg" className="shadow-sm" onClick={handleCreateEmployee} >
           + Create New Employee
         </Button>
-        <Button variant="primary" size="lg" className="shadow-sm" onClick={handleChangeEmployeeRole} >
+        {/* <Button variant="primary" size="lg" className="shadow-sm" onClick={handleChangeEmployeeRole} >
           Change Employee Role
-        </Button>
+        </Button> */}
       </Stack>
       
         <PaginationProvider>
-            <EmployeesTableView employees={employees} changeRole={handleChangeEmployeeRole} /> { /* Ecrãs grandes */}
-            <EmployeeCardView employees={employees} changeRole={handleChangeEmployeeRole} /> { /* Ecrãs pequenos */}
+
+          <EmployeesTableView
+            employees={employees}
+            changeRole={handleChangeEmployeeRole}
+            onEdit={handleEditEmployee}
+            onDelete={handleDeleteEmployee}
+          />
+
+          <EmployeeCardView
+            employees={employees}
+            onEdit={handleEditEmployee}
+            onDelete={handleDeleteEmployee}
+          />
+
+          <EmployeeEditModal
+            show={showEditModal}
+            onHide={() => setShowEditModal(false)}
+            employee={selectedEmployee}
+            onSave={handleSaveEditedEmployee}
+          />
+
+
+
         </PaginationProvider>
 
         <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />

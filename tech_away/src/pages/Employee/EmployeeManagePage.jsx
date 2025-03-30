@@ -14,7 +14,6 @@ const componentMap = {
   equipmentStatusManage: <EquipmentStatusManage />,
   repairStatusManage: <RepairStatusManage />,
   storeManage: <StoreManage />
-
 };
 
 export default function ManagePage() {

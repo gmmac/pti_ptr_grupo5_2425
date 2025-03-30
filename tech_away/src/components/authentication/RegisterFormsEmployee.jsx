@@ -30,7 +30,7 @@ function RegisterFormsEmployee() {
   };
   
   const handlePageChange = () => {
-    navigate("/employee")
+    navigate(-1)
   };
 
   const handleSelectStore = (store) => {

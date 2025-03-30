@@ -17,10 +17,9 @@ export default function EmployeeHomePage() {
 
     // const isMobile = useContext(IsMobileContext);
 
-    const { employee, checkPasswordStatus, changePassword, checkIsAdmin, logOut } = useAuthEmployee();
+    const { employee, checkPasswordStatus, changePassword, checkIsAdmin } = useAuthEmployee();
 
     const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'dashboard');
-    const [isAuthenticated, setIsAuthenticated] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [passwordChanged, setPasswordChanged] = useState(false);
