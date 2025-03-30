@@ -30,6 +30,7 @@ export default function EmployeeLayoutPage() {
           <Row className="h-100">
             {/* Sidebar fixa apenas para telas lg+ */}
             <Col
+              md={4}
               lg={2}
               className="bg-light border-end d-none d-lg-block p-0"
               style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.3)', zIndex: 1 }}
@@ -41,7 +42,10 @@ export default function EmployeeLayoutPage() {
               />
             </Col>
 
-            <Col>
+            <Col
+              md={8}
+              lg={10}
+            >
               <Outlet />
             </Col>
             
