@@ -17,14 +17,13 @@ router.get("/", async (req, res) => {
 			gender,
             // address,
             role,
-            active,
+            active = "1",
             page = 1,
             pageSize = 10,
-            orderBy,
-            orderDirection,
+            orderBy = "internNum",
+            orderDirection = "ASC",
         } = req.query;
 
-		console.log(req.body)
 
         const where = {};
 
@@ -231,7 +230,6 @@ router.patch("/activation/:internNum", async (req, res) => {
 	console.log("ABACABAVSGASKAHSKJDHILS")
 
 	try {
-		console.log("ABACABAVSGASKAHSKJDHILS")
 		const employee = await models.Employee.findOne({
 			where: { internNum: req.params.internNum },
 		});
@@ -249,12 +247,15 @@ router.patch("/activation/:internNum", async (req, res) => {
 
 		const statusText = employee.isActive === 1 ? "active" : "inative";
 
-		res.cookie("employeeInfo", employee.dataValues, {
-			httpOnly: true,
-			secure: false,
-			sameSite: "Lax",
-			maxAge: 24 * 60 * 60 * 1000, // 1 dia
-		});
+		const currentEmployee = req.cookies.employeeInfo;
+		if (currentEmployee && currentEmployee.internNum === req.params.internNum) {
+			res.cookie("employeeInfo", employee.dataValues, {
+				httpOnly: true,
+				secure: false,
+				sameSite: "Lax",
+				maxAge: 24 * 60 * 60 * 1000, // 1 dia
+			});
+		}
 
 		res.status(200).json({
 			message: `Funcionário ${statusText} com sucesso.`,

@@ -33,7 +33,7 @@ export default function EmployeeLayoutPage() {
               md={4}
               lg={2}
               className="bg-light border-end d-none d-lg-block p-0"
-              style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.3)', zIndex: 1 }}
+              style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.2)', zIndex: 1 }}
             >
               <EmployeeSideBar
                 actualTab={actualTab}

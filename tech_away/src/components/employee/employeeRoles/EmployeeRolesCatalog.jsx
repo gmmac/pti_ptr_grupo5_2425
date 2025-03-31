@@ -19,7 +19,6 @@ export default function EmployeeRolesCatalog() {
             setRoles(response.data);
             setErrorMessage(''); 
         } catch (error) {
-            console.error('Error fetching employee roles:', error);
             setErrorMessage('Error fetching roles. Please try again.');
         }
     };

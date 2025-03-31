@@ -11,7 +11,6 @@ import LayoutPage from "./pages/Layout/LayoutPage";
 
 import EmployeeRegisterPage from "./pages/Employee/EmployeeRegisterPage";
 import EmployeeLoginPage from "./pages/Employee/EmployeeLoginPage";
-import EmployeeProtectedRoute from "./contexts/protectedRoutes/EmployeeProtectedRoute";
 import EmployeeHomePage from "./pages/Employee/EmployeeHomePage";
 
 import InterestsPage from "./pages/InterestsPage";
@@ -69,7 +68,7 @@ export default function Router() {
             path="/employee"
             element={
               <EmployeeAuthProvider>
-                <Outlet />
+                  <Outlet />
               </EmployeeAuthProvider>
             }
           >

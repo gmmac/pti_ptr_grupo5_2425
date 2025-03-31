@@ -19,7 +19,7 @@ export default function EmployeeCatalog() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 4;
+  // const itemsPerPage = 4;
 
   const [refresh, setRefresh] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -79,7 +79,7 @@ export default function EmployeeCatalog() {
           ...filters,
           active: isActive,
           page: currentPage,
-          pageSize: itemsPerPage,
+          // pageSize: itemsPerPage,
         },
       });
 

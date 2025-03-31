@@ -31,12 +31,6 @@ export default function EmployeeHomePage() {
 
     useEffect(() => {
 
-        console.log(employee)
-        if(!employee){
-            navigate("/employee/login");
-        }
-
-
         const verifyAdmin = async () => {
             const isADM = await checkIsAdmin();
             setIsAdmin(isADM)
@@ -45,7 +39,6 @@ export default function EmployeeHomePage() {
     
         const verifyPassword = async () => {
             const updatedPasswordChanged = await checkPasswordStatus(setPasswordChanged);
-            console.log("Senha alterada?", updatedPasswordChanged);
 
             if (!updatedPasswordChanged) {
                 setLoading(false)
@@ -55,7 +48,7 @@ export default function EmployeeHomePage() {
 
 
         verifyAdmin();
-        // verifyPassword();
+        // verifyPassword(); // comentar para n verificar a password -> gastar tokens
 
         
 
