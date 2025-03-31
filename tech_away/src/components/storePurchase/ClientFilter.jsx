@@ -5,7 +5,7 @@ import SearchBar from "../searchBar/SearchBar";
 export default function ClientFilter({ setFilters }) {
     const [localFilters, setLocalFilters] = useState({
         nic: "",
-        firstname: "",
+        firstName: "",
         lastName: "",
         email: "",
         phone: "",
@@ -19,6 +19,8 @@ export default function ClientFilter({ setFilters }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLocalFilters((prev) => ({ ...prev, [name]: value }));
+
+        console.log(localFilters)
     };
 
     const handleSubmit = (e) => {
@@ -29,6 +31,7 @@ export default function ClientFilter({ setFilters }) {
             orderBy: orderField,
             orderDirection: orderDirection,
         }));
+        
     };
     
 
@@ -68,19 +71,24 @@ export default function ClientFilter({ setFilters }) {
                                     />
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>First Name</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="firstName" 
                                         value={localFilters.firstName} 
-                                        onChange={handleChange}
-                                        name="Name"
-                                        placeholder="Search by Name"
-                                    />
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
                                     <SearchBar 
+                                        type="text"
                                         value={localFilters.lastName} 
                                         onChange={handleChange}
-                                        name="Name"
-                                        placeholder="Search by Name"
+                                        name="Last Name"
+                                        placeholder="Search by Last Name"
                                     />
                                 </Col>
                                 <Col xs={12} md={6}>

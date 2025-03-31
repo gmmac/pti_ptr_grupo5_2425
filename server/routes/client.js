@@ -3,15 +3,59 @@ const router = express.Router();
 const models = require("../models");
 const { Op } = require("sequelize");
 
+
 router.get("/", async (req, res) => {
 	try {
-		const client = await models.Client.findAll();
-		if (!client) {
-			return res.status(404).json({ error: "Clients not found" });
+		const {
+			nic,
+			firstName,
+			lastName,
+			email,
+			phone,
+			page = 1,
+			pageSize = 10,
+			orderBy,
+			orderDirection,
+		} = req.query;
+
+
+		console.log(req.query)
+		console.log("SSDSD" + req.query.internNum)
+		const where = {};
+
+		if (nic) where.nic = { [Op.like]: `${nic}%` };
+		if (firstName) where.firstName = { [Op.like]: `%${firstName}%` };
+		if (lastName) where.lastName = { [Op.like]: `%${lastName}%` };
+		if (email) where.email = { [Op.like]: `%${email}%` };
+		if (phone) where.phone = { [Op.like]: `%${phone}%` };
+
+		const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+		let order = [];
+		if (orderBy && orderDirection) {
+			order = [[orderBy, orderDirection.toUpperCase()]];
+		} else {
+			order = [["nic", "ASC"]];
 		}
-		res.json(client);
+
+		const { count, rows } = await models.Client.findAndCountAll({
+			where,
+			
+			limit: parseInt(pageSize),
+			offset,
+			order,
+		});
+
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: rows,
+		});
 	} catch (error) {
-		res.status(500).json({ error: error.message });
+		console.error("Error fetching clients:", error);
+		res.status(500).json({ error: "Error fetching clients." });
 	}
 });
 

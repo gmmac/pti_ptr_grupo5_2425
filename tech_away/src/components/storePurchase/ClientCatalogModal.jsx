@@ -21,6 +21,7 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
       lastName: "",
       email: "",
       phone: "",
+      orderBy: "nic",
       orderDirection: "ASC"
     });
   
@@ -36,7 +37,7 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
                 pageSize: itemsPerPage
               }
             });
-            setClients(response.data || []);
+            setClients(response.data.data || []);
             setTotalPages(response.data.totalPages);
           } catch (err) {
             setError("Erro ao carregar os clientes");

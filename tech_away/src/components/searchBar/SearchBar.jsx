@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import { Form } from 'react-bootstrap';
 
 export default function SearchBar({ value, onChange, name, placeholder, type="text" }) {
-    const [nameLower, setNameLower] = useState(name.toLowerCase())
+    // const [nameLower, setNameLower] = useState(name.toLowerCase())
 
     return (
-        <Form.Group controlId={nameLower}>
+        <Form.Group controlId={name}>
             <Form.Label>{name}</Form.Label>
             <Form.Control
                 type={type}
-                name={nameLower}
+                name={name}
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
