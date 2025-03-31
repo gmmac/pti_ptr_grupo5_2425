@@ -55,7 +55,7 @@ export default function EmployeeHomePage() {
 
 
         verifyAdmin();
-        verifyPassword();
+        // verifyPassword();
 
         
 

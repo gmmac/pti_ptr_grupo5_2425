@@ -10,9 +10,6 @@ const EmployeeAuthProvider = ({ children }) => {
 
     const [refresh, setRefresh] = useState(false);
 
-
-    // const [isAdmin, setIsAdmin] = useState(false);
-
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -130,9 +127,21 @@ const EmployeeAuthProvider = ({ children }) => {
         setRefresh(true);
     }
 
+    const toggleActivateAccount = async (internNum) => {
+        try {
+            await api.patch(`/api/employee/activation/${internNum}`);
+        } catch (error) {
+            console.error("Erro ao desativar a conta:", error.message);
+        }
+    }
+
+    const verifyEmployeeIsActive = (givenEmployee) => {
+        return givenEmployee?.isActive === "1";
+    }
+
     return (
         <EmployeeAuthContext.Provider
-            value={{ employee, loginAction, isEmployeeLoggedIn, checkPasswordStatus, changePassword, logOut, refreshPage, checkIsAdmin }}
+            value={{ employee, loginAction, isEmployeeLoggedIn, checkPasswordStatus, changePassword, logOut, refreshPage, checkIsAdmin, toggleActivateAccount, verifyEmployeeIsActive }}
         >
             {children}
         </EmployeeAuthContext.Provider>

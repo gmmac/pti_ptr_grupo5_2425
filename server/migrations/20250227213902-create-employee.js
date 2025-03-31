@@ -70,6 +70,9 @@ module.exports = {
       passwordReseted:{
         type: Sequelize.STRING(1)
       },
+      isActive:{
+        type: Sequelize.STRING(1)
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Row, Col, Badge, Button } from "react-bootstrap";
 import ConfirmationModal from "../modals/ConfirmationModal";
+import { useAuthEmployee } from "../../contexts/AuthenticationProviders/EmployeeAuthProvider";
 
 export default function EmployeeCardView({ employees, onEdit, onDelete }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  const { verifyEmployeeIsActive } = useAuthEmployee();
+  
 
   const handleDeleteClick = (employee) => {
     setSelectedEmployee(employee);
@@ -18,6 +22,10 @@ export default function EmployeeCardView({ employees, onEdit, onDelete }) {
     setShowConfirm(false);
     setSelectedEmployee(null);
   };
+  
+  useEffect(() => {
+    console.log(employees)
+  }, [employees])
 
   return (
     <>
@@ -43,7 +51,13 @@ export default function EmployeeCardView({ employees, onEdit, onDelete }) {
                 </Card.Text>
                 <div className="d-flex gap-2">
                   <Button variant="warning" size="sm" onClick={() => onEdit(employee)}>Edit</Button>
-                  <Button variant="danger" size="sm" onClick={() => handleDeleteClick(employee)}>Delete</Button>
+                  <Button
+                    variant={verifyEmployeeIsActive(employee) ? "danger" : "success"}
+                    size="sm"
+                    onClick={() => handleDeleteClick(employee)}
+                  >
+                    {verifyEmployeeIsActive(employee) ? "Deactivate" : "Activate"}
+                  </Button>
                 </div>
               </Card.Body>
             </Card>
@@ -55,11 +69,20 @@ export default function EmployeeCardView({ employees, onEdit, onDelete }) {
         show={showConfirm}
         onHide={() => setShowConfirm(false)}
         onConfirm={handleConfirmDelete}
-        title="Confirm Deletion"
-        message={`Are you sure you want to delete ${selectedEmployee?.firstName} ${selectedEmployee?.lastName}?`}
-        confirmText="Delete"
-        confirmVariant="danger"
+        title={
+          verifyEmployeeIsActive(selectedEmployee)
+            ? "Deactivate Employee"
+            : "Activate Employee"
+        }
+        message={
+          selectedEmployee
+            ? `Are you sure you want to ${selectedEmployee.isActive ? "deactivate" : "activate"} ${selectedEmployee.firstName} ${selectedEmployee.lastName}?`
+            : ""
+        }
+        confirmText={verifyEmployeeIsActive(selectedEmployee) ? "Deactivate" : "Activate"}
+        confirmVariant={verifyEmployeeIsActive(selectedEmployee) ? "danger" : "success"}
       />
+
     </>
   );
 }

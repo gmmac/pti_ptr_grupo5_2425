@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Badge, Container, Button } from "react-bootstrap";
 import ConfirmationModal from "../modals/ConfirmationModal";
+import { useAuthEmployee } from "../../contexts/AuthenticationProviders/EmployeeAuthProvider";
 
-export default function EmployeesTableView({ employees, onEdit, onDelete }) {
+export default function EmployeeTableView({ employees, onEdit, onDelete }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  const { verifyEmployeeIsActive } = useAuthEmployee();
+  
 
   const handleDeleteClick = (employee) => {
     setSelectedEmployee(employee);
@@ -18,6 +22,10 @@ export default function EmployeesTableView({ employees, onEdit, onDelete }) {
     setShowConfirm(false);
     setSelectedEmployee(null);
   };
+
+  useEffect(() => {
+    console.log(selectedEmployee)
+  }, [selectedEmployee])
 
   return (
     <>
@@ -50,7 +58,13 @@ export default function EmployeesTableView({ employees, onEdit, onDelete }) {
                   <td>{new Date(employee.createdAt).toLocaleDateString()}</td>
                   <td>
                     <Button variant="warning" size="sm" className="me-2" onClick={() => onEdit(employee)}>Edit</Button>
-                    <Button variant="danger" size="sm" onClick={() => handleDeleteClick(employee)}>Delete</Button>
+                    <Button
+                      variant={verifyEmployeeIsActive(employee) ? "danger" : "success"}
+                      size="sm"
+                      onClick={() => handleDeleteClick(employee)}
+                    >
+                      {verifyEmployeeIsActive(employee) ? "Deactivate" : "Activate"}
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -64,11 +78,20 @@ export default function EmployeesTableView({ employees, onEdit, onDelete }) {
         show={showConfirm}
         onHide={() => setShowConfirm(false)}
         onConfirm={handleConfirmDelete}
-        title="Confirm Deletion"
-        message={`Are you sure you want to delete ${selectedEmployee?.firstName} ${selectedEmployee?.lastName}?`}
-        confirmText="Delete"
-        confirmVariant="danger"
+        title={
+          verifyEmployeeIsActive(selectedEmployee)
+            ? "Deactivate Employee"
+            : "Activate Employee"
+        }
+        message={
+          selectedEmployee
+            ? `Are you sure you want to ${verifyEmployeeIsActive(selectedEmployee) ? "deactivate" : "activate"} ${selectedEmployee.firstName} ${selectedEmployee.lastName}?`
+            : ""
+        }
+        confirmText={verifyEmployeeIsActive(selectedEmployee) ? "Deactivate" : "Activate"}
+        confirmVariant={verifyEmployeeIsActive(selectedEmployee) ? "danger" : "success"}
       />
+
     </>
   );
 }
