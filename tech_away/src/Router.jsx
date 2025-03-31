@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -8,11 +8,9 @@ import LoginPageClient from "./pages/Auth/LoginPageClient";
 import ChangePasswordClient from "./pages/Auth/ChangePasswordClient";
 
 import LayoutPage from "./pages/Layout/LayoutPage";
-import EmployeeLayoutPage from "./pages/Layout/EmployeeLayoutPage";
 
 import EmployeeRegisterPage from "./pages/Employee/EmployeeRegisterPage";
 import EmployeeLoginPage from "./pages/Employee/EmployeeLoginPage";
-import EmployeeProtectedRoute from "./contexts/protectedRoutes/EmployeeProtectedRoute";
 import EmployeeHomePage from "./pages/Employee/EmployeeHomePage";
 
 import InterestsPage from "./pages/InterestsPage";
@@ -23,9 +21,11 @@ import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 
 import { IsMobileProvider } from "./contexts/IsMobileContext";
-import AuthProvider from "./contexts/AuthProvider";
-import EmployeeAuthProvider from "./contexts/EmployeeAuthProvider";
+import AuthProvider from "./contexts/AuthenticationProviders/AuthProvider";
+import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAuthProvider";
 import ProfilePageClient from "./pages/Auth/ProfilePageClient";
+import EmployeeLayoutPage from "./pages/Layout/EmployeeLayoutPage";
+import EmployeeManagePage from "./pages/Employee/EmployeeManagePage";
 
 export default function Router() {
   return (
@@ -68,15 +68,20 @@ export default function Router() {
             path="/employee"
             element={
               <EmployeeAuthProvider>
-                <EmployeeLayoutPage />
+                  <Outlet />
               </EmployeeAuthProvider>
             }
           >
+          
+            <Route element={<EmployeeLayoutPage />}>
+              <Route index element={<EmployeeHomePage />} />
+              <Route path="manage" element={<EmployeeManagePage />} />
+
+            </Route>
+
             <Route path="login" element={<EmployeeLoginPage />} />
             <Route path="register" element={<EmployeeRegisterPage />} />
-            <Route element={<EmployeeProtectedRoute />}>
-              <Route index element={<EmployeeHomePage />} />
-            </Route>
+
           </Route>
         </Routes>
       </BrowserRouter>

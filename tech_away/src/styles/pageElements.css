@@ -29,23 +29,24 @@
 }
 
     .custom-tabs .nav-link {
-        background-color: var(--variant-one);
+        /* background-color: var(--variant-one); */
         color: var(--dark-grey);
         font-weight: bold;
     }
     
         .custom-tabs .nav-link:hover {
-            background-color: var(--dark-grey);
-            color: var(--white);
-            text-decoration: none;
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
         }
 
             
         /* selected tab */
         .custom-tabs.nav-item .nav-link.active,
         .custom-tabs .nav-link[aria-selected="true"] {
-            background-color: var(--dark-grey);
-            color: var(--white);
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
         }
 
 .custom-tab-content{
@@ -53,3 +54,50 @@
 }
 
 
+/* ------------------------------------ */
+/*                Navs                  */
+/* ------------------------------------ */
+
+.employee-custom-tabs{
+    margin: 10px;
+}
+
+    .employee-custom-tabs .nav-link {
+        /* background-color: var(--variant-one); */
+
+            /* background-color: var(--variant-one); */
+        color: var(--dark-grey);
+        font-weight: bold;
+    }
+    
+        .employee-custom-tabs .nav-link:hover {
+            background-color: var(--variant-one);
+        
+            color: var(--dark-grey);
+            font-weight: bold;
+        }
+
+            
+        /* selected tab */
+        /* .employee-custom-tabs.nav-item .nav-link.active.active,
+        .employee-custom-tabs .nav-link[aria-selected="true"] {
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
+        } */
+
+        .employee-custom-tabs .nav-link.active-manual {
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
+          }
+          
+
+
+/* ------------------------------------ */
+/*                Cards                  */
+/* ------------------------------------ */
+
+.custom-cards{
+    border-radius: var(--rounded-lg)
+}

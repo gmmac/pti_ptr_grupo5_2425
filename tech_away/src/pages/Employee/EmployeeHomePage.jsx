@@ -1,65 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { Tab, Nav, Modal, Button, Alert } from 'react-bootstrap';
+import React, { useState, useEffect, useContext } from 'react';
+import { Tab, Nav, Modal, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import EmployeeRolesCatalog from '../../components/employee/employeeRoles/EmployeeRolesCatalog';
-import EmployeeProfile from '../../components/employee/EmployeeProfile';
-import { checkIfAdmin, getLoggedUser } from '../../utils/auth';
+import EmployeeProfile from '../../components/HomePageEmployee/EmployeeProfile';
 import EmployeeCatalog from '../../components/employee/EmployeeCatalog';
 import api from '../../utils/axios';
 import BottomNavBar from '../../components/Navbar/BottomNavBar';
-import EmployeeHomeDashboard from '../../components/employee/EmployeeHomeDashboard';
-import EmployeeRepairs from '../../components/employee/EmployeeRepairs';
+import EmployeeHomeDashboard from '../../components/HomePageEmployee/EmployeeHomeDashboard';
+import EmployeeRepairs from '../../components/HomePageEmployee/EmployeeRepairs';
+import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
+import { IsMobileContext } from '../../contexts/IsMobileContext';
+import "../../styles/pageElements.css"
+
 
 export default function EmployeeHomePage() {
-    const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'home');
-    const [isAuthenticated, setIsAuthenticated] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(null);
+
+    // const isMobile = useContext(IsMobileContext);
+
+    const { employee, checkPasswordStatus, changePassword, checkIsAdmin } = useAuthEmployee();
+
+    const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'dashboard');
+    const [isAdmin, setIsAdmin] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [passwordChanged, setPasswordChanged] = useState(false);
     const [emailMessage, setEmailMessage] = useState({ message: "", type: "" });
-    const navigate = useNavigate();
+    const [emailSent, setEmailSent] = useState(false);
 
-    // veridies is user changed password
-    const checkPasswordStatus = async () => {
-        try {
-            const response = await api.get(`/api/auth/getUserByEmail/${getLoggedUser().email}`);
-            
-            const passwordReset = !!response.data.last_password_reset;
-            setPasswordChanged(passwordReset);
-    
-            return passwordReset;
-        } catch (error) {
-            console.error("Error verifying password:", error.response?.data || error.message);
-            return false;
-        }
-    };
-    
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkUser = async () => {
-            const user = getLoggedUser();
-            setIsAuthenticated(user);
 
-            if (!user) {
-                navigate("/employee/login");
-                return;
-            }
-
-            console.log("ULoggedUser:", user);
-
-            const updatedPasswordChanged = await checkPasswordStatus();
-            console.log("Senha alterada?", updatedPasswordChanged);
-
-            if (!updatedPasswordChanged) {
-                setShowPasswordModal(true);
-            }
-
-            const adminStatus = await checkIfAdmin();
-            setIsAdmin(adminStatus);
+        const verifyAdmin = async () => {
+            const isADM = await checkIsAdmin();
+            setIsAdmin(isADM)
         };
 
-        checkUser();
-    }, [navigate]);
+    
+        const verifyPassword = async () => {
+            const updatedPasswordChanged = await checkPasswordStatus(setPasswordChanged);
+
+            if (!updatedPasswordChanged) {
+                setLoading(false)
+                setShowPasswordModal(true);
+            }
+        }
+
+
+        verifyAdmin();
+        // verifyPassword(); // comentar para n verificar a password -> gastar tokens
+
+        
+
+    }, [navigate, employee]);
+
+
 
     useEffect(() => {
         sessionStorage.setItem('selectedTab', actualTab);
@@ -75,30 +70,9 @@ export default function EmployeeHomePage() {
         setShowPasswordModal(false);
     };
 
-    if (isAuthenticated === null) {
-        return <div>Loading...</div>;
-    }
 
-    const handleChangePassword = async () => {
-        try {
-            const user = getLoggedUser();
-            if (!user) {
-                console.error("Usuário não encontrado.");
-                return;
-            }
-    
-            await api.post("/api/auth/changePassword", { email: user.email });
-    
-            setEmailMessage({ message: "Password reset email sent. Please check your email.", type: "success" });
-    
-        } catch (error) {
-            console.error("Error changing password:", error.response?.data || error.message);
-            setEmailMessage({ message: "Error sending password reset email. Try again later.", type: "danger" });
-        }
-    };
-    
     const handleIsPasswordChanged = async () => {
-        const updatedPasswordChanged = await checkPasswordStatus();
+        const updatedPasswordChanged = await checkPasswordStatus(setPasswordChanged);
     
         if (updatedPasswordChanged) {
             setPasswordChanged(true);
@@ -107,75 +81,40 @@ export default function EmployeeHomePage() {
             setEmailMessage({ message: "Employee has not changed password. Please check your email.", type: "danger" });
         }
     };
+
+    const handleChangePassword = () => {
+        changePassword(setEmailMessage, setEmailSent);
+    }   
     
 
 
     return (
         <>
-            <Tab.Container activeKey={actualTab} onSelect={handleChangeTab}>
-                <Nav variant="tabs" className="mb-3 nav-fill">
-                    <Nav.Item className='custom-tabs'>
-                        <Nav.Link eventKey="home">Home</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item className='custom-tabs'>
-                        <Nav.Link eventKey="sales">Sales</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item className='custom-tabs'>
-                        <Nav.Link eventKey="purchases">Purchases</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item className='custom-tabs'>
-                        <Nav.Link eventKey="repairs">Repairs</Nav.Link>
-                    </Nav.Item>
 
-                    {isAdmin && (
-                        <>
-                            <Nav.Item className='custom-tabs'>
-                                <Nav.Link eventKey="roles">Manage Roles</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item className='custom-tabs'>
-                                <Nav.Link eventKey="manage">Manage Employees</Nav.Link>
-                            </Nav.Item>
-                        </>
-                    )}
+            <Tab.Content className="custom-tab-content">
+                <Tab.Pane eventKey="dashboard" className='p-4'>
+                    <EmployeeHomeDashboard />
+                </Tab.Pane>
+                <Tab.Pane eventKey="purchases" className='p-4'>
+                    <h5>Purchases Content</h5>
+                </Tab.Pane>
+                <Tab.Pane eventKey="repairs" className='p-4'>
+                    <h5>Repairs Content</h5>
+                </Tab.Pane>
+                <Tab.Pane eventKey="sales" className='p-4'>
+                    <h5>Sales Content</h5>
+                </Tab.Pane>
+                <Tab.Pane eventKey="charityproject" className='p-4'>
+                    <h5>Charity Projects</h5>
+                </Tab.Pane>
+                <Tab.Pane eventKey="profile" className='p-4'>
+                    <EmployeeProfile />
+                </Tab.Pane>
+            </Tab.Content>
 
-                    <Nav.Item className='custom-tabs'>
-                        <Nav.Link eventKey="profile">Profile</Nav.Link>
-                    </Nav.Item>
-                </Nav>
 
-                <Tab.Content className='custom-tab-content'>
-                    <Tab.Pane eventKey="home">
-                        <EmployeeHomeDashboard />
-                    </Tab.Pane>
-                    <Tab.Pane eventKey="sales">
-                        <p>Tab content for Sales</p>
-                    </Tab.Pane>
-                    <Tab.Pane eventKey="purchases">
-                        <p>Tab content for Purchases</p>
-                    </Tab.Pane>
-                    <Tab.Pane eventKey="repairs">
-                        <EmployeeRepairs />
-                    </Tab.Pane>
-
-                    {isAdmin && (
-                        <>
-                            <Tab.Pane eventKey="roles">
-                                <EmployeeRolesCatalog />
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="manage">
-                                <EmployeeCatalog />
-                            </Tab.Pane>
-                        </>
-                    )}
-
-                    <Tab.Pane eventKey="profile">
-                        <EmployeeProfile />
-                    </Tab.Pane>
-                </Tab.Content>
-            </Tab.Container>
-
-            {/* Modal para alterar senha */}
-            <Modal show={showPasswordModal} onHide={handleClosePasswordModal} backdrop="static" keyboard={false}>
+            
+            {!loading && <Modal show={showPasswordModal} onHide={handleClosePasswordModal} backdrop="static" keyboard={false}>
                 <Modal.Header>
                     <Modal.Title>Welcome</Modal.Title>
                 </Modal.Header>
@@ -197,16 +136,19 @@ export default function EmployeeHomePage() {
                     {!passwordChanged && (
                         <>
                             <Button variant="primary" onClick={handleChangePassword}>
-                                Change Password
+                                {emailSent ? "Resend Email" : "Change Password"}
                             </Button>
 
-                            <Button variant="primary" onClick={handleIsPasswordChanged}>
-                                Next
-                            </Button>
+                            {emailSent && (
+                                <Button variant="primary" onClick={handleIsPasswordChanged}>
+                                    Next
+                                </Button>
+                            )}
                         </>
                     )}
                 </Modal.Footer>
-            </Modal>
+
+            </Modal>}
 
         </>
     );

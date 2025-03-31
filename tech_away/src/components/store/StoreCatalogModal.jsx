@@ -65,12 +65,29 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
     }
   };
 
+  const handleModalClose = () => {
+    setFilters({
+      nipc: "",
+      name: "",
+      address: "",
+      email: "",
+      phone: "",
+      openTime: "",
+      closeTime: "",
+      orderDirection: "ASC"
+    });
+    handleClose();
+  };
+
   return (
-    <Modal show={show} onHide={handleClose} size="xl" centered>
+    <Modal show={show} onHide={handleModalClose} size="xl" centered>
       <Modal.Header closeButton>
         <Modal.Title>Catálogo de Lojas</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body    
+        style={{ 
+          minHeight: '450px'
+        }}> {/* Fixar o tamanho do body para n estar a mudar*/}
         <StoreFilter setFilters={setFilters} />
         
         {loading ? (
@@ -92,18 +109,19 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
                   handleStoreSelection={handleStoreSelection} 
                   />
               })}
-
-            <PaginationControl
-              handlePageChange={handlePageChange}
-              currentPage={currentPage}
-              totalPages={totalPages}
-            />
           </Container>
         )}
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Fechar</Button>
+      <Modal.Footer className="d-flex justify-content-between align-items-center">
+        <div className="flex-grow-1 d-flex justify-content-center">
+          <PaginationControl
+            handlePageChange={handlePageChange}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        </div>
       </Modal.Footer>
+
     </Modal>
   );
 }

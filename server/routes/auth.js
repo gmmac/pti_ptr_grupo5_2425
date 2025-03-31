@@ -130,16 +130,32 @@ router.post("/login", async (req, res) => {
       const existingEmployee = await models.Employee.findOne({where: {email: email}
       });
 
+      console.log(existingEmployee.dataValues);
+
       if(existingEmployee){
+
+        res.cookie("employeeInfo", existingEmployee.dataValues, {
+          httpOnly: true,    
+          secure: false, // Permite o cookie em HTTP durante o desenvolvimento
+          sameSite: "Lax", // Mais flexível que "Strict" para testes locais
+          maxAge: 24 * 60 * 60 * 1000 // 1 dia
+        });
+        
         return res.status(201).json(existingEmployee.dataValues);
       }
     }
 
 
   } catch (error) {
-    console.error(error.status);
-    res.sendStatus(error.status); // Internal Server Error
+    console.error(error);
+  
+    if (error.response?.status === 403) {
+      return res.status(403).json({ message: "Invalid Credentials" });
+    }
+  
+    return res.status(500).json({ message: "Internal Server Error" });
   }
+  
 
 });
 
@@ -190,13 +206,27 @@ router.get("/getUserByEmail/:email", async (req, res) => {
 });
 
 router.get("/user-info", (req, res) => {
-  const userInfo = req.cookies.clientInfo;
+
+  let userInfoName = "clientInfo"
+  if(req.query.userType === 'employee'){
+    userInfoName = "employeeInfo";
+  }
+  
+  let userInfo = req.cookies.employeeInfo;
+
 
   return res.status(200).json({ userInfo: userInfo });
 });
 
 router.get('/logout', (req, res) => {
-  res.clearCookie("clientInfo", {
+  
+  let userInfo = "clientInfo"
+  //é employee. enviar variável na query
+  if(req.query.userType === 'employee'){
+    userInfo = "employeeInfo";
+  }
+  
+  res.clearCookie(userInfo, {
     httpOnly: true,
     secure: false, 
     sameSite: "Lax"
