@@ -109,11 +109,9 @@ router.post("/login", async (req, res) => {
       username: email,
       password: password
     });
-
     if(userType === "client"){
-      const existingClient = await models.Client.findOne({where: {email: email}
-      });
-  
+      const existingClient = await models.Client.findOne({where: {email: email}});
+
       if(existingClient){
         res.cookie("clientInfo", existingClient.dataValues, {
           httpOnly: true,    
@@ -123,6 +121,8 @@ router.post("/login", async (req, res) => {
         });
         
         return res.status(201).json(existingClient.dataValues);
+      } else{
+        return res.status(401);
       }
     }
 

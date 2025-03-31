@@ -3,6 +3,7 @@ import { Nav, Tab, Container } from "react-bootstrap";
 import "../../styles/variables.css";
 import ClientProfile from '../../components/client/ClientProfile';
 import "../../styles/ClientProfilePage.css"
+import ClientRepairs from "../../components/client/ClientRepairs";
 
 export default function ProfilePageClient() {
 	return (
@@ -30,8 +31,11 @@ export default function ProfilePageClient() {
                     <Tab.Pane eventKey="purchases">
                         <p>Tab content for Purchases</p>
                     </Tab.Pane>
+                    <Tab.Pane eventKey="repairs">
+                        <ClientRepairs/>
+                    </Tab.Pane>
 					<Tab.Pane eventKey="profile">
-						<ClientProfile />
+						<ClientProfile/>
                     </Tab.Pane>
                 </Tab.Content>
             </Tab.Container>

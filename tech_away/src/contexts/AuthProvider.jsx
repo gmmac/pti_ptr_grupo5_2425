@@ -1,4 +1,5 @@
 import { useContext, createContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/axios';
 
 const AuthContext = createContext();
@@ -9,6 +10,7 @@ const AuthProvider = ({ children }) => {
 
     const [refresh, setRefresh] = useState(false);
 
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -26,7 +28,7 @@ const AuthProvider = ({ children }) => {
         fetchUser();
     }, [refresh]);
 
-    const loginAction = async (formData, setErrors) => {
+    const loginAction = async (formData, newErrors, setErrors) => {
         await api.post('/api/auth/login', {
             email: formData.email,
             password: formData.password,
@@ -34,15 +36,17 @@ const AuthProvider = ({ children }) => {
         })
         .then(async response => {
             setRefresh(true);
-
+            navigate("/profile");
         })
         .catch(error => {
             if(error.status == 403){
                 newErrors.invalidCredentials = "Invalid credentials!";
                 setErrors(newErrors);
+                return false;
             }else if(error.status == 429){
                 newErrors.invalidCredentials = "Too many attempts. Try again later!";
                 setErrors(newErrors);
+                return false;
             }
         })
     };
