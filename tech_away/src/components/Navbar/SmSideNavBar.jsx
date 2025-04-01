@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
 import { Button, Offcanvas } from 'react-bootstrap';
 import { List } from 'react-bootstrap-icons';
-import EmployeeSideBar from './EmployeeSideNavbar';
+import SideBar from './SideBar'; // a versão generalizada da barra lateral
 
-export default function SmEmployeeSideNavBar({ actualTab, handleChangeTab, logOut }) {
+export default function SmSideNavBar({
+  actualTab,
+  handleChangeTab,
+  logOut,
+  menuItems,
+  title = "App",
+  basePath = "/"
+}) {
   const [show, setShow] = useState(false);
 
-  // Handlers
   const handleToggleMenu = () => setShow(prev => !prev);
-  
   const handleCloseMenu = () => setShow(false);
 
   const handleTabChange = (selectedTab) => {
     handleChangeTab(selectedTab);
     handleCloseMenu();
   };
+
   const handleLogout = () => {
     logOut();
     handleCloseMenu();
@@ -31,10 +37,13 @@ export default function SmEmployeeSideNavBar({ actualTab, handleChangeTab, logOu
       <Offcanvas show={show} onHide={handleCloseMenu} placement="start">
         <Offcanvas.Header closeButton />
         <Offcanvas.Body>
-          <EmployeeSideBar
+          <SideBar
             actualTab={actualTab}
             handleChangeTab={handleTabChange}
             logOut={handleLogout}
+            menuItems={menuItems}
+            title={title}
+            basePath={basePath}
           />
         </Offcanvas.Body>
       </Offcanvas>

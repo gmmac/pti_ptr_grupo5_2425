@@ -3,17 +3,17 @@ import { Outlet } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import SideBar from '../../components/Navbar/SideBar';
 import SmSideNavBar from '../../components/Navbar/SmSideNavBar';
-import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
-import { BarChartLine, CurrencyDollar, HouseDoorFill, PeopleFill, PersonFill, Wrench } from 'react-bootstrap-icons';
+import { BarChartLine, BoxSeam, BoxSeamFill, CurrencyDollar, HouseDoorFill, PeopleFill, PersonFill, Wrench } from 'react-bootstrap-icons';
+import { useAuth } from '../../contexts/AuthenticationProviders/AuthProvider';
 
-export default function EmployeeLayoutPage() {
-  const [actualTab, setActualTab] = useState(sessionStorage.getItem('employeeSelectedTab') || 'dashboard');
-  const { logOut } = useAuthEmployee();
+export default function OrganizerLayoutPage() {
+  const [actualTab, setActualTab] = useState(sessionStorage.getItem('organizerSelectedTab') || 'dashboard');
+  const { logOut } = useAuth();
 
   const handleChangeTab = (tab) => {
     if (tab) {
       setActualTab(tab);
-      sessionStorage.setItem('employeeSelectedTab', tab);
+      sessionStorage.setItem('organizerSelectedTab', tab);
     }
   };
 
@@ -22,11 +22,9 @@ export default function EmployeeLayoutPage() {
   }, [actualTab])
 
   const menuItems = [
-    { key: "dashboard", label: "Dashboard", icon: <HouseDoorFill />, path: "/employee" },
-    { key: "purchases", label: "Purchases", icon: <CurrencyDollar /> },
-    { key: "sales", label: "Sales", icon: <BarChartLine /> },
-    { key: "repairs", label: "Repairs", icon: <Wrench /> },
+    { key: "dashboard", label: "Dashboard", icon: <HouseDoorFill />, path: "/organizer" },
     { key: "charityproject", label: "Charity Projects", icon: <PeopleFill /> },
+    { key: "warehouses", label: "Warehouses", icon: <BoxSeamFill /> },
     { key: "profile", label: "Profile", icon: <PersonFill /> },
   ];
   
@@ -41,7 +39,7 @@ export default function EmployeeLayoutPage() {
           logOut={logOut}
           menuItems={menuItems}
           title="TechAway"
-          basePath="/employee"
+          basePath="/organizer"
         />
 
         <Container fluid className="vh-100">
@@ -60,7 +58,7 @@ export default function EmployeeLayoutPage() {
                 actualTab={actualTab}
                 handleChangeTab={setActualTab}
                 logOut={logOut}
-                basePath="/employee"
+                basePath="/organizer"
               />
             </Col>
 

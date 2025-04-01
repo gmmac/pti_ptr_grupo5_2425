@@ -39,8 +39,8 @@ export default function LoginFormsEmployee() {
 
         await loginAction(formData, setErrors, newErrors);
 
-        sessionStorage.removeItem('selectedTab');
-        sessionStorage.setItem("selectedTab", 'dashboard');
+        sessionStorage.removeItem('employeeSelectedTab');
+        sessionStorage.setItem("employeeSelectedTab", 'dashboard');
 
     };
 

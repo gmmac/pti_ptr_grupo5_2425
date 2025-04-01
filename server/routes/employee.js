@@ -227,7 +227,6 @@ router.delete("/:internNum", async (req, res) => {
 });
 
 router.patch("/activation/:internNum", async (req, res) => {
-	console.log("ABACABAVSGASKAHSKJDHILS")
 
 	try {
 		const employee = await models.Employee.findOne({
@@ -240,10 +239,7 @@ router.patch("/activation/:internNum", async (req, res) => {
 
 		// toggle isActive attribute
 		employee.isActive = employee.isActive === "1" ? "0" : "1";
-		console.log("ASHAJSHASAJKSHA " + employee.isActive);
 		await employee.save();
-
-
 
 		const statusText = employee.isActive === 1 ? "active" : "inative";
 
