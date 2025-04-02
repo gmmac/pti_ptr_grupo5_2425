@@ -7,6 +7,7 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { FilterMatchMode } from "primereact/api";
 import api from "../../utils/axios";
 import ModalEdit from "./ModalEdit";
+import FormsEquipmentSheet from "./FormsEquipmentSheet";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
@@ -29,6 +30,11 @@ export default function DisplayTable({ model }) {
 	const [filters, setFilters] = useState({
 		global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 	});
+
+	const [showEquipmentModal, setShowEquipmentModal] = useState(false);
+
+	const handleOpenEquipmentModal = () => setShowEquipmentModal(true);
+	const handleCloseEquipmentModal = () => setShowEquipmentModal(false);
 
 	const fetchData = () => {
 		api.get(`api/${model}`, { params: queryParams }).then((res) => {
@@ -76,66 +82,71 @@ export default function DisplayTable({ model }) {
 	return (
 		<>
 			<ConfirmDialog />
-			<div className="">
-				<DataTable
-					value={data}
-					paginator
-					rows={6}
-					stripedRows
-					globalFilterFields={columns}
-					removableSort
-				>
-					{columns.map((column, index) => (
-						<Column
-							key={index}
-							field={column}
-							header={column}
-							sortable
-							body={(rowData) => {
-								const value = rowData[column];
-								return typeof value === "object" && value !== null
-									? value.name || "N/A"
-									: value;
-							}}
-						/>
-					))}
+			<DataTable
+				value={data}
+				paginator
+				rows={6}
+				
+				globalFilterFields={columns}
+				removableSort
+				style={{ width: "800px" }}
+			>
+				{columns.map((column, index) => (
 					<Column
-						header=""
-						body={(rowData, options) => {
-							const menuItems = [
-								{
-									label: "Editar",
-									icon: "pi pi-pencil",
-									command: () => handleEdit(rowData.id),
-								},
-								{
-									label: "Excluir",
-									icon: "pi pi-trash",
-									command: () => confirmDelete(rowData.id),
-								},
-							];
-							return (
-								<>
-									<Menu
-										model={menuItems}
-										popup
-										ref={(el) => (menuRefs.current[options.rowIndex] = el)}
-									/>
-									<Button
-										icon="pi pi-ellipsis-v"
-										text
-										severity="secondary"
-										onClick={(e) =>
-											menuRefs.current[options.rowIndex].toggle(e)
-										}
-										className="rounded-5"
-									/>
-								</>
-							);
+						key={index}
+						field={column}
+						header={column}
+						sortable
+						body={(rowData) => {
+							const value = rowData[column];
+							return typeof value === "object" && value !== null
+								? value.name || "N/A"
+								: value;
 						}}
 					/>
-				</DataTable>
-			</div>
+				))}
+				<Column
+					header={
+						<Button
+							icon="pi pi-plus"
+							label="Add"
+							onClick={handleOpenEquipmentModal}
+							className="p-button-sm p-button-outlined"
+						/>
+					}
+					body={(rowData, options) => {
+						const menuItems = [
+							{
+								label: "Edit",
+								icon: "pi pi-pencil",
+								command: () => handleEdit(rowData.id),
+							},
+							{
+								label: "Delete",
+								icon: "pi pi-trash",
+								command: () => confirmDelete(rowData.id),
+							},
+						];
+						return (
+							<>
+								<Menu
+									model={menuItems}
+									popup
+									ref={(el) => (menuRefs.current[options.rowIndex] = el)}
+								/>
+								<Button
+									icon="pi pi-ellipsis-v"
+									text
+									severity="secondary"
+									onClick={(e) => menuRefs.current[options.rowIndex].toggle(e)}
+									className="rounded-5"
+								/>
+							</>
+						);
+					}}
+				/>
+			</DataTable>
+
 			<ModalEdit
 				show={showModal}
 				handleClose={() => setShowModal(false)}
@@ -146,6 +157,11 @@ export default function DisplayTable({ model }) {
 					setShowModal(false);
 					fetchData();
 				}}
+			/>
+
+			<FormsEquipmentSheet
+				showModal={showEquipmentModal}
+				closeModal={handleCloseEquipmentModal}
 			/>
 		</>
 	);
