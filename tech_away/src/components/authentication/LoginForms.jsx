@@ -7,9 +7,7 @@ import '../../styles/AuthPage.css';
 import { useAuth } from '../../contexts/AuthProvider';
 
 export default function LoginForms() {
-
 	const { loginAction } = useAuth();
-
 
     const [formData, setFormData] = useState({
         email: '',

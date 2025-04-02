@@ -1,21 +1,34 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
+const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
   try {
-    const { page = 1, pageSize = 10, orderBy, orderDirection } = req.query;
+    const { page = 1, pageSize = 10, orderBy, orderDirection} = req.query;
+    const activeRepairs = req.query.activeRepairs === "true";
 
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
     let order = [];
+    const where = {};
+
     if (orderBy && orderDirection) {
       order = [[orderBy, orderDirection.toUpperCase()]];
     } else {
       order = [["id", "ASC"]];
     }
 
+    if(activeRepairs){
+      where.statusID = { [Op.ne]: "5" };
+      where.clientId = req.cookies.clientInfo.nic;
+    } else {
+      where.statusID = "5";
+      where.clientId = req.cookies.clientInfo.nic;
+    }
+
     const { count, rows } = await models.Repair.findAndCountAll({
+      where,
       include: [
         {
           model: models.RepairStatus,

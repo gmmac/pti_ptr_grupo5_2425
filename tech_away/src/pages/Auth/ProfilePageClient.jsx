@@ -14,13 +14,13 @@ export default function ProfilePageClient() {
                         <Nav.Link eventKey="profile">Profile</Nav.Link>
                     </Nav.Item>
                     <Nav.Item className='custom-tabs'>
+                        <Nav.Link eventKey="repairs">Repairs</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="sales">Sales</Nav.Link>
                     </Nav.Item>
                     <Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="purchases">Purchases</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item className='custom-tabs'>
-                        <Nav.Link eventKey="repairs">Repairs</Nav.Link>
                     </Nav.Item>
                 </Nav>
 
