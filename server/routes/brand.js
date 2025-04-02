@@ -62,7 +62,6 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/name", async (req, res) => {
-  console.log(req.body);
   try {
     const brand = await models.Brand.findOne({
       where: { name: req.body.name },

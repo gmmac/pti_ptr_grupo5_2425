@@ -80,11 +80,13 @@ export default function Router() {
               <Route path="manage" element={<EmployeeManagePage />} />
 
             </Route>
-            <Route path="teste" element={<TestPage />} />
+            
             <Route path="login" element={<EmployeeLoginPage />} />
-            <Route path="register" element={<EmployeeRegisterPage />} />
+            
 
           </Route>
+          <Route path="/employee/register" element={<EmployeeRegisterPage />} />
+          <Route path="/employee/teste" element={<TestPage />} />
         </Routes>
       </BrowserRouter>
     </IsMobileProvider>
