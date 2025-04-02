@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Container } from 'react-bootstrap';
+import { Table, Button } from 'react-bootstrap';
 
 export default function ClientRepairsCatalog({repairsList, isActive}) {
     return (
@@ -12,6 +12,7 @@ export default function ClientRepairsCatalog({repairsList, isActive}) {
                         <th>Status</th>
                         <th>Data de Criação</th>
                         {!isActive && <th>Data de Fim</th>}
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -22,7 +23,8 @@ export default function ClientRepairsCatalog({repairsList, isActive}) {
                                 <td>{repair.description}</td>
                                 <td>{repair.RepairStatus.state}</td>
                                 <td>{new Date(repair.createdAt).toLocaleDateString()}</td>
-                                {!isActive && <td>{new Date(repair.estimatedDeliverDate).toLocaleDateString()}</td>}
+                                {!isActive && <td>{new Date(repair.updatedAt).toLocaleDateString()}</td>}
+                                <td><Button variant="primary" size="sm" className="w-100 fw-bold">See Details</Button></td>
                             </tr>
                         ))
                     ) : (

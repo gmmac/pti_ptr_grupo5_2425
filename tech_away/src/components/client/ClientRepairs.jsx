@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Container, Tab, Tabs } from 'react-bootstrap';
 import api from '../../utils/axios';
 import ClientRepairsCatalog from './ClientRepairsCatalog';
+import PaginationControl from '../pagination/PaginationControl';
+import RepairInfo from './RepairInfo';
 
 export default function ClientRepairs() {
   const [repairs, setRepairs] = useState([]); // repairs ativas ou terminadas, dependendo da aba
@@ -22,7 +24,6 @@ export default function ClientRepairs() {
   const fetchRepairs = async () => {
     try {
         const activeRepairs = activeTab === "active";
-        console.log(activeRepairs)
 
         const response = await api.get('/api/repair', {
           params: {
@@ -31,7 +32,6 @@ export default function ClientRepairs() {
             // pageSize: itemsPerPage,
           },
         });
-        console.log(response.data);
         setRepairs(response.data.data);
         setTotalPages(response.data.totalPages);
         setError('');
@@ -61,6 +61,8 @@ export default function ClientRepairs() {
               <ClientRepairsCatalog repairsList={repairs} isActive={activeTab === "active"}/>
             </Tab>
           </Tabs>
+          <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages}/>
+          <RepairInfo repairInfo={{}} show={true}/>
       </div>
     </div>
   );
