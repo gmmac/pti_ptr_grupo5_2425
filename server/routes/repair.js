@@ -34,6 +34,9 @@ router.get("/", async (req, res) => {
           model: models.RepairStatus,
           attributes: ["id", "state"],
         },
+        {
+          model: models.RepairStatusLog,
+        },
       ],
       limit: parseInt(pageSize),
       offset,

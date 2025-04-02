@@ -31,7 +31,7 @@ export default function ClientRepairs() {
             // pageSize: itemsPerPage,
           },
         });
-        // console.log(response.data);
+        console.log(response.data);
         setRepairs(response.data.data);
         setTotalPages(response.data.totalPages);
         setError('');

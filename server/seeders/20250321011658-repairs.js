@@ -15,8 +15,21 @@ module.exports = {
         createdAt: new Date(), 
         updatedAt: new Date() 
       },
+
       { 
         statusID: 1, 
+        description: "O computador deu blue screen", 
+        budget: 150,
+        estimatedDeliverDate: new Date(),
+        employeeId: 123456789,
+        clientId: 123456789,
+        usedEquipmentId: 4,
+        createdAt: new Date(), 
+        updatedAt: new Date() 
+      },
+
+      { 
+        statusID: 5, 
         description: "O telemóvel deixou de ligar", 
         budget: 150,
         estimatedDeliverDate: new Date(),
