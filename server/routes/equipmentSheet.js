@@ -77,18 +77,31 @@ router.get("/", async (req, res) => {
       order,
     });
 
-    // Retorno da resposta formatada
-    res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: parseInt(page),
-      pageSize: parseInt(pageSize),
-      data: rows,
-    });
-  } catch (error) {
-    console.error("Error fetching equipment sheets:", error);
-    res.status(500).json({ error: "Error fetching equipment sheets." });
-  }
+		const formattedData = rows.map((item) => ({
+			Barcode: item.barcode,
+			CreatedAt: item.createdAt,
+			UpdatedAt: item.updatedAt,
+			EquipmentModel: {
+				id: item.EquipmentModel.id,
+				name: item.EquipmentModel.name,
+			},
+			EquipmentType: {
+				id: item.EquipmentType.id,
+				name: item.EquipmentType.name,
+			},
+		}));
+		// Retorno da resposta formatada
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: formattedData,
+		});
+	} catch (error) {
+		console.error("Error fetching equipment sheets:", error);
+		res.status(500).json({ error: "Error fetching equipment sheets." });
+	}
 });
 
 router.get("/in-stock", async (req, res) => {

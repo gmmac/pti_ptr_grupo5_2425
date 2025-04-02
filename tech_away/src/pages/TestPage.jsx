@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button, Container, Stack } from "react-bootstrap";
 import DisplayTable from "../components/equipment/DisplayTable";
 import FormsEquipmentSheet from "../components/equipment/FormsEquipmentSheet";
+import DisplayTable from "../components/equipment/DisplayTable";
+import FiltersBarEquipmentSheet from "../components/equipment/FiltersBarEquipmentSheet";
 
 export default function TestPage() {
 	const [show, setShow] = useState(false);
@@ -10,19 +12,20 @@ export default function TestPage() {
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
 
-	const refreshTable = () => {
-        setRefreshKey((prevKey) => prevKey + 1);
-    };
+	const [paramsTofilter, setParamsTofilter] = useState({});
 
+	const handleFilterSet = (params) => {
+		setParamsTofilter(params);
+	};
 	return (
-		<Container>
+		<Container style={{ backgroundColor: "var(--light-grey)" }}>
 			<Stack gap={3} className="justify-content-center align-items-center">
 				<h2>Test Page</h2>
 				<Button variant="primary" onClick={handleShow}>
 					Criar EquipmentSheet
 				</Button>
 
-				<DisplayTable model="equipmentSheet" params="" key={refreshKey} />
+				<DisplayTable model="equipmentSheet" />
 			</Stack>
 
 			<FormsEquipmentSheet showModal={show} closeModal={handleClose} refreshTable={refreshTable} />
