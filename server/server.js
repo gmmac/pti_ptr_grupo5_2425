@@ -4,10 +4,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 
 const app = express();
+app.use(cookieParser());
 
 app.use(cors({
     origin: "http://localhost:5173",
@@ -40,7 +42,7 @@ const repairStatus = require('./routes/repairStatus');
 const store = require('./routes/store');
 const storePurchase = require('./routes/storePurchase');
 const usedEquipment = require('./routes/usedEquipment');
-const warehouse = require('./routes/wharehouse');
+const warehouse = require('./routes/warehouse');
 const auth = require('./routes/auth');
 const employeeRole = require('./routes/employeeRole');
 

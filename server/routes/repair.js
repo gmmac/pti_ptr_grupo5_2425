@@ -1,26 +1,84 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const models = require('../models')
+const models = require("../models");
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+  try {
+    const { page = 1, pageSize = 10, orderBy, orderDirection } = req.query;
 
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+    let order = [];
+    if (orderBy && orderDirection) {
+      order = [[orderBy, orderDirection.toUpperCase()]];
+    } else {
+      order = [["id", "ASC"]];
+    }
+
+    const { count, rows } = await models.Repair.findAndCountAll({
+      include: [
+        {
+          model: models.RepairStatus,
+          attributes: ["id", "state"],
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset,
+      order,
+    });
+    res.status(200).json({
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+      data: rows,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching repairs." });
+  }
+});
+//falta a paginação
+
+router.post("/", async (req, res) => {
+  try {
+    const {
+      statusID,
+      description,
+      budget,
+      estimatedDeliverDate,
+      employeeId,
+      usedEquipmentId,
+    } = req.body;
+    const repair = await models.Repair.create({
+      statusID,
+      description,
+      budget,
+      estimatedDeliverDate,
+      employeeId,
+      usedEquipmentId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    res.status(200).json({
+      data: repair,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error creating repair." });
+  }
 });
 
-router.post("/", (req, res) => {
-
+router.get("/:id", async (req, res) => {
+  try {
+    const repair = await models.Repair.findByPk(req.params.id);
+    if (!repair) return res.status(404).json({ error: "Repair not found." });
+    res.status(200).json(repair);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching repair." });
+  }
 });
 
-router.get("/:ID", (req, res) => {
+router.put("/:id", async (req, res) => {});
 
-});
-
-router.put("/:ID", (req, res) => {
-
-});
-
-router.delete("/:ID", (req, res) => {
-    
-});
-
+router.delete("/:id", async (req, res) => {});
 
 module.exports = router;

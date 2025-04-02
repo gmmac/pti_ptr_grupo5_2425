@@ -33,7 +33,15 @@ router.put("/:NIC", async (req, res) => {
 		if (!client) {
 			return res.status(404).json({ error: "Client not found" });
 		}
+
 		await client.update(req.body);
+
+		res.cookie("clientInfo", client.dataValues, {
+			httpOnly: true,
+			secure: false,
+			sameSite: "Lax",
+			maxAge: 24 * 60 * 60 * 1000 // 1 dia
+		});
 		res.json(client);
 	} catch (error) {
 		res.status(400).json({ error: error.message });
@@ -55,18 +63,15 @@ router.delete("/:NIC", async (req, res) => {
 
 router.post("/", async (req, res) => {
 	try {
-		const client = await models.Client.create(req.body);
-		res.status(201).json(client);
-	} catch (error) {
-		res.status(400).json({ error: error.message });
-	}
-	try {
+		console.log(req.body);
+
 		const {
 			nic,
 			nif,
 			birthDate,
 			gender,
-			name,
+			firstName,
+			lastName,
 			email,
 			phone,
 			adress,
@@ -74,6 +79,7 @@ router.post("/", async (req, res) => {
 			longitude,
 		} = req.body;
 
+		// Verificar se o cliente já existe
 		const existingClient = await models.Client.findOne({
 			where: {
 				[Op.or]: [
@@ -96,15 +102,17 @@ router.post("/", async (req, res) => {
 			} else if (existingClient.email == email) {
 				errorTag = "email";
 			}
-			return res.status(200).json({ errorTag: errorTag });
+			return res.status(200).json({ errorTag: errorTag }); // Retorna imediatamente para evitar múltiplas respostas
 		}
 
+		// Criar o cliente caso não exista
 		const client = await models.Client.create({
 			nic,
 			nif,
 			birthDate,
 			gender,
-			name,
+			firstName,
+			lastName,
 			email,
 			phone,
 			adress,
@@ -113,10 +121,11 @@ router.post("/", async (req, res) => {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		});
+
 		res.status(201).json(client);
 	} catch (error) {
-		console.log(error);
-		res.status(400);
+		console.error(error);
+		res.status(400).json({ error: error.message });
 	}
 });
 

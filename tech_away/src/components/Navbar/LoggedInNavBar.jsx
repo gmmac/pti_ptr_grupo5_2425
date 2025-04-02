@@ -3,7 +3,8 @@ import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { useLocation, Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "../../styles/variables.css";
-import { getLoggedUser,  removeLoggedUser} from "../../utils/auth";
+import { useAuth } from '../../contexts/AuthenticationProviders/AuthProvider';
+// import { getLoggedUser,  removeLoggedUser} from "../../utils/auth";
 
 const navItems = [
   { name: "About Us", path: "/about" },
@@ -11,18 +12,23 @@ const navItems = [
   { name: "Store", path: "/store" },
 ];
 
-export default function LoggedInNavBar({handle}) {
+export default function LoggedInNavBar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const user = getLoggedUser();
-  const userName = user ? user.name : "Utilizador";
+	const { user, logOut } = useAuth();
 
   // Função para logout
   const handleLogout = () => {
-    handle(false);
-    removeLoggedUser();
+    if(user){
+      logOut();
+    }
+    
     navigate("/login");
+  };
+
+  const handleProfile = () => {
+    navigate("/profile");
   };
 
   return (
@@ -80,8 +86,8 @@ export default function LoggedInNavBar({handle}) {
 
         {/* Dropdown com nome do usuário e logout */}
         <Nav>
-          <NavDropdown title={<span style={{ marginRight: '20px' }}>{userName}</span>} className="rounded-pill px-3 fs-6" style={{ backgroundColor: "var(--variant-two)", fontWeight: "bold" }}>
-            <NavDropdown.Item >Perfil</NavDropdown.Item>
+          <NavDropdown title={<span style={{ marginRight: '20px' }}>{user.firstName}</span>} className="rounded-pill px-3 fs-6" style={{ backgroundColor: "var(--variant-two)", fontWeight: "bold" }}>
+            <NavDropdown.Item onClick={handleProfile}>Perfil</NavDropdown.Item>
             <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
           </NavDropdown>
         </Nav>

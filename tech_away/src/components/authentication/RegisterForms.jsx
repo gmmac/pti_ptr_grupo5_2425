@@ -12,7 +12,8 @@ export default function RegisterForms() {
         phone: '',
         birthDate: '',
         gender: '',
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: ''
     });
@@ -23,7 +24,8 @@ export default function RegisterForms() {
         phone: '',
         birthDate: '',
         gender: '',
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: ''
     });
@@ -87,13 +89,14 @@ export default function RegisterForms() {
     };
 
     const verifyData = async () => {
-        //const response = await api.put('/api/auth/generateAuthToken');
+        const response = await api.put('/api/auth/generateAuthToken');
         await api.post('/api/client/', {
             nic: formData.nic, 
             nif: formData.nif, 
             birthDate: formData.birthDate, 
             gender: formData.gender, 
-            name: formData.name, 
+            firstName: formData.firstName, 
+            lastName: formData.lastName, 
             email: formData.email, 
             phone: formData.phone, 
             adress: null,
@@ -108,6 +111,7 @@ export default function RegisterForms() {
             }
 
             await api.post('/api/auth/register', {email: formData.email, password: formData.password});
+            navigate('/login');
         })
         .catch(error => {})
     }
@@ -155,18 +159,33 @@ export default function RegisterForms() {
 
             {/* Name */}
             <Form.Group className="mb-3" controlId="formBasicName">
-                <Form.Label>Name</Form.Label>
+                <Form.Label>First Name</Form.Label>
                 <Form.Control 
                     className='auth-input'
                     type="text" 
-                    placeholder="Enter your full name" 
-                    name="name" 
-                    value={formData.name} 
+                    placeholder="Enter your first name" 
+                    name="firstName" 
+                    value={formData.firstName} 
                     onChange={handleChange} 
-                    isInvalid={!!errors.name}
+                    isInvalid={!!errors.firstName}
                 />
                 <Form.Control.Feedback type="invalid">
                     {errors.name}
+                </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicName">
+                <Form.Label>Last Name</Form.Label>
+                <Form.Control 
+                    className='auth-input'
+                    type="text" 
+                    placeholder="Enter your last name" 
+                    name="lastName" 
+                    value={formData.lastName} 
+                    onChange={handleChange} 
+                    isInvalid={!!errors.lastName}
+                />
+                <Form.Control.Feedback type="invalid">
+                    {errors.lastName}
                 </Form.Control.Feedback>
             </Form.Group>
 
@@ -229,7 +248,15 @@ export default function RegisterForms() {
                             placeholder="Enter your NIC" 
                             name="nic" 
                             value={formData.nic} 
-                            onChange={handleChange} 
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '');
+                                setFormData({ ...formData, nic: value });
+                                if (value.length != 9) {
+                                    errors[e.target.name] = 'Este campo deve ter 9 dígitos!';
+                                }else{
+                                    errors[e.target.name] = '';
+                                }
+                            }}  
                             isInvalid={!!errors.nic}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -253,7 +280,7 @@ export default function RegisterForms() {
                             onChange={(e) => {
                                 const value = e.target.value.replace(/\D/g, '');
                                 setFormData({ ...formData, nif: value });
-                                if (value.length < 9) {
+                                if (value.length != 9) {
                                     errors[e.target.name] = 'Este campo deve ter 9 dígitos!';
                                 }else{
                                     errors[e.target.name] = '';

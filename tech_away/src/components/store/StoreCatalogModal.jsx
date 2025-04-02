@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Table } from "react-bootstrap";
+import { Modal, Button, Table, Container } from "react-bootstrap";
 import api from "../../utils/axios";
 import PaginationControl from "../pagination/PaginationControl";
 import StoreFilter from "./StoreFilter";
+import StoreTableModal from "./StoreTableModal";
+import StoreCardModal from "./StoreCardModal";
 
 export default function StoreCatalogModal({ show, handleClose, handleSelectStore, selectedStore }) {
     const [stores, setStores] = useState([]);
@@ -14,9 +16,9 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
     const itemsPerPage = 4;
     
     const [filters, setFilters] = useState({
+      nipc: "",
       name: "",
-      clientNIC: "",
-      orderBy: "",
+      address: "",
       email: "",
       phone: "",
       openTime: "",
@@ -24,17 +26,6 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
       orderDirection: "ASC"
     });
   
-    const filterParams = {
-      nipc: filters.name,
-      name: filters.clientNIC,
-      address: filters.orderBy,
-      email: filters.email,
-      phone: filters.phone,
-      openTime: filters.openTime,
-      closeTime: filters.closeTime,
-      orderDirection: filters.orderDirection
-    };
-    
     useEffect(() => {
       const fetchStores = async () => {
           setLoading(true);
@@ -42,7 +33,7 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
           try {
             const response = await api.get(`/api/store`, {
               params: {
-                ...filterParams,
+                ...filters,
                 page: currentPage,
                 pageSize: itemsPerPage
               }
@@ -60,20 +51,45 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
       }
     }, [show, currentPage, filters]);
 
-
-
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
 
+  const handleStoreSelection = (store) => {
+    if (selectedStore === store.nipc) {
+      handleSelectStore(null);
+    } else {
+      handleSelectStore(store);
+    }
+  };
+
+  const handleModalClose = () => {
+    setFilters({
+      nipc: "",
+      name: "",
+      address: "",
+      email: "",
+      phone: "",
+      openTime: "",
+      closeTime: "",
+      orderDirection: "ASC"
+    });
+    handleClose();
+  };
+
   return (
-    <Modal show={show} onHide={handleClose} size="xl" centered>
+    <Modal show={show} onHide={handleModalClose} size="xl" centered>
       <Modal.Header closeButton>
         <Modal.Title>Catálogo de Lojas</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body    
+        style={{ 
+          minHeight: '450px'
+        }}> {/* Fixar o tamanho do body para n estar a mudar*/}
+        <StoreFilter setFilters={setFilters} />
+        
         {loading ? (
           <p>Loading Data...</p>
         ) : error ? (
@@ -81,53 +97,31 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
         ) : stores.length === 0 ? (
           <p>Data not found.</p>
         ) : (
-            <>
-            <StoreFilter setFilters={setFilters} />
-                <Table striped bordered hover>
-                    <thead>
-                    <tr>
-                        <th>NIPC</th>
-                        <th>Name</th>
-                        <th>Address</th>
-                        <th>Select Store</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {stores.map((store) => (
-                        <tr key={store.nipc}>
-                        <td>{store.nipc}</td>
-                        <td>{store.name}</td>
-                        <td>{store.address}</td>
-                        <td>
-                            <Button 
-                            variant={selectedStore === store.nipc ? "secondary" : "primary"} 
-                            onClick={() => handleSelectStore(store)}
-                            disabled={selectedStore === store.nipc}
-                            >
-                                {selectedStore === store.nipc ? "Selected" : "Select"}
-                            </Button>
-                        </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </Table>
-                <div>
-                    <PaginationControl
-                    handlePageChange={handlePageChange}
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    />
-                </div>
-                    
-            </>
+          <Container>
+              {/* Desktop */}
+              <StoreTableModal stores={stores} selectedStore={selectedStore} handleStoreSelection={handleStoreSelection} /> 
+              {/* Mobile */}
+              {stores.map((s) => {
+                return <StoreCardModal 
+                  key={s.nipc} 
+                  store={s} 
+                  selectedStore={selectedStore} 
+                  handleStoreSelection={handleStoreSelection} 
+                  />
+              })}
+          </Container>
         )}
-
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Fechar
-        </Button>
+      <Modal.Footer className="d-flex justify-content-between align-items-center">
+        <div className="flex-grow-1 d-flex justify-content-center">
+          <PaginationControl
+            handlePageChange={handlePageChange}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        </div>
       </Modal.Footer>
+
     </Modal>
   );
 }

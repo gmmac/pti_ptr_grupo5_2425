@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.STRING(50),
 				allowNull: true,
 			},
-			type: {
+			brand_id: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
@@ -30,9 +30,9 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.FLOAT,
 				allowNull: true,
 			},
-			brand_id: {
+			releaseYear: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
 		},
 		{

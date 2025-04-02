@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Stack } from 'react-bootstrap';
 import api from '../../utils/axios';
 import StoreCatalogModal from '../store/StoreCatalogModal';
 import "../../styles/AuthPage.css"
+import { useNavigate } from 'react-router-dom';
 
 function RegisterFormsEmployee() {
 
@@ -15,23 +16,37 @@ function RegisterFormsEmployee() {
     storeNIPC: '',
     birthDate: '',
     gender: '',
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     role: '',
   });
   const [errors, setErrors] = useState({});
-
+  const navigate = useNavigate();
 
   const handleCloseModal = () => {
     setShowModal(false);
   };
   
+  const handlePageChange = () => {
+    navigate(-1)
+  };
 
   const handleSelectStore = (store) => {
-    setEmployeeData({ ...employeeData, storeNIPC: store.nipc });
+    setEmployeeData(prev => ({
+      ...prev,
+      storeNIPC: store ? store.nipc : ''
+    }));
+    
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      storeNIPC: store ? '' : 'This input is required'
+    }));
+    
     setShowModal(false);
   };
+  
 
   useEffect(() => {
     api.get("api/employeeRole")
@@ -45,38 +60,53 @@ function RegisterFormsEmployee() {
 
 
   const handleChange = (e) => {
-
-    // Guarda o valor do input
     const { name, value } = e.target;
-    setEmployeeData({ ...employeeData, [name]: value });
-
     let newErrors = { ...errors };
 
+    // Atualiza os dados do funcionário
+    setEmployeeData({ ...employeeData, [name]: value });
+
+    // Validação de campos obrigatórios
     if (!value) {
-      newErrors[name] = 'Este campo é obrigatório';
-    } else if (name === 'email') {
-      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!emailPattern.test(value)) {
-        newErrors[name] = 'O email deve ser válido';
-      } else {
-        newErrors[name] = '';
-      }
-    } else if (name === 'phone') {
-      const phonePattern = /^\d{9}$/; // Exemplo de validação simples de telefone com 9 dígitos
-      if (!phonePattern.test(value)) {
-        newErrors[name] = 'O número de telefone deve ter 9 dígitos';
-      } else {
-        newErrors[name] = '';
-      }
+      newErrors[name] = 'This field is required';
     } else {
-      newErrors[name] = ''; // Limpa erro se o campo não estiver vazio
+      newErrors[name] = '';
+    }
+
+    // Validação do email
+    if (name === 'email') {
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      newErrors[name] = emailPattern.test(value) ? '' : 'Email must be valid';
+    }
+
+    // Validação de número de telefone, NIF e NIC (exatamente 9 dígitos)
+    if (['phone', 'nif', 'nic'].includes(name)) {
+      const nineDigitPattern = /^\d{9}$/;
+      newErrors[name] = nineDigitPattern.test(value) ? '' : 'Value must have exactly 9 digits';
+    }
+
+    if (name === 'birthDate') {
+      const birthDate = new Date(value);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+
+      if (
+        age < 16 ||
+        (age === 16 && (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())))
+      ) {
+        newErrors[name] = 'Employee must be at least 16 years old';
+      } else {
+        newErrors[name] = '';
+      }
     }
 
     setErrors(newErrors);
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
 
     // Verificar campos vazios
     let newErrors = { ...errors };
@@ -98,41 +128,72 @@ function RegisterFormsEmployee() {
         return; // Impede o envio do formulário se houver erros
     }
 
-    console.log("Employee criado.")
-    // try {
-    //   const response = await api.post('api/employee', employeeData);
-    //   alert('Employee created successfully');
-    //   console.log(response.data); // Pode ser usado para depuração
-    // } catch (error) {
-    //   console.error('Error creating employee!', error);
-    //   alert('Error creating employee');
-    // }
+    
+    verifyData();
+
   };
 
+
+  const verifyData = async () => {
+    const response = await api.put('/api/auth/generateAuthToken');
+    await api.post('api/employee', employeeData)
+    .then(async response => {
+      if(response.data.errorTag){
+          let newErrors = { ...errors };
+          newErrors[response.data.errorTag] = 'A employee with this ' + response.data.errorTag + ' already exists';
+          setErrors(newErrors);
+      }
+
+        console.log(employeeData.nif + "@A")
+        await api.post('/api/auth/register', {email: employeeData.email, password: employeeData.nif + "@A"}); // password inical -> nif@A
+    })
+    .catch(error => {})
+}
+
   return (
-    <div className='bg-white w-100 p-md-5 p-3 rounded' >
-      <h2>Create Employee</h2>
+    <div className='bg-white w-100 px-md-5 p-5 pt-4 rounded-lg shadow-lg' >
+
+      <Stack gap={4} direction='horizontal' className="align-items-center">
+        <Button onClick={handlePageChange}>Go back</Button>
+        <h2>Create Employee</h2>
+      </Stack>
 
       <Form onSubmit={handleSubmit} className='bg-white'>
 
         <Row className="mb-3">
           <Col sm={12} md={6}>
             <Form.Group controlId="name">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>First Name</Form.Label>
               <Form.Control
                 type="text"
-                name="name"
-                value={employeeData.name}
+                name="firstName"
+                value={employeeData.firstName}
                 onChange={handleChange}
-                isInvalid={!!errors.name}
+                isInvalid={!!errors.firstName}
                 className='auth-input'
 
               />
-              <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{errors.firstName}</Form.Control.Feedback>
             </Form.Group>
           </Col>
 
           <Col sm={12} md={6}>
+            <Form.Group controlId="name">
+              <Form.Label>Last Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="lastName"
+                value={employeeData.lastName}
+                onChange={handleChange}
+                isInvalid={!!errors.lastName}
+                className='auth-input'
+
+              />
+              <Form.Control.Feedback type="invalid">{errors.lastName}</Form.Control.Feedback>
+            </Form.Group>
+          </Col>
+
+          <Col sm={12} md={12}>
             <Form.Group controlId="email">
               <Form.Label>Email</Form.Label>
               <Form.Control
@@ -152,7 +213,7 @@ function RegisterFormsEmployee() {
         <Row className="mb-3">
           <Col sm={12} md={6}>
             <Form.Group controlId="nic">
-              <Form.Label>NIC (Primary Key)</Form.Label>
+              <Form.Label>NIC</Form.Label>
               <Form.Control
                 type="number"
                 name="nic"
@@ -175,37 +236,12 @@ function RegisterFormsEmployee() {
                 value={employeeData.nif}
                 onChange={handleChange}
                 className='auth-input'
+                isInvalid={!!errors.nif}
 
               />
+              <Form.Control.Feedback type="invalid">{errors.nif}</Form.Control.Feedback>
+
             </Form.Group>
-          </Col>
-        </Row>
-
-        <Row className="mb-3">
-          <Col sm={12} md={6}>
-            <Form.Group controlId="storeNIPC">
-              <Form.Label>Store NIPC</Form.Label>
-              <Form.Control
-                type="text"
-                name="storeNIPC"
-                value={employeeData.storeNIPC}
-                onChange={handleChange}
-                isInvalid={!!errors.storeNIPC}
-                className='auth-input'
-                disabled
-
-              />
-              <Form.Control.Feedback type="invalid">{errors.storeNIPC}</Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-
-          <Col sm={12} md={6} className='d-flex align-items-end justify-content-start'>
-            <Button 
-            onClick={() => setShowModal(true)}
-            className='w-100 rounded-pill forms-btn shadow-lg'
-            >
-              Choose Store
-            </Button>
           </Col>
         </Row>
 
@@ -260,6 +296,35 @@ function RegisterFormsEmployee() {
             />
             <Form.Control.Feedback type="invalid">{errors.phone}</Form.Control.Feedback>
           </Form.Group>
+        </Row>
+
+
+        <Row className="mb-3">
+          <Col sm={12} md={6}>
+            <Form.Group controlId="storeNIPC">
+              <Form.Label>Store NIPC</Form.Label>
+              <Form.Control
+                type="text"
+                name="storeNIPC"
+                value={employeeData.storeNIPC}
+                onChange={handleChange}
+                isInvalid={!!errors.storeNIPC}
+                className='auth-input'
+                disabled
+
+              />
+              <Form.Control.Feedback type="invalid">{errors.storeNIPC}</Form.Control.Feedback>
+            </Form.Group>
+          </Col>
+
+          <Col sm={12} md={6} className='d-flex align-items-end justify-content-start'>
+            <Button 
+            onClick={() => {setShowModal(true)}}
+            className='w-100 rounded-pill forms-btn shadow-lg'
+            >
+              Choose Store
+            </Button>
+          </Col>
         </Row>
 
         <Row className="mb-3">

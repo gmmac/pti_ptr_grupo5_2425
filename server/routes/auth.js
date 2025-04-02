@@ -18,7 +18,7 @@ const decryptToken = (encryptedToken) => {
 };
 
 router.put("/generateAuthToken", async (req, res) => {
-  try {
+  // try {
     // Request an access token from Auth0
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
       client_id: process.env.AUTH0_CLIENT_ID,
@@ -34,7 +34,6 @@ router.put("/generateAuthToken", async (req, res) => {
     const token = response.data.access_token;
 
     const tokenAuth = await models.Token.findOne({ where: { name: "auth" } });
-
     if(tokenAuth){ //token exists
       const [updated] = await models.Token.update(
         {
@@ -53,12 +52,13 @@ router.put("/generateAuthToken", async (req, res) => {
       }
     }
     else{ //token do not exists
+
       await models.Token.create({name: "auth", token: encryptToken(token), createdAt: Date.now(), updatedAt: Date.now()});
     }
 
-  } catch (error) {
-    res.status(500);
-  }
+  // } catch (error) {
+  //   res.status(500);
+  // }
 });
 
 router.post("/register", async (req, res) => {
@@ -95,7 +95,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  // try {
+  try {
     const { email, password, userType } = req.body;
 
     // Login User
@@ -115,6 +115,13 @@ router.post("/login", async (req, res) => {
       });
   
       if(existingClient){
+        res.cookie("clientInfo", existingClient.dataValues, {
+          httpOnly: true,    
+          secure: false, // Permite o cookie em HTTP durante o desenvolvimento
+          sameSite: "Lax", // Mais flexível que "Strict" para testes locais
+          maxAge: 24 * 60 * 60 * 1000 // 1 dia
+        });
+        
         return res.status(201).json(existingClient.dataValues);
       }
     }
@@ -122,16 +129,34 @@ router.post("/login", async (req, res) => {
     if(userType === "employee"){
       const existingEmployee = await models.Employee.findOne({where: {email: email}
       });
-  
+
+      console.log(existingEmployee.dataValues);
+
       if(existingEmployee){
+
+        res.cookie("employeeInfo", existingEmployee.dataValues, {
+          httpOnly: true,    
+          secure: false, // Permite o cookie em HTTP durante o desenvolvimento
+          sameSite: "Lax", // Mais flexível que "Strict" para testes locais
+          maxAge: 24 * 60 * 60 * 1000 // 1 dia
+        });
+        
         return res.status(201).json(existingEmployee.dataValues);
       }
     }
 
-  // } catch (error) {
-  //   console.error(error.status);
-  //   res.sendStatus(error.status); // Internal Server Error
-  // }
+
+  } catch (error) {
+    console.error(error);
+  
+    if (error.response?.status === 403) {
+      return res.status(403).json({ message: "Invalid Credentials" });
+    }
+  
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+  
+
 });
 
 router.post("/changePassword", async (req, res) => {
@@ -145,11 +170,70 @@ router.post("/changePassword", async (req, res) => {
       email: email,
     });
     
-    res.status(201).json("Email enviado");
+    res.status(201).json("Email Sent")
   // } catch (error) {
   //   console.error(error.status);
   //   res.sendStatus(error.status); // Internal Server Error
   // }
 });
+
+
+router.get("/getUserByEmail/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    // Buscar token armazenado no banco
+    const token = await models.Token.findOne({ where: { name: "auth" } });
+    if (!token) return res.status(500).json({ error: "Auth Token not found" });
+
+    const desencriptedToken = decryptToken(token.dataValues.token);
+
+    // Buscar usuário pelo email na API do Auth0
+    const response = await axios.get(`${process.env.AUTH0_API_URL}/api/v2/users-by-email?email=${encodeURIComponent(email)}`, {
+      headers: { Authorization: "Bearer " + desencriptedToken }
+    });
+
+    if (response.data.length === 0) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
+    res.status(200).json(response.data[0]); // Retorna o primeiro usuário encontrado
+
+  } catch (error) {
+    console.error("Erro ao buscar usuário:", error.response?.data || error.message);
+    res.status(500).json({ error: "Erro ao buscar usuário" });
+  }
+});
+
+router.get("/user-info", (req, res) => {
+
+  let userInfoName = "clientInfo"
+  if(req.query.userType === 'employee'){
+    userInfoName = "employeeInfo";
+  }
+  
+  let userInfo = req.cookies.employeeInfo;
+
+
+  return res.status(200).json({ userInfo: userInfo });
+});
+
+router.get('/logout', (req, res) => {
+  
+  let userInfo = "clientInfo"
+  //é employee. enviar variável na query
+  if(req.query.userType === 'employee'){
+    userInfo = "employeeInfo";
+  }
+  
+  res.clearCookie(userInfo, {
+    httpOnly: true,
+    secure: false, 
+    sameSite: "Lax"
+  });
+
+  return res.status(200).json({ message: 'Logout realizado com sucesso.' });
+});
+
 
 module.exports = router;

@@ -1,0 +1,103 @@
+
+/* ------------------------------------ */
+/*              Accordion               */
+/* ------------------------------------ */
+
+.custom-accordion .accordion-button {
+    background-color: var(--variant-two);
+    color: var(--dark-grey);
+    font-weight: bold;
+}
+
+.custom-accordion .accordion-button:not(.collapsed) {
+    background-color: var(--variant-two);
+    color: var(--dark-grey);
+    box-shadow: none;
+}
+
+.custom-accordion .accordion-button:focus {
+    box-shadow: none;
+}
+
+
+/* ------------------------------------ */
+/*                Tabs                  */
+/* ------------------------------------ */
+
+.custom-tabs{
+    margin: 10px;
+}
+
+    .custom-tabs .nav-link {
+        /* background-color: var(--variant-one); */
+        color: var(--dark-grey);
+        font-weight: bold;
+    }
+    
+        .custom-tabs .nav-link:hover {
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
+        }
+
+            
+        /* selected tab */
+        .custom-tabs.nav-item .nav-link.active,
+        .custom-tabs .nav-link[aria-selected="true"] {
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
+        }
+
+.custom-tab-content{
+    margin: 10px;
+}
+
+
+/* ------------------------------------ */
+/*                Navs                  */
+/* ------------------------------------ */
+
+.employee-custom-tabs{
+    margin: 10px;
+}
+
+    .employee-custom-tabs .nav-link {
+        /* background-color: var(--variant-one); */
+
+            /* background-color: var(--variant-one); */
+        color: var(--dark-grey);
+        font-weight: bold;
+    }
+    
+        .employee-custom-tabs .nav-link:hover {
+            background-color: var(--variant-one);
+        
+            color: var(--dark-grey);
+            font-weight: bold;
+        }
+
+            
+        /* selected tab */
+        /* .employee-custom-tabs.nav-item .nav-link.active.active,
+        .employee-custom-tabs .nav-link[aria-selected="true"] {
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
+        } */
+
+        .employee-custom-tabs .nav-link.active-manual {
+            background-color: var(--variant-one);
+            color: var(--dark-grey);
+            font-weight: bold;
+          }
+          
+
+
+/* ------------------------------------ */
+/*                Cards                  */
+/* ------------------------------------ */
+
+.custom-cards{
+    border-radius: var(--rounded-lg)
+}

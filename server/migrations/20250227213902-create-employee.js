@@ -14,8 +14,8 @@ module.exports = {
         unique: true
       },
       internNum: {
-        type: Sequelize.STRING(6),
-        autoIncrement: false,
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
         unique: true
       },
       storeNIPC:{
@@ -34,15 +34,19 @@ module.exports = {
       gender: {
         type: Sequelize.STRING(1)
       },
-      name: {
-        type: Sequelize.STRING(100)
+      firstName: {
+        type: Sequelize.STRING(50)
+      },
+      lastName: {
+        type: Sequelize.STRING(50)
       },
       email: {
         type: Sequelize.STRING,
         unique: true
       },
       phone: {
-        type: Sequelize.STRING(9)
+        type: Sequelize.STRING(9),
+        unique: true
       },
       address: {
         type: Sequelize.STRING(50)
@@ -62,6 +66,12 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
+      },
+      passwordReseted:{
+        type: Sequelize.STRING(1)
+      },
+      isActive:{
+        type: Sequelize.STRING(1)
       },
       createdAt: {
         allowNull: false,

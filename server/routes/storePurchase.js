@@ -4,7 +4,7 @@ const models = require('../models');
 
 router.post("/", async (req, res) => {
 
-    try {
+    // try {
 
         const {statusID, price, equipmentId} = req.body;
         // const {statusID, price, equipmentId, clientNIC} = req.body; //tem de receber do frontend
@@ -31,9 +31,9 @@ router.post("/", async (req, res) => {
             res.status(400).json({ error: "Error." });
         }
 
-    } catch (error) {
-        res.status(400).json({ error: "Error." });
-    }
+    // } catch (error) {
+    //     res.status(400).json({ error: "Error." });
+    // }
 });
 
 module.exports = router;
