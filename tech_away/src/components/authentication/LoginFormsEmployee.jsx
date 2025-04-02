@@ -12,7 +12,6 @@ export default function LoginFormsEmployee() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log(isEmployeeLoggedIn())
         if (isEmployeeLoggedIn()) {
             navigate("/employee");
         }

@@ -25,10 +25,9 @@ export default function EmployeeProfile() {
     const [roleName, setRoleName] = useState("");
     const [storeName, setStoreName] = useState("");
 
-
     const [originalData, setOriginalData] = useState({});
     const [isEditing, setIsEditing] = useState(false);
-    const [changedFields, setChangedFields] = useState([]);
+    const [changedFields, setChangedFields] = useState({});
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -42,7 +41,6 @@ export default function EmployeeProfile() {
                 console.error("Erro ao buscar os dados do Employeee:", error.message);
             }
         }
-
 
         fetchUserData();
     }, []);
@@ -65,14 +63,13 @@ export default function EmployeeProfile() {
             }
         }
 
-
         fetchEmployeeData();
 
     }, [formData])
 
     useEffect(() => {
-        console.log(errors)
-    }, [errors])
+        console.log(formData)
+    }, [formData])
 
     const handleEditClick = () => {
         if (isEditing) {
@@ -85,13 +82,13 @@ export default function EmployeeProfile() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+
+        console.log({ ...formData, [name]: value })
         setFormData({ ...formData, [name]: value });
     
-        // Verifica se o valor alterado é diferente do original
         if (value !== originalData[name]) {
-            setChangedFields({ ...changedFields, [name]: value }); // Armazena campo e valor
+            setChangedFields({ ...changedFields, [name]: value });
         } else {
-            // Remove o campo se voltar ao valor original
             const updatedFields = { ...changedFields };
             delete updatedFields[name];
             setChangedFields(updatedFields);

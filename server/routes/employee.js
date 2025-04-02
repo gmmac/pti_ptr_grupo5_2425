@@ -181,6 +181,7 @@ router.put("/:internNum", async (req, res) => {
 		const employee = await models.Employee.findOne({
 			where: { internNum: req.params.internNum },
 		});
+
 		if (!employee) {
 			return res.status(404).json({ error: "Employee not found" });
 		}
@@ -189,7 +190,7 @@ router.put("/:internNum", async (req, res) => {
 
 		// Verifica se existe um cookie de employeeInfo e se é o mesmo internNum
 		const currentEmployee = req.cookies.employeeInfo;
-		if (currentEmployee && currentEmployee.internNum === req.params.internNum) {
+		if (currentEmployee && currentEmployee.internNum == req.params.internNum) {
 			res.cookie("employeeInfo", employee.dataValues, {
 				httpOnly: true,
 				secure: false,

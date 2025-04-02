@@ -1,12 +1,12 @@
 import React from 'react'
 import { useState } from 'react';
 import { Tab } from 'react-bootstrap';
+import ClientProfile from '../../components/client/ClientProfile';
 
 export default function OrganizerHomePage() {
-    const [actualTab, setActualTab] = useState(sessionStorage.getItem('employeeSelectedTab') || 'dashboard');
-    
-  return (
-    
+
+    return (
+
     <Tab.Content className="custom-tab-content">
         <Tab.Pane eventKey="dashboard" className='p-4'>
             Dashboard
@@ -18,7 +18,7 @@ export default function OrganizerHomePage() {
             <h5>Charity Projects</h5>
         </Tab.Pane>
         <Tab.Pane eventKey="profile" className='p-4'>
-            {/* <EmployeeProfile /> */}
+            <ClientProfile userType='organizer' />
         </Tab.Pane>
     </Tab.Content>
 

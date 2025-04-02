@@ -4,7 +4,7 @@ import { PencilSquare, XCircleFill } from 'react-bootstrap-icons';
 import api from '../../utils/axios';
 import "../../styles/ClientProfilePage.css"
 
-export default function ClientProfile() {
+export default function ClientProfile({userType="client"}) {
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -32,7 +32,11 @@ export default function ClientProfile() {
     useEffect(() => {
         async function fetchClientData() {
             try {
-                const res = await api.get("/api/auth/user-info");
+                const res = await api.get("/api/auth/user-info", {
+                    params: {
+                        userType: userType
+                    }
+                });
                 const userInfo = res.data.userInfo;
                 setFormData(userInfo);
                 setOriginalData(userInfo); // Armazena os dados originais
@@ -91,7 +95,7 @@ export default function ClientProfile() {
     };
     
     const handleSaveChanges = () => {
-        api.put(`/api/client/${formData.nic}`, changedFields)
+        api.put(`/api/${userType}/${formData.nic}`, changedFields)
             .then((res) => {
                 setOriginalData({ ...originalData, ...changedFields });
                 setChangedFields([]);
@@ -245,21 +249,25 @@ export default function ClientProfile() {
                                 </Form.Group>
                             </Col>
                         </Row>
-                        <Row>
-                            <Col md={12}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Address</Form.Label>
-                                    <Form.Control 
-                                        className="profile-input" 
-                                        type="text" 
-                                        name="address" 
-                                        value={formData.address || ""} 
-                                        disabled={!isEditing} 
-                                        onChange={handleInputChange}
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
+
+                        {userType !== "organizer" &&
+                            <Row>
+                                <Col md={12}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Address</Form.Label>
+                                        <Form.Control 
+                                            className="profile-input" 
+                                            type="text" 
+                                            name="address" 
+                                            value={formData.address || ""} 
+                                            disabled={!isEditing} 
+                                            onChange={handleInputChange}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                        }
+                        
                     </Card.Body>
                 </Card>
 

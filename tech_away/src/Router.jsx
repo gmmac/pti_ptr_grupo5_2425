@@ -107,6 +107,7 @@ export default function Router() {
 
             <Route path="login" element={<OrganizerLoginPage />} />
             <Route path="register" element={<OrganizerRegisterPage />} />
+            <Route path="changePassword" element={<ChangePasswordClient userType="organizer" />} />
 
           </Route>
 

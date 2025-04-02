@@ -20,9 +20,6 @@ router.post("/", async (req, res) => {
 			lastName,
 			email,
 			phone,
-			// adress,
-			// latitude,
-			// longitude,
 		} = req.body;
 
 		// Verificar se o cliente já existe
@@ -61,9 +58,6 @@ router.post("/", async (req, res) => {
 			lastName,
 			email,
 			phone,
-			// adress,
-			// latitude,
-			// longitude,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		});
@@ -79,8 +73,26 @@ router.get("/:NIC", (req, res) => {
 
 });
 
-router.put("/:NIC", (req, res) => {
+router.put("/:NIC", async (req, res) => {
+	try {
+		const organizer = await models.Organizer.findByPk(req.params.NIC);
+		if (!organizer) {
+			return res.status(404).json({ error: "Organizer not found" });
+		}
 
+		await organizer.update(req.body);
+
+		res.cookie("organizerInfo", organizer.dataValues, {
+			httpOnly: true,
+			secure: false,
+			sameSite: "Lax",
+			maxAge: 24 * 60 * 60 * 1000 // 1 dia
+		});
+		console.log(organizer)
+		res.json(organizer);
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
 });
 
 router.delete("/:NIC", (req, res) => {

@@ -39,7 +39,7 @@ const EmployeeAuthProvider = ({ children }) => {
         if (!employee) {
           navigate("/employee/login");
         }
-    })
+    }, [])
 
     const loginAction = async (formData, setErrors, newErrors) => {
         try {

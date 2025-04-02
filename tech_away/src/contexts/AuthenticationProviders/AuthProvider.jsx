@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api from "../../utils/axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -10,40 +10,53 @@ const AuthProvider = ({ children, userType, loginPath }) => {
   const [refresh, setRefresh] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const fetchUser = async () => {
+    try {
+      const response = await api.get(`/api/auth/user-info`, {
+          params:{
+              userType: userType === "organizer" ? "organizer" : ""
+          },
+          withCredentials: true,
+      });
+
+      if (response.data?.userInfo) {
+        setUser(response.data.userInfo);
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("Erro ao buscar usuário:", err);
+      setUser(null);
+    } finally {
+      setLoading(false);
+      setRefresh(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await api.get(`/api/auth/user-info`, {
-            params:{
-                userType: userType == "organizer"? "organizer" : ""
-            },
-            withCredentials: true,
-        });
-
-        if (response.data?.userInfo) {
-          setUser(response.data.userInfo);
-        } else {
-          setUser(null);
-        }
-      } catch (err) {
-        console.error("Erro ao buscar usuário:", err);
-        setUser(null);
-      } finally {
-        setLoading(false);
-        setRefresh(false);
-      }
-    };
-
     fetchUser();
   }, [refresh]);
 
-  useEffect(() => {
-    if (!user && !loading && userType != "client") {
+  useEffect(() => { // is not logged
+    console.log(user)
+    const isOnPublicAuthRoute = location.pathname.includes("register") || location.pathname.includes("changePassword");
+    if (!user && !loading && userType != "client" && !isOnPublicAuthRoute) {
       navigate(loginPath || `/${userType}/login`);
     }
-  }, [user, loading, navigate, loginPath, userType]);
+  }, [user, loading, navigate, loginPath, userType, refresh]);
 
+
+  useEffect(() => { // is logged
+    if (user && userType) {
+      const profilePath = userType === "client" ? "/profile" : "/organizer";
+      sessionStorage.setItem("organizerSelectedTab", "dashboard")
+      navigate(profilePath);
+    }
+  }, [user]);
+  
+  
   const loginAction = async (formData, setErrors, newErrors = {}) => {
     try {
       await api.post("/api/auth/login", {
@@ -51,9 +64,9 @@ const AuthProvider = ({ children, userType, loginPath }) => {
         password: formData.password,
         userType,
       });
-
-      setRefresh(true);
-      return true;
+  
+      await fetchUser();
+  
     } catch (error) {
       if (error.response?.status === 403) {
         newErrors.invalidCredentials = "Invalid credentials!";
@@ -62,11 +75,12 @@ const AuthProvider = ({ children, userType, loginPath }) => {
       } else {
         newErrors.invalidCredentials = "Login failed. Try again.";
       }
-
+  
       setErrors(newErrors);
       return false;
     }
   };
+  
 
   const logOut = async () => {
     try {

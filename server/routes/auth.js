@@ -164,9 +164,6 @@ router.post("/login", async (req, res) => {
       }
     }
 
-
-
-
   } catch (error) {
     console.error(error);
   
@@ -236,8 +233,7 @@ router.get("/user-info", (req, res) => {
     userInfoName = "organizerInfo";
   }
   
-  let userInfo = req.cookies.employeeInfo;
-
+  let userInfo = req.cookies[userInfoName];
 
   return res.status(200).json({ userInfo: userInfo });
 });
