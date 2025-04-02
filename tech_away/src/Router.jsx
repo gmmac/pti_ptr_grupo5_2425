@@ -30,6 +30,9 @@ import OrganizerRegisterPage from "./pages/Organizer/OrganizerRegisterPage";
 import OrganizerLoginPage from "./pages/Organizer/OrganizerLoginPage";
 import OrganizerLayoutPage from "./pages/Layout/OrganizerLayoutPage";
 import OrganizerHomePage from "./pages/Organizer/OrganizerHomePage";
+import PaymentForm from "./components/payment/PaymentForm";
+import Payment from "./components/payment/Payment";
+import ConfirmedPayment from "./components/payment/ConfirmedPayment";
 
 export default function Router() {
   return (
@@ -110,6 +113,10 @@ export default function Router() {
             <Route path="changePassword" element={<ChangePasswordClient userType="organizer" />} />
 
           </Route>
+
+          <Route path="payment" element={<Payment />} />
+          <Route path="payment/confirmed" element={<ConfirmedPayment />} />
+
 
         </Routes>
       </BrowserRouter>
