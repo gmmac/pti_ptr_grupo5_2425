@@ -15,12 +15,11 @@ import "../../styles/pageElements.css"
 
 export default function EmployeeHomePage() {
 
-    const isMobile = useContext(IsMobileContext);
+    // const isMobile = useContext(IsMobileContext);
 
-    const { employee, checkPasswordStatus, changePassword, checkIsAdmin, logOut } = useAuthEmployee();
+    const { employee, checkPasswordStatus, changePassword, checkIsAdmin } = useAuthEmployee();
 
     const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'dashboard');
-    const [isAuthenticated, setIsAuthenticated] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [passwordChanged, setPasswordChanged] = useState(false);
@@ -28,15 +27,9 @@ export default function EmployeeHomePage() {
     const [emailSent, setEmailSent] = useState(false);
 
     const navigate = useNavigate();
-    
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
-        console.log(employee)
-        if(!employee){
-            navigate("/employee/login");
-        }
-
 
         const verifyAdmin = async () => {
             const isADM = await checkIsAdmin();
@@ -46,30 +39,22 @@ export default function EmployeeHomePage() {
     
         const verifyPassword = async () => {
             const updatedPasswordChanged = await checkPasswordStatus(setPasswordChanged);
-            console.log("Senha alterada?", updatedPasswordChanged);
 
             if (!updatedPasswordChanged) {
+                setLoading(false)
                 setShowPasswordModal(true);
-
             }
         }
 
 
         verifyAdmin();
-        verifyPassword();
+        // verifyPassword(); // comentar para n verificar a password -> gastar tokens
 
+        
 
     }, [navigate, employee]);
 
 
-    // useEffect(() => {
-    //     if(checkIsAdmin()){
-    //         console.log("YEEES")
-    //     }
-    //     else{
-    //         console.log("NOOOO")
-    //     }
-    // }, [employee])
 
     useEffect(() => {
         sessionStorage.setItem('selectedTab', actualTab);
@@ -105,78 +90,31 @@ export default function EmployeeHomePage() {
 
     return (
         <>
-            <Container fluid className="vh-100">
-                <Tab.Container activeKey={actualTab} onSelect={handleChangeTab}>
-                    <Container fluid className="vh-100">
-                        <Row className="h-100">
-                            <Col
-                                xs={isMobile ? 12 : 2}
-                                md={isMobile ? 12 : 2}
-                                lg={isMobile ? 12 : 2}
-                                className="bg-light border-end p-0"
-                                style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.3)', zIndex: 1 }}
-                            >
-                                <h2 className="mb-4 p-3 fs-2" style={{fontWeight: "bold"}}>TechAway</h2>
-                                <Nav variant="pills" className="flex-column">
-                                    <Nav.Item className="custom-tabs fs-5">
-                                        <Nav.Link eventKey="dashboard">Dashboard</Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item className="custom-tabs fs-5">
-                                        <Nav.Link eventKey="purchases">Purchases</Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item className="custom-tabs fs-5">
-                                        <Nav.Link eventKey="repairs">Repairs</Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item className="custom-tabs fs-5">
-                                        <Nav.Link eventKey="sales">Sales</Nav.Link>
-                                    </Nav.Item>
-                                    {isAdmin && <Nav.Item className="custom-tabs fs-5">
-                                        <Nav.Link eventKey="admin">Admin</Nav.Link>
-                                    </Nav.Item>}
-                                    <Nav.Item className="custom-tabs fs-5">
-                                        <Nav.Link eventKey="profile">Profile</Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item className="mt-3 custom-tabs fs-5">
-                                        <Nav.Link className="text-danger" onClick={logOut}>Logout</Nav.Link>
-                                    </Nav.Item>
-                                </Nav>
-                            </Col>
 
-                            <Col
-                                xs={isMobile ? 12 : 10}
-                                md={isMobile ? 12 : 10}
-                                lg={isMobile ? 12 : 10}
-                                className="p-3 overflow-auto"
-                            >
-                                <Tab.Content className="custom-tab-content">
-                                    <Tab.Pane eventKey="dashboard" className='p-4'>
-                                        <EmployeeHomeDashboard />
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="purchases" className='p-4'>
-                                        <h5>Purchases Content</h5>
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="repairs" className='p-4'>
-                                        <h5>Repairs Content</h5>
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="sales" className='p-4'>
-                                        <h5>Sales Content</h5>
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="profile" className='p-4'>
-                                        <EmployeeProfile />
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="admin" className='p-4'>
-                                        {/* <EmployeeProfile /> */}
-                                        AAAAAAAAAAAAA
-                                    </Tab.Pane>
-                                </Tab.Content>
-                            </Col>
-                        </Row>
-                    </Container>
-                </Tab.Container>
-            </Container>
+            <Tab.Content className="custom-tab-content">
+                <Tab.Pane eventKey="dashboard" className='p-4'>
+                    <EmployeeHomeDashboard />
+                </Tab.Pane>
+                <Tab.Pane eventKey="purchases" className='p-4'>
+                    <h5>Purchases Content</h5>
+                </Tab.Pane>
+                <Tab.Pane eventKey="repairs" className='p-4'>
+                    <h5>Repairs Content</h5>
+                </Tab.Pane>
+                <Tab.Pane eventKey="sales" className='p-4'>
+                    <h5>Sales Content</h5>
+                </Tab.Pane>
+                <Tab.Pane eventKey="charityproject" className='p-4'>
+                    <h5>Charity Projects</h5>
+                </Tab.Pane>
+                <Tab.Pane eventKey="profile" className='p-4'>
+                    <EmployeeProfile />
+                </Tab.Pane>
+            </Tab.Content>
+
 
             
-            <Modal show={showPasswordModal} onHide={handleClosePasswordModal} backdrop="static" keyboard={false}>
+            {!loading && <Modal show={showPasswordModal} onHide={handleClosePasswordModal} backdrop="static" keyboard={false}>
                 <Modal.Header>
                     <Modal.Title>Welcome</Modal.Title>
                 </Modal.Header>
@@ -210,7 +148,7 @@ export default function EmployeeHomePage() {
                     )}
                 </Modal.Footer>
 
-            </Modal>
+            </Modal>}
 
         </>
     );

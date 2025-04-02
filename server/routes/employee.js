@@ -17,15 +17,14 @@ router.get("/", async (req, res) => {
 			gender,
             // address,
             role,
+            active = "1",
             page = 1,
             pageSize = 10,
-            orderBy,
-            orderDirection,
+            orderBy = "internNum",
+            orderDirection = "ASC",
         } = req.query;
 
 
-		console.log(req.query)
-		console.log("SSDSD" + req.query.internNum)
         const where = {};
 
         if (nic) where.nic = { [Op.like]: `${nic}%` };
@@ -39,6 +38,7 @@ router.get("/", async (req, res) => {
         if (gender) where.gender = { [Op.like]: `%${gender}%` };
         // if (address) where.address = { [Op.like]: `%${address}%` };
         if (role) where.role = { [Op.eq]: role };
+        if (active) where.isActive = { [Op.eq]: active };
 
         const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
@@ -53,7 +53,7 @@ router.get("/", async (req, res) => {
             where,
 			attributes:{
 				exclude: ["role", "storeNIPC"],
-				include: ["passwordReseted"]
+				include: ["passwordReseted", "isActive"]
 			},
 			include: [
                 {
@@ -129,6 +129,7 @@ router.post("/", async (req, res) => {
             phone:phone,
             role:role,
 			passwordReseted: 0,
+			isActive: 1,
 			createdAt: Date.now(),
 			updatedAt: Date.now()
 		});
@@ -159,7 +160,6 @@ router.get('/logout', (req, res) => {
 });
 
 
-
 router.get("/:internNum", async (req, res) => {
 	try {
 
@@ -178,20 +178,33 @@ router.get("/:internNum", async (req, res) => {
 
 router.put("/:internNum", async (req, res) => {
 	try {
-
 		const employee = await models.Employee.findOne({
 			where: { internNum: req.params.internNum },
 		});
-		
 		if (!employee) {
 			return res.status(404).json({ error: "Employee not found" });
 		}
+
 		await employee.update(req.body);
+
+		// Verifica se existe um cookie de employeeInfo e se é o mesmo internNum
+		const currentEmployee = req.cookies.employeeInfo;
+		if (currentEmployee && currentEmployee.internNum === req.params.internNum) {
+			res.cookie("employeeInfo", employee.dataValues, {
+				httpOnly: true,
+				secure: false,
+				sameSite: "Lax",
+				maxAge: 24 * 60 * 60 * 1000, // 1 dia
+			});
+		}
+
 		res.json(employee);
+
 	} catch (error) {
 		res.status(400).json({ error: error.message });
 	}
 });
+
 
 router.delete("/:internNum", async (req, res) => {
 	try {
@@ -200,6 +213,9 @@ router.delete("/:internNum", async (req, res) => {
 			where: { internNum: req.params.internNum },
 		});
 		
+		console.log("AAAAAAAAA")
+		console.log(employee)
+
 		if (!employee) {
 			return res.status(404).json({ error: "Employee not found" });
 		}
@@ -207,6 +223,47 @@ router.delete("/:internNum", async (req, res) => {
 		res.status(204).send();
 	} catch (error) {
 		res.status(500).json({ error: error.message });
+	}
+});
+
+router.patch("/activation/:internNum", async (req, res) => {
+	console.log("ABACABAVSGASKAHSKJDHILS")
+
+	try {
+		const employee = await models.Employee.findOne({
+			where: { internNum: req.params.internNum },
+		});
+
+		if (!employee) {
+			return res.status(404).json({ error: "Funcionário não encontrado." });
+		}
+
+		// toggle isActive attribute
+		employee.isActive = employee.isActive === "1" ? "0" : "1";
+		console.log("ASHAJSHASAJKSHA " + employee.isActive);
+		await employee.save();
+
+
+
+		const statusText = employee.isActive === 1 ? "active" : "inative";
+
+		const currentEmployee = req.cookies.employeeInfo;
+		if (currentEmployee && currentEmployee.internNum === req.params.internNum) {
+			res.cookie("employeeInfo", employee.dataValues, {
+				httpOnly: true,
+				secure: false,
+				sameSite: "Lax",
+				maxAge: 24 * 60 * 60 * 1000, // 1 dia
+			});
+		}
+
+		res.status(200).json({
+			message: `Funcionário ${statusText} com sucesso.`,
+			employee,
+		});
+	} catch (error) {
+		console.error("Erro ao alternar isActive:", error);
+		res.status(500).json({ error: "Erro ao atualizar o status do funcionário." });
 	}
 });
 

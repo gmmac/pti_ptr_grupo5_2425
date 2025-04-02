@@ -1,5 +1,6 @@
 import { useContext, createContext, useState, useEffect } from 'react';
 import api from '../../utils/axios';
+import { useNavigate } from 'react-router-dom';
 
 const EmployeeAuthContext = createContext();
 
@@ -9,6 +10,9 @@ const EmployeeAuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     const [refresh, setRefresh] = useState(false);
+
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -31,6 +35,11 @@ const EmployeeAuthProvider = ({ children }) => {
         fetchUser();
     }, [refresh]);
     
+    useEffect(() => {
+        if (!employee) {
+          navigate("/employee/login");
+        }
+    })
 
     const loginAction = async (formData, setErrors, newErrors) => {
         try {
@@ -127,9 +136,21 @@ const EmployeeAuthProvider = ({ children }) => {
         setRefresh(true);
     }
 
+    const toggleActivateAccount = async (internNum) => {
+        try {
+            await api.patch(`/api/employee/activation/${internNum}`);
+        } catch (error) {
+            console.error("Erro ao desativar a conta:", error.message);
+        }
+    }
+
+    const verifyEmployeeIsActive = (givenEmployee) => {
+        return givenEmployee?.isActive === "1";
+    }
+
     return (
         <EmployeeAuthContext.Provider
-            value={{ employee, loginAction, isEmployeeLoggedIn, checkPasswordStatus, changePassword, logOut, refreshPage, checkIsAdmin }}
+            value={{ employee, loginAction, isEmployeeLoggedIn, checkPasswordStatus, changePassword, logOut, refreshPage, checkIsAdmin, toggleActivateAccount, verifyEmployeeIsActive }}
         >
             {children}
         </EmployeeAuthContext.Provider>

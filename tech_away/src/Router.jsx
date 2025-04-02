@@ -11,7 +11,6 @@ import LayoutPage from "./pages/Layout/LayoutPage";
 
 import EmployeeRegisterPage from "./pages/Employee/EmployeeRegisterPage";
 import EmployeeLoginPage from "./pages/Employee/EmployeeLoginPage";
-import EmployeeProtectedRoute from "./contexts/protectedRoutes/EmployeeProtectedRoute";
 import EmployeeHomePage from "./pages/Employee/EmployeeHomePage";
 
 import InterestsPage from "./pages/InterestsPage";
@@ -24,6 +23,9 @@ import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 import { IsMobileProvider } from "./contexts/IsMobileContext";
 import AuthProvider from "./contexts/AuthenticationProviders/AuthProvider";
 import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAuthProvider";
+import ProfilePageClient from "./pages/Auth/ProfilePageClient";
+import EmployeeLayoutPage from "./pages/Layout/EmployeeLayoutPage";
+import EmployeeManagePage from "./pages/Employee/EmployeeManagePage";
 
 import TestPage from "./pages/TestPage";
 
@@ -52,6 +54,7 @@ export default function Router() {
             <Route path="storePurchasePage" element={<StorePurchasePage />} />
             <Route path="register" element={<RegisterPageClient />} />
             <Route path="login" element={<LoginPageClient />} />
+            <Route path="/profile" element={<ProfilePageClient />} />
             <Route
               path="interests"
               element={
@@ -67,13 +70,15 @@ export default function Router() {
             path="/employee"
             element={
               <EmployeeAuthProvider>
-                <Outlet />
+                  <Outlet />
               </EmployeeAuthProvider>
             }
           >
           
-            <Route element={<EmployeeProtectedRoute />}>
+            <Route element={<EmployeeLayoutPage />}>
               <Route index element={<EmployeeHomePage />} />
+              <Route path="manage" element={<EmployeeManagePage />} />
+
             </Route>
             <Route path="teste" element={<TestPage />} />
             <Route path="login" element={<EmployeeLoginPage />} />

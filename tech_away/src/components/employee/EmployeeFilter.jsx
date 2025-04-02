@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Button, Container, Accordion, Row, Col } from 'react-bootstrap';
 
-export default function EmployeeFilter({ filters, onFilterChange }) {
+export default function EmployeeFilter({ filters, onFilterChange, resetFilter }) {
   const [localFilters, setLocalFilters] = useState(filters);
   const [errors, setErrors] = useState({}); // Estado para armazenar erros
 
@@ -49,6 +49,10 @@ export default function EmployeeFilter({ filters, onFilterChange }) {
     setErrors({});
     onFilterChange(clearedFilters);
   };
+  
+  useEffect(() => {
+    handleClear();
+  }, [resetFilter])
 
   return (
     <Container className="my-4">

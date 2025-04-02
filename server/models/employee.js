@@ -86,6 +86,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     passwordReseted: {
       type: DataTypes.STRING(1),
+    },    
+    isActive: {
+      type: DataTypes.STRING(1),
     },
     
   }, {

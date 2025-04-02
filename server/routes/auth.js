@@ -206,7 +206,14 @@ router.get("/getUserByEmail/:email", async (req, res) => {
 });
 
 router.get("/user-info", (req, res) => {
-  const userInfo = req.cookies.clientInfo;
+
+  let userInfoName = "clientInfo"
+  if(req.query.userType === 'employee'){
+    userInfoName = "employeeInfo";
+  }
+  
+  let userInfo = req.cookies.employeeInfo;
+
 
   return res.status(200).json({ userInfo: userInfo });
 });
@@ -221,7 +228,7 @@ router.get('/logout', (req, res) => {
   
   res.clearCookie(userInfo, {
     httpOnly: true,
-    secure: false, // Deve bater com a flag usada na criação do cookie
+    secure: false, 
     sameSite: "Lax"
   });
 
