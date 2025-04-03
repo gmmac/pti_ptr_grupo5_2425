@@ -8,6 +8,8 @@ import RepairInfo from './RepairInfo';
 export default function ClientRepairs() {
   const [repairs, setRepairs] = useState([]); // repairs ativas ou terminadas, dependendo da aba
   const [activeTab, setActiveTab] = useState("active"); // 'active' ou 'inactive'
+  const [selectedRepair, setSelectedRepair] = useState(null); // informação da repair selecionada
+  const [showRepairInfo, setShowRepairInfo] = useState(false); // visibilidade do popup da reparação
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState("");
@@ -19,6 +21,11 @@ export default function ClientRepairs() {
   const handleTabChange = (key) => {
     setActiveTab(key);
     setCurrentPage(1);
+  };
+
+  const handleShowRepairDetails = (repair) => {
+    setSelectedRepair(repair);
+    setShowRepairInfo(true);
   };
 
   const fetchRepairs = async () => {
@@ -55,14 +62,14 @@ export default function ClientRepairs() {
             className="mb-3"
           >
             <Tab eventKey="active" title="Active Repairs">
-              <ClientRepairsCatalog repairsList={repairs} isActive={activeTab === "active"}/>
+              <ClientRepairsCatalog repairsList={repairs} isActive={activeTab === "active"} onShowDetails={handleShowRepairDetails}/>
             </Tab>
             <Tab eventKey="inactive" title="Repairs History">
-              <ClientRepairsCatalog repairsList={repairs} isActive={activeTab === "active"}/>
+              <ClientRepairsCatalog repairsList={repairs} isActive={activeTab === "active"} onShowDetails={handleShowRepairDetails}/>
             </Tab>
           </Tabs>
           <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages}/>
-          <RepairInfo repairInfo={{}} show={true}/>
+          <RepairInfo repairInfo={selectedRepair} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
       </div>
     </div>
   );

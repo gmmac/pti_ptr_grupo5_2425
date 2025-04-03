@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button } from 'react-bootstrap';
 
-export default function ClientRepairsCatalog({repairsList, isActive}) {
+export default function ClientRepairsCatalog({ repairsList, isActive, onShowDetails }) {
     return (
         <div className="mt-4">
             <Table striped bordered hover responsive className="w-100">
@@ -24,7 +24,7 @@ export default function ClientRepairsCatalog({repairsList, isActive}) {
                                 <td>{repair.RepairStatus.state}</td>
                                 <td>{new Date(repair.createdAt).toLocaleDateString()}</td>
                                 {!isActive && <td>{new Date(repair.updatedAt).toLocaleDateString()}</td>}
-                                <td><Button variant="primary" size="sm" className="w-100 fw-bold">See Details</Button></td>
+                                <td><Button variant="primary" size="sm" className="w-100 fw-bold" onClick={() => onShowDetails(repair)}>See Details</Button></td>
                             </tr>
                         ))
                     ) : (

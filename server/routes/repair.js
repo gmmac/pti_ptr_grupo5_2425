@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
   // try {
-    const { page = 1, pageSize = 1, orderBy, orderDirection} = req.query;
+    const { page = 1, pageSize = 10, orderBy, orderDirection} = req.query;
     const activeRepairs = req.query.activeRepairs === "true";
 
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
@@ -35,13 +35,19 @@ router.get("/", async (req, res) => {
         },
         {
           model: models.RepairStatusLog,
-          where: { statusId: "5" },
           required: false,
+          include: [
+            {
+              model: models.RepairStatus,
+              attributes: ["state"],
+            },
+          ],
         },
       ],
       limit: parseInt(pageSize),
       offset,
       order,
+      distinct: true,
     });
     res.status(200).json({
       totalItems: count,
