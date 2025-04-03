@@ -26,6 +26,7 @@ import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAut
 import ProfilePageClient from "./pages/Auth/ProfilePageClient";
 import EmployeeLayoutPage from "./pages/Layout/EmployeeLayoutPage";
 import EmployeeManagePage from "./pages/Employee/EmployeeManagePage";
+import TestPage from "./pages/TestPage";
 
 export default function Router() {
 	return (
@@ -44,6 +45,7 @@ export default function Router() {
 						}
 					>
 						<Route index element={<HomePage />} />
+						<Route path="teste" element={<TestPage />} />
 						<Route path="store" element={<StorePage />} />
 						<Route
 							path="store/:equipmentSheetName"
