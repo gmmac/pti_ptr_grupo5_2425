@@ -62,13 +62,17 @@ export default function ClientFilter({ setFilters }) {
                             <Row className="gy-3 d-block d-flex flex-md-row">
 
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
-                                        type="number"
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>NIC</Form.Label>
+                                        <Form.Control 
+                                        type="number" 
+                                        name="nic" 
                                         value={localFilters.nic} 
-                                        onChange={handleChange}
-                                        name="NIC"
-                                        placeholder="Search by NIC"
-                                    />
+                                        placeholder="Insert NIC"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
                                     <Form.Group controlId="filterName">
@@ -77,35 +81,50 @@ export default function ClientFilter({ setFilters }) {
                                         type="text" 
                                         name="firstName" 
                                         value={localFilters.firstName} 
+                                        placeholder="Insert first name"
                                         onChange={handleChange} 
                                         />
                                     
                                     </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
-                                        type="text"
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Last Name</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="lastName" 
                                         value={localFilters.lastName} 
-                                        onChange={handleChange}
-                                        name="Last Name"
-                                        placeholder="Search by Last Name"
-                                    />
+                                        placeholder="Insert last name"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Email</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="email" 
                                         value={localFilters.email} 
-                                        onChange={handleChange}
-                                        name="Email"
-                                        placeholder="Search by Email"
-                                    />
+                                        placeholder="Insert email"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Phone</Form.Label>
+                                        <Form.Control 
+                                        type="number" 
+                                        name="phone" 
                                         value={localFilters.phone} 
-                                        onChange={handleChange}
-                                        name="Phone"
-                                        placeholder="Search by Phone"
-                                    />
+                                        placeholder="Insert phone number"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                             </Row>
                             <Row className='d-flex align-items-center justify-content-center'>

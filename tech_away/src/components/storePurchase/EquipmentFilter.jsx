@@ -55,38 +55,56 @@ export default function EquipmentFilter({ setFilters }) {
                             <Row className="gy-3 d-block d-flex flex-md-row">
 
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
-                                        type="number"
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Barcode</Form.Label>
+                                        <Form.Control 
+                                        type="number" 
+                                        name="barcode" 
                                         value={localFilters.barcode} 
-                                        onChange={handleChange}
-                                        name="Barcode"
-                                        placeholder="Search by barcode"
-                                    />
+                                        placeholder="Insert barcode"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Model</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="model" 
                                         value={localFilters.model} 
-                                        onChange={handleChange}
-                                        name="Model"
-                                        placeholder="Search by Model"
-                                    />
+                                        placeholder="Insert model"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
-                                    type="number"
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Release Year</Form.Label>
+                                        <Form.Control 
+                                        type="number" 
+                                        name="releaseYear" 
                                         value={localFilters.releaseYear} 
-                                        onChange={handleChange}
-                                        name="Release Year"
-                                        placeholder="Search by Release Year"
-                                    />
+                                        placeholder="Insert release year"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Type</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="type" 
                                         value={localFilters.type} 
-                                        onChange={handleChange}
-                                        name="Type"
-                                        placeholder="Search by Type"
-                                    />
+                                        placeholder="Insert type"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                             </Row>
                             <Row className='d-flex align-items-center justify-content-center'>
