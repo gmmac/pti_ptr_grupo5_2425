@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../utils/axios";
 import { OrderList } from "primereact/orderlist";
-import { Image } from "react-bootstrap";
+import { Image, Stack } from "react-bootstrap";
 import ItemCart from "./ItemCart";
 
 export default function DisplayCart({}) {
@@ -34,10 +34,10 @@ export default function DisplayCart({}) {
 	}, [cart]);
 
 	return (
-		<div >
+		<Stack gap={3} className="w-50">
 			{cart.map((item, index) => {
 				return <ItemCart key={index} equipment={item} />;
 			})}
-		</div>
+		</Stack>
 	);
 }
