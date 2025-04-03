@@ -12,19 +12,21 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
       <Modal.Body className="p-4">
         {repairInfo ? (
           <div className="d-flex flex-column gap-3">
-            <div className="mb-3">
+            <div>
               <p className="fw-bold">Nº Repair: <span className="fw-normal text-primary">#{repairInfo.id}</span></p>
+              <p className="fw-bold">Estimated Delivery: <span className="fw-normal">{new Date(repairInfo.estimatedDeliverDate).toLocaleDateString()}</span></p>
+              <p className="fw-bold">Created At: <span className="fw-normal">{new Date(repairInfo.createdAt).toLocaleDateString()}</span></p>
               <p className="fw-bold">Description: <span className="fw-normal">{repairInfo.description}</span></p>
               <p className="fw-bold">Budget: <span className="fw-normal">${repairInfo.budget}</span></p>
-              <p className="fw-bold">Estimated Delivery: <span className="fw-normal">{new Date(repairInfo.estimatedDeliverDate).toLocaleDateString()}</span></p>
               <p className="fw-bold">
                 Status: 
                 <span className={`badge ${repairInfo.RepairStatus?.state === 'Completed' ? 'bg-success' : 'bg-primary'} ms-2`}>
                   {repairInfo.RepairStatus?.state}
                 </span>
               </p>
-              <p className="fw-bold">Created At: <span className="fw-normal">{new Date(repairInfo.createdAt).toLocaleDateString()}</span></p>
             </div>
+
+            <hr/>
 
             <h5 className="fw-bold text-primary">Repair Status History</h5>
             <div className="table-responsive overflow-auto" style={{ maxHeight: "300px" }}>
