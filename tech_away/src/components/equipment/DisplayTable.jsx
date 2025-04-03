@@ -23,7 +23,7 @@ export default function DisplayTable({ model }) {
 		sortField: null,
 		sortOrder: null,
 		page: 1,
-		pageSize: 6,
+		pageSize: 10,
 	});
 
 	const [filters, setFilters] = useState({
@@ -38,7 +38,7 @@ export default function DisplayTable({ model }) {
 				);
 				setData(res.data.data);
 				setColumns(allColumns);
-			}
+			} 
 		});
 	};
 

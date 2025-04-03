@@ -21,13 +21,12 @@ export default function ModalToSelect({
 				params: { search },
 			})
 			.then((res) => {
-				if (res.data.length > 0) {
-					setList(res.data);
-					const allColumns = Object.keys(res.data[0]);
-					const filteredColumns = allColumns.filter(
+				if (res.data.data.length > 0) {
+					const allColumns = Object.keys(res.data.data[0]).filter(
 						(col) => col !== "createdAt" && col !== "updatedAt"
 					);
-					setColumns(filteredColumns);
+					setList(res.data.data);
+					setColumns(allColumns);
 				} else {
 					setList([]);
 					setColumns([]);

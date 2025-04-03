@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Button, Container, Stack } from "react-bootstrap";
 import DisplayTable from "../components/equipment/DisplayTable";
 import FormsEquipmentSheet from "../components/equipment/FormsEquipmentSheet";
-import DisplayTable from "../components/equipment/DisplayTable";
 import FiltersBarEquipmentSheet from "../components/equipment/FiltersBarEquipmentSheet";
 
 export default function TestPage() {
@@ -28,7 +27,7 @@ export default function TestPage() {
 				<DisplayTable model="equipmentSheet" />
 			</Stack>
 
-			<FormsEquipmentSheet showModal={show} closeModal={handleClose} refreshTable={refreshTable} />
+			<FormsEquipmentSheet showModal={show} closeModal={handleClose} />
 		</Container>
 	);
 }

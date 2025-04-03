@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import DisplayTable from "../../equipment/DisplayTable";
-import FormsNewBrand from "../../brands/FormsNewBrand";
+import FormsEquipmentModel from "../../equipment/FormsEquipmentModel";
 
 export default function ModelsManage() {
 	const [show, setShow] = useState(false);
@@ -18,13 +18,13 @@ export default function ModelsManage() {
 		<Container className="mt-4">
             <Row className="mb-3">
                 <Col className="text-end">
-                    <Button variant="success" onClick={handleShow}>Add Model</Button>
+                    <Button variant="success" onClick={handleShow}>Add Equipment Model</Button>
                 </Col>
             </Row>
 
             <DisplayTable model="model" params="" key={refreshKey} />
 
-			<FormsNewBrand showModal={show} closeModal={handleClose} refreshTable={refreshTable} />
+			<FormsEquipmentModel showModal={show} closeModal={handleClose} refreshTable={refreshTable} />
 		</Container>
 	);
 }

@@ -100,7 +100,53 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", (req, res) => {});
+router.post("/", async (req, res) => {
+  try {
+    const { name, brand, price, releaseYear } = req.body;
+
+    if (!name) {
+      return res
+        .status(400)
+        .json({ error: "Equipment Model name is required." });
+    }
+    if (!brand) {
+      return res.status(400).json({ error: "Brand is required." });
+    }
+    if (!price) {
+      return res
+        .status(400)
+        .json({ error: "Equipment Model price is required." });
+    }
+    if (!releaseYear) {
+      return res
+        .status(400)
+        .json({ error: "Equipment Model release year is required." });
+    }
+
+    const exists = await models.EquipmentModel.findOne({
+      where: { name, brand_id: brand },
+    });
+    if (exists) {
+      return res
+        .status(400)
+        .json({ error: "This equipment model already exists." });
+    }
+
+    const model = await models.EquipmentModel.create({
+      name,
+      brand_id: brand,
+      price,
+      releaseYear,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    res.status(200).json({
+      data: model,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error creating brand." });
+  }
+});
 
 router.put("/:ID", (req, res) => {});
 
