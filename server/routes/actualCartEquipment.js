@@ -24,16 +24,45 @@ router.post("/", async (req, res) => {
 
 // Get a specific ActualCartEquipment by Cart ID
 router.get("/:cartId", async (req, res) => {
-	try {
-		const cartEquipment = await models.ActualCartEquipment.findAll({
-			where: { cartId: req.params.cartId },
-		});
-		if (!cartEquipment.length)
-			return res.status(404).json({ error: "ActualCartEquipment not found" });
-		res.json(cartEquipment);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+	// try {
+	const cartEquipment = await models.ActualCartEquipment.findAll({
+		where: { cartId: req.params.cartId },
+	});
+
+	if (!cartEquipment.length)
+		return res.status(404).json({ error: "ActualCartEquipment not found" });
+
+	const equipmentDetails = await Promise.all(
+		cartEquipment.map(async (item) => {
+			const usedEquipment = await models.UsedEquipment.findOne({
+				where: { id: item.equipmentId },
+			});
+			if (!usedEquipment) return null;
+
+			const status = await models.EquipmentStatus.findOne({
+				where: { id: usedEquipment.statusID },
+			});
+			const equipmentSheet = await models.EquipmentSheet.findOne({
+				where: { barcode: usedEquipment.equipmentId },
+			});
+
+			const model = equipmentSheet
+				? await models.EquipmentModel.findOne({
+						where: { id: equipmentSheet.model },
+				  })
+				: null;
+			return {
+				...usedEquipment.get(),
+				statusName: status ? status.state : null,
+				modelName: model ? model.name : null,
+			};
+		})
+	);
+
+	res.json(equipmentDetails.filter((e) => e !== null));
+	// } catch (error) {
+	// 	res.status(500).json({ error: error.message });
+	// }
 });
 
 // Update an ActualCartEquipment by ID

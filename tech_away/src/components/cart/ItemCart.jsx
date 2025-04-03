@@ -21,9 +21,15 @@ export default function ItemCart({ equipment }) {
 				<Col>
 					<Row>
 						<Stack direction="verrical" className="align-items-start">
-							<h5>Bamboo Watch</h5>
-							<p>65 EUR</p>
-							<Tag value="Usado"></Tag>
+							<h5>{equipment.modelName}</h5>
+							<p>{equipment.price} EUR</p>
+							<Tag
+								style={{
+									backgroundColor: "var(--variant-one)",
+									fontFamily: "var(--body-font)",
+								}}
+								value={equipment.statusName}
+							></Tag>
 						</Stack>
 					</Row>
 					<Row>
