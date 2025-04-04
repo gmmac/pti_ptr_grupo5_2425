@@ -1,13 +1,62 @@
-import React from "react";
-import { Button, Col, Container, Image, Row, Stack } from "react-bootstrap";
+import React, { useState } from "react";
+import {
+	Button,
+	Col,
+	Container,
+	Image,
+	Row,
+	Stack,
+	Modal,
+} from "react-bootstrap";
 import { Tag } from "primereact/tag";
 
-export default function ItemCart({ equipment }) {
+export default function ItemCart({ equipment, onRemove }) {
+	const [showModal, setShowModal] = useState(false);
+
+	const handleRemove = () => {
+		onRemove(equipment.id);
+		setShowModal(false);
+	};
+
 	return (
 		<Container
 			className="background-white rounded-sm p-4"
 			style={{ boxShadow: "var(--shadow-default)" }}
 		>
+			<Modal show={showModal} onHide={() => setShowModal(false)}>
+				<Modal.Header closeButton>
+					<Modal.Title></Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<Stack direction="horizontal" gap={3}>
+						<i className="pi pi-exclamation-triangle"></i>
+						<p className="m-0">
+							Are you sure you want to remove{" "}
+							<strong>{equipment.modelName}</strong> from cart?
+						</p>
+					</Stack>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button
+						className="rounded-pill"
+						variant="secondary"
+						onClick={() => setShowModal(false)}
+					>
+						Cancelar
+					</Button>
+					<Button
+						className="rounded-pill"
+						style={{
+							backgroundColor: "var(--danger)",
+							border: "none",
+						}}
+						onClick={handleRemove}
+					>
+						Remover
+					</Button>
+				</Modal.Footer>
+			</Modal>
+
 			<Row>
 				<Col className="d-flex justify-content-center align-items-center">
 					<Image
@@ -19,7 +68,7 @@ export default function ItemCart({ equipment }) {
 					/>
 				</Col>
 				<Col>
-					<Row>
+					<Row className="mb-2">
 						<Stack direction="verrical" className="align-items-start">
 							<h5>{equipment.modelName}</h5>
 							<p>{equipment.price} EUR</p>
@@ -48,6 +97,7 @@ export default function ItemCart({ equipment }) {
 								<i className="pi pi-heart"></i>
 							</Button>
 							<Button
+								onClick={() => setShowModal(true)}
 								className="rounded-circle"
 								style={{ backgroundColor: "var(--danger)", border: "none" }}
 							>

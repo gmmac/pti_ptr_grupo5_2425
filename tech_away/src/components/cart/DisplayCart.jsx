@@ -33,10 +33,23 @@ export default function DisplayCart({}) {
 		console.log(cart);
 	}, [cart]);
 
+	const handleRemove = (id) => {
+		api
+			.delete(`/api/actualCartEquipment/${id}`)
+			.then(() => {
+				setCart(cart.filter((item) => item.id !== id));
+			})
+			.catch((error) => {
+				console.log("Erro ao remover item: ", error.message);
+			});
+	};
+
 	return (
 		<Stack gap={3} className="w-50">
 			{cart.map((item, index) => {
-				return <ItemCart key={index} equipment={item} />;
+				return (
+					<ItemCart key={index} equipment={item} onRemove={handleRemove} />
+				);
 			})}
 		</Stack>
 	);
