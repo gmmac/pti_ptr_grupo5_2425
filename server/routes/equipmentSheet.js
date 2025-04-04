@@ -6,9 +6,47 @@ const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
     // try {
-        const EquipmentSheets = await models.EquipmentSheet.findAll({
+        const {
+            barcode,
+            model,
+            releaseYear,
+            type,
+            page = 1,
+            pageSize = 10,
+            orderBy,
+            orderDirection,
+        } = req.query;
+
+        console.log('------------------------',req.query)
+        const where = {};
+        const equipmentModelCondition = {};
+
+        if (barcode) where.barcode = { [Op.like]: `${barcode}%` };
+        if (releaseYear) equipmentModelCondition.releaseYear = { [Op.eq]: releaseYear }
+
+        if (model) {
+            where['$EquipmentModel.name$'] = { [Op.like]: `${model}%` };
+        }
+        
+        if (type) {
+            where['$EquipmentType.name$'] = { [Op.like]: `${type}%` };
+        }
+
+        const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+        let order = [];
+        if (orderBy && orderDirection) {
+            order = [[orderBy, orderDirection.toUpperCase()]];
+        } else {
+            order = [["barcode", "ASC"]];
+        }
+
+        const { count, rows } = await models.EquipmentSheet.findAndCountAll({
+            where,
+
             include: [
                 {
+                    where: equipmentModelCondition,
                     model: models.EquipmentModel,
                     attributes: ["name", "releaseYear"],
                 },
@@ -17,12 +55,22 @@ router.get("/", async (req, res) => {
                     attributes: ["name"],
                 }
             ],
+
+            limit: parseInt(pageSize),
+            offset,
+            order,
         });
-        res.json(EquipmentSheets);
-        
+
+        res.json({
+            totalItems: count,
+            totalPages: Math.ceil(count / pageSize),
+            currentPage: parseInt(page),
+            pageSize: parseInt(pageSize),
+            data: rows,
+        });
     // } catch (error) {
-    //     console.error("Error fetching equipment sheets:", error);
-    //     res.status(500).json({ error: "Error fetching equipment sheets." });
+    //     console.error("Error fetching equipments:", error);
+    //     res.status(500).json({ error: "Error fetching equipments." });
     // }
 });
 

@@ -37,7 +37,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
                 pageSize: itemsPerPage
               }
             });
-            setEquipments(response.data || []);
+            setEquipments(response.data.data || []);
             setTotalPages(response.data.totalPages);
             console.log(response.data)
           } catch (err) {

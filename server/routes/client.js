@@ -20,7 +20,6 @@ router.get("/", async (req, res) => {
 
 
 		console.log(req.query)
-		console.log("SSDSD" + req.query.internNum)
 		const where = {};
 
 		if (nic) where.nic = { [Op.like]: `${nic}%` };
