@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Tab, Tabs } from 'react-bootstrap';
+import { Tab, Tabs } from 'react-bootstrap';
 import api from '../../utils/axios';
 import ClientRepairsCatalog from './ClientRepairsCatalog';
 import PaginationControl from '../pagination/PaginationControl';
 import RepairInfo from './RepairInfo';
 
-export default function ClientRepairs() {
+export default function ClientRepairs({isSelected}) {
   const [repairs, setRepairs] = useState([]); // repairs ativas ou terminadas, dependendo da aba
   const [activeTab, setActiveTab] = useState("active"); // 'active' ou 'inactive'
   const [selectedRepair, setSelectedRepair] = useState(null); // informação da repair selecionada
@@ -36,9 +36,9 @@ export default function ClientRepairs() {
           params: {
             activeRepairs: activeRepairs,
             page: currentPage,
-            // pageSize: itemsPerPage,
           },
         });
+        console.log("Dei load das reparações")
         setRepairs(response.data.data);
         setTotalPages(response.data.totalPages);
         setError('');
@@ -49,8 +49,10 @@ export default function ClientRepairs() {
   };
 
   useEffect(() => {
-    fetchRepairs();
-  }, [currentPage, activeTab]);
+    if(isSelected){
+      fetchRepairs();
+    }
+  }, [isSelected, currentPage, activeTab]);
 
   return (
     <div className="m-0 d-flex flex-column w-100">

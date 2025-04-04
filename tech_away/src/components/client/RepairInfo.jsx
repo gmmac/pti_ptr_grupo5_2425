@@ -1,8 +1,35 @@
-import React from 'react';
-import { Modal, Button, Table } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Modal, Table } from 'react-bootstrap';
+import api from '../../utils/axios';
 
 export default function RepairInfo({ repairInfo, show, onClose }) {
-  console.log(repairInfo);
+  const [repairStatusLogs, setRepairStatusLogs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState("");
+
+  const fetchRepairsLogs = async () => {
+    try {
+        const response = await api.get(`/api/repairStatusLogs/${repairInfo.id}`, {
+          params: {
+            page: currentPage,
+          },
+        });
+        console.log(response.data.data)
+        setRepairStatusLogs(response.data.data);
+        setTotalPages(response.data.totalPages);
+        setError('');
+    } catch (error) {
+        console.error('Error fetching repairs:', error);
+        setError('Error fetching repairs. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    if(show){
+      fetchRepairsLogs();
+    }
+  }, [show, currentPage]);
 
   return (
     <Modal show={show} onHide={onClose} centered size="lg">
@@ -39,11 +66,11 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {repairInfo.RepairStatusLogs && repairInfo.RepairStatusLogs.length > 0 ? (
-                    repairInfo.RepairStatusLogs.map((log) => (
+                  {repairStatusLogs.length > 0 ? (
+                    repairStatusLogs.map((log) => (
                       <tr key={log.id}>
                         <td>
-                          <span className="fw-bold">{log.RepairStatus.state}</span>
+                          <span className="fw-bold">{log.statusId}</span>
                         </td>
                         <td>{new Date(log.createdAt).toLocaleDateString()}</td>
                         <td>{log.description}</td>
@@ -51,7 +78,7 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="3" className="text-muted">No status history available</td>
+                      <td colSpan="3" className="text-muted">No status history available. Please contact the store</td>
                     </tr>
                   )}
                 </tbody>
@@ -62,11 +89,6 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
           <p className="text-center text-muted">No repair information available.</p>
         )}
       </Modal.Body>
-      <Modal.Footer className="d-flex justify-content-center">
-        <Button variant="secondary" onClick={onClose} className="px-4 fw-bold">
-          Close
-        </Button>
-      </Modal.Footer>
     </Modal>
   );
 }

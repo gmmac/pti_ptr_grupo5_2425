@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 import { Nav, Tab, Container } from "react-bootstrap";
 import "../../styles/variables.css";
 import ClientProfile from '../../components/client/ClientProfile';
@@ -6,9 +6,10 @@ import "../../styles/ClientProfilePage.css"
 import ClientRepairs from "../../components/client/ClientRepairs";
 
 export default function ProfilePageClient() {
+    const [activeTab, setActiveTab] = useState("profile");
 	return (
 		<Container>
-			<Tab.Container defaultActiveKey="profile">
+			<Tab.Container defaultActiveKey="profile" activeKey={activeTab} onSelect={(selectedKey) => setActiveTab(selectedKey)}>
                 <Nav variant="tabs" className="mb-3 nav-fill">
 					<Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="profile">Profile</Nav.Link>
@@ -32,7 +33,7 @@ export default function ProfilePageClient() {
                         <p>Tab content for Purchases</p>
                     </Tab.Pane>
                     <Tab.Pane eventKey="repairs">
-                        <ClientRepairs/>
+                        <ClientRepairs isSelected={activeTab === "repairs"}/>
                     </Tab.Pane>
 					<Tab.Pane eventKey="profile">
 						<ClientProfile/>

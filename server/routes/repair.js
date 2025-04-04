@@ -4,7 +4,7 @@ const models = require("../models");
 const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
-  // try {
+  try {
     const { page = 1, pageSize = 10, orderBy, orderDirection} = req.query;
     const activeRepairs = req.query.activeRepairs === "true";
 
@@ -33,21 +33,10 @@ router.get("/", async (req, res) => {
           model: models.RepairStatus,
           attributes: ["id", "state"],
         },
-        {
-          model: models.RepairStatusLog,
-          required: false,
-          include: [
-            {
-              model: models.RepairStatus,
-              attributes: ["state"],
-            },
-          ],
-        },
       ],
       limit: parseInt(pageSize),
       offset,
       order,
-      distinct: true,
     });
     res.status(200).json({
       totalItems: count,
@@ -56,9 +45,9 @@ router.get("/", async (req, res) => {
       pageSize: parseInt(pageSize),
       data: rows,
     });
-  // } catch (error) {
-  //   res.status(500).json({ error: "Error fetching repairs." });
-  // }
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching repairs." });
+  }
 });
 //falta a paginação
 
