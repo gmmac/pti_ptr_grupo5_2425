@@ -103,11 +103,12 @@ export default function OrganizerCharityProjects() {
         ) : ( 
             <>
                 <CharityProjectCatalog 
-                charityProjects={charityProjects} 
-                handlePageChange={handlePageChange} 
-                currentPage={currentPage} 
-                totalPages={totalPages}
-                onOpenDetails={handleOpenDetailsModal}
+                  charityProjects={charityProjects} 
+                  handlePageChange={handlePageChange} 
+                  currentPage={currentPage} 
+                  totalPages={totalPages}
+                  onOpenDetails={handleOpenDetailsModal}
+                  onRefresh={toggleRefresh}
                 />
 
               <ModalCharityProjectDetails

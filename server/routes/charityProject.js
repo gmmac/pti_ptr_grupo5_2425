@@ -263,9 +263,20 @@ router.put('/:ID', async (req, res) => {
   }
 });
 
-router.delete("/:ID", (req, res) => {
-    
+router.delete('/:ID', async (req, res) => {
+  const projectId = req.params.ID;
+  try {
+    const deleted = await models.CharityProject.destroy({ where: { id: projectId } });
+
+    if (!deleted) return res.status(404).json({ message: 'Project not found' });
+
+    return res.status(200).json({ message: 'Project deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
+
 
 
 module.exports = router;

@@ -1,28 +1,26 @@
 import React from "react";
 import { Card, Row, Col, Button } from "react-bootstrap";
-
-export default function CharityProjectCardView({ projects, onOpenDetails }) {
+export default function CharityProjectCardView({ projects, onOpenDetails, onDelete, deleting }) {
   return (
     <Row className="g-3 d-lg-none">
-      {projects.map((project, index) => (
-        <Col key={index} xs={12}>
+      {projects.map((project) => (
+        <Col key={project.id} xs={12}>
           <Card className="shadow-sm rounded p-3">
             <Card.Body>
               <Card.Title className="fw-bold">{project.name}</Card.Title>
               <Card.Text>
-                <strong>Start:</strong>{" "}
-                {project.startDate ? new Date(project.startDate).toLocaleDateString() : "—"} <br />
-                <strong>Completion:</strong>{" "}
-                {project.completionDate ? new Date(project.completionDate).toLocaleDateString() : "—"} <br />
+                <strong>Start:</strong> {project.startDate ? new Date(project.startDate).toLocaleDateString() : "—"} <br />
+                <strong>Completion:</strong> {project.completionDate ? new Date(project.completionDate).toLocaleDateString() : "—"} <br />
                 <strong>Status:</strong> {project.ProjectStatus?.state || "—"} <br />
                 <strong>Warehouse:</strong> {project.Warehouse?.name || "—"} <br />
-                <strong>Created At:</strong>{" "}
-                {project.createdAt ? new Date(project.createdAt).toLocaleDateString() : "—"}
+                <strong>Created At:</strong> {project.createdAt ? new Date(project.createdAt).toLocaleDateString() : "—"}
               </Card.Text>
-
-              <div className="text-end">
+              <div className="d-flex justify-content-end gap-2">
                 <Button size="sm" onClick={() => onOpenDetails(project)}>
                   See Details
+                </Button>
+                <Button size="sm" variant="danger" onClick={() => onDelete(project)} disabled={deleting}>
+                  Delete
                 </Button>
               </div>
             </Card.Body>
