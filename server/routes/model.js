@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
+const { sequelize } = require("../models/index");
 
 // router.get("/", async (req, res) => {
 //   try {
@@ -47,30 +48,58 @@ const { Op } = require("sequelize");
 router.get("/", async (req, res) => {
   try {
     const {
+      id,
       name,
-      brand,
+      Brand,
       price,
       releaseYear,
       page = 1,
       pageSize = 10,
-      orderBy = "name",
-      orderDirection = "ASC",
+      sortField = "name",
+      sortOrder = "ASC",
     } = req.query;
 
     const where = {};
 
-    if (name) where.name = { [Op.like]: `${name}%` };
-    if (brand) where.brand = { [Op.like]: `${brand}%` };
-    if (price) where.price = { [Op.like]: `${price}%` };
-    if (releaseYear) where.releaseYear = { [Op.like]: `${releaseYear}%` };
+    if (id)
+      where.id = sequelize.where(
+        sequelize.cast(sequelize.col("EquipmentModel.id"), "varchar"),
+        { [Op.iLike]: `${id}%` }
+      );
+    if (name) where.name = { [Op.iLike]: `%${name}%` };
+    if (Brand) where["$Brand.name$"] = { [Op.iLike]: `%${Brand}%` };
+    if (price)
+      where.price = sequelize.where(
+        sequelize.cast(sequelize.col("price"), "varchar"),
+        { [Op.iLike]: `${price}%` }
+      );
+    if (releaseYear)
+      where.releaseYear = sequelize.where(
+        sequelize.cast(sequelize.col("releaseYear"), "varchar"),
+        { [Op.iLike]: `%${releaseYear}%` }
+      );
 
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
-    let order = [];
-    if (orderBy && orderDirection) {
-      order = [[orderBy, orderDirection.toUpperCase()]];
-    } else {
-      order = [["name", "ASC"]];
+    const orderClause = [];
+
+    if (sortField === "Brand") {
+      orderClause.push([
+        Sequelize.fn("LOWER", Sequelize.col("Brand.name")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField === "name") {
+      // Especifica a tabela EquipmentModel ao referir-se ao campo name
+      orderClause.push([
+        Sequelize.fn("LOWER", Sequelize.col("EquipmentModel.name")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField) {
+      // Para outros campos, use o nome da tabela corretamente
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
     }
 
     const { count, rows } = await models.EquipmentModel.findAndCountAll({
@@ -85,7 +114,7 @@ router.get("/", async (req, res) => {
       ],
       limit: parseInt(pageSize),
       offset,
-      order,
+      order: orderClause,
     });
 
     res.status(200).json({
@@ -96,6 +125,7 @@ router.get("/", async (req, res) => {
       data: rows,
     });
   } catch (error) {
+    console.error("Erro no GET /model:", error);
     res.status(500).json({ error: "Error fetching equipment models." });
   }
 });

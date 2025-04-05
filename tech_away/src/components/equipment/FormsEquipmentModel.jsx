@@ -120,7 +120,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 	};
 
 	return (
-		<Modal show={showModal} onHide={() => { closeModal(); handleRefresh()}}>
+		<Modal show={showModal} onHide={() => { closeModal(); handleRefresh()}} className={showNewBrandModal ? 'd-none' : ''}>
 			<Modal.Header closeButton>
 				<Modal.Title>Add New Equipment Model</Modal.Title>
 			</Modal.Header>
