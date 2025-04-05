@@ -1,20 +1,26 @@
-import React, { useState } from 'react'
-import { Form } from 'react-bootstrap';
+import React from 'react';
+import { InputGroup, FormControl, Button } from 'react-bootstrap';
 
-export default function SearchBar({ value, onChange, name, placeholder, type="text" }) {
-    const [nameLower, setNameLower] = useState(name.toLowerCase())
+export default function SearchBar({ value, onChange, onSearch }) {
+  const handleClear = () => {
+    onChange('');
+    onSearch('');
+  };
 
-    return (
-        <Form.Group controlId={nameLower}>
-            <Form.Label>{name}</Form.Label>
-            <Form.Control
-                type={type}
-                name={nameLower}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                className="rounded-pill"
-            />
-        </Form.Group>
-    );
+  return (
+    <InputGroup className="mb-3 shadow-sm">
+      <FormControl
+        placeholder="Search by name..."
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="rounded-start rounded-sm"
+      />
+      <Button variant="primary" onClick={() => onSearch(value)} className="rounded-0">
+        Search
+      </Button>
+      <Button variant="outline-secondary" onClick={handleClear} className="rounded-end rounded-sm">
+        Clear
+      </Button>
+    </InputGroup>
+  );
 }

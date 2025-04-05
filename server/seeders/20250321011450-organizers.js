@@ -38,6 +38,18 @@ module.exports = {
         phone: '965432187',
         createdAt: new Date(),
         updatedAt: new Date()
+      },
+      {
+        nic: '122454888',
+        nif: '444555216',
+        birthDate: new Date('1995-01-20'),
+        gender: 'M',
+        firstName: 'Organizer',
+        lastName: '1',
+        email: 'organizer1@email.com',
+        phone: '965432137',
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     ]);
   },

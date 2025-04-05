@@ -112,7 +112,6 @@ function RegisterFormsEmployee() {
     let newErrors = { ...errors };
     let hasError = false;
 
-    console.log(employeeData)
     Object.keys(employeeData).forEach(field => {
         if (!employeeData[field]) {
             newErrors[field] = 'This field is required';

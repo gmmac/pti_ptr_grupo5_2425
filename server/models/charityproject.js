@@ -43,6 +43,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true
     },
+    name: {
+      allowNull: false,
+      type: DataTypes.STRING(50),
+    },
     completionDate: {
       type: DataTypes.DATE,
       allowNull: true

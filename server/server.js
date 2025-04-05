@@ -45,6 +45,8 @@ const usedEquipment = require('./routes/usedEquipment');
 const warehouse = require('./routes/warehouse');
 const auth = require('./routes/auth');
 const employeeRole = require('./routes/employeeRole');
+const projectStatus = require('./routes/projectStatus');
+const equipmentType = require('./routes/equipmentType');
 
 // Definição de endpoints --> rotas
 app.use('/api/address', address);
@@ -70,6 +72,8 @@ app.use('/api/usedEquipment', usedEquipment);
 app.use('/api/warehouse', warehouse);
 app.use('/api/auth', auth);
 app.use("/api/employeeRole", employeeRole)
+app.use("/api/projectStatus", projectStatus)
+app.use("/api/equipmentType", equipmentType)
 
 app.get('/status', (req, res) => {
 	res.json({
