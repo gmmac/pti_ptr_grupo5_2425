@@ -277,32 +277,32 @@ export default function CharityProjectInfoEditor({ project, onChangeAlert, onRef
             </Row>
 
             <Row className="mb-4">
-    <Col md={12}>
-        <Form.Group>
-            <Form.Label><strong>Warehouse:</strong></Form.Label>
-            <div className={`d-flex flex-column flex-md-row gap-3`}>
-                <Form.Control
-                    type="text"
-                    value={formData.warehouse ? `${formData.warehouse} (ID: ${formData.warehouseID})` : ''}
-                    readOnly
-                    plaintext={!editing}
-                    className={`flex-grow-1 ${editing ? "rounded-pill" : ""}`}
-                    isInvalid={!!errors.warehouseID}
-                />
-                {editing && (
-                    <Button
-                        variant="outline-primary"
-                        onClick={() => setShowWarehouseModal(true)}
-                        className="rounded-pill"
-                    >
-                        Select
-                    </Button>
-                )}
-            </div>
-            <Form.Control.Feedback type="invalid">{errors.warehouseID}</Form.Control.Feedback>
-        </Form.Group>
-    </Col>
-</Row>
+                <Col md={12}>
+                    <Form.Group>
+                        <Form.Label><strong>Warehouse:</strong></Form.Label>
+                        <div className={`d-flex flex-column flex-md-row gap-3`}>
+                            <Form.Control
+                                type="text"
+                                value={formData.warehouse ? `${formData.warehouse} (ID: ${formData.warehouseID})` : ''}
+                                readOnly
+                                plaintext={!editing}
+                                className={`flex-grow-1 ${editing ? "rounded-pill" : ""}`}
+                                isInvalid={!!errors.warehouseID}
+                            />
+                            {editing && (
+                                <Button
+                                    variant="outline-primary"
+                                    onClick={() => setShowWarehouseModal(true)}
+                                    className="rounded-pill"
+                                >
+                                    Select
+                                </Button>
+                            )}
+                        </div>
+                        <Form.Control.Feedback type="invalid">{errors.warehouseID}</Form.Control.Feedback>
+                    </Form.Group>
+                </Col>
+            </Row>
 
             <WarehouseCatalogModal
                 show={showWarehouseModal}

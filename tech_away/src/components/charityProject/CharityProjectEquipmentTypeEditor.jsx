@@ -59,29 +59,16 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
     }
   };
 
-  const toggleSelectType = async (type) => {
+  const toggleSelectType = (type) => {
     const isAlreadySelected = selectedTypes.find((e) => e.id === type.id);
   
     if (isAlreadySelected) {
-      try {
-        await api.delete('/api/charityProject/unlinkEquipmentType', {
-          data: {
-            charityProjectId: projectId,
-            equipmentTypeId: type.id
-          }
-        });
-  
-        setSelectedTypes(prev => prev.filter(e => e.id !== type.id));
-        showAlert(`Removed ${type.name} from project.`, 'secondary');
-        onChangeAlert?.({ message: `Removed ${type.name} from project.`, variant: 'secondary' });
-      } catch (error) {
-        console.error('Error unlinking equipment type:', error);
-        showAlert('Error removing equipment type.', 'danger');
-      }
+      setSelectedTypes(prev => prev.filter(e => e.id !== type.id));
     } else {
       setSelectedTypes(prev => [...prev, type]);
     }
   };
+  
   
 
   const haveChanges = () => {
@@ -95,12 +82,13 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
       showAlert('No changes to save.', 'warning');
       return;
     }
-
+  
     try {
       await api.post('/api/charityProject/linkEquipmentType', {
         charityProjectId: projectId,
         equipmentTypeIds: selectedTypes.map((t) => t.id),
       });
+  
       setOriginalTypes(selectedTypes);
       showAlert('Equipment types updated!', 'success');
       onChangeAlert?.({ message: 'Equipment types updated!', variant: 'success' });
@@ -111,6 +99,7 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
       onChangeAlert?.({ message: 'Error updating equipment types.', variant: 'danger' });
     }
   };
+  
 
   const handleCancel = () => {
     setSelectedTypes(originalTypes);
@@ -120,7 +109,7 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
 
   const showAlert = (message, variant) => {
     setAlert({ show: true, message, variant });
-    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 4000);
+    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 2500);
   };
 
   const handleSearch = (value = search) => {

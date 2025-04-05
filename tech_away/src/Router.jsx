@@ -30,6 +30,7 @@ import OrganizerRegisterPage from "./pages/Organizer/OrganizerRegisterPage";
 import OrganizerLoginPage from "./pages/Organizer/OrganizerLoginPage";
 import OrganizerLayoutPage from "./pages/Layout/OrganizerLayoutPage";
 import OrganizerHomePage from "./pages/Organizer/OrganizerHomePage";
+import OrganizerAuthProvider from "./contexts/AuthenticationProviders/OrganizerAuthProvider";
 
 export default function Router() {
   return (
@@ -93,9 +94,9 @@ export default function Router() {
           <Route
             path="/organizer"
             element={
-              <AuthProvider userType="organizer">
+              <OrganizerAuthProvider>
                   <Outlet />
-              </AuthProvider>
+              </OrganizerAuthProvider>
             }
           >
           

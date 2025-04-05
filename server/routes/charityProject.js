@@ -108,6 +108,10 @@ router.post("/linkEquipmentType", async (req, res) => {
       return res.status(400).json({ error: "charityProjectId and equipmentTypeIds[] are required." });
     }
 
+    await models.CharityProjectEquipmentType.destroy({
+      where: { charityProjectId }
+    });
+
     const records = equipmentTypeIds.map((e) => ({
       charityProjectId,
       equipmentTypeId: e,
@@ -115,48 +119,18 @@ router.post("/linkEquipmentType", async (req, res) => {
       updatedAt: new Date()
     }));
 
-    const created = await models.CharityProjectEquipmentType.bulkCreate(records, {
-      ignoreDuplicates: true
-    });
+    const created = await models.CharityProjectEquipmentType.bulkCreate(records);
 
     res.status(201).json({
-      message: "Tipos de equipamento vinculados com sucesso (ignorando duplicados).",
+      message: "Tipos de equipamento atualizados com sucesso.",
       insertedCount: created.length,
       data: created
     });
   } catch (error) {
-    console.error("Error creating CharityProjectEquipmentType:", error);
+    console.error("Error updating CharityProjectEquipmentType:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
-
-router.delete('/unlinkEquipmentType', async (req, res) => {
-  try {
-    const { charityProjectId, equipmentTypeId } = req.body;
-
-    if (!charityProjectId || !equipmentTypeId) {
-      return res.status(400).json({ error: 'charityProjectId and equipmentTypeId are required.' });
-    }
-
-    const deletedCount = await models.CharityProjectEquipmentType.destroy({
-      where: {
-        charityProjectId,
-        equipmentTypeId
-      }
-    });
-
-    if (deletedCount === 0) {
-      return res.status(404).json({ message: 'No relation found to delete.' });
-    }
-
-    return res.status(200).json({ message: 'Equipment type unlinked successfully.', deletedCount });
-  } catch (error) {
-    console.error('Error unlinking equipment type:', error);
-    return res.status(500).json({ error: 'Internal server error.' });
-  }
-});
-
-
 
 router.get("/:id/equipmentTypes", async (req, res) => {
   try {

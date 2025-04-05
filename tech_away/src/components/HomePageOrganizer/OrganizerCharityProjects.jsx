@@ -62,10 +62,6 @@ export default function OrganizerCharityProjects() {
     fetchCharityProjects();
   }, [currentPage, filters, refresh]);
 
-  useEffect(() => {
-    console.log(charityProjects)
-  }, [charityProjects])
-
 
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);

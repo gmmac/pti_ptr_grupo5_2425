@@ -21,10 +21,7 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
 
   useEffect(() => {
     setLocalProject(project);
-    console.log("AAAAAAAA")
   }, [project]);
-
-
 
 
   if (!project) return null;

@@ -92,6 +92,9 @@ const AuthProvider = ({ children, userType, loginPath }) => {
     }
   };
 
+
+  const getUserType = () => userType;
+
   const isUserLoggedIn = () => !!user;
 
   const refreshPage = () => setRefresh(true);
@@ -105,6 +108,7 @@ const AuthProvider = ({ children, userType, loginPath }) => {
         logOut,
         refreshPage,
         loading,
+        getUserType
       }}
     >
       {children}
