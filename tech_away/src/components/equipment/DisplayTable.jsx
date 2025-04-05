@@ -10,6 +10,7 @@ import ModalEdit from "./ModalEdit";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
+import { Paginator } from 'primereact/paginator';
 
 export default function DisplayTable({ model }) {
 	const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ export default function DisplayTable({ model }) {
 
     const [lazyState, setLazyState] = useState({
         first: 0,
-        rows: 6,
+        rows: 5,
         page: 0,
         sortField: null,
         sortOrder: null,
@@ -139,6 +140,9 @@ export default function DisplayTable({ model }) {
                     filters={lazyState.filters}
                     stripedRows
                     removableSort
+					rowsPerPageOptions={[5, 10, 25, 50]}
+					paginatorTemplate=" FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+					currentPageReportTemplate="{first} to {last} of {totalRecords}"
                 >
                     {columns.map((column, index) => (
                         <Column
@@ -192,6 +196,51 @@ export default function DisplayTable({ model }) {
                         }}
                     />
                 </DataTable>
+				<style>
+					{`
+						.p-paginator .p-paginator-pages .p-paginator-page {
+							border: 0 none;
+							color: #374151;
+							min-width: 3rem;
+							height: 3rem;
+							margin: 0.143rem;
+							transition: box-shadow 0.2s;
+							border-radius: 50%;
+						}
+
+						.p-paginator .p-paginator-first:not(.p-disabled):not(.p-highlight):hover, .p-paginator .p-paginator-prev:not(.p-disabled):not(.p-highlight):hover, .p-paginator .p-paginator-next:not(.p-disabled):not(.p-highlight):hover, .p-paginator .p-paginator-last:not(.p-disabled):not(.p-highlight):hover{
+							background: #f3f4f6;
+							border-color: transparent;
+							color: #374151;
+							border-radius: 50%;
+						}
+						.p-dropdown-items{
+							padding-bottom: 0rem !important;
+							padding-left: 0rem !important;
+						}
+						.p-paginator-current{
+							cursor: default;
+						}
+						.p-paginator-page.p-highlight{
+							background: var(--variant-green-highlight)
+						}
+						.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight.p-focus{
+							background: var(--variant-green-highlight) !important;
+						}
+						.p-dropdown-item.p-highlight{
+							background: var(--variant-green-highlight) !important;
+							color: #374151;
+						}
+						.p-dropdown:not(.p-disabled):hover{
+							border-color: var(--variant-green-highlight);
+						}
+						.p-dropdown:not(.p-disabled).p-focus{
+							box-shadow: 0 0 0 0.2rem var(--variant-green-highlight);
+							border-color:rgba(55, 65, 81, 0.35);
+						}
+
+						`}
+				</style>
             </div>
             <ModalEdit
                 show={showModal}
