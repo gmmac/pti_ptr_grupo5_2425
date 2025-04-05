@@ -39,6 +39,7 @@ export default function ClientRepairs({isSelected}) {
           },
         });
         console.log("Dei load das reparações")
+        console.log(response.data.data)
         setRepairs(response.data.data);
         setTotalPages(response.data.totalPages);
         setError('');

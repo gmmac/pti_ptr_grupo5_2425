@@ -4,7 +4,6 @@ const models = require('../models')
 
 router.get("/:repairId", async (req, res) => {
     try {
-        console.log("entreiii")
         const { page = 1, pageSize = 5, orderBy, orderDirection} = req.query;
         const repairId = req.params.repairId;
         const offset = (parseInt(page) - 1) * parseInt(pageSize);
@@ -21,6 +20,12 @@ router.get("/:repairId", async (req, res) => {
         where: {
             repairId: repairId,
         },
+        include: [
+            {
+                model: models.RepairStatus,
+                attributes: ["id", "state"],
+            },
+        ],
 
         limit: parseInt(pageSize),
         offset,

@@ -33,6 +33,16 @@ router.get("/", async (req, res) => {
           model: models.RepairStatus,
           attributes: ["id", "state"],
         },
+        {
+          model: models.Employee,
+          attributes: ["firstName", "lastName"],
+          include: [
+            {
+              model: models.Store,
+              attributes: ["name"],
+            }
+          ]
+        }
       ],
       limit: parseInt(pageSize),
       offset,
