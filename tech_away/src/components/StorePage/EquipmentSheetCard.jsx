@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Image, Stack } from "react-bootstrap";
-import Icon from "../svg/Icon";
+import { Button, Image, Stack } from "react-bootstrap";
+import { Tag } from "primereact/tag";
 import api from "../../utils/axios";
 
 export default function EquipmentSheetCard(eSheet) {
@@ -9,17 +9,18 @@ export default function EquipmentSheetCard(eSheet) {
 	const navigate = useNavigate();
 
 	useEffect(() => {
+		console.log(eSheet);
+
 		api
 			.get("/api/usedEquipment/price-range/" + eSheet?.eSheet?.barcode)
 			.then((res) => {
-				
 				if ("price" in res.data) {
 					// Se for um único preço, salva como número
 
-					setPriceRange(res.data.price + " EUR");
+					setPriceRange(res.data.price + " €");
 				} else if ("minPrice" in res.data && "maxPrice" in res.data) {
 					// Se for um objeto com minPrice e maxPrice, salva o objeto
-					setPriceRange(res.data.minPrice + " - " + res.data.maxPrice + " EUR");
+					setPriceRange(res.data.minPrice + " - " + res.data.maxPrice + " €");
 				}
 			})
 			.catch((error) => {
@@ -41,37 +42,57 @@ export default function EquipmentSheetCard(eSheet) {
 				color: "var(--dark-grey)",
 				backgroundColor: "var(--white)",
 				boxShadow: "var(--shadow-default)",
-				cursor: "pointer"
+				cursor: "pointer",
 			}}
-			className="rounded-sm w-25 p-4"
-			onClick={() => navigate(`/store/${slug}`, { state: { barcode: equipmentBarcode} })}
-			
+			gap={2}
+			className="rounded-sm w-25 p-4 justify-content-center align-items-center"
+			onClick={() =>
+				navigate(`/store/${slug}`, { state: { barcode: equipmentBarcode } })
+			}
 		>
+			<Stack direction="horizontal" gap={2} className="justify-content-between">
+				<Stack
+					direction="horizontal"
+					className="justify-content-center align-items-center"
+					gap={2}
+				>
+					<i className="pi pi-tag" style={{ color: "var(--dark-grey)" }}></i>
+					<p className="m-0">{eSheet?.eSheet?.EquipmentType?.name}</p>
+				</Stack>
+				<Tag
+					value={eSheet?.eSheet?.EquipmentModel?.Brand?.name}
+					rounded
+					style={{
+						backgroundColor: "var(--variant-one)",
+						fontFamily: "var(--body-font)",
+					}}
+				/>
+			</Stack>
 			<Image
 				src="../../public/assets/pc.jpg"
-				className="img-fluid"
+				className="w-50"
 				style={{
 					mixBlendMode: "darken",
 				}}
 			/>
+			<h5
+				style={{ color: "var(--variant-two)", fontFamily: "var(--title-font)" }}
+				className="m-0 text-bold"
+			>
+				{eSheet?.eSheet?.EquipmentModel?.name}
+			</h5>
 			<Stack
 				direction="horizontal"
 				className="justify-content-between align-items-center"
 			>
-				<h4
-					style={{ color: "var(--variant-two)" }}
-					className="m-0 fs-5 text-bold"
+				<p className=" m-0">{priceRange}</p>
+				<Button
+					className="rounded-circle"
+					style={{ backgroundColor: "var(--variant-two)", border: "none" }}
 				>
-					{eSheet?.eSheet?.EquipmentModel?.name}
-				</h4>
-				<Icon
-					d="M16 26C16 26 1 17.8424 1 8.94309C1 0.0437896 10.75 -2.92245 16 8.20156C21.25 -2.92245 31 0.0437812 31 8.94308C31 17.8424 16 26 16 26Z"
-					w={"32"}
-					h={"27"}
-					color={"var(--variant-two)"}
-				/>
+					<i className="pi pi-heart" style={{ color: "var(--white)" }}></i>
+				</Button>
 			</Stack>
-			<p className="fs-5">{priceRange}</p>
 		</Stack>
 	);
 }

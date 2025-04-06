@@ -38,7 +38,7 @@ export default function StorePage() {
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
-	}, [currentPage, refresh]); // Se usares filtros, adiciona `filters` à lista de dependências
+	}, [currentPage, refresh]); 
 
 	const handlePageChange = (pageNumber) => {
 		setCurrentPage(pageNumber);

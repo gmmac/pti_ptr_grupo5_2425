@@ -45,7 +45,7 @@ export default function DisplayCart({}) {
 	};
 
 	return (
-		<Stack gap={3} className="w-50">
+		<Stack gap={3} className="background-white">
 			{cart.map((item, index) => {
 				return (
 					<ItemCart key={index} equipment={item} onRemove={handleRemove} />

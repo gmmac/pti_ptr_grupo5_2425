@@ -19,10 +19,7 @@ export default function ItemCart({ equipment, onRemove }) {
 	};
 
 	return (
-		<Container
-			className="background-white rounded-sm p-4"
-			style={{ boxShadow: "var(--shadow-default)" }}
-		>
+		<Container className="p-4 m-2 border-bottom">
 			<Modal show={showModal} onHide={() => setShowModal(false)}>
 				<Modal.Header closeButton>
 					<Modal.Title></Modal.Title>
