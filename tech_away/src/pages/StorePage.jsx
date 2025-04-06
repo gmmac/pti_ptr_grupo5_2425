@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-// import { useFilter } from "../contexts/FilterProvider";
-// import FilterSearch from "../components/StorePage/FilterSearch";
+import { Container, Row, Col, Stack } from "react-bootstrap";
+import EquipmentSheetCard from "../components/StorePage/EquipmentSheetCard";
+import PaginationControl from "../components/pagination/PaginationControl";
 import api from "../utils/axios";
-import EquipmentSheetCatalogue from "../components/StorePage/EquipmentSheetCatalogue";
-import { Container } from "react-bootstrap";
+import Filters from "../components/StorePage/Filters";
 
 export default function StorePage() {
 	const [equipmentModelCatalog, setEquipmentModelCatalog] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
-	const itemsPerPage = 6;
-
-	// const { filters } = useFilter();
-
-	// useEffect(() => {}, [filters]);
-
+	const itemsPerPage = 9;
 	const [refresh, setRefresh] = useState(false);
+	const [filters, setFilters] = useState({
+		orderBy: "",
+		state: "",
+		store: "",
+	});
 
 	const handleRefresh = () => {
 		setRefresh(!refresh);
@@ -27,8 +27,10 @@ export default function StorePage() {
 				params: {
 					page: currentPage,
 					pageSize: itemsPerPage,
-					orderBy: "createdAt", // Para ordenação dinâmica
-					orderDirection: "DESC",
+					orderBy: filters.orderBy || "createdAt", // Use selected orderBy or default to createdAt
+					orderDirection: "DESC", // Can be dynamic too based on filter
+					state: filters.state,
+					store: filters.store,
 				},
 			})
 			.then((res) => {
@@ -38,15 +40,56 @@ export default function StorePage() {
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
-	}, [currentPage, refresh]); 
+	}, [currentPage, refresh, filters]);
 
 	const handlePageChange = (pageNumber) => {
 		setCurrentPage(pageNumber);
 	};
 
 	return (
-		<Container>
-			<EquipmentSheetCatalogue equipmentSheets={equipmentModelCatalog} />
+		<Container className="mb-5">
+			<Stack gap={4}>
+				{/* Mapa */}
+				<div
+					style={{
+						fontFamily: "var(--body-font)",
+						color: "var(--dark-grey)",
+						backgroundColor: "var(--white)",
+						boxShadow: "var(--shadow-default)",
+						height: "300px",
+					}}
+					className="rounded-sm p-4 d-flex justify-content-center align-items-center"
+				>
+					mapa
+				</div>
+
+				<Filters filters={filters} setFilters={setFilters} />
+
+				{/* Grid de Equipamentos */}
+				<Row className="g-4">
+					{equipmentModelCatalog.length > 0 ? (
+						equipmentModelCatalog.map((item, index) => (
+							<Col key={index} xs={12} sm={6} md={4} lg={3}>
+								<EquipmentSheetCard eSheet={item} />
+							</Col>
+						))
+					) : (
+						<Col xs={12} className="text-center mt-5">
+							<i className="pi pi-exclamation-triangle"></i>
+							<p className="m-0">No equipment found</p>
+						</Col>
+					)}
+				</Row>
+
+				{/* Paginação */}
+				{totalPages > 1 && (
+					<PaginationControl
+						handlePageChange={handlePageChange}
+						currentPage={currentPage}
+						totalPages={totalPages}
+					/>
+				)}
+			</Stack>
 		</Container>
 	);
 }
