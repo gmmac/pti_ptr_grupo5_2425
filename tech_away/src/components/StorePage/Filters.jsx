@@ -3,25 +3,20 @@ import { Form, Stack, Button } from "react-bootstrap";
 import api from "../../utils/axios";
 
 export default function Filters({ filters, setFilters }) {
-	const [state, setState] = useState([]);
-	const [store, setStore] = useState([]);
-
-	const [tempFilters, setTempFilters] = useState({
-		orderBy: "",
-		state: "",
-		store: "",
-	});
+	const [types, SetTypes] = useState([]);
+	const [models, setModels] = useState([]);
+	const [brands, setBrands] = useState([]);
 
 	useEffect(() => {
 		api
-			.get("api/equipmentStatus")
+			.get("api/type")
 			.then((res) => {
-				const statesObj = res.data;
-				const statesArray = Object.keys(statesObj).map((key) => ({
-					id: key,
-					name: statesObj[key].state,
+				const typesObj = res.data;
+				const typesArray = Object.keys(typesObj).map((key) => ({
+					id: typesObj[key].id,
+					name: typesObj[key].name,
 				}));
-				setState(statesArray);
+				SetTypes(typesArray);
 			})
 			.catch((error) => {
 				console.error("API error:", error.message);
@@ -30,29 +25,39 @@ export default function Filters({ filters, setFilters }) {
 
 	useEffect(() => {
 		api
-			.get("api/store")
+			.get("api/model")
 			.then((res) => {
-				const storesObj = res.data.data;
-				const storesArray = Object.keys(storesObj).map((key) => ({
-					id: key,
-					name: storesObj[key].name,
+				const modelsObj = res.data;
+
+				const modelsArray = Object.keys(modelsObj).map((key) => ({
+					id: modelsObj[key].id,
+					name: modelsObj[key].name,
 				}));
-				setStore(storesArray);
+				setModels(modelsArray);
 			})
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
 	}, []);
 
-	// Aplica os filtros apenas quando o botão "Sort By" for clicado
-	const applyFilters = () => {
-		setFilters(tempFilters);
-	};
+	useEffect(() => {
+		api
+			.get("api/brand")
+			.then((res) => {
+				const brandsObj = res.data;
+				const brandsArray = Object.keys(brandsObj).map((key) => ({
+					id: brandsObj[key].id,
+					name: brandsObj[key].name,
+				}));
+				setBrands(brandsArray);
+			})
+			.catch((error) => {
+				console.error("API error:", error.message);
+			});
+	}, []);
 
-	// Reseta os filtros ao clicar em "Clear"
 	const clearFilters = () => {
-		setTempFilters({ orderBy: "", state: "", store: "" });
-		setFilters({ orderBy: "", state: "", store: "" });
+		setFilters({ orderBy: "", type: "", model: "", brand: "" });
 	};
 
 	return (
@@ -88,17 +93,17 @@ export default function Filters({ filters, setFilters }) {
 				</Form.Select>
 
 				<Form.Select
-					value={filters.state}
+					value={filters.type}
 					className="rounded-pill"
 					style={{
 						backgroundColor: "var(--light-grey)",
 						boxShadow: "var(--shadow-default)",
 					}}
-					onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+					onChange={(e) => setFilters({ ...filters, type: e.target.value })}
 				>
-					<option value="">State</option>
-					{state.map((item) => (
-						<option key={item.id} value={item.name}>
+					<option value="">Type</option>
+					{types.map((item) => (
+						<option key={item.id} value={item.id}>
 							{item.name}
 						</option>
 					))}
@@ -111,11 +116,27 @@ export default function Filters({ filters, setFilters }) {
 						backgroundColor: "var(--light-grey)",
 						boxShadow: "var(--shadow-default)",
 					}}
-					onChange={(e) => setFilters({ ...filters, store: e.target.value })}
+					onChange={(e) => setFilters({ ...filters, model: e.target.value })}
 				>
-					<option value="">Store</option>
-					{store.map((item) => (
-						<option key={item.id} value={item.name}>
+					<option value="">Model</option>
+					{models.map((item) => (
+						<option key={item.id} value={item.id}>
+							{item.name}
+						</option>
+					))}
+				</Form.Select>
+				<Form.Select
+					value={filters.brand}
+					className="rounded-pill"
+					style={{
+						backgroundColor: "var(--light-grey)",
+						boxShadow: "var(--shadow-default)",
+					}}
+					onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
+				>
+					<option value="">Brand</option>
+					{brands.map((item) => (
+						<option key={item.id} value={item.id}>
 							{item.name}
 						</option>
 					))}
@@ -130,23 +151,12 @@ export default function Filters({ filters, setFilters }) {
 				<Button
 					className="rounded-pill px-4"
 					style={{
-						backgroundColor: "var(--variant-one)",
-						color: "var(--white)",
-						border: "none",
-					}}
-					onClick={applyFilters}
-				>
-					SortBy
-				</Button>
-				<Button
-					className="rounded-pill px-4"
-					style={{
 						// backgroundColor: "var(--variant-one)",
 						color: "var(--white)",
 						border: "none",
 					}}
 					variant="secondary"
-					disabled={!filters.orderBy && !filters.state && !filters.store}
+					disabled={!filters.orderBy && !filters.model && !filters.type && !filters.brand}
 					onClick={clearFilters}
 				>
 					Clear

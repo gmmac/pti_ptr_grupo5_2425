@@ -10,16 +10,12 @@ export default function StorePage() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
 	const itemsPerPage = 9;
-	const [refresh, setRefresh] = useState(false);
 	const [filters, setFilters] = useState({
 		orderBy: "",
-		state: "",
-		store: "",
+		type: "",
+		model: "",
+		brand: "",
 	});
-
-	const handleRefresh = () => {
-		setRefresh(!refresh);
-	};
 
 	useEffect(() => {
 		api
@@ -27,10 +23,10 @@ export default function StorePage() {
 				params: {
 					page: currentPage,
 					pageSize: itemsPerPage,
-					orderBy: filters.orderBy || "createdAt", // Use selected orderBy or default to createdAt
-					orderDirection: "DESC", // Can be dynamic too based on filter
-					state: filters.state,
-					store: filters.store,
+					orderBy: filters.orderBy || "recent-date", // Use selected orderBy or default to createdAt
+					modelId: filters.model,
+					typeId: filters.type,
+					brandId: filters.brand,
 				},
 			})
 			.then((res) => {
@@ -40,7 +36,7 @@ export default function StorePage() {
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
-	}, [currentPage, refresh, filters]);
+	}, [currentPage, filters]);
 
 	const handlePageChange = (pageNumber) => {
 		setCurrentPage(pageNumber);

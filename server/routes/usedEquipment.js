@@ -38,7 +38,6 @@ router.get("/:ID", async (req, res) => {
 router.get("/price-range/:equipmentId", async (req, res) => {
 	try {
 		const { equipmentId } = req.params;
-		console.log("equipmentId:", equipmentId);
 
 		const priceRes = await models.UsedEquipment.findAll({
 			attributes: ["price"],
@@ -52,8 +51,6 @@ router.get("/price-range/:equipmentId", async (req, res) => {
 		}
 		if (priceRange.length === 1) {
 			// Se houver apenas um equipamento, retorna apenas o preço
-			console.log(priceRange[0]);
-
 			return res.status(200).json({ price: priceRange[0] });
 		} else if (priceRange.length > 1) {
 			// Se houver mais de um, retorna o preço mínimo e máximo

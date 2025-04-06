@@ -48,6 +48,7 @@ const auth = require("./routes/auth");
 const employeeRole = require("./routes/employeeRole");
 const actualCart = require("./routes/actualCart");
 const actualCartEquipment = require("./routes/actualCartEquipment");
+const type = require("./routes/type");
 
 // Definição de endpoints --> rotas
 app.use("/api/address", address);
@@ -75,6 +76,7 @@ app.use("/api/auth", auth);
 app.use("/api/employeeRole", employeeRole);
 app.use("/api/actualCart", actualCart);
 app.use("/api/actualCartEquipment", actualCartEquipment);
+app.use("/api/type", type);
 
 app.get("/status", (req, res) => {
 	res.json({

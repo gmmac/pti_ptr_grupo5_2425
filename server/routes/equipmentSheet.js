@@ -107,14 +107,12 @@ router.get("/", async (req, res) => {
 router.get("/in-stock", async (req, res) => {
 	// try {
 	const {
-		modelId,
-		typeId,
 		page = 1,
 		pageSize = 6,
 		orderBy = "recent-date", // Valor padrão
+		modelId,
+		typeId,
 		brandId,
-		storeId,
-		statusID,
 	} = req.query;
 
 	// Construção do objeto 'where' dinamicamente
@@ -123,35 +121,10 @@ router.get("/in-stock", async (req, res) => {
 	const modelCondition = modelId ? { id: modelId } : {};
 	const typeCondition = typeId ? { id: typeId } : {};
 	const brandCondition = brandId ? { id: brandId } : {};
+	console.log(modelId, typeId, brandId);
 
 	// Calculando o offset com base na página
 	const offset = (parseInt(page) - 1) * parseInt(pageSize);
-
-	const usedEquipmentCondition = {};
-	if (storeId) usedEquipmentCondition.storeId = storeId;
-	if (statusID) usedEquipmentCondition.statusID = statusID;
-
-	let order = [];
-	switch (orderBy) {
-		case "recent-date":
-			order = [["createdAt", "DESC"]];
-			break;
-		case "oldest-date":
-			order = [["createdAt", "ASC"]];
-			break;
-		case "ASC":
-			order = [
-				[Sequelize.fn("LOWER", Sequelize.col("EquipmentModel.name")), "ASC"],
-			];
-			break;
-		case "DESC":
-			order = [
-				[Sequelize.fn("LOWER", Sequelize.col("EquipmentModel.name")), "DESC"],
-			];
-			break;
-		default:
-			order = [["createdAt", "DESC"]];
-	}
 
 	// Consulta ao banco de dados
 	const { count, rows } = await models.EquipmentSheet.findAndCountAll({
@@ -160,7 +133,6 @@ router.get("/in-stock", async (req, res) => {
 			{
 				model: models.UsedEquipment,
 				as: "UsedEquipments",
-				where: usedEquipmentCondition,
 				required: true,
 			},
 			{
@@ -186,7 +158,6 @@ router.get("/in-stock", async (req, res) => {
 		],
 		limit: parseInt(pageSize),
 		offset,
-		order,
 	});
 
 	const formattedData = rows.map((item) => ({
@@ -197,6 +168,29 @@ router.get("/in-stock", async (req, res) => {
 		Brand: item.EquipmentModel.Brand.name,
 		EquipmentType: item.EquipmentType.name,
 	}));
+
+	switch (orderBy) {
+		case "recent-date":
+			formattedData.sort(
+				(a, b) => b.CreatedAt.getTime() - a.CreatedAt.getTime()
+			);
+			break;
+		case "oldest-date":
+			formattedData.sort(
+				(a, b) => a.CreatedAt.getTime() - b.CreatedAt.getTime()
+			);
+			break;
+		case "ASC":
+			formattedData.sort((a, b) =>
+				a.EquipmentModel.localeCompare(b.EquipmentModel)
+			);
+			break;
+		case "DESC":
+			formattedData.sort((a, b) =>
+				b.EquipmentModel.localeCompare(a.EquipmentModel)
+			);
+			break;
+	}
 
 	res.json({
 		totalItems: count,
