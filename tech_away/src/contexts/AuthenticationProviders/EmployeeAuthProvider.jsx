@@ -1,17 +1,17 @@
 import { useContext, createContext, useState, useEffect } from 'react';
 import api from '../../utils/axios';
 import { useNavigate } from 'react-router-dom';
+import { useUserType } from './UserTypeProvider';
 
 const EmployeeAuthContext = createContext();
 
 const EmployeeAuthProvider = ({ children }) => {
     const [employee, setEmployee] = useState(null);
-
     const [loading, setLoading] = useState(true);
-
     const [refresh, setRefresh] = useState(false);
 
-    const navigate = useNavigate();
+    const navigate = useNavigate();    
+    const { setUserType } = useUserType()
 
 
     useEffect(() => {
@@ -32,6 +32,7 @@ const EmployeeAuthProvider = ({ children }) => {
             }
         };
     
+        setUserType("employee")
         fetchUser();
     }, [refresh]);
     

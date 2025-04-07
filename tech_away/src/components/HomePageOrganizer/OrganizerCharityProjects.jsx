@@ -4,13 +4,13 @@ import { Alert, Button, Spinner } from 'react-bootstrap';
 import CharityProjectCatalog from '../charityProject/CharityProjectCatalog';
 import api from '../../utils/axios';
 import ModalCharityProjectDetails from '../charityProject/ModalCharityProjectDetails';
-import { useAuth } from '../../contexts/AuthenticationProviders/OrganizerAuthProvider';
+import { useOrganizerAuth  } from '../../contexts/AuthenticationProviders/OrganizerAuthProvider';
 
 export default function OrganizerCharityProjects() {
   const [showModal, setShowModal] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
-  const { getOrganizerID, isOrganizer } = useAuth();
+  const { getOrganizerID, isOrganizer } = useOrganizerAuth ();
 
   const [charityProjects, setCharityProjects] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);

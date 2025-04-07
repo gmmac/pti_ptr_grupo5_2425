@@ -1,16 +1,17 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api from "../../utils/axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useUserType } from "./UserTypeProvider";
 
 const AuthContext = createContext();
-
-const AuthProvider = ({ children, userType, loginPath }) => {
+const AuthProvider = ({ children, userType="client", loginPath }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
-
+  
   const navigate = useNavigate();
   const location = useLocation();
+  const { setUserType } = useUserType()
 
   const fetchUser = async () => {
     try {
@@ -36,6 +37,7 @@ const AuthProvider = ({ children, userType, loginPath }) => {
   };
 
   useEffect(() => {
+    setUserType(userType)
     fetchUser();
   }, [refresh]);
 

@@ -51,7 +51,7 @@ const useOrganizerAuthExtension = () => {
   };
 };
 
-export const useAuth = () => {
+export const useOrganizerAuth  = () => {
   return useContext(OrganizerAuthContext);
 };
 

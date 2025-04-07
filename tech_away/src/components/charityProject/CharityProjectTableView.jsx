@@ -1,11 +1,32 @@
-import React, { useEffect } from "react";
-
+import React from "react";
 import { Button, Container, Table } from "react-bootstrap";
-import { useAuth } from "../../contexts/AuthenticationProviders/OrganizerAuthProvider";
+import { useUserType } from "../../contexts/AuthenticationProviders/UserTypeProvider";
+import { useOrganizerAuth } from "../../contexts/AuthenticationProviders/OrganizerAuthProvider";
+
 export default function CharityProjectTableView({ projects, onOpenDetails, onDelete, deleting }) {
+  const { userType } = useUserType();
+
+  let organizerAuth = {
+    user: null,
+    isOrganizer: () => false,
+    getOrganizerID: () => null,
+    isOrganizerProject: () => false,
+  };
+
+  try {
+    organizerAuth = useOrganizerAuth();
+  } catch (e) {
+    console.warn("Active user is an employee");
+  }
+
+  const { isOrganizer } = organizerAuth;
+
   return (
     <Container fluid className="p-3">
-      <div className="table-responsive shadow-sm rounded" style={{ backgroundColor: "#f8f9fa", borderRadius: "10px" }}>
+      <div
+        className="table-responsive shadow-sm rounded"
+        style={{ backgroundColor: "#f8f9fa", borderRadius: "10px" }}
+      >
         <Table hover bordered className="mb-0 d-none d-lg-table">
           <thead className="bg-light text-dark">
             <tr>
@@ -30,13 +51,22 @@ export default function CharityProjectTableView({ projects, onOpenDetails, onDel
                 <td>{project.Warehouse?.name}</td>
                 <td>{new Date(project.createdAt).toLocaleDateString()}</td>
                 <td>
-                  <Button size="sm" onClick={() => onOpenDetails(project)}>See Details</Button>
-                </td>
-                <td>
-                  <Button size="sm" variant="danger" onClick={() => onDelete(project)} disabled={deleting}>
-                    Delete
+                  <Button size="sm" onClick={() => onOpenDetails(project)}>
+                    See Details
                   </Button>
                 </td>
+                {isOrganizer() && (
+                  <td>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => onDelete(project)}
+                      disabled={deleting}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

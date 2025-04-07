@@ -6,7 +6,6 @@ import { useAuth } from '../../contexts/AuthenticationProviders/AuthProvider';
 import OrganizerCharityProjects from '../../components/HomePageOrganizer/OrganizerCharityProjects';
 
 export default function OrganizerHomePage() {
-
     const { user } = useAuth;
 
     return (

@@ -31,10 +31,12 @@ import OrganizerLoginPage from "./pages/Organizer/OrganizerLoginPage";
 import OrganizerLayoutPage from "./pages/Layout/OrganizerLayoutPage";
 import OrganizerHomePage from "./pages/Organizer/OrganizerHomePage";
 import OrganizerAuthProvider from "./contexts/AuthenticationProviders/OrganizerAuthProvider";
+import { UserTypeProvider } from "./contexts/AuthenticationProviders/UserTypeProvider";
 
 export default function Router() {
   return (
     <IsMobileProvider>
+      <UserTypeProvider>
       <BrowserRouter>
         <Routes>
 
@@ -114,6 +116,7 @@ export default function Router() {
 
         </Routes>
       </BrowserRouter>
+      </UserTypeProvider>
     </IsMobileProvider>
   );
 }
