@@ -29,6 +29,8 @@ export default function OffCanvasCart({ cartId, isOpen, onClose }) {
 		api
 			.delete(`/api/actualCartEquipment/${id}`)
 			.then(() => {
+				console.log("item removido com sucesso");
+
 				fetchCartItems();
 				fetchTotalPrice();
 			})
@@ -104,10 +106,21 @@ export default function OffCanvasCart({ cartId, isOpen, onClose }) {
 						></i>
 					</Button>
 				</Stack>
-				<Stack direction="vertical">
-					{cartItems.map((item, index) => (
-						<ItemCart key={index} equipment={item} onRemove={handleRemove} />
-					))}
+				<Stack
+					direction="vertical"
+					style={{
+						maxHeight: "100%",
+						overflowY: "scroll",
+						overflowX: "hidden",
+					}}
+				>
+					{cartItems ? (
+						cartItems.map((item, index) => (
+							<ItemCart key={index} equipment={item} onRemove={handleRemove} />
+						))
+					) : (
+						<p className="text-center">Cart is empty :(</p>
+					)}
 				</Stack>
 				<Stack
 					direction="horizontal"

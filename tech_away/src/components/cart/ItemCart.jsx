@@ -14,7 +14,7 @@ export default function ItemCart({ equipment, onRemove }) {
 	const [showModal, setShowModal] = useState(false);
 
 	const handleRemove = () => {
-		onRemove(equipment.id);
+		onRemove(equipment.lineId);
 		setShowModal(false);
 	};
 
