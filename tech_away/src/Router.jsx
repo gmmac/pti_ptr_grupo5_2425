@@ -26,6 +26,10 @@ import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAut
 import ProfilePageClient from "./pages/Auth/ProfilePageClient";
 import EmployeeLayoutPage from "./pages/Layout/EmployeeLayoutPage";
 import EmployeeManagePage from "./pages/Employee/EmployeeManagePage";
+import OrganizerRegisterPage from "./pages/Organizer/OrganizerRegisterPage";
+import OrganizerLoginPage from "./pages/Organizer/OrganizerLoginPage";
+import OrganizerLayoutPage from "./pages/Layout/OrganizerLayoutPage";
+import OrganizerHomePage from "./pages/Organizer/OrganizerHomePage";
 import TestPage from "./pages/TestPage";
 
 export default function Router() {
@@ -39,7 +43,7 @@ export default function Router() {
 					<Route
 						path="/"
 						element={
-							<AuthProvider>
+							<AuthProvider userType="client">
 								<LayoutPage />
 							</AuthProvider>
 						}
@@ -59,7 +63,7 @@ export default function Router() {
 						<Route path="storePurchasePage" element={<StorePurchasePage />} />
 						<Route path="register" element={<RegisterPageClient />} />
 						<Route path="login" element={<LoginPageClient />} />
-						<Route path="/profile" element={<ProfilePageClient />} />
+						<Route path="profile" element={<ProfilePageClient />} />
 						<Route
 							path="interests"
 							element={
@@ -84,11 +88,36 @@ export default function Router() {
 							<Route path="manage" element={<EmployeeManagePage />} />
 						</Route>
 
-						<Route path="login" element={<EmployeeLoginPage />} />
-						<Route path="register" element={<EmployeeRegisterPage />} />
-					</Route>
-				</Routes>
-			</BrowserRouter>
-		</IsMobileProvider>
-	);
+            <Route path="login" element={<EmployeeLoginPage />} />
+            <Route path="register" element={<EmployeeRegisterPage />} />
+
+          </Route>
+
+
+          {/* Rotas do organizador */}
+          <Route
+            path="/organizer"
+            element={
+              <AuthProvider userType="organizer">
+                  <Outlet />
+              </AuthProvider>
+            }
+          >
+          
+            <Route element={<OrganizerLayoutPage />}>
+              <Route index element={<OrganizerHomePage />} />
+              {/* <Route path="manage" element={<EmployeeManagePage />} /> */}
+
+            </Route>
+
+            <Route path="login" element={<OrganizerLoginPage />} />
+            <Route path="register" element={<OrganizerRegisterPage />} />
+            <Route path="changePassword" element={<ChangePasswordClient userType="organizer" />} />
+
+          </Route>
+
+        </Routes>
+      </BrowserRouter>
+    </IsMobileProvider>
+  );
 }
