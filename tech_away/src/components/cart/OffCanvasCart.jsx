@@ -1,0 +1,132 @@
+import React, { useState, useEffect } from "react";
+import { Button, Container, Stack } from "react-bootstrap";
+import ItemCart from "./ItemCart";
+import api from "../../utils/axios";
+
+export default function OffCanvasCart({ cartId, isOpen, onClose }) {
+	if (!isOpen) return null;
+	const [numCartItems, setNumCartItems] = useState(0);
+	const [cartItems, setCartItems] = useState([]);
+	const [totalPrice, setTotalPrice] = useState(0);
+
+	useEffect(() => {
+		api
+			.get("/api/actualCartEquipment/countItems/" + cartId)
+			.then((res) => {
+				setNumCartItems(res.data.count);
+			})
+			.catch((error) => {
+				console.error("Erro ao buscar número de itens no carrinho:", error);
+			});
+	}, [cartId]);
+
+	useEffect(() => {
+		fetchCartItems();
+		fetchTotalPrice();
+	}, [cartId]);
+
+	const handleRemove = (id) => {
+		api
+			.delete(`/api/actualCartEquipment/${id}`)
+			.then(() => {
+				fetchCartItems();
+				fetchTotalPrice();
+			})
+			.catch((error) => {
+				console.log("Erro ao remover item: ", error.message);
+			});
+	};
+
+	const fetchCartItems = async () => {
+		try {
+			const response = await api.get(`/api/actualCartEquipment/${cartId}`);
+			setCartItems(response.data);
+		} catch (error) {
+			console.error("Erro ao buscar itens do carrinho:", error);
+		}
+	};
+
+	const fetchTotalPrice = async () => {
+		try {
+			const response = await api.get(
+				`/api/actualCartEquipment/totalPrice/${cartId}`
+			);
+			setTotalPrice(response.data.totalPrice);
+		} catch (error) {
+			console.error("Erro ao buscar preço total do carrinho:", error);
+		}
+	};
+
+	return (
+		<>
+			<div
+				className="cart-overlay"
+				onClick={onClose}
+				style={{
+					position: "fixed",
+					top: 0,
+					left: 0,
+					width: "100%",
+					height: "100%",
+					background: "rgba(0, 0, 0, 0.5)" /* Fundo escuro semi-transparente */,
+					zIndex: "2",
+					transition: "opacity 0.3s ease-in-out",
+				}}
+			></div>
+			<Stack
+				style={{
+					backgroundColor: "var(--white)",
+					color: "var(dark-grey)",
+					fontFamily: "var(--body-font)",
+					position: "fixed",
+					right: "0",
+					top: "0",
+					width: "400px",
+					height: "95%",
+					transition: "transform 0.3s ease-in-out",
+					zIndex: "3",
+				}}
+				className="p-4 m-3 rounded-sm"
+				gap={3}
+			>
+				<Stack
+					direction="horizontal"
+					className="justify-content-between border-bottom pb-1"
+				>
+					<h5>Cart({numCartItems})</h5>
+					<Button
+						onClick={onClose}
+						style={{ background: "none", border: "none" }}
+					>
+						<i
+							className="pi pi-times"
+							style={{ color: "var(--dark-grey)" }}
+						></i>
+					</Button>
+				</Stack>
+				<Stack direction="vertical">
+					{cartItems.map((item, index) => (
+						<ItemCart key={index} equipment={item} onRemove={handleRemove} />
+					))}
+				</Stack>
+				<Stack
+					direction="horizontal"
+					className="justify-content-between align-items-center border-top pt-2"
+				>
+					<h5 className="m-0">Total Price</h5>{" "}
+					<h5 className="m-0">{totalPrice}€</h5>
+				</Stack>
+				<Button
+					className="rounded-pill py-2 fs-5"
+					style={{
+						backgroundColor: "var(--variant-one)",
+						border: "none",
+						fontFamily: "var(--title-font)",
+					}}
+				>
+					Pay
+				</Button>
+			</Stack>
+		</>
+	);
+}

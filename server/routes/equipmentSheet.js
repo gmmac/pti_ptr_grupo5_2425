@@ -105,105 +105,105 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/in-stock", async (req, res) => {
-	// try {
-	const {
-		page = 1,
-		pageSize = 6,
-		orderBy = "recent-date", // Valor padrão
-		modelId,
-		typeId,
-		brandId,
-	} = req.query;
+	try {
+		const {
+			page = 1,
+			pageSize = 6,
+			orderBy = "recent-date", // Valor padrão
+			modelId,
+			typeId,
+			brandId,
+		} = req.query;
 
-	// Construção do objeto 'where' dinamicamente
-	const where = {};
+		// Construção do objeto 'where' dinamicamente
+		const where = {};
 
-	const modelCondition = modelId ? { id: modelId } : {};
-	const typeCondition = typeId ? { id: typeId } : {};
-	const brandCondition = brandId ? { id: brandId } : {};
-	console.log(modelId, typeId, brandId);
+		const modelCondition = modelId ? { id: modelId } : {};
+		const typeCondition = typeId ? { id: typeId } : {};
+		const brandCondition = brandId ? { id: brandId } : {};
+		console.log(modelId, typeId, brandId);
 
-	// Calculando o offset com base na página
-	const offset = (parseInt(page) - 1) * parseInt(pageSize);
+		// Calculando o offset com base na página
+		const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
-	// Consulta ao banco de dados
-	const { count, rows } = await models.EquipmentSheet.findAndCountAll({
-		where,
-		include: [
-			{
-				model: models.UsedEquipment,
-				as: "UsedEquipments",
-				required: true,
-			},
-			{
-				model: models.EquipmentModel,
-				as: "EquipmentModel",
-				where: modelCondition,
-				attributes: ["name", "price", "releaseYear"],
-				include: [
-					{
-						model: models.Brand,
-						as: "Brand",
-						where: brandCondition,
-						attributes: ["name"],
-					},
-				],
-			},
-			{
-				model: models.EquipmentType,
-				as: "EquipmentType",
-				where: typeCondition,
-				attributes: ["name"],
-			},
-		],
-		limit: parseInt(pageSize),
-		offset,
-	});
+		// Consulta ao banco de dados
+		const { count, rows } = await models.EquipmentSheet.findAndCountAll({
+			where,
+			include: [
+				{
+					model: models.UsedEquipment,
+					as: "UsedEquipments",
+					required: true,
+				},
+				{
+					model: models.EquipmentModel,
+					as: "EquipmentModel",
+					where: modelCondition,
+					attributes: ["name", "price", "releaseYear"],
+					include: [
+						{
+							model: models.Brand,
+							as: "Brand",
+							where: brandCondition,
+							attributes: ["name"],
+						},
+					],
+				},
+				{
+					model: models.EquipmentType,
+					as: "EquipmentType",
+					where: typeCondition,
+					attributes: ["name"],
+				},
+			],
+			limit: parseInt(pageSize),
+			offset,
+		});
 
-	const formattedData = rows.map((item) => ({
-		Barcode: item.barcode,
-		CreatedAt: item.createdAt,
-		UpdatedAt: item.updatedAt,
-		EquipmentModel: item.EquipmentModel.name,
-		Brand: item.EquipmentModel.Brand.name,
-		EquipmentType: item.EquipmentType.name,
-	}));
+		const formattedData = rows.map((item) => ({
+			Barcode: item.barcode,
+			CreatedAt: item.createdAt,
+			UpdatedAt: item.updatedAt,
+			EquipmentModel: item.EquipmentModel.name,
+			Brand: item.EquipmentModel.Brand.name,
+			EquipmentType: item.EquipmentType.name,
+		}));
 
-	switch (orderBy) {
-		case "recent-date":
-			formattedData.sort(
-				(a, b) => b.CreatedAt.getTime() - a.CreatedAt.getTime()
-			);
-			break;
-		case "oldest-date":
-			formattedData.sort(
-				(a, b) => a.CreatedAt.getTime() - b.CreatedAt.getTime()
-			);
-			break;
-		case "ASC":
-			formattedData.sort((a, b) =>
-				a.EquipmentModel.localeCompare(b.EquipmentModel)
-			);
-			break;
-		case "DESC":
-			formattedData.sort((a, b) =>
-				b.EquipmentModel.localeCompare(a.EquipmentModel)
-			);
-			break;
+		switch (orderBy) {
+			case "recent-date":
+				formattedData.sort(
+					(a, b) => b.CreatedAt.getTime() - a.CreatedAt.getTime()
+				);
+				break;
+			case "oldest-date":
+				formattedData.sort(
+					(a, b) => a.CreatedAt.getTime() - b.CreatedAt.getTime()
+				);
+				break;
+			case "ASC":
+				formattedData.sort((a, b) =>
+					a.EquipmentModel.localeCompare(b.EquipmentModel)
+				);
+				break;
+			case "DESC":
+				formattedData.sort((a, b) =>
+					b.EquipmentModel.localeCompare(a.EquipmentModel)
+				);
+				break;
+		}
+
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: formattedData,
+			// data: rows,
+		});
+	} catch (error) {
+		console.error("Error fetching equipment sheets:", error);
+		res.status(500).json({ error: "Error fetching equipment sheets." });
 	}
-
-	res.json({
-		totalItems: count,
-		totalPages: Math.ceil(count / pageSize),
-		currentPage: parseInt(page),
-		pageSize: parseInt(pageSize),
-		data: formattedData,
-		// data: rows,
-	});
-	// } catch (error) {
-	//     console.error("Error fetching equipment sheets:", error);
-	//     res.status(500).json({ error: "Error fetching equipment sheets." });
-	// }
 });
 
 router.post("/", (req, res) => {});

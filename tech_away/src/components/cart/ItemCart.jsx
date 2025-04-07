@@ -19,7 +19,10 @@ export default function ItemCart({ equipment, onRemove }) {
 	};
 
 	return (
-		<Container className="p-4 m-2 border-bottom">
+		<Container
+			className="p-2  border-bottom"
+			style={{ fontFamily: "var(--body-font)" }}
+		>
 			<Modal show={showModal} onHide={() => setShowModal(false)}>
 				<Modal.Header closeButton>
 					<Modal.Title></Modal.Title>
@@ -39,7 +42,7 @@ export default function ItemCart({ equipment, onRemove }) {
 						variant="secondary"
 						onClick={() => setShowModal(false)}
 					>
-						Cancelar
+						Cancel
 					</Button>
 					<Button
 						className="rounded-pill"
@@ -49,13 +52,19 @@ export default function ItemCart({ equipment, onRemove }) {
 						}}
 						onClick={handleRemove}
 					>
-						Remover
+						Remove
 					</Button>
 				</Modal.Footer>
 			</Modal>
 
 			<Row>
-				<Col className="d-flex justify-content-center align-items-center">
+				<Col
+					className="d-flex justify-content-center align-items-center"
+					xs={4}
+					sm={4}
+					md={4}
+					lg={4}
+				>
 					<Image
 						src={`../../../public/assets/pc.jpg`}
 						width={100}
@@ -67,8 +76,8 @@ export default function ItemCart({ equipment, onRemove }) {
 				<Col>
 					<Row className="mb-2">
 						<Stack direction="verrical" className="align-items-start">
-							<h5>{equipment.modelName}</h5>
-							<p>{equipment.price} EUR</p>
+							<p className="m-0">{equipment.modelName}</p>
+							<p>{equipment.price} €</p>
 							<Tag
 								style={{
 									backgroundColor: "var(--variant-one)",

@@ -39,6 +39,9 @@ router.get("/clientCartID/:clientNic", async (req, res) => {
 		const cart = await models.ActualCart.findOne({
 			where: { clientNIC: req.params.clientNic },
 		});
+
+		console.log("aqui", cart);
+
 		if (!cart) return res.status(404).json({ error: "ActualCart not found" });
 		res.json(cart.id);
 	} catch (error) {
