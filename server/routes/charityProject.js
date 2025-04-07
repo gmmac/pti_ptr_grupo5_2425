@@ -25,6 +25,9 @@ router.get("/", async (req, res) => {
     if (warehouseID) where.warehouseID = { [Op.eq]: parseInt(warehouseID) };
     if (organizerNic) where.organizerNic = { [Op.like]: `%${organizerNic}%` };
 
+    console.log("ON ", organizerNic)
+    console.log("AAAAAA")
+
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
     const order = [[orderBy, orderDirection.toUpperCase()]];
 

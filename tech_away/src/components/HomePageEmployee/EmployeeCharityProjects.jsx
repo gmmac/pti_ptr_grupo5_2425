@@ -4,13 +4,10 @@ import { Alert, Button, Spinner } from 'react-bootstrap';
 import CharityProjectCatalog from '../charityProject/CharityProjectCatalog';
 import api from '../../utils/axios';
 import ModalCharityProjectDetails from '../charityProject/ModalCharityProjectDetails';
-import { useAuth } from '../../contexts/AuthenticationProviders/OrganizerAuthProvider';
 
 export default function OrganizerCharityProjects() {
   const [showModal, setShowModal] = useState(false);
   const [refresh, setRefresh] = useState(false);
-
-  const { getOrganizerID, isOrganizer } = useAuth();
 
   const [charityProjects, setCharityProjects] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,7 +20,6 @@ export default function OrganizerCharityProjects() {
     completionDate: '',
     status: '',
     warehouseID: '',
-    // orderDirection: 'ASC'
   });
 
   const handleFilterChange = (newFilters) => {
@@ -46,7 +42,6 @@ export default function OrganizerCharityProjects() {
       const response = await api.get('/api/charityProject/', {
         params: {
           ...filters,
-          organizerNic: getOrganizerID(),
           page: currentPage
         },
       });
@@ -62,9 +57,8 @@ export default function OrganizerCharityProjects() {
   };
 
   useEffect(() => {
-    if (!isOrganizer() || !getOrganizerID()) return;
     fetchCharityProjects();
-  }, [currentPage, filters, refresh, getOrganizerID()]);
+  }, [currentPage, filters, refresh]);
   
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
@@ -85,8 +79,6 @@ export default function OrganizerCharityProjects() {
   return (
     <div>
 
-        <h1> My Charity Projects </h1>
-
         {error && <Alert variant="danger">{error}</Alert>}
         {loading ? (
             <div className="text-center my-5">
@@ -94,17 +86,6 @@ export default function OrganizerCharityProjects() {
             </div>
         ) : ( 
             <>
-              {isOrganizer() && 
-                <div className="d-flex justify-content-end mb-3">
-                  <Button
-                    className="rounded-pill"
-                    style={{ backgroundColor: "var(--variant-two)", border: "none" }}
-                    onClick={handleOpenModal}
-                  >
-                    Add Charity Project
-                  </Button> 
-                </div>
-                }
                 <CharityProjectCatalog 
                   charityProjects={charityProjects} 
                   handlePageChange={handlePageChange} 
@@ -125,12 +106,6 @@ export default function OrganizerCharityProjects() {
 
             )}
 
-        {isOrganizer() && 
-          <RegisterCharityProject 
-            showModal={showModal} 
-            closeModal={handleCloseModal} 
-            setRefresh={toggleRefresh} />
-        }
-        </div>
+    </div>
   );
 }

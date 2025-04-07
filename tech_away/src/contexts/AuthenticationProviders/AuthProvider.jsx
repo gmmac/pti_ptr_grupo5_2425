@@ -40,7 +40,6 @@ const AuthProvider = ({ children, userType, loginPath }) => {
   }, [refresh]);
 
   useEffect(() => { // is not logged
-    console.log(user)
     const isOnPublicAuthRoute = location.pathname.includes("register") || location.pathname.includes("changePassword");
     if (!user && !loading && userType != "client" && !isOnPublicAuthRoute) {
       navigate(loginPath || `/${userType}/login`);

@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect } from "react";
 import AuthProvider, { useAuth as useGenericAuth } from "./AuthProvider";
 
 const OrganizerAuthContext = createContext();
@@ -24,6 +24,12 @@ const OrganizerAuthProviderWrapper = ({ children }) => {
 const useOrganizerAuthExtension = () => {
   const baseAuth = useGenericAuth();
 
+
+  useEffect(() => {
+    console.log("Organizer ", baseAuth.user)
+  
+  }, [baseAuth.user])
+  
   const isOrganizer = () => {
     return baseAuth.getUserType() === "organizer";
   };

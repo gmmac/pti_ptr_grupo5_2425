@@ -3,14 +3,6 @@ import React, { useEffect } from "react";
 import { Button, Container, Table } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthenticationProviders/OrganizerAuthProvider";
 export default function CharityProjectTableView({ projects, onOpenDetails, onDelete, deleting }) {
-    const { user, isOrganizerProject } = useAuth();
-
-    useEffect(() => {
-      console.log("User:", user);
-      console.log("Projects[0]:", projects[0]);
-      console.log(user?.nic === projects[0]?.organizerNic)
-    }, [user])
-    
   return (
     <Container fluid className="p-3">
       <div className="table-responsive shadow-sm rounded" style={{ backgroundColor: "#f8f9fa", borderRadius: "10px" }}>
@@ -41,10 +33,9 @@ export default function CharityProjectTableView({ projects, onOpenDetails, onDel
                   <Button size="sm" onClick={() => onOpenDetails(project)}>See Details</Button>
                 </td>
                 <td>
-                  {isOrganizerProject(project) &&
                   <Button size="sm" variant="danger" onClick={() => onDelete(project)} disabled={deleting}>
                     Delete
-                  </Button>}
+                  </Button>
                 </td>
               </tr>
             ))}
