@@ -6,6 +6,7 @@ import SelectedCardList from '../../elements/SelectedCardList';
 import PaginationControl from '../../pagination/PaginationControl';
 import api from '../../../utils/axios';
 import EquipmentSheetFlowCard from './../../equipmentSheet/EquipmentSheetFlowCard';
+import useSafeOrganizerAuth from '../../../utils/auth';
 
 export default function CharityProjectEquipmentSheetEditor({ projectId, onChangeAlert }) {
   const [equipmentSheets, setEquipmentSheets] = useState([]);
@@ -14,6 +15,9 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
   const [search, setSearch] = useState('');
   const [alert, setAlert] = useState({ show: false, message: '', variant: '' });
   const [isEditing, setIsEditing] = useState(false);
+
+  const {isOrganizer} = useSafeOrganizerAuth()
+
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -135,22 +139,22 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
     <>
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h5 className="fw-semibold mb-0">Selected Equipment Sheets</h5>
-        {!isEditing ? (
-          <Button variant="outline-primary" size="sm" onClick={() => setIsEditing(true)}>
-            Edit
-          </Button>
-        ) : (
-          <div className="d-flex gap-2">
-            {haveChanges() && (
-              <Button variant="success" size="sm" onClick={handleSave}>
-                Save
+          {isOrganizer && (
+              !isEditing ? (
+              <Button variant="primary" size="sm" onClick={() => setIsEditing(true)}>
+                  Edit
               </Button>
-            )}
-            <Button variant="outline-secondary" size="sm" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </div>
-        )}
+              ) : (
+              <div className="d-flex gap-2">
+                  <Button variant="success" size="sm" onClick={handleSave}>
+                  Save
+                  </Button>
+                  <Button variant="outline-secondary" size="sm" onClick={handleCancel}>
+                  Cancel
+                  </Button>
+              </div>
+              )
+          )}
       </div>
 
       {alert.show && (
@@ -164,13 +168,13 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
         isEditing={isEditing}
         onRemove={toggleSelectSheet}
         renderCard={(sheet) => (
-          <>
+          <div style={{cursor: "pointer"}}>
             <div className="fw-semibold">{sheet.EquipmentModel?.name} - {sheet?.Brand?.name}</div>
             <div className="small text-muted">
               {sheet.EquipmentType?.name}
             </div>
             <div className="small text-muted">{sheet.Barcode}</div>
-          </>
+          </div>
         )}
       />
 

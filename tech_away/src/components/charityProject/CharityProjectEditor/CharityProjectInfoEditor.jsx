@@ -3,13 +3,14 @@ import { Row, Col, Button, Form, Alert } from 'react-bootstrap';
 import api from '../../../utils/axios';
 import DatePicker from '../../elements/DatePicker';
 import WarehouseCatalogModal from '../../warehouse/WarehouseCatalogModal';
+import useSafeOrganizerAuth from '../../../utils/auth';
 
 export default function CharityProjectInfoEditor({ project, onChangeAlert, onRefresh, setProject, setSelectedProject }) {
     const [editing, setEditing] = useState(false);
     const [alert, setAlert] = useState({ show: false, message: '', variant: '' });
     const [errors, setErrors] = useState({});
     const [statusOptions, setStatusOptions] = useState([]);
-
+    const {isOrganizer} = useSafeOrganizerAuth()
     const [formData, setFormData] = useState({
         name: '',
         startDate: '',
@@ -176,19 +177,25 @@ export default function CharityProjectInfoEditor({ project, onChangeAlert, onRef
         <>
             <div className="d-flex justify-content-between align-items-center mb-2">
                 <h5 className="fw-semibold mb-0">Project Info</h5>
-                {!editing ? (
-                    <Button variant="primary" size="sm" onClick={() => setEditing(true)}>Edit</Button>
-                ) : (
+
+                {isOrganizer && (
+                    !editing ? (
+                    <Button variant="primary" size="sm" onClick={() => setEditing(true)}>
+                        Edit
+                    </Button>
+                    ) : (
                     <div className="d-flex gap-2">
                         <Button variant="success" size="sm" onClick={handleSave} disabled={!hasChanged()}>
-                            Save
+                        Save
                         </Button>
                         <Button variant="outline-secondary" size="sm" onClick={handleCancel}>
-                            Cancel
+                        Cancel
                         </Button>
                     </div>
+                    )
                 )}
             </div>
+
 
             {alert.show && (
                 <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>

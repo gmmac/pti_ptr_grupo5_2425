@@ -6,8 +6,6 @@ export default function CharityProjectCardView({ projects, onOpenDetails, onDele
 
   const {isOrganizer} = useSafeOrganizerAuth()
 
-
-
   return (
     <Row className="g-3 d-lg-none">
       {projects.map((project) => (
