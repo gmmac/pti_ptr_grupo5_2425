@@ -137,6 +137,9 @@ router.post("/linkEquipmentSheet", async (req, res) => {
   try {
     const { charityProjectId, equipmentSheetIds } = req.body;
 
+
+    console.log("AAAAAAAAAASHAJSH ", req.body)
+
     if (!charityProjectId || !Array.isArray(equipmentSheetIds)) {
       return res.status(400).json({ error: "charityProjectId and equipmentSheetIds[] are required." });
     }
@@ -222,7 +225,6 @@ router.get("/:id/equipmentTypes", async (req, res) => {
   }
 });
 
-
 router.get("/:id/equipmentSheet", async (req, res) => {
   try {
     const { id } = req.params;
@@ -255,7 +257,7 @@ router.get("/:id/equipmentSheet", async (req, res) => {
           [Op.in]: equipmentSheetIds,
           [Op.iLike]: `%${barcode}%`
         }
-      },
+      },      
       include: [
         {
           model: models.EquipmentModel,
@@ -264,7 +266,7 @@ router.get("/:id/equipmentSheet", async (req, res) => {
             {
               model: models.Brand,
               attributes: ['id', 'name']
-            },
+            }
           ]
         },
         {
@@ -277,12 +279,30 @@ router.get("/:id/equipmentSheet", async (req, res) => {
       limit
     });
 
+    const formattedRows = rows.map((item) => ({
+      Barcode: item.barcode,
+      CreatedAt: item.createdAt,
+      UpdatedAt: item.updatedAt,
+      EquipmentModel: {
+        id: item.EquipmentModel?.id,
+        name: item.EquipmentModel?.name
+      },
+      Brand: {
+        id: item.EquipmentModel?.Brand?.id,
+        name: item.EquipmentModel?.Brand?.name
+      },
+      EquipmentType: {
+        id: item.EquipmentType?.id,
+        name: item.EquipmentType?.name
+      }
+    }));
+
     res.json({
       totalItems: count,
       totalPages: Math.ceil(count / limit),
       currentPage: parseInt(page),
       pageSize: limit,
-      data: rows
+      data: formattedRows
     });
 
   } catch (error) {
@@ -290,6 +310,7 @@ router.get("/:id/equipmentSheet", async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar EquipmentSheets vinculados ao projeto." });
   }
 });
+
 
 
 router.get("/:ID", async (req, res) => {

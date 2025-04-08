@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Accordion, Alert, Button } from 'react-bootstrap';
+import { Accordion, Alert, Button, Col, Row } from 'react-bootstrap';
 import SearchBar from '../../searchBar/SearchBar';
 import FlowPane from '../../elements/FlowPane';
 import SelectedCardList from '../../elements/SelectedCardList';
@@ -32,7 +32,7 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
     try {
       const res = await api.get(`/api/charityProject/${projectId}/equipmentSheet`);
       const normalized = (res.data?.data || []).map((item) => ({
-        barcode: item.Barcode,
+        Barcode: item.Barcode,
         EquipmentModel: item.EquipmentModel,
         EquipmentType: item.EquipmentType,
         Brand: item.Brand,
@@ -67,7 +67,8 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
   };
 
   const toggleSelectSheet = (sheet) => {
-    console.log(sheet)
+    // console.log("SHEET: ", sheet)
+    // console.log("SELEC SHEETS ", selectedSheets)
     const isAlreadySelected = selectedSheets.some((e) => e.Barcode === sheet.Barcode);
     if (isAlreadySelected) {
       setSelectedSheets((prev) => prev.filter((e) => e.Barcode !== sheet.Barcode));
@@ -164,7 +165,7 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
         onRemove={toggleSelectSheet}
         renderCard={(sheet) => (
           <>
-            <div className="fw-semibold">{sheet.EquipmentModel?.name} - {sheet.Brand?.name}</div>
+            <div className="fw-semibold">{sheet.EquipmentModel?.name} - {sheet?.Brand?.name}</div>
             <div className="small text-muted">
               {sheet.EquipmentType?.name}
             </div>

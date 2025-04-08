@@ -12,7 +12,7 @@ export default function SelectedCardList({ selectedElements = [], isEditing = fa
             className="shadow-sm rounded-sm border-0"
           >
             <Card.Body className="d-flex justify-content-between align-items-center py-2 px-3">
-              <div>{renderCard(element)}</div>
+              <>{renderCard(element)}</>
               {isEditing && onRemove && (
                 <Button
                   size="sm"
