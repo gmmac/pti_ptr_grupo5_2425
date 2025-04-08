@@ -78,6 +78,8 @@ export default function OrganizerCharityProjects() {
 
   return (
     <div>
+        Associate to project
+
 
         {error && <Alert variant="danger">{error}</Alert>}
         {loading ? (
@@ -102,6 +104,7 @@ export default function OrganizerCharityProjects() {
                 onRefresh={toggleRefresh}
                 setSelectedProject={setSelectedProject}
               />
+              
             </>
 
             )}

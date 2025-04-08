@@ -1,25 +1,11 @@
 import React from "react";
 import { Button, Container, Table } from "react-bootstrap";
-import { useUserType } from "../../contexts/AuthenticationProviders/UserTypeProvider";
-import { useOrganizerAuth } from "../../contexts/AuthenticationProviders/OrganizerAuthProvider";
+import useSafeOrganizerAuth from "../../utils/auth";
 
 export default function CharityProjectTableView({ projects, onOpenDetails, onDelete, deleting }) {
-  const { userType } = useUserType();
 
-  let organizerAuth = {
-    user: null,
-    isOrganizer: () => false,
-    getOrganizerID: () => null,
-    isOrganizerProject: () => false,
-  };
-
-  try {
-    organizerAuth = useOrganizerAuth();
-  } catch (e) {
-    console.warn("Active user is an employee");
-  }
-
-  const { isOrganizer } = organizerAuth;
+  const {isOrganizer} = useSafeOrganizerAuth()
+  
 
   return (
     <Container fluid className="p-3">
@@ -55,7 +41,7 @@ export default function CharityProjectTableView({ projects, onOpenDetails, onDel
                     See Details
                   </Button>
                 </td>
-                {isOrganizer() && (
+                {isOrganizer && (
                   <td>
                     <Button
                       size="sm"

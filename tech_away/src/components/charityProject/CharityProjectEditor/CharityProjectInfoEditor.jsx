@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Button, Form, Alert } from 'react-bootstrap';
-import api from '../../utils/axios';
-import DatePicker from '../elements/DatePicker';
-import WarehouseCatalogModal from '../warehouse/WarehouseCatalogModal';
+import api from '../../../utils/axios';
+import DatePicker from '../../elements/DatePicker';
+import WarehouseCatalogModal from '../../warehouse/WarehouseCatalogModal';
 
 export default function CharityProjectInfoEditor({ project, onChangeAlert, onRefresh, setProject, setSelectedProject }) {
     const [editing, setEditing] = useState(false);

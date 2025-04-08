@@ -25,12 +25,6 @@ module.exports = (sequelize, DataTypes) => {
 				onDelete: "SET NULL",
 			});
 
-
-			UsedEquipment.belongsToMany(models.CharityProject, {
-				through: models.UsedEquipmentCharityProject,
-				foreignKey: 'usedEquipmentId',
-				otherKey: 'charityProjectId'
-			});
 			
 		}
 	}

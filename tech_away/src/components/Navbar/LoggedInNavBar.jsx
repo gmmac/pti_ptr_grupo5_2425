@@ -4,7 +4,6 @@ import { useLocation, Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "../../styles/variables.css";
 import { useAuth } from '../../contexts/AuthenticationProviders/AuthProvider';
-// import { getLoggedUser,  removeLoggedUser} from "../../utils/auth";
 
 const navItems = [
   { name: "About Us", path: "/about" },

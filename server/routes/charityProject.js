@@ -25,9 +25,6 @@ router.get("/", async (req, res) => {
     if (warehouseID) where.warehouseID = { [Op.eq]: parseInt(warehouseID) };
     if (organizerNic) where.organizerNic = { [Op.like]: `%${organizerNic}%` };
 
-    console.log("ON ", organizerNic)
-    console.log("AAAAAA")
-
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
     const order = [[orderBy, orderDirection.toUpperCase()]];
 
@@ -135,6 +132,41 @@ router.post("/linkEquipmentType", async (req, res) => {
   }
 });
 
+
+router.post("/linkEquipmentSheet", async (req, res) => {
+  try {
+    const { charityProjectId, equipmentSheetIds } = req.body;
+
+    if (!charityProjectId || !Array.isArray(equipmentSheetIds)) {
+      return res.status(400).json({ error: "charityProjectId and equipmentSheetIds[] are required." });
+    }
+
+    await models.EquipmentSheetCharityProject.destroy({
+      where: { charityProjectId }
+    });
+
+    console.log("qaaasasasasas", equipmentSheetIds)
+    const records = equipmentSheetIds.map((e) => ({
+      charityProjectId,
+      equipmentSheetId: e,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }));
+
+    const created = await models.EquipmentSheetCharityProject.bulkCreate(records);
+
+    res.status(201).json({
+      message: "Equipment Sheets update sucessfully.",
+      insertedCount: created.length,
+      data: created
+    });
+  } catch (error) {
+    console.error("Error updating CharityProjectEquipmentSheet:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+
 router.get("/:id/equipmentTypes", async (req, res) => {
   try {
     const { id } = req.params;
@@ -187,6 +219,75 @@ router.get("/:id/equipmentTypes", async (req, res) => {
   } catch (error) {
     console.error("Erro ao buscar tipos vinculados ao projeto:", error);
     res.status(500).json({ error: "Erro ao buscar tipos vinculados ao projeto." });
+  }
+});
+
+
+router.get("/:id/equipmentSheet", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      page = 1,
+      pageSize = 10,
+      barcode = "",
+      orderBy = "barcode",
+      orderDirection = "ASC"
+    } = req.query;
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+    const limit = parseInt(pageSize);
+
+    const project = await models.CharityProject.findByPk(id);
+    if (!project) {
+      return res.status(404).json({ error: "Charity Project not found." });
+    }
+
+    const linkedRecords = await models.EquipmentSheetCharityProject.findAll({
+      where: { charityProjectId: id },
+      attributes: ['equipmentSheetId']
+    });
+
+    const equipmentSheetIds = linkedRecords.map(record => record.equipmentSheetId);
+
+    const { count, rows } = await models.EquipmentSheet.findAndCountAll({
+      where: {
+        barcode: {
+          [Op.in]: equipmentSheetIds,
+          [Op.iLike]: `%${barcode}%`
+        }
+      },
+      include: [
+        {
+          model: models.EquipmentModel,
+          attributes: ['id', 'name'],
+          include: [
+            {
+              model: models.Brand,
+              attributes: ['id', 'name']
+            },
+          ]
+        },
+        {
+          model: models.EquipmentType,
+          attributes: ['id', 'name']
+        }
+      ],
+      order: [[orderBy, orderDirection.toUpperCase()]],
+      offset,
+      limit
+    });
+
+    res.json({
+      totalItems: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      pageSize: limit,
+      data: rows
+    });
+
+  } catch (error) {
+    console.error("Erro ao buscar EquipmentSheets vinculados ao projeto:", error);
+    res.status(500).json({ error: "Erro ao buscar EquipmentSheets vinculados ao projeto." });
   }
 });
 

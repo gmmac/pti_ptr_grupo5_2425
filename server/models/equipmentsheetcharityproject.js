@@ -2,21 +2,21 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class UsedEquipmentCharityProject extends Model {
+  class EquipmentSheetCharityProject extends Model {
     static associate(models) {
-      UsedEquipmentCharityProject.belongsTo(models.UsedEquipment, {
-        foreignKey: 'usedEquipmentId',
+      EquipmentSheetCharityProject.belongsTo(models.UsedEquipment, {
+        foreignKey: 'equipmentSheetId',
       });
 
-      UsedEquipmentCharityProject.belongsTo(models.CharityProject, {
+      EquipmentSheetCharityProject.belongsTo(models.CharityProject, {
         foreignKey: 'charityProjectId',
       });
     }
   }
 
-  UsedEquipmentCharityProject.init({
-    usedEquipmentId: {
-      type: DataTypes.INTEGER,
+  EquipmentSheetCharityProject.init({
+    equipmentSheetId: {
+      type: DataTypes.STRING(20),
       primaryKey: true,
       allowNull: false,
     },
@@ -27,9 +27,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'UsedEquipmentCharityProject',
+    modelName: 'EquipmentSheetCharityProject',
     timestamps: true,
   });
 
-  return UsedEquipmentCharityProject;
+  return EquipmentSheetCharityProject;
 };

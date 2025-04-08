@@ -4,11 +4,9 @@ import { PaginationProvider } from '../../contexts/PaginationContext';
 
 import api from '../../utils/axios';
 import PaginationControl from '../pagination/PaginationControl';
-import { getLoggedUser } from '../../utils/auth';
 import "../../styles/pageElements.css";
 
 export default function EmployeeRepairs() {
-  const user = getLoggedUser();
   const [employeeStore, setEmployeeStore] = useState({});
   const [repairs, setRepairs] = useState([]);
 

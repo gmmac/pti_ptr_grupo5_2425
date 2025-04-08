@@ -29,11 +29,12 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'SET NULL'
       });
       
-      CharityProject.belongsToMany(models.UsedEquipment, {
-        through: models.UsedEquipmentCharityProject,
-        foreignKey: 'charityProjectId',
-        otherKey: 'usedEquipmentId'
+      CharityProject.belongsToMany(models.EquipmentSheet, {
+        through: models.EquipmentSheetCharityProject,
+				foreignKey: 'charityProjectId',
+        otherKey: 'equipmentSheetId'
       });
+      
       
       }
   }

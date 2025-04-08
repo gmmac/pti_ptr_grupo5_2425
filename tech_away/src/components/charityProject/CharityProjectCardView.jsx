@@ -1,22 +1,11 @@
 import React, { useEffect } from "react";
 import { Card, Row, Col, Button } from "react-bootstrap";
-import { useUserType } from "../../contexts/AuthenticationProviders/UserTypeProvider";
-import { useOrganizerAuth } from "../../contexts/AuthenticationProviders/OrganizerAuthProvider";
+import useSafeOrganizerAuth from "../../utils/auth";
 
 export default function CharityProjectCardView({ projects, onOpenDetails, onDelete, deleting }) {
-  const { userType } = useUserType();
 
-  let user = null;
-  let isOrganizer = () => false;
+  const {isOrganizer} = useSafeOrganizerAuth()
 
-  if (userType === "organizer") {
-    try {
-      const auth = useOrganizerAuth();
-      user = auth.user;
-      isOrganizer = auth.isOrganizer;
-    } catch (e) {
-    }
-  }
 
 
   return (
@@ -40,7 +29,7 @@ export default function CharityProjectCardView({ projects, onOpenDetails, onDele
                 <Button size="sm" onClick={() => onOpenDetails(project)}>
                   See Details
                 </Button>
-                {isOrganizer() && (
+                {isOrganizer && (
                   <Button
                     size="sm"
                     variant="danger"

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Accordion, Alert, Button } from 'react-bootstrap';
-import SearchBar from '../searchBar/SearchBar';
-import FlowPane from '../elements/FlowPane';
-import SelectedCardList from '../elements/SelectedCardList';
-import PaginationControl from '../pagination/PaginationControl';
-import api from '../../utils/axios';
+import SearchBar from '../../searchBar/SearchBar';
+import FlowPane from '../../elements/FlowPane';
+import SelectedCardList from '../../elements/SelectedCardList';
+import PaginationControl from '../../pagination/PaginationControl';
+import api from '../../../utils/axios';
+import EquipmentTypeCard from '../../equipmentType/EquipmentTypeCard';
 
 export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeAlert }) {
   const [equipmentTypes, setEquipmentTypes] = useState([]);
@@ -61,15 +62,12 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
 
   const toggleSelectType = (type) => {
     const isAlreadySelected = selectedTypes.find((e) => e.id === type.id);
-  
     if (isAlreadySelected) {
-      setSelectedTypes(prev => prev.filter(e => e.id !== type.id));
+      setSelectedTypes((prev) => prev.filter((e) => e.id !== type.id));
     } else {
-      setSelectedTypes(prev => [...prev, type]);
+      setSelectedTypes((prev) => [...prev, type]);
     }
   };
-  
-  
 
   const haveChanges = () => {
     const a = selectedTypes.map((t) => t.id).sort();
@@ -82,13 +80,13 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
       showAlert('No changes to save.', 'warning');
       return;
     }
-  
+
     try {
       await api.post('/api/charityProject/linkEquipmentType', {
         charityProjectId: projectId,
         equipmentTypeIds: selectedTypes.map((t) => t.id),
       });
-  
+
       setOriginalTypes(selectedTypes);
       showAlert('Equipment types updated!', 'success');
       onChangeAlert?.({ message: 'Equipment types updated!', variant: 'success' });
@@ -99,7 +97,6 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
       onChangeAlert?.({ message: 'Error updating equipment types.', variant: 'danger' });
     }
   };
-  
 
   const handleCancel = () => {
     setSelectedTypes(originalTypes);
@@ -139,7 +136,11 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
       </div>
 
       {alert.show && (
-        <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>
+        <Alert
+          variant={alert.variant}
+          onClose={() => setAlert({ ...alert, show: false })}
+          dismissible
+        >
           {alert.message}
         </Alert>
       )}
@@ -148,6 +149,9 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
         selectedElements={selectedTypes}
         isEditing={isEditing}
         onRemove={toggleSelectType}
+        renderCard={(type) => (
+          <div className="fw-semibold text-capitalize">{type.name}</div>
+        )}
       />
 
       {isEditing && (
@@ -159,8 +163,17 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
               <FlowPane
                 elements={equipmentTypes}
                 selectedElements={selectedTypes}
-                isEditing={true}
+                isEditing={isEditing}
                 onToggle={toggleSelectType}
+                isSelected={(e) => selectedTypes.some((t) => t.id === e.id)}
+                renderCard={({ element, isSelected, isEditing, onToggle }) => (
+                  <EquipmentTypeCard
+                    element={element}
+                    isSelected={isSelected}
+                    isEditing={isEditing}
+                    onToggle={onToggle}
+                  />
+                )}
               />
               <PaginationControl
                 currentPage={pagination.currentPage}

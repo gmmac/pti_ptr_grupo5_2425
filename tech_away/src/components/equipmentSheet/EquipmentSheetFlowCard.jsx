@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
 
-export default function FlowCard({ element, isSelected, isEditing, onToggle }) {
+export default function EquipmentSheetFlowCard({ element, isSelected, isEditing, onToggle }) {
   return (
     <Card
       onClick={() => isEditing && onToggle(element)}
@@ -10,8 +10,11 @@ export default function FlowCard({ element, isSelected, isEditing, onToggle }) {
     >
       <Card.Body className="d-flex justify-content-between align-items-center px-3 py-2">
         <div>
-          <Card.Title className="mb-0 fs-6 fw-semibold">{element.name}</Card.Title>
-          <small className="text-muted">ID: {element.id}</small>
+          <Card.Title className="mb-0 fs-6 fw-semibold">{element.EquipmentModel?.name} - {element.Brand?.name}</Card.Title>
+          <small className="text-muted">
+            {element.EquipmentType?.name}
+          </small>
+          <div className="small text-muted">{element.Barcode}</div>
         </div>
         {isEditing && isSelected && (
           <Button

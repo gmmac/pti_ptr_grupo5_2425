@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import './../../styles/pageElements.css';
-import CharityProjectInfoEditor from './CharityProjectInfoEditor';
-import CharityProjectEquipmentTypeEditor from './CharityProjectEquipmentTypeEditor';
+import CharityProjectInfoEditor from './CharityProjectEditor/CharityProjectInfoEditor';
+import CharityProjectEquipmentTypeEditor from './CharityProjectEditor/CharityProjectEquipmentTypeEditor';
+import CharityProjectEquipmentSheetEditor from './CharityProjectEditor/CharityProjectEquipmentSheetEditor';
 
 export default function ModalCharityProjectDetails({ show, handleClose, project, onRefresh, setSelectedProject }) {
   const [infoAlert, setInfoAlert] = useState({ message: '', variant: '', show: false });
   const [equipmentAlert, setEquipmentAlert] = useState({ message: '', variant: '', show: false });
+  const [equipmentSheetAlert, setEquipmentSheetAlert] = useState({ message: '', variant: '', show: false });
+
   const [localProject, setLocalProject] = useState(project);
 
   const handleInfoAlert = ({ message, variant }) => {
@@ -17,6 +20,12 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
   const handleEquipmentAlert = ({ message, variant }) => {
     setEquipmentAlert({ message, variant, show: true });
     setTimeout(() => setEquipmentAlert({ message: '', variant: '', show: false }), 4000);
+  };
+
+
+  const handleEquipmentSheetAlert = ({ message, variant }) => {
+    setEquipmentSheetAlert({ message, variant, show: true });
+    setTimeout(() => setEquipmentSheetAlert({ message: '', variant: '', show: false }), 4000);
   };
 
   useEffect(() => {
@@ -33,7 +42,7 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
       </Modal.Header>
 
       <Modal.Body className="px-4">
-      <CharityProjectInfoEditor
+        <CharityProjectInfoEditor
           project={localProject}
           setProject={setLocalProject}
           alert={infoAlert}
@@ -50,7 +59,16 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
           alert={equipmentAlert}
           onChangeAlert={handleEquipmentAlert}
         />
+
+        <hr className="my-4" />
+
+        <CharityProjectEquipmentSheetEditor
+          projectId={project.id}
+          alert={equipmentSheetAlert}
+          onChangeAlert={handleEquipmentSheetAlert}
+        />
       </Modal.Body>
+
     </Modal>
   );
 }

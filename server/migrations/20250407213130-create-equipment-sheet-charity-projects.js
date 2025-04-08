@@ -2,14 +2,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UsedEquipmentCharityProjects', {
-      usedEquipmentId: {
-        type: Sequelize.INTEGER,
+    await queryInterface.createTable('EquipmentSheetCharityProjects', {
+      equipmentSheetId: {
+        type: Sequelize.STRING(20),
         allowNull: false,
         primaryKey: true,
         references: {
-          model: 'UsedEquipments',
-          key: 'id',
+          model: 'EquipmentSheets',
+          key: 'barcode',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
@@ -28,14 +28,17 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
   },
+
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UsedEquipmentCharityProjects');
+    await queryInterface.dropTable('EquipmentSheetCharityProjects');
   }
 };
