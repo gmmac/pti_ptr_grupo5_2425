@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Image, Stack } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
-
+import { useAuth } from "../contexts/AuthenticationProviders/AuthProvider";
 import api from "../utils/axios";
 import EquipmentSheetInfo from "../components/EquipmentSheetPage/EquipmentSheetInfo";
 import UsedEquipmentCard from "../components/EquipmentSheetPage/UsedEquipmentCard";
@@ -13,6 +13,10 @@ export default function EquipmentSheetPage() {
 	const [equipmentSheet, setEquipmentSheet] = useState({});
 	const [refresh, setRefresh] = useState(false);
 
+	// vai ser usado para obter o id do carrinho
+	const { user, logOut } = useAuth();
+	const [cartId, setCartId] = useState(null);
+
 	const [usedEquipmentList, setUsedEquipmentList] = useState({});
 
 	const handleRefresh = () => {
@@ -20,8 +24,6 @@ export default function EquipmentSheetPage() {
 	};
 
 	useEffect(() => {
-		console.log(`api/equipmentSheet/${barcode}`);
-
 		api
 			.get(`api/equipmentSheet/${barcode}`)
 			.then((res) => {
@@ -44,9 +46,17 @@ export default function EquipmentSheetPage() {
 	}, [refresh]);
 
 	useEffect(() => {
-		// console.log(equipmentSheet);
-		console.log(usedEquipmentList);
-	}, [equipmentSheet, usedEquipmentList]);
+		if (user) {
+			api
+				.get(`/api/actualCart/clientCartID/${user.nic}`)
+				.then((res) => {
+					setCartId(res.data);
+				})
+				.catch((error) => {
+					console.error("Erro ao buscar ID do carrinho:", error);
+				});
+		}
+	}, [user]);
 
 	return (
 		<Container>
@@ -64,7 +74,11 @@ export default function EquipmentSheetPage() {
 				<Stack direction="horizontal" gap={3} className="">
 					{usedEquipmentList.length > 0 ? (
 						usedEquipmentList.map((usedEquipment, index) => (
-							<UsedEquipmentCard key={index} usedEquipment={usedEquipment} />
+							<UsedEquipmentCard
+								key={index}
+								usedEquipment={usedEquipment}
+								cartId={cartId}
+							/>
 						))
 					) : (
 						<p>Nenhum equipamento usado encontrado.</p>

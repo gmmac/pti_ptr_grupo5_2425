@@ -1,23 +1,27 @@
-import React, { useEffect } from "react";
-import { Card, Button, Stack, Image } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Button, Stack, Image } from "react-bootstrap";
 import { Heart, Cart } from "react-bootstrap-icons";
-import { useNavigate, useLocation } from "react-router-dom";
 import { Tag } from "primereact/tag";
+import api from "../../utils/axios";
 
-export default function UsedEquipmentCard({ usedEquipment }) {
-	const navigate = useNavigate();
-	const location = useLocation(); // URL atual
+export default function UsedEquipmentCard({ usedEquipment, cartId }) {
+	const putInCart = () => {
+		if (cartId) {
+			const payload = {
+				equipmentId: usedEquipment.id,
+				cartId: cartId,
+			};
 
-	const path = location.pathname;
-	function getLastPathSegment(url) {
-		const parts = url.split("/").filter(Boolean);
-		return parts.pop();
-	}
-
-	useEffect(() => {
-		console.log(usedEquipment);
-	}, []);
-
+			api
+				.post("/api/actualCartEquipment", payload)
+				.then((response) => {
+					console.log("Equipment added to cart:", response.data);
+				})
+				.catch((error) => {
+					console.error("Error adding equipment to cart:", error);
+				});
+		}
+	};
 	return (
 		<Stack
 			direction="vertical"
@@ -31,11 +35,6 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 			}}
 			gap={2}
 			className="rounded-sm p-4 justify-content-center align-items-center"
-			// onClick={() =>
-			// 	navigate(`${path}/${usedEquipment.id}`, {
-			// 		state: { equipmentName: getLastPathSegment(path) },
-			// 	})
-			// }
 		>
 			{/* Informações do tipo e marca */}
 			<Stack direction="horizontal" gap={2} className="justify-content-between">
@@ -93,6 +92,7 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 					<Button
 						className="rounded-pill"
 						style={{ backgroundColor: "var(--variant-two)", border: "none" }}
+						onClick={putInCart}
 					>
 						<Cart size={20} style={{ color: "var(--white)" }} />
 					</Button>
