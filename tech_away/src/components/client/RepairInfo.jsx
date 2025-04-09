@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Table, Card, Row, Col } from 'react-bootstrap';
 import { FileText, Calendar, Wallet, People, Shop, CheckCircle } from 'react-bootstrap-icons';
+import PaginationControl from '../pagination/PaginationControl';
 import api from '../../utils/axios';
 
 export default function RepairInfo({ repairInfo, show, onClose }) {
@@ -8,6 +9,10 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState("");
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   const fetchRepairsLogs = async () => {
     try {
@@ -33,7 +38,7 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
 
   return (
     <Modal show={show} onHide={onClose} centered size="xl" >
-      <Modal.Header closeButton className="bg-primary text-white">
+      <Modal.Header closeButton className="variant-two">
         <Modal.Title>Repair Details</Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-4">
@@ -47,10 +52,10 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
                     <FileText /> Nº Repair: <span className="fw-normal text-primary">#{repairInfo.id}</span>
                   </p>
                   <p className="fw-bold">
-                    <Calendar /> Estimated Delivery: <span className="fw-normal">{new Date(repairInfo.estimatedDeliverDate).toLocaleDateString()}</span>
+                    <Calendar /> Created At: <span className="fw-normal">{new Date(repairInfo.createdAt).toLocaleDateString()}</span>
                   </p>
                   <p className="fw-bold">
-                    <Calendar /> Created At: <span className="fw-normal">{new Date(repairInfo.createdAt).toLocaleDateString()}</span>
+                    <Calendar /> Estimated Delivery: <span className="fw-normal">{new Date(repairInfo.estimatedDeliverDate).toLocaleDateString()}</span>
                   </p>
                   <p className="fw-bold">
                     <FileText /> Description: <span className="fw-normal">{repairInfo.description}</span>
@@ -83,7 +88,7 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
             <Col md={6}>
               <Card className="shadow-sm">
                 <Card.Body>
-                  <h5 className="fw-bold text-primary mb-3">Repair Status History</h5>
+                  <h5 className="fw-bold mb-3">Repair Status History</h5>
                   <div className="table-responsive overflow-auto" style={{ maxHeight: "300px" }}>
                     <Table striped bordered hover responsive className="text-center">
                       <thead className="table-dark">
@@ -110,6 +115,7 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
                       </tbody>
                     </Table>
                   </div>
+                  <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages}/>
                 </Card.Body>
               </Card>
             </Col>

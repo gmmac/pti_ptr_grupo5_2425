@@ -38,3 +38,8 @@ form .profile-input:disabled {
     cursor: not-allowed; /* Muda o cursor para indicar que o campo não pode ser editado */
     opacity: 0.6; /* Reduz um pouco a opacidade para reforçar o efeito */
 }
+
+.variant-two{
+    background-color: var(--variant-two);
+    color: white;
+}
