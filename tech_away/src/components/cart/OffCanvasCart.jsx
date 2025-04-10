@@ -12,6 +12,7 @@ export default function OffCanvasCart() {
 		cartItems,
 		isCartOpen,
 		closeCart,
+		clearCart,
 	} = useCart();
 	if (!isCartOpen) return null;
 	return (
@@ -60,6 +61,21 @@ export default function OffCanvasCart() {
 							style={{ color: "var(--dark-grey)" }}
 						></i>
 					</Button>
+				</Stack>
+				<Stack direction="horizontal" className="justify-content-end">
+					<p
+						className="m-0 me-3"
+						style={{
+							fontFamily: "var(--body-font)",
+							textDecoration: "underline",
+							opacity: "50%",
+							fontSize: "15px",
+							cursor: "pointer",
+						}}
+						onClick={clearCart}
+					>
+						Clean cart
+					</p>
 				</Stack>
 				<Stack
 					direction="vertical"

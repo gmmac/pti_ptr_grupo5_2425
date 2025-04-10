@@ -139,17 +139,30 @@ router.put("/:id", async (req, res) => {
 
 // Delete an ActualCartEquipment by ID
 router.delete("/:id", async (req, res) => {
-	// try {
-	const deleted = await models.ActualCartEquipment.destroy({
-		where: { id: req.params.id },
-	});
+	try {
+		const deleted = await models.ActualCartEquipment.destroy({
+			where: { id: req.params.id },
+		});
 
-	if (!deleted)
-		return res.status(404).json({ error: "ActualCartEquipment not found" });
-	res.json({ message: "ActualCartEquipment deleted successfully" });
-	// } catch (error) {
-	// 	res.status(500).json({ error: error.message });
-	// }
+		if (!deleted)
+			return res.status(404).json({ error: "ActualCartEquipment not found" });
+		res.json({ message: "ActualCartEquipment deleted successfully" });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+});
+
+router.delete("/clearCart/:id", async (req, res) => {
+	try {
+		const deleted = await models.ActualCartEquipment.destroy({
+			where: { cartId: req.params.id },
+		});
+		if (!deleted)
+			return res.status(404).json({ error: "ActualCartEquipment not found" });
+		res.json({ message: "Carrinho apagado com sucesso" });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
 });
 
 module.exports = router;

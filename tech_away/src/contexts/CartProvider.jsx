@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, useRef } from "react";
 import api from "../utils/axios";
 import { useAuth } from "./AuthenticationProviders/AuthProvider";
 import OffCanvasCart from "../components/cart/OffCanvasCart";
-import { Badge } from "primereact/badge";
 import { Toast } from "primereact/toast";
 
 const CartContext = createContext();
@@ -57,6 +56,7 @@ export const CartProvider = ({ children }) => {
 	useEffect(() => {
 		if (isCartOpen) {
 			fetchCartItems();
+			fetchTotalPrice();
 		}
 	}, [isCartOpen]);
 
@@ -124,12 +124,27 @@ export const CartProvider = ({ children }) => {
 			});
 	};
 
+	const clearCart = async () => {
+		api
+			.delete(`/api/actualCartEquipment/clearCart/${cartId}`)
+			.then(() => {
+				console.log("Carrinho limpo com sucesso");
+
+				fetchNumCartItems();
+				fetchCartItems();
+				fetchTotalPrice();
+			})
+			.catch((error) => {
+				console.log("Erro ao limpar carrinho: ", error.message);
+			});
+	};
+
 	const fetchTotalPrice = async () => {
 		try {
 			const response = await api.get(
 				`/api/actualCartEquipment/totalPrice/${cartId}`
 			);
-			setTotalPrice(response.data.totalPrice);
+			setTotalPrice(Math.round(response.data.totalPrice * 100) / 100);
 		} catch (error) {
 			console.error("Erro ao buscar preço total do carrinho:", error);
 		}
@@ -144,17 +159,6 @@ export const CartProvider = ({ children }) => {
 		}
 	};
 
-	const CartBadge = () => (
-		<Badge
-			value={numCartItems}
-			style={{
-				fontSize: "10px",
-				backgroundColor: "var(--white)",
-				color: "var(--dark-grey)",
-			}}
-		/>
-	);
-
 	return (
 		<CartContext.Provider
 			value={{
@@ -165,10 +169,10 @@ export const CartProvider = ({ children }) => {
 				isCartOpen,
 				openCart,
 				closeCart,
-				CartBadge,
 				removeItemFromCart,
 				totalPrice,
 				cartItems,
+				clearCart,
 			}}
 		>
 			{cartId && (

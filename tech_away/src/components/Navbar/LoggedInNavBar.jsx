@@ -11,6 +11,7 @@ import { useLocation, Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 import { useCart } from "../../contexts/CartProvider";
+import { Badge } from "primereact/badge";
 import "../../styles/variables.css";
 
 const navItems = [
@@ -24,7 +25,7 @@ export default function LoggedInNavBar() {
 	const navigate = useNavigate();
 
 	const { user, logOut } = useAuth();
-	const { CartBadge, openCart } = useCart();
+	const { numCartItems, openCart } = useCart();
 
 	// Função para logout
 	const handleLogout = () => {
@@ -115,7 +116,14 @@ export default function LoggedInNavBar() {
 										className="pi pi-shopping-cart p-overlay-badge px-2"
 										style={{ color: "var(--dark-grey)", fontSize: "20px" }}
 									>
-										<CartBadge />
+										<Badge
+											value={numCartItems}
+											style={{
+												fontSize: "10px",
+												backgroundColor: "var(--white)",
+												color: "var(--dark-grey)",
+											}}
+										/>
 									</i>
 								</Button>
 							</Nav.Item>
