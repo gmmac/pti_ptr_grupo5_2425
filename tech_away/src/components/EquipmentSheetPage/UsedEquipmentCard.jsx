@@ -4,30 +4,10 @@ import { Heart, Cart } from "react-bootstrap-icons";
 import { Tag } from "primereact/tag";
 import api from "../../utils/axios";
 import { useCart } from "../../contexts/CartProvider";
-import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 
 export default function UsedEquipmentCard({ usedEquipment }) {
-	const { cartId, updateCartItemCount } = useCart();
-	const { isUserLoggedIn } = useAuth();
+	const { addItemToCart } = useCart();
 
-	const putInCart = () => {
-		if (isUserLoggedIn) {
-			const payload = {
-				equipmentId: usedEquipment.id,
-				cartId: cartId,
-			};
-			console.log(payload);
-
-			api
-				.post("/api/actualCartEquipment", payload)
-				.then((response) => {
-					console.log("Equipment added to cart:", response.data);
-				})
-				.catch((error) => {
-					console.error("Error adding equipment to cart:", error);
-				});
-		}
-	};
 	return (
 		<Stack
 			direction="vertical"
@@ -98,7 +78,9 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 					<Button
 						className="rounded-pill"
 						style={{ backgroundColor: "var(--variant-two)", border: "none" }}
-						onClick={putInCart}
+						onClick={() => {
+							addItemToCart(usedEquipment.id);
+						}}
 					>
 						<Cart size={20} style={{ color: "var(--white)" }} />
 					</Button>

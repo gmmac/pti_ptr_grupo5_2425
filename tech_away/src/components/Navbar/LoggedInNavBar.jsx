@@ -9,12 +9,9 @@ import {
 } from "react-bootstrap";
 import { useLocation, Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import "../../styles/variables.css";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 import { useCart } from "../../contexts/CartProvider";
-import { Badge } from "primereact/badge";
-import OffCanvasCart from "../cart/OffCanvasCart";
-// import { getLoggedUser,  removeLoggedUser} from "../../utils/auth";
+import "../../styles/variables.css";
 
 const navItems = [
 	{ name: "About Us", path: "/about" },
@@ -27,9 +24,7 @@ export default function LoggedInNavBar() {
 	const navigate = useNavigate();
 
 	const { user, logOut } = useAuth();
-	const { cartId, numCartItems, fetchNumCartItems } = useCart();
-
-	const [isCartOpen, setIsCartOpen] = useState(false); // Estado do carrinho
+	const { CartBadge, openCart } = useCart();
 
 	// Função para logout
 	const handleLogout = () => {
@@ -43,12 +38,6 @@ export default function LoggedInNavBar() {
 	const handleProfile = () => {
 		navigate("/profile");
 	};
-
-	useEffect(() => {
-		if (cartId) {
-			fetchNumCartItems();
-		}
-	}, [numCartItems, isCartOpen]);
 
 	return (
 		<>
@@ -120,20 +109,13 @@ export default function LoggedInNavBar() {
 										backgroundColor: "var(--variant-two)",
 										border: "none",
 									}}
-									onClick={() => setIsCartOpen(true)}
+									onClick={openCart}
 								>
 									<i
 										className="pi pi-shopping-cart p-overlay-badge px-2"
 										style={{ color: "var(--dark-grey)", fontSize: "20px" }}
 									>
-										<Badge
-											value={numCartItems}
-											style={{
-												fontSize: "10px",
-												backgroundColor: "var(--white)",
-												color: "var(--dark-grey)",
-											}}
-										></Badge>
+										<CartBadge />
 									</i>
 								</Button>
 							</Nav.Item>
@@ -158,11 +140,6 @@ export default function LoggedInNavBar() {
 					</Nav>
 				</Container>
 			</Navbar>
-			<OffCanvasCart
-				cartId={cartId}
-				isOpen={isCartOpen}
-				onClose={() => setIsCartOpen(false)}
-			/>
 		</>
 	);
 }
