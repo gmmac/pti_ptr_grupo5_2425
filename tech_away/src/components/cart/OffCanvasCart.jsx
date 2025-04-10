@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Button, Stack } from "react-bootstrap";
+import { Button, Stack, Modal } from "react-bootstrap";
 import ItemCart from "./ItemCart";
-import api from "../../utils/axios";
 import { useCart } from "../../contexts/CartProvider";
 
 export default function OffCanvasCart() {
+	const [showModal, setShowModal] = useState(false);
 	const {
 		removeItemFromCart,
 		numCartItems,
@@ -15,6 +15,8 @@ export default function OffCanvasCart() {
 		clearCart,
 	} = useCart();
 	if (!isCartOpen) return null;
+
+	const onClickClearAll = () => {};
 	return (
 		<>
 			<div
@@ -63,19 +65,24 @@ export default function OffCanvasCart() {
 					</Button>
 				</Stack>
 				<Stack direction="horizontal" className="justify-content-end">
-					<p
-						className="m-0 me-3"
+					<Button
+						className="m-0 me-3 p-0"
 						style={{
 							fontFamily: "var(--body-font)",
 							textDecoration: "underline",
-							opacity: "50%",
+							opacity: numCartItems == 0 ? "50%" : "100%", // Altera a opacidade com base em numCartItems
 							fontSize: "15px",
-							cursor: "pointer",
+							cursor: numCartItems == 0 ? "not-allowed" : "pointer", // Cursor mude para "not-allowed" quando desabilitado
+							background: "none",
+							border: "none",
+							color:
+								numCartItems == 0 ? "var(--light-grey)" : "var(--dark-grey)", // Altere a cor para indicar desabilitação
 						}}
-						onClick={clearCart}
+						onClick={() => setShowModal(true)}
+						disabled={numCartItems == 0}
 					>
 						Clean cart
-					</p>
+					</Button>
 				</Stack>
 				<Stack
 					direction="vertical"
@@ -115,6 +122,40 @@ export default function OffCanvasCart() {
 					Pay
 				</Button>
 			</Stack>
+
+			<Modal show={showModal} onHide={() => setShowModal(false)}>
+				<Modal.Header closeButton>
+					<Modal.Title></Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<Stack direction="horizontal" gap={3}>
+						<i className="pi pi-exclamation-triangle"></i>
+						<p className="m-0">Are you sure you want to clear the cart?</p>
+					</Stack>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button
+						className="rounded-pill"
+						variant="secondary"
+						onClick={() => setShowModal(false)}
+					>
+						Cancel
+					</Button>
+					<Button
+						className="rounded-pill"
+						style={{
+							backgroundColor: "var(--danger)",
+							border: "none",
+						}}
+						onClick={() => {
+							clearCart();
+							setShowModal(false);
+						}}
+					>
+						Remove
+					</Button>
+				</Modal.Footer>
+			</Modal>
 		</>
 	);
 }

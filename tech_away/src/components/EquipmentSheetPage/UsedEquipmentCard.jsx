@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Button, Stack, Image } from "react-bootstrap";
 import { Heart, Cart } from "react-bootstrap-icons";
 import { Tag } from "primereact/tag";
-import api from "../../utils/axios";
 import { useCart } from "../../contexts/CartProvider";
 
 export default function UsedEquipmentCard({ usedEquipment }) {
