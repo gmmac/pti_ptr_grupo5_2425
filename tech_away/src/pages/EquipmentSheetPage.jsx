@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Container, Image, Stack } from "react-bootstrap";
+import { Container, Image, Stack, Row, Col } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
-import { useAuth } from "../contexts/AuthenticationProviders/AuthProvider";
 import api from "../utils/axios";
 import EquipmentSheetInfo from "../components/EquipmentSheetPage/EquipmentSheetInfo";
 import UsedEquipmentCard from "../components/EquipmentSheetPage/UsedEquipmentCard";
@@ -12,10 +11,6 @@ export default function EquipmentSheetPage() {
 
 	const [equipmentSheet, setEquipmentSheet] = useState({});
 	const [refresh, setRefresh] = useState(false);
-
-	// vai ser usado para obter o id do carrinho
-	const { user, logOut } = useAuth();
-	const [cartId, setCartId] = useState(null);
 
 	const [usedEquipmentList, setUsedEquipmentList] = useState({});
 
@@ -45,19 +40,6 @@ export default function EquipmentSheetPage() {
 			});
 	}, [refresh]);
 
-	useEffect(() => {
-		if (user) {
-			api
-				.get(`/api/actualCart/clientCartID/${user.nic}`)
-				.then((res) => {
-					setCartId(res.data);
-				})
-				.catch((error) => {
-					console.error("Erro ao buscar ID do carrinho:", error);
-				});
-		}
-	}, [user]);
-
 	return (
 		<Container>
 			<Stack direction="vertical" gap={3}>
@@ -71,19 +53,20 @@ export default function EquipmentSheetPage() {
 						className="rounded-sm"
 					/>
 				</Stack>
-				<Stack direction="horizontal" gap={3} className="">
+				<Row className="g-4">
 					{usedEquipmentList.length > 0 ? (
 						usedEquipmentList.map((usedEquipment, index) => (
-							<UsedEquipmentCard
-								key={index}
-								usedEquipment={usedEquipment}
-								cartId={cartId}
-							/>
+							<Col key={index} xs={12} sm={6} md={4} lg={3}>
+								<UsedEquipmentCard usedEquipment={usedEquipment} />
+							</Col>
 						))
 					) : (
-						<p>Nenhum equipamento usado encontrado.</p>
+						<Col xs={12} className="text-center mt-5">
+							<i className="pi pi-exclamation-triangle"></i>
+							<p className="m-0">No equipment found</p>
+						</Col>
 					)}
-				</Stack>
+				</Row>
 			</Stack>
 		</Container>
 	);

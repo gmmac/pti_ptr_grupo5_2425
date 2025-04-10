@@ -11,8 +11,8 @@ import { useLocation, Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "../../styles/variables.css";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
+import { useCart } from "../../contexts/CartProvider";
 import { Badge } from "primereact/badge";
-import api from "../../utils/axios";
 import OffCanvasCart from "../cart/OffCanvasCart";
 // import { getLoggedUser,  removeLoggedUser} from "../../utils/auth";
 
@@ -27,8 +27,8 @@ export default function LoggedInNavBar() {
 	const navigate = useNavigate();
 
 	const { user, logOut } = useAuth();
-	const [cartId, setCartId] = useState(null);
-	const [numCartItems, setNumCartItems] = useState(0);
+	const { cartId, numCartItems, fetchNumCartItems } = useCart();
+
 	const [isCartOpen, setIsCartOpen] = useState(false); // Estado do carrinho
 
 	// Função para logout
@@ -45,28 +45,10 @@ export default function LoggedInNavBar() {
 	};
 
 	useEffect(() => {
-		api
-			.get("/api/actualCart/clientCartID/" + user.nic)
-			.then((res) => {
-				setCartId(res.data);
-			})
-			.catch((error) => {
-				console.error("Erro ao buscar ID do carrinho:", error);
-			});
-	}, []);
-
-	useEffect(() => {
 		if (cartId) {
-			api
-				.get("/api/actualCartEquipment/countItems/" + cartId)
-				.then((res) => {
-					setNumCartItems(res.data.count);
-				})
-				.catch((error) => {
-					console.error("Erro ao buscar número de itens no carrinho:", error);
-				});
+			fetchNumCartItems();
 		}
-	}, [cartId]);
+	}, [numCartItems, isCartOpen]);
 
 	return (
 		<>

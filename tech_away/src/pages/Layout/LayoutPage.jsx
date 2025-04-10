@@ -7,41 +7,55 @@ import { IsMobileContext } from "../../contexts/IsMobileContext";
 import BottomNavBar from "../../components/Navbar/BottomNavBar";
 import LoggedInNavBar from "../../components/Navbar/LoggedInNavBar";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
-
+import { CartProvider } from "../../contexts/CartProvider";
 function LayoutPage() {
-  const isMobile = useContext(IsMobileContext);
-  const { isUserLoggedIn } = useAuth();
+	const isMobile = useContext(IsMobileContext);
+	const { user, isUserLoggedIn } = useAuth();
 
-  const renderNavBar = () => {
-    if (isUserLoggedIn()) {
-      return isMobile ? (
-        <>
-          <SmNavBar />
-          <BottomNavBar />
-        </>
-      ) : (
-        <LoggedInNavBar />
-      );
-    } else {
-      return isMobile ? (
-        <>
-          <SmNavBar />
-          <BottomNavBar />
-        </>
-      ) : (
-        <InitialNavBar />
-      );
-    }
-  };
+	const renderNavBar = () => {
+		if (isUserLoggedIn()) {
+			return isMobile ? (
+				<>
+					<SmNavBar />
+					<BottomNavBar />
+				</>
+			) : (
+				<LoggedInNavBar />
+			);
+		} else {
+			return isMobile ? (
+				<>
+					<SmNavBar />
+					<BottomNavBar />
+				</>
+			) : (
+				<InitialNavBar />
+			);
+		}
+	};
 
-  return (
-    <Stack className="vh-100 m-0 p-0" style={{ backgroundColor: "var(--light-grey)" }}>
-      {renderNavBar()}
-      <div className="flex-grow-1 overflow-auto">
-        <Outlet />
-      </div>
-    </Stack>
-  );
+	return (
+		<Stack
+			className="vh-100 m-0 p-0"
+			style={{ backgroundColor: "var(--light-grey)" }}
+		>
+			{isUserLoggedIn() ? (
+				<CartProvider user={user}>
+					{renderNavBar()}
+					<div className="flex-grow-1 overflow-auto">
+						<Outlet />
+					</div>
+				</CartProvider>
+			) : (
+				<>
+					{renderNavBar()}
+					<div className="flex-grow-1 overflow-auto">
+						<Outlet />
+					</div>
+				</>
+			)}
+		</Stack>
+	);
 }
 
 export default LayoutPage;

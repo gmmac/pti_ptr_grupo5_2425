@@ -3,14 +3,20 @@ import { Button, Stack, Image } from "react-bootstrap";
 import { Heart, Cart } from "react-bootstrap-icons";
 import { Tag } from "primereact/tag";
 import api from "../../utils/axios";
+import { useCart } from "../../contexts/CartProvider";
+import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 
-export default function UsedEquipmentCard({ usedEquipment, cartId }) {
+export default function UsedEquipmentCard({ usedEquipment }) {
+	const { cartId, updateCartItemCount } = useCart();
+	const { isUserLoggedIn } = useAuth();
+
 	const putInCart = () => {
-		if (cartId) {
+		if (isUserLoggedIn) {
 			const payload = {
 				equipmentId: usedEquipment.id,
 				cartId: cartId,
 			};
+			console.log(payload);
 
 			api
 				.post("/api/actualCartEquipment", payload)
