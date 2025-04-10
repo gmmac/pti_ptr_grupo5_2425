@@ -30,7 +30,7 @@ import OrganizerRegisterPage from "./pages/Organizer/OrganizerRegisterPage";
 import OrganizerLoginPage from "./pages/Organizer/OrganizerLoginPage";
 import OrganizerLayoutPage from "./pages/Layout/OrganizerLayoutPage";
 import OrganizerHomePage from "./pages/Organizer/OrganizerHomePage";
-import TestPage from "./pages/TestPage";
+import CheckoutOrderPage from "./pages/CheckoutOrderPage";
 
 export default function Router() {
 	return (
@@ -49,7 +49,6 @@ export default function Router() {
 						}
 					>
 						<Route index element={<HomePage />} />
-						<Route path="teste" element={<TestPage />} />
 						<Route path="store" element={<StorePage />} />
 						<Route
 							path="store/:equipmentSheetName"
@@ -72,6 +71,7 @@ export default function Router() {
 								</InterestsFilterProvider>
 							}
 						/>
+						<Route path="checkout-order" element={<CheckoutOrderPage />} />
 					</Route>
 
 					{/* Rotas do Employee */}
@@ -88,36 +88,33 @@ export default function Router() {
 							<Route path="manage" element={<EmployeeManagePage />} />
 						</Route>
 
-            <Route path="login" element={<EmployeeLoginPage />} />
-            <Route path="register" element={<EmployeeRegisterPage />} />
+						<Route path="login" element={<EmployeeLoginPage />} />
+						<Route path="register" element={<EmployeeRegisterPage />} />
+					</Route>
 
-          </Route>
+					{/* Rotas do organizador */}
+					<Route
+						path="/organizer"
+						element={
+							<AuthProvider userType="organizer">
+								<Outlet />
+							</AuthProvider>
+						}
+					>
+						<Route element={<OrganizerLayoutPage />}>
+							<Route index element={<OrganizerHomePage />} />
+							{/* <Route path="manage" element={<EmployeeManagePage />} /> */}
+						</Route>
 
-
-          {/* Rotas do organizador */}
-          <Route
-            path="/organizer"
-            element={
-              <AuthProvider userType="organizer">
-                  <Outlet />
-              </AuthProvider>
-            }
-          >
-          
-            <Route element={<OrganizerLayoutPage />}>
-              <Route index element={<OrganizerHomePage />} />
-              {/* <Route path="manage" element={<EmployeeManagePage />} /> */}
-
-            </Route>
-
-            <Route path="login" element={<OrganizerLoginPage />} />
-            <Route path="register" element={<OrganizerRegisterPage />} />
-            <Route path="changePassword" element={<ChangePasswordClient userType="organizer" />} />
-
-          </Route>
-
-        </Routes>
-      </BrowserRouter>
-    </IsMobileProvider>
-  );
+						<Route path="login" element={<OrganizerLoginPage />} />
+						<Route path="register" element={<OrganizerRegisterPage />} />
+						<Route
+							path="changePassword"
+							element={<ChangePasswordClient userType="organizer" />}
+						/>
+					</Route>
+				</Routes>
+			</BrowserRouter>
+		</IsMobileProvider>
+	);
 }

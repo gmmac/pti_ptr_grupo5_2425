@@ -40,7 +40,7 @@ function LayoutPage() {
 			style={{ backgroundColor: "var(--light-grey)" }}
 		>
 			{isUserLoggedIn() ? (
-				<CartProvider user={user}>
+				<CartProvider>
 					{renderNavBar()}
 					<div className="flex-grow-1 overflow-auto">
 						<Outlet />

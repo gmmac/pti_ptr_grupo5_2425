@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button, Stack, Modal } from "react-bootstrap";
 import ItemCart from "./ItemCart";
 import { useCart } from "../../contexts/CartProvider";
+import { useNavigate } from "react-router-dom";
 
 export default function OffCanvasCart() {
 	const [showModal, setShowModal] = useState(false);
+	const navigate = useNavigate();
 	const {
 		removeItemFromCart,
 		numCartItems,
@@ -16,7 +18,6 @@ export default function OffCanvasCart() {
 	} = useCart();
 	if (!isCartOpen) return null;
 
-	const onClickClearAll = () => {};
 	return (
 		<>
 			<div
@@ -118,11 +119,16 @@ export default function OffCanvasCart() {
 						border: "none",
 						fontFamily: "var(--title-font)",
 					}}
+					disabled={numCartItems == 0}
+					onClick={() => {
+						closeCart();
+						navigate("/checkout-order");
+					}}
 				>
 					Pay
 				</Button>
 			</Stack>
-
+			{/*modal de confirmação do clear all*/}
 			<Modal show={showModal} onHide={() => setShowModal(false)}>
 				<Modal.Header closeButton>
 					<Modal.Title></Modal.Title>
