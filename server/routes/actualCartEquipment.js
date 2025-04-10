@@ -103,6 +103,26 @@ router.get("/totalPrice/:cartId", async (req, res) => {
 	}
 });
 
+router.get("/exists/:cartID/:equipmentID", async (req, res) => {
+	try {
+		const { cartID, equipmentID } = req.params;
+
+		// Verificar se os parâmetros existem
+		if (!cartID || !equipmentID) {
+			return res.status(400).json({ error: "Parâmetros inválidos" });
+		}
+
+		const item = await models.ActualCartEquipment.findOne({
+			where: { cartId: cartID, equipmentId: equipmentID },
+		});
+
+		res.json({ exists: !!item });
+	} catch (error) {
+		console.error("Erro ao verificar se item já está no carrinho:", error);
+		res.status(500).json({ error: "Erro interno do servidor" });
+	}
+});
+
 // Update an ActualCartEquipment by ID
 router.put("/:id", async (req, res) => {
 	try {

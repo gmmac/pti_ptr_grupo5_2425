@@ -1,69 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Button, Container, Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import ItemCart from "./ItemCart";
 import api from "../../utils/axios";
+import { useCart } from "../../contexts/CartProvider";
 
-export default function OffCanvasCart({ cartId, isOpen, onClose }) {
-	if (!isOpen) return null;
-	const [numCartItems, setNumCartItems] = useState(0);
-	const [cartItems, setCartItems] = useState([]);
-	const [totalPrice, setTotalPrice] = useState(0);
-
-	useEffect(() => {
-		api
-			.get("/api/actualCartEquipment/countItems/" + cartId)
-			.then((res) => {
-				setNumCartItems(res.data.count);
-			})
-			.catch((error) => {
-				console.error("Erro ao buscar número de itens no carrinho:", error);
-			});
-	}, [cartId]);
-
-	useEffect(() => {
-		fetchCartItems();
-		fetchTotalPrice();
-	}, [cartId]);
-
-	const handleRemove = (id) => {
-		api
-			.delete(`/api/actualCartEquipment/${id}`)
-			.then(() => {
-				console.log("item removido com sucesso");
-
-				fetchCartItems();
-				fetchTotalPrice();
-			})
-			.catch((error) => {
-				console.log("Erro ao remover item: ", error.message);
-			});
-	};
-
-	const fetchCartItems = async () => {
-		try {
-			const response = await api.get(`/api/actualCartEquipment/${cartId}`);
-			setCartItems(response.data);
-		} catch (error) {
-			console.error("Erro ao buscar itens do carrinho:", error);
-		}
-	};
-
-	const fetchTotalPrice = async () => {
-		try {
-			const response = await api.get(
-				`/api/actualCartEquipment/totalPrice/${cartId}`
-			);
-			setTotalPrice(response.data.totalPrice);
-		} catch (error) {
-			console.error("Erro ao buscar preço total do carrinho:", error);
-		}
-	};
-
+export default function OffCanvasCart() {
+	const {
+		removeItemFromCart,
+		numCartItems,
+		totalPrice,
+		cartItems,
+		isCartOpen,
+		closeCart,
+	} = useCart();
+	if (!isCartOpen) return null;
 	return (
 		<>
 			<div
 				className="cart-overlay"
-				onClick={onClose}
+				onClick={closeCart}
 				style={{
 					position: "fixed",
 					top: 0,
@@ -97,7 +52,7 @@ export default function OffCanvasCart({ cartId, isOpen, onClose }) {
 				>
 					<h5>Cart({numCartItems})</h5>
 					<Button
-						onClick={onClose}
+						onClick={closeCart}
 						style={{ background: "none", border: "none" }}
 					>
 						<i
@@ -116,7 +71,11 @@ export default function OffCanvasCart({ cartId, isOpen, onClose }) {
 				>
 					{cartItems ? (
 						cartItems.map((item, index) => (
-							<ItemCart key={index} equipment={item} onRemove={handleRemove} />
+							<ItemCart
+								key={index}
+								equipment={item}
+								onRemove={removeItemFromCart}
+							/>
 						))
 					) : (
 						<p className="text-center">Cart is empty :(</p>
