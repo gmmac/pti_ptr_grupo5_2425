@@ -24,6 +24,23 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
+      nic: '987654321',
+      nif: '123456789',
+      birthDate: '1985-07-20',
+      gender: 'F',
+      firstName: 'Jane',
+      lastName: 'Smith',
+      email: 'janesmith@example.com',
+      phone: '923456789',
+      address: '456 Elm Street',
+      latitude: '34.052235',
+      longitude: '-118.243683',
+      storeNIPC: "987654321",
+      role: "1",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+      {
         nic: "123000001",
         nif: "123000001",
         storeNIPC: "486371589",

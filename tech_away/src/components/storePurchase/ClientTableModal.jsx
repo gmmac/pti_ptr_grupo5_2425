@@ -22,6 +22,11 @@ export default function ClientTableModal({clients, selectedClient, handleClientS
             <td>{client.phone}</td>
             <td>
                 <Button 
+                style={{
+                    backgroundColor: selectedClient === client.nic ? '#708c7e' : '#b5a8c9',
+                    color: 'white',
+                    border: 'none'
+                }} 
                 variant={selectedClient === client.nic ? "secondary" : "primary"} 
                 onClick={() => handleClientSelection(client)}
                 >

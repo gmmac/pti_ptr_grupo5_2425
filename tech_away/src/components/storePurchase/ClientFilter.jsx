@@ -5,7 +5,7 @@ import SearchBar from "../searchBar/SearchBar";
 export default function ClientFilter({ setFilters }) {
     const [localFilters, setLocalFilters] = useState({
         nic: "",
-        firstname: "",
+        firstName: "",
         lastName: "",
         email: "",
         phone: "",
@@ -19,6 +19,8 @@ export default function ClientFilter({ setFilters }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLocalFilters((prev) => ({ ...prev, [name]: value }));
+
+        console.log(localFilters)
     };
 
     const handleSubmit = (e) => {
@@ -29,6 +31,7 @@ export default function ClientFilter({ setFilters }) {
             orderBy: orderField,
             orderDirection: orderDirection,
         }));
+        
     };
     
 
@@ -59,55 +62,90 @@ export default function ClientFilter({ setFilters }) {
                             <Row className="gy-3 d-block d-flex flex-md-row">
 
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
-                                        type="number"
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>NIC</Form.Label>
+                                        <Form.Control 
+                                        type="number" 
+                                        name="nic" 
                                         value={localFilters.nic} 
-                                        onChange={handleChange}
-                                        name="NIC"
-                                        placeholder="Search by NIC"
-                                    />
+                                        placeholder="Insert NIC"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>First Name</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="firstName" 
                                         value={localFilters.firstName} 
-                                        onChange={handleChange}
-                                        name="Name"
-                                        placeholder="Search by Name"
-                                    />
+                                        placeholder="Insert first name"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Last Name</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="lastName" 
                                         value={localFilters.lastName} 
-                                        onChange={handleChange}
-                                        name="Name"
-                                        placeholder="Search by Name"
-                                    />
+                                        placeholder="Insert last name"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Email</Form.Label>
+                                        <Form.Control 
+                                        type="text" 
+                                        name="email" 
                                         value={localFilters.email} 
-                                        onChange={handleChange}
-                                        name="Email"
-                                        placeholder="Search by Email"
-                                    />
+                                        placeholder="Insert email"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                                 <Col xs={12} md={6}>
-                                    <SearchBar 
+                                    <Form.Group controlId="filterName">
+                                        <Form.Label>Phone</Form.Label>
+                                        <Form.Control 
+                                        type="number" 
+                                        name="phone" 
                                         value={localFilters.phone} 
-                                        onChange={handleChange}
-                                        name="Phone"
-                                        placeholder="Search by Phone"
-                                    />
+                                        placeholder="Insert phone number"
+                                        onChange={handleChange} 
+                                        />
+                                    
+                                    </Form.Group>
                                 </Col>
                             </Row>
                             <Row className='d-flex align-items-center justify-content-center'>
                                 <Col xs={12} md={6} lg={4} className="mt-3 mt-md-4">
-                                    <Button variant="primary" type="submit" className="w-100 rounded-pill">
+                                    <Button
+                                        style={{
+                                            backgroundColor:'#b5a8c9',
+                                            color: 'white',
+                                            border: 'none'
+                                        }} 
+                                        variant="primary" type="submit" className="w-100 rounded-pill">
                                         Apply Filters
                                     </Button>
                                 </Col>
                                 <Col xs={12} md={6} lg={4} className="mt-2 mt-md-4">
                                     <Button 
+                                        style={{
+                                            backgroundColor: '#708c7e',
+                                            color: 'white',
+                                            border: 'none'
+                                        }} 
                                         variant="secondary" 
                                         className="w-100 rounded-pill" 
                                         onClick={handleClear}
