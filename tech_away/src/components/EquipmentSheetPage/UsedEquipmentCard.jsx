@@ -1,106 +1,90 @@
-import React, { useEffect } from "react";
-import { Card, Stack } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Button, Stack, Image } from "react-bootstrap";
 import { Heart, Cart } from "react-bootstrap-icons";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Tag } from "primereact/tag";
+import { useCart } from "../../contexts/CartProvider";
 
 export default function UsedEquipmentCard({ usedEquipment }) {
-  const navigate = useNavigate();
-  const location = useLocation(); // URL atual
+	const { addItemToCart } = useCart();
 
-  const path = location.pathname;
-  function getLastPathSegment(url) {
-    const parts = url.split("/").filter(Boolean);
-    return parts.pop();
-  }
-  return (
-    <Card
-      style={{
-        backgroundColor: "var(--white)",
-        boxShadow: "var(--shadow-default)",
-        borderRadius: "var(--rounded-sm)",
-        border: "none",
-      }}
-      className=""
-      onClick={() =>
-        navigate(`${path}/${usedEquipment.id}`, {
-          state: { equipmentName: getLastPathSegment(path) },
-        })
-      }
-    >
-      <Card.Img
-        variant="top"
-        src="../../public/assets/ip.png"
-        className="w-50 mx-auto mt-3"
-        style={{ objectFit: "cover", mixBlendMode: "darken" }}
-      />
+	return (
+		<Stack
+			direction="vertical"
+			style={{
+				fontFamily: "var(--body-font)",
+				color: "var(--dark-grey)",
+				backgroundColor: "var(--white)",
+				boxShadow: "var(--shadow-default)",
+				borderRadius: "var(--rounded-sm)",
+				padding: "16px",
+			}}
+			gap={2}
+			className="rounded-sm p-4 justify-content-center align-items-center"
+		>
+			{/* Informações do tipo e marca */}
+			<Stack direction="horizontal" gap={2} className="justify-content-between">
+				<Stack
+					direction="horizontal"
+					className="justify-content-center align-items-center"
+					gap={2}
+				>
+					<i className="pi pi-tag" style={{ color: "var(--dark-grey)" }}></i>
+					<p className="m-0">{usedEquipment.price}€</p>
+				</Stack>
+				<Tag
+					value={usedEquipment?.EquipmentStatus?.state}
+					rounded
+					style={{
+						backgroundColor: "var(--variant-one)",
+						fontFamily: "var(--body-font)",
+					}}
+				/>
+			</Stack>
 
-      <Card.Body className="ps-4">
-        <Card.Title>
-          <Stack
-            direction="horizontal"
-            gap={2}
-            className="justify-content-between align-items-center"
-          >
-            <span style={{ color: "var(--variant-two" }} className="fs-4">
-              {usedEquipment?.Store?.name}
-            </span>
-            <Stack direction="horizontal" gap={2}>
-              <Stack
-                direction="horizontal"
-                gap={2}
-                style={{
-                  border: "1px solid var(--variant-two)",
-                  color: "var(--variant-two)",
-                  boxShadow: "var(--shadow-default)",
-                }}
-                className="rounded-pill py-1 px-2"
-              >
-                <Heart size={20} style={{ color: "var(--variant-two)" }} />
-                <p className="m-0 fs-5">16</p>
-              </Stack>
-              <Stack
-                direction="horizontal"
-                gap={2}
-                style={{
-                  border: "1px solid var(--variant-two)",
-                  color: "var(--white)",
-                  boxShadow: "var(--shadow-default)",
-                }}
-                className="rounded-pill py-1 px-2"
-              >
-                <Cart size={20} style={{ color: "var(--variant-two)" }} />
-              </Stack>
-            </Stack>
-          </Stack>
-        </Card.Title>
-        <Card.Text style={{ color: "var(--dark-gray)" }}>
-          State: {usedEquipment?.EquipmentStatus?.state || "Desconhecido"}
-          <br />
-          {usedEquipment?.price
-            ? `${usedEquipment.price} EUR`
-            : "Não disponível"}
-        </Card.Text>
-      </Card.Body>
-    </Card>
-    // 	<Stack
-    // 		direction="vertical"
-    // 		gap={3}
-    // 		style={{ width: "260px", overflow: "hidden" }}
-    // 	>
-    // 		<Image
-    // 			src="../../public/assets/ip.png"
-    // 			style={{ objectFit: "cover" }}
-    // 			className="rounded-sm img-fluid"
-    // 		/>
-    // 		<Stack
-    // 			direction="vertical"
-    // 			className="ps-3"
-    // 			style={{ color: "var(--dark-gray)" }}
-    // 		>
-    // 			<p className="m-0">{usedEquipment?.Store?.name}</p>
-    // 			<p className="m-0">{usedEquipment?.EquipmentStatus?.state}</p>
-    // 			<p className="m-0">{usedEquipment?.price}</p>
-    // 		</Stack>
-    // 	</Stack>
-  );
+			{/* Imagem do equipamento */}
+			<Image
+				src="../../public/assets/ip.png"
+				className="w-50"
+				style={{
+					objectFit: "cover",
+					mixBlendMode: "darken",
+				}}
+			/>
+
+			{/* Preço e botões de interação */}
+			<Stack
+				direction="horizontal"
+				className="justify-content-between align-items-center"
+				gap={2}
+			>
+				{/* Nome do equipamento */}
+				<h5
+					style={{
+						color: "var(--variant-two)",
+						fontFamily: "var(--title-font)",
+					}}
+					className="m-0 text-bold"
+				>
+					{usedEquipment?.Store?.name}
+				</h5>
+				<Stack direction="horizontal" gap={2}>
+					<Button
+						className="rounded-pill"
+						style={{ backgroundColor: "var(--variant-two)", border: "none" }}
+					>
+						<Heart size={20} style={{ color: "var(--white)" }} />
+					</Button>
+					<Button
+						className="rounded-pill"
+						style={{ backgroundColor: "var(--variant-two)", border: "none" }}
+						onClick={() => {
+							addItemToCart(usedEquipment.id);
+						}}
+					>
+						<Cart size={20} style={{ color: "var(--white)" }} />
+					</Button>
+				</Stack>
+			</Stack>
+		</Stack>
+	);
 }

@@ -22,7 +22,7 @@ module.exports = {
 					putOnSaleDate: null,
 					purchaseDate: new Date("2023-12-10"),
 					equipmentId: "12345678901234567890", // Referência ao barcode do equipamento "iPhone 15" na tabela EquipmentSheets
-					storeId: "987654321", // Referência ao NIPC da loja "Loja Porto" na tabela Stores	
+					storeId: "987654321", // Referência ao NIPC da loja "Loja Porto" na tabela Stores
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
@@ -32,7 +32,7 @@ module.exports = {
 					putOnSaleDate: null,
 					purchaseDate: new Date("2023-12-10"),
 					equipmentId: "12345678901234567890", // Referência ao barcode do equipamento "iPhone 15" na tabela EquipmentSheets
-					storeId: "112233445", // Referência ao NIPC da loja "Loja Coimbra" na tabela Stores	
+					storeId: "112233445", // Referência ao NIPC da loja "Loja Coimbra" na tabela Stores
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},

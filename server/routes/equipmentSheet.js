@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 
 router.get("/", async (req, res) => {
 	try {
@@ -109,78 +109,105 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/in-stock", async (req, res) => {
-	// try {
-	const {
-		modelId,
-		typeId,
-		page = 1,
-		pageSize = 6,
-		orderBy = "createdAt", // Valor padrão
-		orderDirection = "DESC", // Valor padrão
-		brandId,
-	} = req.query;
+	try {
+		const {
+			page = 1,
+			pageSize = 6,
+			orderBy = "recent-date", // Valor padrão
+			modelId,
+			typeId,
+			brandId,
+		} = req.query;
 
-	// Construção do objeto 'where' dinamicamente
-	const where = {};
+		// Construção do objeto 'where' dinamicamente
+		const where = {};
 
-	const modelCondition = modelId ? { id: modelId } : {};
-	const typeCondition = typeId ? { id: typeId } : {};
-	const brandCondition = brandId ? { id: brandId } : {};
+		const modelCondition = modelId ? { id: modelId } : {};
+		const typeCondition = typeId ? { id: typeId } : {};
+		const brandCondition = brandId ? { id: brandId } : {};
+		console.log(modelId, typeId, brandId);
 
-	// Calculando o offset com base na página
-	const offset = (parseInt(page) - 1) * parseInt(pageSize);
+		// Calculando o offset com base na página
+		const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
-	// Construindo a ordenação
-	const order = [[orderBy, orderDirection.toUpperCase()]];
+		// Consulta ao banco de dados
+		const { count, rows } = await models.EquipmentSheet.findAndCountAll({
+			where,
+			include: [
+				{
+					model: models.UsedEquipment,
+					as: "UsedEquipments",
+					required: true,
+				},
+				{
+					model: models.EquipmentModel,
+					as: "EquipmentModel",
+					where: modelCondition,
+					attributes: ["name", "price", "releaseYear"],
+					include: [
+						{
+							model: models.Brand,
+							as: "Brand",
+							where: brandCondition,
+							attributes: ["name"],
+						},
+					],
+				},
+				{
+					model: models.EquipmentType,
+					as: "EquipmentType",
+					where: typeCondition,
+					attributes: ["name"],
+				},
+			],
+			limit: parseInt(pageSize),
+			offset,
+		});
 
-	// Consulta ao banco de dados
-	const { count, rows } = await models.EquipmentSheet.findAndCountAll({
-		where,
-		include: [
-			// {
-			//     model: models.UsedEquipment,  // Inclui os equipamentos usados
-			//     as: "UsedEquipments",  // Alias para o relacionamento
-			//     required: true,  // Isso garante que só as EquipmentSheet com UsedEquipments associados sejam retornadas
-			// },
-			{
-				model: models.EquipmentModel,
-				as: "EquipmentModel",
-				where: modelCondition,
-				attributes: ["name", "price", "releaseYear"],
-				include: [
-					{
-						model: models.Brand,
-						as: "Brand",
-						where: brandCondition,
-						attributes: ["name"],
-					},
-				],
-			},
-			{
-				model: models.EquipmentType,
-				as: "EquipmentType",
-				where: typeCondition,
-				attributes: ["name"],
-			},
-		],
-		attributes: ["barcode"],
-		limit: parseInt(pageSize),
-		offset,
-		order,
-	});
+		const formattedData = rows.map((item) => ({
+			Barcode: item.barcode,
+			CreatedAt: item.createdAt,
+			UpdatedAt: item.updatedAt,
+			EquipmentModel: item.EquipmentModel.name,
+			Brand: item.EquipmentModel.Brand.name,
+			EquipmentType: item.EquipmentType.name,
+		}));
 
-	// Retorno da resposta com a paginação
-	res.json({
-		totalItems: count,
-		totalPages: Math.ceil(count / pageSize),
-		currentPage: parseInt(page),
-		pageSize: parseInt(pageSize),
-		data: rows,
-	});
-	// } catch (error) {
-	//     console.error("Error fetching equipment sheets:", error);
-	//     res.status(500).json({ error: "Error fetching equipment sheets." });
-	// }
+		switch (orderBy) {
+			case "recent-date":
+				formattedData.sort(
+					(a, b) => b.CreatedAt.getTime() - a.CreatedAt.getTime()
+				);
+				break;
+			case "oldest-date":
+				formattedData.sort(
+					(a, b) => a.CreatedAt.getTime() - b.CreatedAt.getTime()
+				);
+				break;
+			case "ASC":
+				formattedData.sort((a, b) =>
+					a.EquipmentModel.localeCompare(b.EquipmentModel)
+				);
+				break;
+			case "DESC":
+				formattedData.sort((a, b) =>
+					b.EquipmentModel.localeCompare(a.EquipmentModel)
+				);
+				break;
+		}
+
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: formattedData,
+			// data: rows,
+		});
+	} catch (error) {
+		console.error("Error fetching equipment sheets:", error);
+		res.status(500).json({ error: "Error fetching equipment sheets." });
+	}
 });
 
 router.post("/", async (req, res) => {

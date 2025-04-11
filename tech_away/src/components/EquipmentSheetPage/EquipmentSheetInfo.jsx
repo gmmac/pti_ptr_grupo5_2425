@@ -31,7 +31,7 @@ export default function EquipmentSheetInfo({ equipmentInfo }) {
 					}
 					w={"27"}
 					h={"19"}
-					color={"var(--dark-grey)"}
+					color={"var(--white)"}
 				/>
 			</Link>
 			<Stack direction="vertical" gap={3}>

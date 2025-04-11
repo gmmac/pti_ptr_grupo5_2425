@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Container, Image, Stack } from "react-bootstrap";
+import { Container, Image, Stack, Row, Col } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
-
 import api from "../utils/axios";
 import EquipmentSheetInfo from "../components/EquipmentSheetPage/EquipmentSheetInfo";
 import UsedEquipmentCard from "../components/EquipmentSheetPage/UsedEquipmentCard";
@@ -20,8 +19,6 @@ export default function EquipmentSheetPage() {
 	};
 
 	useEffect(() => {
-		console.log(`api/equipmentSheet/${barcode}`);
-
 		api
 			.get(`api/equipmentSheet/${barcode}`)
 			.then((res) => {
@@ -43,11 +40,6 @@ export default function EquipmentSheetPage() {
 			});
 	}, [refresh]);
 
-	useEffect(() => {
-		// console.log(equipmentSheet);
-		console.log(usedEquipmentList);
-	}, [equipmentSheet, usedEquipmentList]);
-
 	return (
 		<Container>
 			<Stack direction="vertical" gap={3}>
@@ -61,15 +53,20 @@ export default function EquipmentSheetPage() {
 						className="rounded-sm"
 					/>
 				</Stack>
-				<Stack direction="horizontal" gap={3} className="">
+				<Row className="g-4">
 					{usedEquipmentList.length > 0 ? (
 						usedEquipmentList.map((usedEquipment, index) => (
-							<UsedEquipmentCard key={index} usedEquipment={usedEquipment} />
+							<Col key={index} xs={12} sm={6} md={4} lg={3}>
+								<UsedEquipmentCard usedEquipment={usedEquipment} />
+							</Col>
 						))
 					) : (
-						<p>Nenhum equipamento usado encontrado.</p>
+						<Col xs={12} className="text-center mt-5">
+							<i className="pi pi-exclamation-triangle"></i>
+							<p className="m-0">No equipment found</p>
+						</Col>
 					)}
-				</Stack>
+				</Row>
 			</Stack>
 		</Container>
 	);

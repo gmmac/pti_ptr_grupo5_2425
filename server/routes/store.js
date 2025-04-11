@@ -42,7 +42,7 @@ router.get("/", async (req, res) => {
 		order = [["nipc", "ASC"]];
 	  }
   
-	  console.log("Order applied:", order);
+	//   console.log("Order applied:", order);
   
 	  const { count, rows } = await models.Store.findAndCountAll({
 		where,

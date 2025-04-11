@@ -50,7 +50,7 @@ const AuthProvider = ({ children, userType="client", loginPath }) => {
 
 
   useEffect(() => { // is logged
-    if (user && userType) {
+    if (user && userType && userType !== "client") {
       const profilePath = userType === "client" ? "/profile" : "/organizer";
       sessionStorage.setItem("organizerSelectedTab", "dashboard")
       navigate(profilePath);
