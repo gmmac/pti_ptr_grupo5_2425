@@ -2,54 +2,84 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    await queryInterface.bulkInsert('Clients', [
+  async up(queryInterface, Sequelize) {
+    await queryInterface.bulkInsert("Clients", [
       {
-        nic: '123456789',
-        nif: '987654327',
-        birthDate: new Date('2004-02-07'), 
-        gender: 'M', // 'M' para masculino, 'F' para feminino
-        firstName: 'Diogo',
-        lastName: 'Roque',
-        email: 'diogorq2@gmail.com',
-        phone: '123456789',
-        address: '', 
-        latitude: '', 
-        longitude: '', 
+        nic: "123456789",
+        nif: "987654327",
+        birthDate: new Date("2004-02-07"),
+        gender: "M", // 'M' para masculino, 'F' para feminino
+        firstName: "Diogo",
+        lastName: "Roque",
+        email: "diogorq2@gmail.com",
+        phone: "123456789",
+        address: "",
+        latitude: "",
+        longitude: "",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-	  {
-		nic: "123456788",
-		nif: "987654321",
-		birthDate: "1990-05-15",
-		gender: "M",
-		firstName: "John",
-		lastName: "Doe",
-		email: "johndoe@example.com",
-		phone: "912345678",
-		address: "123 Main Street",
-		latitude: "40.712776",
-		longitude: "-74.005974",
-		createdAt: new Date(),
-		updatedAt: new Date(),
-	},
-	{
-		nic: "987654321",
-		nif: "123456789",
-		birthDate: "1985-07-20",
-		gender: "F",
-		firstName: "Jane",
-		lastName: "Smith",
-		email: "janesmith@example.com",
-		phone: "923456789",
-		address: "456 Elm Street",
-		latitude: "34.052235",
-		longitude: "-118.243683",
-		createdAt: new Date(),
-		updatedAt: new Date(),
-	},
-	{
+      {
+        nic: "123456788",
+        nif: "987654321",
+        birthDate: "1990-05-15",
+        gender: "M",
+        firstName: "John",
+        lastName: "Doe",
+        email: "johndoe@example.com",
+        phone: "912345678",
+        address: "123 Main Street",
+        latitude: "40.712776",
+        longitude: "-74.005974",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        nic: "895235746",
+        nif: "895235746",
+        birthDate: "1990-05-15",
+        gender: "M",
+        firstName: "Leonor",
+        lastName: "Cardoso",
+        email: "nonodavidcardoso@gmail.com",
+        phone: "895235746",
+        address: "123 Main Street",
+        latitude: "40.712776",
+        longitude: "-74.005974",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        nic: "895235711",
+        nif: "895235711",
+        birthDate: "1992-05-15",
+        gender: "M",
+        firstName: "Diogo",
+        lastName: "Roque",
+        email: "diogorq30@gmail.com",
+        phone: "895235711",
+        address: "123 Main Street",
+        latitude: "40.712776",
+        longitude: "-74.005974",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        nic: "987654321",
+        nif: "123456789",
+        birthDate: "1985-07-20",
+        gender: "F",
+        firstName: "Jane",
+        lastName: "Smith",
+        email: "janesmith@example.com",
+        phone: "923456789",
+        address: "456 Elm Street",
+        latitude: "34.052235",
+        longitude: "-118.243683",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
         nic: "987654323",
         nif: "123456791",
         birthDate: "1990-11-22",
@@ -62,7 +92,7 @@ module.exports = {
         latitude: "51.507351",
         longitude: "-0.127758",
         createdAt: "2025-03-30T12:00:00Z",
-        updatedAt: "2025-03-30T12:00:00Z"
+        updatedAt: "2025-03-30T12:00:00Z",
       },
       {
         nic: "987654324",
@@ -77,7 +107,7 @@ module.exports = {
         latitude: "48.856613",
         longitude: "2.352222",
         createdAt: "2025-03-30T12:00:00Z",
-        updatedAt: "2025-03-30T12:00:00Z"
+        updatedAt: "2025-03-30T12:00:00Z",
       },
       {
         nic: "987654325",
@@ -92,7 +122,7 @@ module.exports = {
         latitude: "34.052235",
         longitude: "-118.243683",
         createdAt: "2025-03-30T12:00:00Z",
-        updatedAt: "2025-03-30T12:00:00Z"
+        updatedAt: "2025-03-30T12:00:00Z",
       },
       {
         nic: "987654326",
@@ -107,12 +137,12 @@ module.exports = {
         latitude: "39.739235",
         longitude: "-104.990250",
         createdAt: "2025-03-30T12:00:00Z",
-        updatedAt: "2025-03-30T12:00:00Z"
-      }
-    ])
+        updatedAt: "2025-03-30T12:00:00Z",
+      },
+    ]);
   },
 
-	async down(queryInterface, Sequelize) {
-		await queryInterface.bulkDelete("Clients", null, {});
-	},
+  async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete("Clients", null, {});
+  },
 };

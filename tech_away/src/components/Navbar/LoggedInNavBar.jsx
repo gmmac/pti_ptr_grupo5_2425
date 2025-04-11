@@ -13,7 +13,6 @@ import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 import { useCart } from "../../contexts/CartProvider";
 import { Badge } from "primereact/badge";
 import "../../styles/variables.css";
-import { useAuth } from '../../contexts/AuthenticationProviders/AuthProvider';
 
 const navItems = [
 	{ name: "About Us", path: "/about" },

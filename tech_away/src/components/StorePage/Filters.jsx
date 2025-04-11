@@ -27,7 +27,7 @@ export default function Filters({ filters, setFilters }) {
 		api
 			.get("api/model")
 			.then((res) => {
-				const modelsObj = res.data;
+				const modelsObj = res.data.data;
 
 				const modelsArray = Object.keys(modelsObj).map((key) => ({
 					id: modelsObj[key].id,
@@ -44,7 +44,7 @@ export default function Filters({ filters, setFilters }) {
 		api
 			.get("api/brand")
 			.then((res) => {
-				const brandsObj = res.data;
+				const brandsObj = res.data.data;
 				const brandsArray = Object.keys(brandsObj).map((key) => ({
 					id: brandsObj[key].id,
 					name: brandsObj[key].name,

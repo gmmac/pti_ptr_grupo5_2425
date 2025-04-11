@@ -116,12 +116,12 @@ export default function RegisterForms({userType="client"}) {
             }
             else{
                 await api.post('/api/auth/register', {email: formData.email, password: formData.password})
+                await api.post('/api/actualCart', {clientNIC: formData.nic})
                 ChangeToLogin()
             }
         })
         .catch(error => {})
     }
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;

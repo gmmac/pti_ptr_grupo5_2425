@@ -54,7 +54,7 @@ export default function LoginForms({registerPath="/register", changePasswordPath
         }
 
         newErrors = { ...errors };
-        loginAction(formData, newErrors,setErrors);
+        loginAction(formData, setErrors , newErrors);
     };
 
 
