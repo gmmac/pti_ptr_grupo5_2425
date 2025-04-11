@@ -52,7 +52,7 @@ export default function StorePurchasePage() {
     }, []);
 
     useEffect(() => {
-        api.get(`/api/equipmentSheet/`)
+        api.get(`/api/equipmentSheet/teste`)
             .then(res => setEquipmentList(res.data.data.map(e => e.barcode)))
             .catch(error => console.error('Erro ao buscar equipamentos:', error.message));
     }, []);

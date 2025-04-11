@@ -279,7 +279,6 @@ router.get("/in-stock", async (req, res) => {
 		console.error("Error fetching equipment sheets:", error);
 		res.status(500).json({ error: "Error fetching equipment sheets." });
 	}
->>>>>>> purchase
 });
 
 router.post("/", async (req, res) => {
