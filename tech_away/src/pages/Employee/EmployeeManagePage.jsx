@@ -6,6 +6,8 @@ import EmployeeManage from "../../components/HomePageEmployee/Manage/EmployeeMan
 import EquipmentStatusManage from "../../components/HomePageEmployee/Manage/EquipmentStatusManage";
 import RepairStatusManage from "../../components/HomePageEmployee/Manage/RepairStatusManage";
 import StoreManage from "../../components/HomePageEmployee/Manage/StoreManage";
+import BrandsManage from "../../components/HomePageEmployee/Manage/BrandsManage";
+import ModelsManage from "../../components/HomePageEmployee/Manage/ModelsManage";
 
 
 const componentMap = {
@@ -13,7 +15,9 @@ const componentMap = {
   employeeRoleManage: <EmployeeRoleManage />,
   equipmentStatusManage: <EquipmentStatusManage />,
   repairStatusManage: <RepairStatusManage />,
-  storeManage: <StoreManage />
+  storeManage: <StoreManage />,
+  brandsManage: <BrandsManage />,
+  modelsManage: <ModelsManage />
 };
 
 export default function ManagePage() {

@@ -6,17 +6,18 @@ import DashboardVerticalSection from './Dashboard/DashboardVerticalSection';
 import EmployeeManage from './Manage/EmployeeManage';
 import EmployeeRoleManage from './Manage/EmployeeRoleManage';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
+import BrandsManage from './Manage/BrandsManage';
 
 export default function EmployeeHomeDashboard() {
 
-    // const sections = [
-    //     { title: 'Models', component: "model" },
-    //     { title: 'Brands', component: 'brand' },
-    //     { title: 'Equipment Types', component: 'equipmentType' },
-    //     { title: 'Equiment Sheet', component: 'equipmentSheet' },
-    //     { title: 'Parts', component: 'parts' },
-    //     { title: 'Clients', component: 'clients' },
-    // ];
+    const sections = [
+        { title: 'Equipment Models', key: 'modelsManage' },
+        { title: 'Brands', key: 'brandsManage' },
+        { title: 'Equipment Types', key: 'equipmentType' },
+        { title: 'Equiment Sheet', key: 'equipmentSheet' },
+        { title: 'Parts', key: 'parts' },
+        { title: 'Clients', key: 'clients' },
+    ];
     
     const {checkIsAdmin } = useAuthEmployee();
     const [isAdmin, setIsAdmin] = useState(false);
@@ -55,9 +56,9 @@ export default function EmployeeHomeDashboard() {
 
             <Row>
 
-                {/* <Col xl={8} lg={12} md={12} >
+                <Col xl={8} lg={12} md={12} >
                     <DashboardGrid sections={sections} title="Manage" />
-                </Col> */}
+                </Col>
 
                 <Col xl={4} lg={12} md={12} className='pt-4 pt-xl-0 gx-xl-5' >
                     <DashboardVerticalSection />

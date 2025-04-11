@@ -1,11 +1,10 @@
 // server.js
 
 //Imports
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const cookieParser = require("cookie-parser");
-
 require("dotenv").config();
 
 const app = express();

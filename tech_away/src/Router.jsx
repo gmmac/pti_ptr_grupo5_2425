@@ -38,6 +38,7 @@ import ConfirmedPayment from "./components/payment/ConfirmedPayment";
 import OrganizerAuthProvider from "./contexts/AuthenticationProviders/OrganizerAuthProvider";
 import { UserTypeProvider } from "./contexts/AuthenticationProviders/UserTypeProvider";
 import CharityProjectPage from "./pages/Organizer/CharityProjectPage";
+import TestPage from "./pages/TestPage";
 
 
 export default function Router() {
@@ -103,6 +104,7 @@ export default function Router() {
 
 						<Route path="login" element={<EmployeeLoginPage />} />
 						<Route path="register" element={<EmployeeRegisterPage />} />
+            <Route path="teste" element={<TestPage />} />
 					</Route>
 
           {/* Rotas do organizador */}
@@ -127,7 +129,6 @@ export default function Router() {
             <Route path="changePassword" element={<ChangePasswordClient userType="organizer" />} />
 
           </Route>
-
         </Routes>
       </BrowserRouter>
       </UserTypeProvider>

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Button, Container, Stack } from "react-bootstrap";
 import DisplayTable from "../components/equipment/DisplayTable";
+import FormsEquipmentSheet from "../components/equipment/FormsEquipmentSheet";
 import FiltersBarEquipmentSheet from "../components/equipment/FiltersBarEquipmentSheet";
 
 export default function TestPage() {
 	const [show, setShow] = useState(false);
+	const [refreshKey, setRefreshKey] = useState(0);
 
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
