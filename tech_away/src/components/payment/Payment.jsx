@@ -12,6 +12,8 @@ export default function Payment() {
     if (!stripePromise) {
       api.get('/api/payment/config').then(async (r) => {
         const { publishableKey } = await r.data;
+
+        
         const stripe = await loadStripe(publishableKey);
         setStripePromise(stripe);
       });
