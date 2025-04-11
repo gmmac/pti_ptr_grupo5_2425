@@ -10,7 +10,6 @@ export default function LoginForms({registerPath="/register", changePasswordPath
 
 	const { loginAction } = useAuth();
 
-
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -34,7 +33,7 @@ export default function LoginForms({registerPath="/register", changePasswordPath
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+        console.log()
         // Verificar campos vazios
         let newErrors = { ...errors };
         let hasError = false;
@@ -55,7 +54,7 @@ export default function LoginForms({registerPath="/register", changePasswordPath
         }
 
         newErrors = { ...errors };
-        loginAction(formData, setErrors);
+        loginAction(formData, newErrors,setErrors);
     };
 
 

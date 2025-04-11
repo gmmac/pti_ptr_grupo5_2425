@@ -19,6 +19,9 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
+      description: {
+        type: Sequelize.STRING(500),
+      },
       repairId: {
         type: Sequelize.INTEGER,
         allowNull: false,

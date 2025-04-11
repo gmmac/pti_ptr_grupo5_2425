@@ -30,6 +30,12 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       });
+
+      Repair.hasMany(models.RepairStatusLog, {
+				foreignKey: 'repairId',
+				onDelete: 'CASCADE',
+       			onUpdate: 'CASCADE'
+			});
     }
   }
   Repair.init(
