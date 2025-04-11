@@ -1,24 +1,64 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
+const { Op, Sequelize } = require("sequelize");
+const { sequelize } = require("../models/index");
 
 router.get("/", async (req, res) => {
   try {
-    const { page = 1, pageSize = 10, orderBy, orderDirection } = req.query;
+    const {
+      id,
+      name,
+      createdAt,
+      updatedAt,
+      page = 1,
+      pageSize = 10,
+      sortField = "name",
+      sortOrder = "ASC",
+    } = req.query;
+
+    const where = {};
+
+    if (id)
+      where.id = sequelize.where(
+        sequelize.cast(sequelize.col("Brand.id"), "varchar"),
+        { [Op.iLike]: `${id}%` }
+      );
+    if (name) where.name = { [Op.iLike]: `%${name}%` };
+    if (createdAt) {
+      where.createdAt = {
+        [Op.gte]: new Date(createdAt),
+        [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+      };
+    }
+    if (updatedAt) {
+      where.updatedAt = {
+        [Op.gte]: new Date(updatedAt),
+        [Op.lt]: new Date(new Date(updatedAt).getTime() + 24 * 60 * 60 * 1000),
+      };
+    }
 
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
-    let order = [];
-    if (orderBy && orderDirection) {
-      order = [[orderBy, orderDirection.toUpperCase()]];
-    } else {
-      order = [["name", "ASC"]];
+    const orderClause = [];
+
+    if (sortField === "name") {
+      orderClause.push([
+        Sequelize.fn("LOWER", Sequelize.col("Brand.name")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField) {
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
     }
 
     const { count, rows } = await models.Brand.findAndCountAll({
+      where,
       limit: parseInt(pageSize),
       offset,
-      order,
+      order: orderClause,
     });
     res.status(200).json({
       totalItems: count,
@@ -28,6 +68,7 @@ router.get("/", async (req, res) => {
       data: rows,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Error fetching brands." });
   }
 });
@@ -117,6 +158,7 @@ router.delete("/:id", async (req, res) => {
     await brand.destroy();
     res.status(204).send();
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });

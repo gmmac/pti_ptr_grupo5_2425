@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Col, Form, Modal, Row, Stack } from "react-bootstrap";
 import { Stepper } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
@@ -8,7 +8,7 @@ import FormsNewBrand from "../brands/FormsNewBrand";
 import ModalToSelect from "./ModalToSelect";
 import { Calendar } from 'primereact/calendar';
 
-export default function FormsEquipmentModel({ showModal, closeModal, refreshTable}) {
+export default function FormsEquipmentModel({ showModal, closeModal, refreshTable, existingModel = null }) {
 
     const stepperRef = useRef(null);
 
@@ -16,13 +16,39 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 
     const [showNewBrandModal, setShowNewBrandModal] = useState(false);
 
-    const [equipmentModel, setEquipmentModel] = useState({
+    const [equipmentModel, setEquipmentModel] = useState(() => {
+        console.log(existingModel)
+        if (existingModel) {
+            return {
+                name: existingModel.name || "",
+                brandId: existingModel.Brand?.id || "",
+                brand: existingModel.Brand?.name || "",
+                price: existingModel.price || "",
+                releaseYear: existingModel.releaseYear || "",
+            };
+        }
+        return {
             name: "",
             brandId: "",
             brand: "",
             price: "",
             releaseYear: "",
-        });
+        };
+    });
+
+    useEffect(() => {
+        if (existingModel) {
+            console.log("Exist",  existingModel)
+          setEquipmentModel({
+            name: existingModel.name || "",
+            brandId: existingModel.Brand?.id || "",
+            brand: existingModel.Brand?.name || "",
+            price: existingModel.price || "",
+            releaseYear: existingModel.releaseYear || "",
+          });
+          console.log("Equipm",existingModel)
+        }
+      }, [existingModel]);
 
 	const [errors, setErrors] = useState({});
 
@@ -45,11 +71,8 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 		setEquipmentModel((prev) => ({ ...prev, brand: name, brandId: id }));
 	};
 
-	// Post de uma nova brand
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-
-        console.log(equipmentModel)
 
 		// Validação antes do envio
 		let hasError = false;
@@ -73,25 +96,24 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 
 		};
 
-		await api
-			.post("api/model/", dataToSubmit)
-			.then(() => {
-				handleRefresh();
-				refreshTable();
-				closeModal();
-			})
-			.catch((error) => {
-                if (error.response && error.response.status === 400) {
-                    // Se for erro 400, mostra a mensagem vinda do backend
-                    setErrors((prevErrors) => ({
-                        ...prevErrors,
-                        exist: error.response.data.error
-                    }));
-                    } else {
-                        console.error("API error:", error.message);
-                    }
-				
-			});
+        const method = existingModel ? api.put : api.post;
+        const url = existingModel ? `api/model/${existingModel.id}/` : "api/model/";
+
+        try {
+            await method(url, dataToSubmit);
+            handleRefresh();
+            refreshTable();
+            closeModal();
+        } catch (error) {
+            if (error.response?.status === 400) {
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    exist: error.response.data.error,
+                }));
+            } else {
+                console.error("API error:", error.message);
+            }
+        }
 	};
 
     // const handleNext = () => {
@@ -112,6 +134,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 	const handleRefresh = () => {
 		setEquipmentModel({
 			name: "",
+            brandId: "",
             brand: "",
             price: "",
             releaseYear: "",
@@ -122,7 +145,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 	return (
 		<Modal show={showModal} onHide={() => { closeModal(); handleRefresh()}} className={showNewBrandModal ? 'd-none' : ''}>
 			<Modal.Header closeButton>
-				<Modal.Title>Add New Equipment Model</Modal.Title>
+                <Modal.Title>{existingModel ? "Edit Equipment Model" : "Add New Equipment Model"}</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				
@@ -280,7 +303,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
                                 style={{ backgroundColor: "var(--variant-one)", border: "none" }}
                                 onClick={handleSubmit}
                             >
-                                Salvar Alterações
+                                {existingModel ? "Update Equipment Model" : "Add Equipment Model"}
                             </Button>
                         </Stack>
                         

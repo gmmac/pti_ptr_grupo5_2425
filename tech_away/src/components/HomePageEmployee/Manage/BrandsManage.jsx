@@ -18,7 +18,7 @@ export default function BrandsManage() {
 		<Container className="mt-4">
             <Row className="mb-3">
                 <Col className="text-end">
-                    <Button variant="success" onClick={handleShow}>Add Brand</Button>
+                    <Button style={{ backgroundColor: "var(--variant-one)", border: "none" }} onClick={handleShow}>Add Brand</Button>
                 </Col>
             </Row>
 

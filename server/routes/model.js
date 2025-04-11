@@ -109,7 +109,7 @@ router.get("/", async (req, res) => {
         {
           model: models.Brand,
           as: "Brand",
-          attributes: ["name"],
+          attributes: ["id", "name"],
         },
       ],
       limit: parseInt(pageSize),
@@ -178,8 +178,63 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:ID", (req, res) => {});
+router.put("/:id", async (req, res) => {
+  try {
+    const { name, brand, price, releaseYear } = req.body;
+    const model = await models.EquipmentModel.findByPk(req.params.id);
+    if (!model) {
+      return res.status(404).json({ error: "Equipment Model not found" });
+    }
+    if (!name) {
+      return res
+        .status(400)
+        .json({ error: "Equipment Model name is required." });
+    }
+    if (!brand) {
+      return res.status(400).json({ error: "Brand is required." });
+    }
+    if (!price) {
+      return res
+        .status(400)
+        .json({ error: "Equipment Model price is required." });
+    }
+    if (!releaseYear) {
+      return res
+        .status(400)
+        .json({ error: "Equipment Model release year is required." });
+    }
+    const exists = await models.EquipmentModel.findOne({
+      where: { name, brand_id: brand },
+    });
+    if (exists && exists.price == price && exists.releaseYear == releaseYear) {
+      return res
+        .status(400)
+        .json({ error: "This equipment model already exists." });
+    }
+    await model.update({
+      name,
+      brand_id: brand,
+      price,
+      releaseYear,
+      updatedAt: new Date(),
+    });
+    res.status(200).json(model);
+  } catch (error) {
+    res.status(500).json({ error: "Error updating equipment model." });
+  }
+});
 
-router.delete("/:ID", (req, res) => {});
+router.delete("/:id", async (req, res) => {
+  try {
+    const model = await models.EquipmentModel.findByPk(req.params.id);
+    if (!model) {
+      return res.status(404).json({ error: "Equipment Model not found" });
+    }
+    await model.destroy();
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router;

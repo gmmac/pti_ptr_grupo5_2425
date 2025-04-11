@@ -10,7 +10,8 @@ import ModalEdit from "./ModalEdit";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
-import { Paginator } from 'primereact/paginator';
+import FormsEquipmentModel from "./FormsEquipmentModel";
+import { Calendar } from 'primereact/calendar';
 
 export default function DisplayTable({ model }) {
 	const [loading, setLoading] = useState(false);
@@ -27,7 +28,9 @@ export default function DisplayTable({ model }) {
 			'name': { value: '', matchMode: 'contains' },
 			'price': { value: '', matchMode: 'contains' },
 			'releaseYear': { value: '', matchMode: 'contains' },
-			'Brand': { value: '', matchMode: 'contains' }
+			'Brand': { value: '', matchMode: 'contains' },
+			'createdAt': { value: '', matchMode: 'equals' },
+			'updatedAt': { value: '', matchMode: 'equals' }
 		}
     });
 
@@ -36,9 +39,7 @@ export default function DisplayTable({ model }) {
     const [selectedObj, setSelectedObj] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const menuRefs = useRef([]);
-    const [globalFilterValue, setGlobalFilterValue] = useState("");
-
-    let networkTimeout = null;
+	const dateFields = ['createdAt', 'updatedAt']; // adiciona os campos relevantes
 
     useEffect(() => {
         loadLazyData();
@@ -103,7 +104,7 @@ export default function DisplayTable({ model }) {
 
     const confirmDelete = (id) => {
         confirmDialog({
-            message: "Are you sure you want to delete this item?",
+            message: (<> Are you sure you want to delete this {model}?<br />This action will erase other items associated with this {model}.</>),
             header: "Confirmation",
             icon: "pi pi-exclamation-triangle",
             accept: () => handleDelete(id),
@@ -116,7 +117,7 @@ export default function DisplayTable({ model }) {
     };
 
     const handleDelete = (id) => {
-        api.delete(`api/${model}/${id}`).then(() => fetchData());
+        api.delete(`api/${model}/${id}`).then(() => loadLazyData());
     };
 
     return (
@@ -151,13 +152,52 @@ export default function DisplayTable({ model }) {
                             header={column}
                             sortable
                             filter
-                            filterPlaceholder="Search"
+							showFilterMenu={false}
+							filterMatchMode={dateFields.includes(column) ? 'equals' : 'contains'}
+							filterElement={dateFields.includes(column) ? (options) => (
+								<Calendar
+									value={options.value ? new Date(options.value) : null}
+									onChange={(e) => {
+										const selectedDate = e.value;
+										if (selectedDate) {
+											selectedDate.setHours(12, 0, 0, 0);
+										}
+										const isoDate = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
+										options.filterCallback(isoDate, options.index);
+										const newFilters = { ...lazyState.filters };
+										newFilters[column].value = isoDate;
+										setLazyState({
+											...lazyState,
+											filters: newFilters,
+										});
+									}}
+									dateFormat="dd/mm/yy"
+									placeholder="Date"
+									showIcon
+									panelStyle={{
+										borderRadius: "10px",
+									}}
+								/>
+							) : undefined}
+
+                            filterPlaceholder={dateFields.includes(column) ? undefined : "Search"}
                             body={(rowData) => {
-                                const value = rowData[column];
-                                return typeof value === "object" && value !== null
-                                    ? value.name || "N/A"
-                                    : value;
-                            }}
+								const value = rowData[column];
+								if (typeof value === "object" && value !== null) {
+									return value.name || "N/A";
+								}
+								if (dateFields.includes(column) && value) {
+									const date = new Date(value);
+									const formattedDate = date.toLocaleDateString("pt-PT");
+									const formattedTime = date.toLocaleTimeString("pt-PT", {
+										hour: "2-digit",
+										minute: "2-digit",
+										hour12: false,
+									});
+									return `${formattedDate} ${formattedTime}`;
+								}			
+								return value;
+							}}
                         />
                     ))}
                     <Column
@@ -165,12 +205,12 @@ export default function DisplayTable({ model }) {
                         body={(rowData, options) => {
                             const menuItems = [
                                 {
-                                    label: "Editar",
+                                    label: "Edit",
                                     icon: "pi pi-pencil",
-                                    command: () => handleEdit(rowData.id),
+                                    command: () => handleEdit(rowData),
                                 },
                                 {
-                                    label: "Excluir",
+                                    label: "Delete",
                                     icon: "pi pi-trash",
                                     command: () => confirmDelete(rowData.id),
                                 },
@@ -239,20 +279,31 @@ export default function DisplayTable({ model }) {
 							border-color:rgba(55, 65, 81, 0.35);
 						}
 
+						.p-datepicker-trigger {
+							border: var(--variant-one);
+							border-top-right-radius: 6px !important;
+							border-bottom-right-radius: 6px !important;
+							padding-right: 0.05rem;
+							background-color: var(--variant-one);
+						}
 						`}
 				</style>
             </div>
-            <ModalEdit
-                show={showModal}
-                handleClose={() => setShowModal(false)}
-                modelToEdit={model}
-                objectToChange={selectedObj || {}}
-                attributesToEdit={columns}
-                onSave={() => {
-                    setShowModal(false);
-                    loadLazyData();
-                }}
-            />
+				{model == "model" ? 
+					<FormsEquipmentModel showModal={showModal} closeModal={() => setShowModal(false)} refreshTable={() => loadLazyData()} existingModel = {selectedObj || {}} /> : 
+					<ModalEdit
+						show={showModal}
+						handleClose={() => setShowModal(false)}
+						modelToEdit={model}
+						objectToChange={selectedObj || {}}
+						attributesToEdit={columns}
+						onSave={() => {
+							setShowModal(false);
+							loadLazyData();
+						}}
+					/>
+				}
+            
         </>
     );
 }

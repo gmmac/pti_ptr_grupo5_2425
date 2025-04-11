@@ -18,7 +18,7 @@ export default function ModelsManage() {
 		<Container className="mt-4">
             <Row className="mb-3">
                 <Col className="text-end">
-                    <Button variant="success" onClick={handleShow}>Add Equipment Model</Button>
+                    <Button style={{ backgroundColor: "var(--variant-one)", border: "none" }} onClick={handleShow}>Add Equipment Model</Button>
                 </Col>
             </Row>
 
