@@ -2,7 +2,7 @@
 
 :root {
 	/* Variaveis para cores: */
-	--danger: #B5483E;
+	--danger: #b5483e;
 	--dark-grey: #27272d;
 	--light-grey: #e7e7e7;
 	--valid: #409966;
@@ -28,4 +28,19 @@
 
 .rounded-sm {
 	border-radius: var(--rounded-sm);
+}
+
+.background-white {
+	background-color: var(--white);
+}
+
+.btn-variant-one {
+	background-color: var(--variant-one);
+	color: var(--white);
+}
+
+.btn-variant-two {
+	background-color: var(--variant-two);
+	border: none;
+	color: var(--white);
 }

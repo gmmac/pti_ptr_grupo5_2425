@@ -21,6 +21,7 @@ import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 
 import { IsMobileProvider } from "./contexts/IsMobileContext";
+
 import AuthProvider from "./contexts/AuthenticationProviders/AuthProvider";
 import EmployeeAuthProvider from "./contexts/AuthenticationProviders/EmployeeAuthProvider";
 import ProfilePageClient from "./pages/Auth/ProfilePageClient";
@@ -30,6 +31,7 @@ import OrganizerRegisterPage from "./pages/Organizer/OrganizerRegisterPage";
 import OrganizerLoginPage from "./pages/Organizer/OrganizerLoginPage";
 import OrganizerLayoutPage from "./pages/Layout/OrganizerLayoutPage";
 import OrganizerHomePage from "./pages/Organizer/OrganizerHomePage";
+
 
 export default function Router() {
   return (
