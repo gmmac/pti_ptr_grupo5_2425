@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal } from 'react-bootstrap';
+import { Col, Modal, Row } from 'react-bootstrap';
 import './../../styles/pageElements.css';
 import CharityProjectInfoEditor from './CharityProjectEditor/CharityProjectInfoEditor';
 import CharityProjectEquipmentTypeEditor from './CharityProjectEditor/CharityProjectEquipmentTypeEditor';
@@ -40,7 +40,7 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
       <Modal.Header closeButton className="bg-light border-0">
         <Modal.Title className="fw-bold">{project.name} Details</Modal.Title>
       </Modal.Header>
-
+    
       <Modal.Body className="px-4">
         <CharityProjectInfoEditor
           project={localProject}
@@ -50,25 +50,29 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
           onRefresh={onRefresh}
           setSelectedProject={setSelectedProject}
         />
-
+    
         <hr className="my-4" />
-
-        <CharityProjectEquipmentTypeEditor
-          projectId={project.id}
-          isEditing={true}
-          alert={equipmentAlert}
-          onChangeAlert={handleEquipmentAlert}
-        />
-
-        <hr className="my-4" />
-
-        <CharityProjectEquipmentSheetEditor
-          projectId={project.id}
-          alert={equipmentSheetAlert}
-          onChangeAlert={handleEquipmentSheetAlert}
-        />
+    
+        <Row>
+          <Col md={12} lg={6} className="mb-4">
+            <CharityProjectEquipmentTypeEditor
+              projectId={project.id}
+              isEditing={true}
+              alert={equipmentAlert}
+              onChangeAlert={handleEquipmentAlert}
+            />
+          </Col>
+    
+          <Col md={12} lg={6} className="mb-4">
+            <CharityProjectEquipmentSheetEditor
+              projectId={project.id}
+              alert={equipmentSheetAlert}
+              onChangeAlert={handleEquipmentSheetAlert}
+            />
+          </Col>
+        </Row>
       </Modal.Body>
-
     </Modal>
+    
   );
 }

@@ -5,6 +5,7 @@ import CharityProjectCatalog from '../charityProject/CharityProjectCatalog';
 import api from '../../utils/axios';
 import ModalCharityProjectDetails from '../charityProject/ModalCharityProjectDetails';
 import { useOrganizerAuth  } from '../../contexts/AuthenticationProviders/OrganizerAuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 export default function OrganizerCharityProjects() {
   const [showModal, setShowModal] = useState(false);
@@ -17,6 +18,8 @@ export default function OrganizerCharityProjects() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const navigate = useNavigate();
 
   const [filters, setFilters] = useState({
     startDate: '',
@@ -73,6 +76,7 @@ export default function OrganizerCharityProjects() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
 
     const handleOpenDetailsModal = (project) => {
+    navigate(`/organizer/projects/${project.name}`)
     setSelectedProject(project);
     setShowDetailsModal(true);
     };
@@ -114,13 +118,14 @@ export default function OrganizerCharityProjects() {
                   onRefresh={toggleRefresh}
                 />
 
-              <ModalCharityProjectDetails
+              {/* <ModalCharityProjectDetails
                 show={showDetailsModal}
                 handleClose={handleCloseDetailsModal}
                 project={selectedProject}
                 onRefresh={toggleRefresh}
                 setSelectedProject={setSelectedProject}
-              />
+              /> */}
+
             </>
 
             )}

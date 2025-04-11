@@ -9,6 +9,7 @@ router.get("/", async (req, res) => {
       startDate,
       completionDate,
       status,
+      projectName,
       warehouseID,
       organizerNic,
       page = 1,
@@ -19,11 +20,14 @@ router.get("/", async (req, res) => {
 
     const where = {};
 
+    console.log(projectName)
+
     if (startDate) where.startDate = { [Op.gte]: startDate };
     if (completionDate) where.completionDate = { [Op.lte]: completionDate };
     if (status) where.status = { [Op.eq]: parseInt(status) };
     if (warehouseID) where.warehouseID = { [Op.eq]: parseInt(warehouseID) };
     if (organizerNic) where.organizerNic = { [Op.like]: `%${organizerNic}%` };
+    if (projectName) where.name = { [Op.like]: `%${projectName}%` };
 
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
     const order = [[orderBy, orderDirection.toUpperCase()]];
@@ -138,8 +142,6 @@ router.post("/linkEquipmentSheet", async (req, res) => {
     const { charityProjectId, equipmentSheetIds } = req.body;
 
 
-    console.log("AAAAAAAAAASHAJSH ", req.body)
-
     if (!charityProjectId || !Array.isArray(equipmentSheetIds)) {
       return res.status(400).json({ error: "charityProjectId and equipmentSheetIds[] are required." });
     }
@@ -148,7 +150,6 @@ router.post("/linkEquipmentSheet", async (req, res) => {
       where: { charityProjectId }
     });
 
-    console.log("qaaasasasasas", equipmentSheetIds)
     const records = equipmentSheetIds.map((e) => ({
       charityProjectId,
       equipmentSheetId: e,

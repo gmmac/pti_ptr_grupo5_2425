@@ -32,6 +32,7 @@ import OrganizerLayoutPage from "./pages/Layout/OrganizerLayoutPage";
 import OrganizerHomePage from "./pages/Organizer/OrganizerHomePage";
 import OrganizerAuthProvider from "./contexts/AuthenticationProviders/OrganizerAuthProvider";
 import { UserTypeProvider } from "./contexts/AuthenticationProviders/UserTypeProvider";
+import CharityProjectPage from "./pages/Organizer/CharityProjectPage";
 
 export default function Router() {
   return (
@@ -108,6 +109,7 @@ export default function Router() {
 
             </Route>
 
+            <Route path="projects/:projectName" element={<CharityProjectPage />} />
             <Route path="login" element={<OrganizerLoginPage />} />
             <Route path="register" element={<OrganizerRegisterPage />} />
             <Route path="changePassword" element={<ChangePasswordClient userType="organizer" />} />
