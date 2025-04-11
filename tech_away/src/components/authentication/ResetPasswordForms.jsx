@@ -5,7 +5,7 @@ import api from '../../utils/axios';
 import '../../styles/index.css';
 import '../../styles/AuthPage.css';
 
-export default function LoginForms() {
+export default function LoginForms({userType="client"}) {
     const [formData, setFormData] = useState({
         email: '',
     });
@@ -18,7 +18,11 @@ export default function LoginForms() {
     const navigate = useNavigate();
 
     const ChangeToLogin = () => {
-        navigate('/login');
+        if(userType === 'client') {
+            navigate('/login');
+        } else if(userType === 'organizer') {
+            navigate('/organizer/login');
+        }
     };
 
     const handleSubmit = async (e) => {

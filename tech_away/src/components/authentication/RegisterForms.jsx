@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/index.css';
 import '../../styles/AuthPage.css';
 
-export default function RegisterForms() {
+export default function RegisterForms({userType="client"}) {
     const [formData, setFormData] = useState({
         nic: '',
         nif: '',
@@ -33,7 +33,11 @@ export default function RegisterForms() {
     const navigate = useNavigate();
 
     const ChangeToLogin = () => {
-        navigate('/login');
+        if(userType === 'client') {
+            navigate('/login');
+        } else if(userType === 'organizer') {
+            navigate('/organizer/login');
+        }
     };
 
     const validatePassword = (password) => {
@@ -90,7 +94,8 @@ export default function RegisterForms() {
 
     const verifyData = async () => {
         const response = await api.put('/api/auth/generateAuthToken');
-        await api.post('/api/client/', {
+
+        await api.post(`/api/${userType}/`, {
             nic: formData.nic, 
             nif: formData.nif, 
             birthDate: formData.birthDate, 
@@ -109,8 +114,10 @@ export default function RegisterForms() {
                 newErrors[response.data.errorTag] = 'Já existe um utilizador com este ' + response.data.errorTag;
                 setErrors(newErrors);
             }
-
-            await api.post('/api/auth/register', {email: formData.email, password: formData.password});
+            else{
+                await api.post('/api/auth/register', {email: formData.email, password: formData.password})
+                ChangeToLogin()
+            }
         })
         .catch(error => {})
     }
@@ -247,7 +254,15 @@ export default function RegisterForms() {
                             placeholder="Enter your NIC" 
                             name="nic" 
                             value={formData.nic} 
-                            onChange={handleChange} 
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '');
+                                setFormData({ ...formData, nic: value });
+                                if (value.length != 9) {
+                                    errors[e.target.name] = 'Este campo deve ter 9 dígitos!';
+                                }else{
+                                    errors[e.target.name] = '';
+                                }
+                            }}  
                             isInvalid={!!errors.nic}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -271,7 +286,7 @@ export default function RegisterForms() {
                             onChange={(e) => {
                                 const value = e.target.value.replace(/\D/g, '');
                                 setFormData({ ...formData, nif: value });
-                                if (value.length < 9) {
+                                if (value.length != 9) {
                                     errors[e.target.name] = 'Este campo deve ter 9 dígitos!';
                                 }else{
                                     errors[e.target.name] = '';

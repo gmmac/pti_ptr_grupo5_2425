@@ -70,7 +70,7 @@ router.delete("/:ID", async (req, res) => {
   try {
     const { ID } = req.params;
 
-    // verifies if role is used
+    // Verifica se existe algum funcionário com esse cargo
     const employeesWithRole = await models.Employee.count({ where: { role: ID } });
 
     if (employeesWithRole > 0) {
@@ -79,7 +79,7 @@ router.delete("/:ID", async (req, res) => {
       });
     }
 
-    // delete role
+    // Busca e tenta excluir
     const employeeRole = await models.EmployeeRole.findByPk(ID);
     if (!employeeRole) {
       return res.status(404).json({ message: "Role not found." });
@@ -89,10 +89,16 @@ router.delete("/:ID", async (req, res) => {
     res.json({ message: "Role deleted successfully." });
 
   } catch (error) {
-    console.error(error);
+
+    // Tratamento específico para erro de proteção
+    if (error.message.includes("protected")) {
+      return res.status(403).json({ message: "This role is protected and cannot be deleted." });
+    }
+
     res.status(500).json({ message: "Error deleting role." });
   }
 });
+
 
 
 module.exports = router;

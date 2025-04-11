@@ -115,24 +115,65 @@ router.post("/login", async (req, res) => {
       });
   
       if(existingClient){
+        res.cookie("clientInfo", existingClient.dataValues, {
+          httpOnly: true,    
+          secure: false, // Permite o cookie em HTTP durante o desenvolvimento
+          sameSite: "Lax", // Mais flexível que "Strict" para testes locais
+          maxAge: 24 * 60 * 60 * 1000 // 1 dia
+        });
+        
         return res.status(201).json(existingClient.dataValues);
       }
     }
 
-    if(userType === "employee"){
+    else if(userType === "employee"){
       const existingEmployee = await models.Employee.findOne({where: {email: email}
       });
 
+      console.log(existingEmployee.dataValues);
+
       if(existingEmployee){
+
+        res.cookie("employeeInfo", existingEmployee.dataValues, {
+          httpOnly: true,    
+          secure: false, // Permite o cookie em HTTP durante o desenvolvimento
+          sameSite: "Lax", // Mais flexível que "Strict" para testes locais
+          maxAge: 24 * 60 * 60 * 1000 // 1 dia
+        });
+        
         return res.status(201).json(existingEmployee.dataValues);
       }
     }
 
+    else if(userType === "organizer"){
+      const existingOrganizer = await models.Organizer.findOne({where: {email: email}
+      });
+
+      console.log(existingOrganizer.dataValues);
+
+      if(existingOrganizer){
+
+        res.cookie("organizerInfo", existingOrganizer.dataValues, {
+          httpOnly: true,    
+          secure: false, // Permite o cookie em HTTP durante o desenvolvimento
+          sameSite: "Lax", // Mais flexível que "Strict" para testes locais
+          maxAge: 24 * 60 * 60 * 1000 // 1 dia
+        });
+        
+        return res.status(201).json(existingOrganizer.dataValues);
+      }
+    }
 
   } catch (error) {
-    console.error(error.status);
-    res.sendStatus(error.status); // Internal Server Error
+    console.error(error);
+  
+    if (error.response?.status === 403) {
+      return res.status(403).json({ message: "Invalid Credentials" });
+    }
+  
+    return res.status(500).json({ message: "Internal Server Error" });
   }
+  
 
 });
 
@@ -182,7 +223,40 @@ router.get("/getUserByEmail/:email", async (req, res) => {
   }
 });
 
+router.get("/user-info", (req, res) => {
 
+  let userInfoName = "clientInfo"
+  if(req.query.userType === 'employee'){
+    userInfoName = "employeeInfo";
+  }
+  else if(req.query.userType === 'organizer'){
+    userInfoName = "organizerInfo";
+  }
+  
+  let userInfo = req.cookies[userInfoName];
+
+  return res.status(200).json({ userInfo: userInfo });
+});
+
+router.get('/logout', (req, res) => {
+  
+  let userInfo = "clientInfo"
+  //é employee. enviar variável na query
+  if(req.query.userType === 'employee'){
+    userInfo = "employeeInfo";
+  }
+  else if(req.query.userType === 'organizer'){
+    userInfo = "organizerInfo";
+  }
+  
+  res.clearCookie(userInfo, {
+    httpOnly: true,
+    secure: false, 
+    sameSite: "Lax"
+  });
+
+  return res.status(200).json({ message: 'Logout realizado com sucesso.' });
+});
 
 
 module.exports = router;

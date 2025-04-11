@@ -3,16 +3,16 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-
     await queryInterface.bulkInsert("EmployeeRoles", [
-      { role: "Admin", createdAt: new Date(), updatedAt: new Date() },
-      { role: "Employee", createdAt: new Date(), updatedAt: new Date() },
+      { role: "Admin", protected: true, createdAt: new Date(), updatedAt: new Date() },
+      { role: "Employee", protected: true, createdAt: new Date(), updatedAt: new Date() },
     ]);
-    
   },
 
   async down (queryInterface, Sequelize) {
-		await queryInterface.bulkDelete("EmployeeRoles", null, {});
-
+    // Remove apenas os que não são protegidos
+    await queryInterface.bulkDelete("EmployeeRoles", {
+      protected: false
+    });
   }
 };
