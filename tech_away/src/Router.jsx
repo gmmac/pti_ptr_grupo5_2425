@@ -31,7 +31,9 @@ import OrganizerLoginPage from "./pages/Organizer/OrganizerLoginPage";
 import OrganizerLayoutPage from "./pages/Layout/OrganizerLayoutPage";
 import OrganizerHomePage from "./pages/Organizer/OrganizerHomePage";
 import CheckoutOrderPage from "./pages/CheckoutOrderPage";
-
+import PaymentForm from "./components/payment/PaymentForm";
+import Payment from "./components/payment/Payment";
+import ConfirmedPayment from "./components/payment/ConfirmedPayment";
 export default function Router() {
 	return (
 		<IsMobileProvider>
@@ -106,15 +108,14 @@ export default function Router() {
 							{/* <Route path="manage" element={<EmployeeManagePage />} /> */}
 						</Route>
 
-						<Route path="login" element={<OrganizerLoginPage />} />
-						<Route path="register" element={<OrganizerRegisterPage />} />
-						<Route
-							path="changePassword"
-							element={<ChangePasswordClient userType="organizer" />}
-						/>
-					</Route>
-				</Routes>
-			</BrowserRouter>
-		</IsMobileProvider>
-	);
+            <Route path="login" element={<OrganizerLoginPage />} />
+            <Route path="register" element={<OrganizerRegisterPage />} />
+            <Route path="changePassword" element={<ChangePasswordClient userType="organizer" />} />
+
+          </Route>
+
+        </Routes>
+      </BrowserRouter>
+    </IsMobileProvider>
+  );
 }
