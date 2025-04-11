@@ -4,6 +4,11 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert('ProjectStatuses', [
       {
+        state: 'Created',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
         state: 'Opened',
         createdAt: new Date(),
         updatedAt: new Date()

@@ -149,8 +149,6 @@ router.post("/login", async (req, res) => {
       const existingOrganizer = await models.Organizer.findOne({where: {email: email}
       });
 
-      console.log(existingOrganizer.dataValues);
-
       if(existingOrganizer){
 
         res.cookie("organizerInfo", existingOrganizer.dataValues, {

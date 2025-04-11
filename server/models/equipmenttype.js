@@ -13,8 +13,10 @@ module.exports = (sequelize, DataTypes) => {
 
       EquipmentType.belongsToMany(models.CharityProject, {
         through: models.CharityProjectEquipmentType,
-        foreignKey: 'EquipmentTypeId',
+        foreignKey: 'equipmentTypeId',
+        otherKey: 'charityProjectId'
       });
+      
       
     }
   }

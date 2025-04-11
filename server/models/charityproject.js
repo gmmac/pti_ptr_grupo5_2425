@@ -29,11 +29,12 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'SET NULL'
       });
       
-      CharityProject.belongsToMany(models.UsedEquipment, {
-        through: models.UsedEquipmentCharityProject,
-        foreignKey: 'charityProjectId',
-        otherKey: 'usedEquipmentId'
+      CharityProject.belongsToMany(models.EquipmentSheet, {
+        through: models.EquipmentSheetCharityProject,
+				foreignKey: 'charityProjectId',
+        otherKey: 'equipmentSheetId'
       });
+      
       
       }
   }
@@ -42,6 +43,11 @@ module.exports = (sequelize, DataTypes) => {
     startDate: {
       type: DataTypes.DATE,
       allowNull: true
+    },
+    name: {
+      allowNull: false,
+      unique: true,
+      type: DataTypes.STRING(50),
     },
     completionDate: {
       type: DataTypes.DATE,

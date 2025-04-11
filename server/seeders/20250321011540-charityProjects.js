@@ -6,7 +6,8 @@ module.exports = {
       {
         startDate: new Date('2024-01-10'),
         completionDate: new Date('2024-03-15'),
-        organizerNic: '123456789',
+        name: "Projeto 1",
+        organizerNic: '122454888',
         status: 1,
         warehouseID: 1,
         totalSpace: 500,
@@ -16,7 +17,8 @@ module.exports = {
       {
         startDate: new Date('2024-02-01'),
         completionDate: new Date('2024-05-20'),
-        organizerNic: '123456789',
+        name: "Projeto 2",
+        organizerNic: '122454888',
         status: 1,
         warehouseID: 1,
         totalSpace: 300,
@@ -24,12 +26,24 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        startDate: new Date('2024-04-01'),
-        completionDate: null, // ainda em andamento
+        startDate: new Date('2026-05-20'),
+        completionDate: new Date('2029-05-20'),
+        name: "Projeto 3",
         organizerNic: '123456789',
         status: 1,
         warehouseID: 3,
         totalSpace: 400,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        startDate: new Date('2025-03-20'),
+        completionDate: new Date('2025-10-20'),
+        name: "Projeto 4",
+        organizerNic: '987654321',
+        status: 2,
+        warehouseID: 1,
+        // totalSpace: ,
         createdAt: new Date(),
         updatedAt: new Date()
       },

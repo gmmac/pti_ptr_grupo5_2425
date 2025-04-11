@@ -4,11 +4,11 @@ import { Col, Container, Row, Tab } from 'react-bootstrap';
 import SideBar from '../../components/Navbar/SideBar';
 import SmSideNavBar from '../../components/Navbar/SmSideNavBar';
 import { BarChartLine, BoxSeam, BoxSeamFill, CurrencyDollar, HouseDoorFill, PeopleFill, PersonFill, Wrench } from 'react-bootstrap-icons';
-import { useAuth } from '../../contexts/AuthenticationProviders/AuthProvider';
+import { useOrganizerAuth } from '../../contexts/AuthenticationProviders/OrganizerAuthProvider';
 
 export default function OrganizerLayoutPage() {
   const [actualTab, setActualTab] = useState(sessionStorage.getItem('organizerSelectedTab') || 'dashboard');
-  const { logOut } = useAuth();
+  const { logOut } = useOrganizerAuth();
 
   const handleChangeTab = (tab) => {
     if (tab) {

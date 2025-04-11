@@ -7,6 +7,7 @@ import EmployeeCatalog from '../../components/employee/EmployeeCatalog';
 import api from '../../utils/axios';
 import BottomNavBar from '../../components/Navbar/BottomNavBar';
 import EmployeeHomeDashboard from '../../components/HomePageEmployee/EmployeeHomeDashboard';
+import EmployeeCharityProjects from '../../components/HomePageEmployee/EmployeeCharityProjects';
 import EmployeeRepairs from '../../components/HomePageEmployee/EmployeeRepairs';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
 import { IsMobileContext } from '../../contexts/IsMobileContext';
@@ -105,7 +106,7 @@ export default function EmployeeHomePage() {
                     <h5>Sales Content</h5>
                 </Tab.Pane>
                 <Tab.Pane eventKey="charityproject" className='p-4'>
-                    <h5>Charity Projects</h5>
+                    <EmployeeCharityProjects />
                 </Tab.Pane>
                 <Tab.Pane eventKey="profile" className='p-4'>
                     <EmployeeProfile />

@@ -1,38 +1,22 @@
-import api from './axios';
+import { useOrganizerAuth } from "../contexts/AuthenticationProviders/OrganizerAuthProvider";
 
+export default function useSafeOrganizerAuth() {
+  try {
+    const organizerAuth = useOrganizerAuth();
 
-export const getLoggedUser = () => {
-    // const res = api.get("/api/auth/user-info", {
-    //     withCredentials: true, // Garante que os cookies sejam enviados
-    // });
-    // return res
-};
-
-
-export const removeLoggedUser = () => {
-
-};
-
-
-// Employee
-
-export const checkIfAdmin = async () => {
-    // const user = getLoggedUser();
-    // if (!user) return false;
-    
-    // try {
-    //     const res = await api.get(`/api/employeeRole/${user?.role}`);
-    //     return res.data.role === "Admin";
-    // } catch (error) {
-    //     console.error("Erro ao verificar admin:", error.message);
-    //     return false;
-    // }
-};
-
-
-export const employeeChangedPassword = async () => {
-    // const user = getLoggedUser();
-    // if (!user) return false;
-    // return user?.passwordReseted == 1
+    return {
+      isOrganizer: organizerAuth?.isOrganizer?.() || false,
+      organizerID: organizerAuth?.getOrganizerID?.() || null,
+      isOrganizerProject: organizerAuth?.isOrganizerProject || (() => false),
+      user: organizerAuth?.user || null,
+    };
+  } catch (error) {
+    console.warn("OrganizerAuthProvider is not available in this context.");
+    return {
+      isOrganizer: false,
+      organizerID: null,
+      isOrganizerProject: () => false,
+      user: null,
+    };
+  }
 }
-

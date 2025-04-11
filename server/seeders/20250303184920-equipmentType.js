@@ -9,6 +9,13 @@ module.exports = {
       { name: 'Laptop', createdAt: new Date(), updatedAt: new Date() },
       { name: 'Smartwatch', createdAt: new Date(), updatedAt: new Date() },
       { name: 'Headphones', createdAt: new Date(), updatedAt: new Date() },
+      
+      { name: 'Tablet', createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Camera', createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Printer', createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Monitor', createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Speaker', createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Projector', createdAt: new Date(), updatedAt: new Date() }
     ]);
   },
 

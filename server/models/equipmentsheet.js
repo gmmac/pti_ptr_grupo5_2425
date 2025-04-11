@@ -27,6 +27,12 @@ module.exports = (sequelize, DataTypes) => {
 				onDelete: 'CASCADE',
        			onUpdate: 'CASCADE'
 			  });
+
+			  EquipmentSheet.belongsToMany(models.CharityProject, {
+				through: models.EquipmentSheetCharityProject,
+				foreignKey: 'equipmentSheetId',
+				otherKey: 'charityProjectId'
+			});
 		}
 	}
 	EquipmentSheet.init(

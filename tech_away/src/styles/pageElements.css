@@ -101,3 +101,9 @@
 .custom-cards{
     border-radius: var(--rounded-lg)
 }
+
+.card:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease;
+    box-shadow: var(--shadow-default);
+}

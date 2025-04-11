@@ -85,6 +85,10 @@ router.get("/", async (req, res) => {
 				id: item.EquipmentModel.id,
 				name: item.EquipmentModel.name,
 			},
+            Brand: {
+                id: item.EquipmentModel.Brand.id,
+                name: item.EquipmentModel.Brand.name,
+            },
 			EquipmentType: {
 				id: item.EquipmentType.id,
 				name: item.EquipmentType.name,

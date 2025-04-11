@@ -4,23 +4,38 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('CharityProjectEquipmentTypes', {
       charityProjectId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        references: {
+          model: 'CharityProjects',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       equipmentTypeId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        references: {
+          model: 'EquipmentTypes',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       }
     });
   },
+
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('CharityProjectEquipmentTypes');
   }

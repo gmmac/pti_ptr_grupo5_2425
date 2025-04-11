@@ -88,7 +88,6 @@ router.put("/:NIC", async (req, res) => {
 			sameSite: "Lax",
 			maxAge: 24 * 60 * 60 * 1000 // 1 dia
 		});
-		console.log(organizer)
 		res.json(organizer);
 	} catch (error) {
 		res.status(400).json({ error: error.message });
