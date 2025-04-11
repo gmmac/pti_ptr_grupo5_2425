@@ -14,6 +14,11 @@ export default function EquipmentCardModal({equipment, selectedEquipment, handle
             <strong>Type:</strong> {equipment.EquipmentType.name}
         </Card.Text>
         <Button 
+            style={{
+              backgroundColor: selectedEquipment === equipment.barcode ? '#708c7e' : '#b5a8c9',
+              color: 'white',
+              border: 'none'
+            }} 
             variant={selectedEquipment === equipment.barcode ? "secondary" : "primary"} 
             onClick={() => handleEquipmentSelection(equipment)}
         >

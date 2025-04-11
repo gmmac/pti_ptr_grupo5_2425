@@ -274,6 +274,13 @@ export default function StorePurchasePage() {
                         <Button
                             onClick={() => setShowModal(true)}
                             className='w-100 rounded-pill forms-btn shadow-lg'
+                            style={{
+                                backgroundColor:'white', 
+                                color: '#b5a8c9',
+                                borderColor: '#b5a8c9',
+                                borderWidth: '2px',
+                                borderStyle: 'solid',
+                              }} 
                         >
                             Procurar cliente
                         </Button>
@@ -299,6 +306,13 @@ export default function StorePurchasePage() {
                         <Button
                             onClick={() => setShowModalEq(true)}
                             className='w-100 rounded-pill forms-btn shadow-lg'
+                            style={{
+                                backgroundColor:'white', 
+                                color: '#b5a8c9',
+                                borderColor: '#b5a8c9',
+                                borderWidth: '2px',
+                                borderStyle: 'solid',
+                              }} 
                         >
                             Procurar equipamento
                         </Button>

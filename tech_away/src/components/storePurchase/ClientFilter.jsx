@@ -129,12 +129,23 @@ export default function ClientFilter({ setFilters }) {
                             </Row>
                             <Row className='d-flex align-items-center justify-content-center'>
                                 <Col xs={12} md={6} lg={4} className="mt-3 mt-md-4">
-                                    <Button variant="primary" type="submit" className="w-100 rounded-pill">
+                                    <Button
+                                        style={{
+                                            backgroundColor:'#b5a8c9',
+                                            color: 'white',
+                                            border: 'none'
+                                        }} 
+                                        variant="primary" type="submit" className="w-100 rounded-pill">
                                         Apply Filters
                                     </Button>
                                 </Col>
                                 <Col xs={12} md={6} lg={4} className="mt-2 mt-md-4">
                                     <Button 
+                                        style={{
+                                            backgroundColor: '#708c7e',
+                                            color: 'white',
+                                            border: 'none'
+                                        }} 
                                         variant="secondary" 
                                         className="w-100 rounded-pill" 
                                         onClick={handleClear}
