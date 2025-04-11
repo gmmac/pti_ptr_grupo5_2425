@@ -19,7 +19,7 @@ export default function EmployeeHomePage() {
 
     const { employee, checkPasswordStatus, changePassword, checkIsAdmin } = useAuthEmployee();
 
-    const [actualTab, setActualTab] = useState(sessionStorage.getItem('selectedTab') || 'dashboard');
+    const [actualTab, setActualTab] = useState(sessionStorage.getItem('employeeSelectedTab') || 'dashboard');
     const [isAdmin, setIsAdmin] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [passwordChanged, setPasswordChanged] = useState(false);
@@ -57,7 +57,7 @@ export default function EmployeeHomePage() {
 
 
     useEffect(() => {
-        sessionStorage.setItem('selectedTab', actualTab);
+        sessionStorage.setItem('employeeSelectedTab', actualTab);
     }, [actualTab]);
 
     const handleChangeTab = (tab) => {

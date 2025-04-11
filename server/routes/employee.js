@@ -181,6 +181,7 @@ router.put("/:internNum", async (req, res) => {
 		const employee = await models.Employee.findOne({
 			where: { internNum: req.params.internNum },
 		});
+
 		if (!employee) {
 			return res.status(404).json({ error: "Employee not found" });
 		}
@@ -189,7 +190,7 @@ router.put("/:internNum", async (req, res) => {
 
 		// Verifica se existe um cookie de employeeInfo e se é o mesmo internNum
 		const currentEmployee = req.cookies.employeeInfo;
-		if (currentEmployee && currentEmployee.internNum === req.params.internNum) {
+		if (currentEmployee && currentEmployee.internNum == req.params.internNum) {
 			res.cookie("employeeInfo", employee.dataValues, {
 				httpOnly: true,
 				secure: false,
@@ -227,7 +228,6 @@ router.delete("/:internNum", async (req, res) => {
 });
 
 router.patch("/activation/:internNum", async (req, res) => {
-	console.log("ABACABAVSGASKAHSKJDHILS")
 
 	try {
 		const employee = await models.Employee.findOne({
@@ -240,10 +240,7 @@ router.patch("/activation/:internNum", async (req, res) => {
 
 		// toggle isActive attribute
 		employee.isActive = employee.isActive === "1" ? "0" : "1";
-		console.log("ASHAJSHASAJKSHA " + employee.isActive);
 		await employee.save();
-
-
 
 		const statusText = employee.isActive === 1 ? "active" : "inative";
 

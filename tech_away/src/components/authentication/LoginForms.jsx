@@ -6,7 +6,7 @@ import '../../styles/index.css';
 import '../../styles/AuthPage.css';
 import { useAuth } from '../../contexts/AuthenticationProviders/AuthProvider';
 
-export default function LoginForms() {
+export default function LoginForms({registerPath="/register", changePasswordPath='/changePassword'}) {
 
 	const { loginAction } = useAuth();
 
@@ -25,11 +25,11 @@ export default function LoginForms() {
     const navigate = useNavigate();
 
     const ChangeToRegister = () => {
-        navigate('/register');
+        navigate(registerPath);
     };
 
     const ChangeToChangePassword = () => {
-        navigate('/changePassword');
+        navigate(changePasswordPath);
     };
 
     const handleSubmit = async (e) => {

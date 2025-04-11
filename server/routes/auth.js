@@ -126,7 +126,7 @@ router.post("/login", async (req, res) => {
       }
     }
 
-    if(userType === "employee"){
+    else if(userType === "employee"){
       const existingEmployee = await models.Employee.findOne({where: {email: email}
       });
 
@@ -145,6 +145,24 @@ router.post("/login", async (req, res) => {
       }
     }
 
+    else if(userType === "organizer"){
+      const existingOrganizer = await models.Organizer.findOne({where: {email: email}
+      });
+
+      console.log(existingOrganizer.dataValues);
+
+      if(existingOrganizer){
+
+        res.cookie("organizerInfo", existingOrganizer.dataValues, {
+          httpOnly: true,    
+          secure: false, // Permite o cookie em HTTP durante o desenvolvimento
+          sameSite: "Lax", // Mais flexível que "Strict" para testes locais
+          maxAge: 24 * 60 * 60 * 1000 // 1 dia
+        });
+        
+        return res.status(201).json(existingOrganizer.dataValues);
+      }
+    }
 
   } catch (error) {
     console.error(error);
@@ -211,9 +229,11 @@ router.get("/user-info", (req, res) => {
   if(req.query.userType === 'employee'){
     userInfoName = "employeeInfo";
   }
+  else if(req.query.userType === 'organizer'){
+    userInfoName = "organizerInfo";
+  }
   
-  let userInfo = req.cookies.employeeInfo;
-
+  let userInfo = req.cookies[userInfoName];
 
   return res.status(200).json({ userInfo: userInfo });
 });
@@ -224,6 +244,9 @@ router.get('/logout', (req, res) => {
   //é employee. enviar variável na query
   if(req.query.userType === 'employee'){
     userInfo = "employeeInfo";
+  }
+  else if(req.query.userType === 'organizer'){
+    userInfo = "organizerInfo";
   }
   
   res.clearCookie(userInfo, {

@@ -166,6 +166,7 @@ export default function EmployeeCatalog() {
           employee={selectedEmployee}
           onSave={handleSaveEditedEmployee}
         />
+        
       </PaginationProvider>
 
       <PaginationControl

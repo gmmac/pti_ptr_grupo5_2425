@@ -12,7 +12,6 @@ export default function LoginFormsEmployee() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log(isEmployeeLoggedIn())
         if (isEmployeeLoggedIn()) {
             navigate("/employee");
         }
@@ -39,8 +38,8 @@ export default function LoginFormsEmployee() {
 
         await loginAction(formData, setErrors, newErrors);
 
-        sessionStorage.removeItem('selectedTab');
-        sessionStorage.setItem("selectedTab", 'dashboard');
+        sessionStorage.removeItem('employeeSelectedTab');
+        sessionStorage.setItem("employeeSelectedTab", 'dashboard');
 
     };
 
