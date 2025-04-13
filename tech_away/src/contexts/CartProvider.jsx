@@ -159,6 +159,32 @@ export const CartProvider = ({ children }) => {
 		}
 	};
 
+	const putPurchaseInBd = async () => {
+		try {
+			// OK
+			const clientPurchaseRes = await api.post(`/api/clientPurchase`, {
+				clientNIC: user.nic,
+				totalPrice: totalPrice,
+				// employeeID: opcional
+			});
+
+			const clientPurchaseId = clientPurchaseRes.data.id;
+			console.log(clientPurchaseId);// OK
+			
+			// 2. Enviar todos os equipamentos do carrinho para ClientPurchaseEquipment
+			await api.post("/api/purchaseCartEquipment/all-actual-cart", {
+				clientPurchaseId,
+				cartId: cartId, // ou outro identificador do carrinho do user
+			});
+
+			console.log("Compra registrada com sucesso!");
+			// limpar carrinho, redirecionar, mostrar toast, etc.
+			clearCart();
+		} catch (error) {
+			console.error("Erro ao registrar a compra:", error);
+		}
+	};
+
 	return (
 		<CartContext.Provider
 			value={{
@@ -173,6 +199,7 @@ export const CartProvider = ({ children }) => {
 				totalPrice,
 				cartItems,
 				clearCart,
+				putPurchaseInBd,
 			}}
 		>
 			{cartId && (

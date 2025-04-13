@@ -14,23 +14,34 @@ router.get("/config", (req, res) => {
 });
 
 router.post("/create-payment-intent", async (req, res) => {
-	try {
-		const paymentIntent = await stripe.paymentIntents.create({
-			currency: "eur",
-			amount: 1999,
-			automatic_payment_methods: {
-				enabled: true,
-			},
-		});
+	// try {
+	const { totalPrice } = req.body;
 
-		res.send({ clientSecret: paymentIntent.client_secret });
-	} catch (e) {
-		return res.status(400).send({
-			error: {
-				message: e.message,
-			},
-		});
+	if (!totalPrice || isNaN(totalPrice)) {
+		return res
+			.status(400)
+			.send({ error: { message: "totalPrice inválido ou ausente." } });
 	}
+
+	// Stripe espera amount em cêntimos (inteiro)
+	const amountInCents = Math.round(totalPrice * 100);
+
+	const paymentIntent = await stripe.paymentIntents.create({
+		currency: "eur",
+		amount: amountInCents,
+		automatic_payment_methods: {
+			enabled: true,
+		},
+	});
+
+	res.send({ clientSecret: paymentIntent.client_secret });
+	// } catch (e) {
+	// 	return res.status(400).send({
+	// 		error: {
+	// 			message: e.message,
+	// 		},
+	// 	});
+	// }
 });
 
 module.exports = router;
