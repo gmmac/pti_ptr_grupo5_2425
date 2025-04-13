@@ -27,7 +27,7 @@ export default function BrandsManage() {
 				defaultActiveKey="active"
 				// activeKey={activeTab}
 				// onSelect={handleTabChange}
-				className="mb-3"
+				className="custom-manage-tabs mb-3"
 			>
 				<Tab eventKey="active" title="Active Brands">
 					<DisplayTable model="brand" params="" key={refreshKey} active="1" refreshAllTables={refreshTable}/>

@@ -231,7 +231,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                                         onClick={() => confirmDelete(rowData.id)}
                                     /> : 
                                     <Button
-                                        icon="pi pi-check-circle"
+                                        icon="pi pi-history"
                                         text
                                         severity="success"
                                         label="Restore"
