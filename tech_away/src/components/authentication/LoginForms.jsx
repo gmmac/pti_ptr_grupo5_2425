@@ -33,7 +33,6 @@ export default function LoginForms({registerPath="/register", changePasswordPath
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log()
         // Verificar campos vazios
         let newErrors = { ...errors };
         let hasError = false;
