@@ -12,6 +12,7 @@ module.exports = {
       state: {
         type: Sequelize.STRING(50),
         allowNull: false,
+        unique: true
       },
       createdAt: {
         allowNull: false,

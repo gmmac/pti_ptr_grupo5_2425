@@ -87,7 +87,6 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
 	try {
-		console.log(req.body);
 		const { nic, nif, storeNIPC, birthDate, gender, firstName, lastName, email, phone, role } = req.body
 
 
@@ -136,7 +135,6 @@ router.post("/", async (req, res) => {
 
 		res.status(201).json(employee);
 	} catch (error) {
-		console.log(error)
 		res.status(400).json({ error: error.message });
 	}
 });
@@ -144,8 +142,6 @@ router.post("/", async (req, res) => {
 
 router.get("/user-info", (req, res) => {
 	const employeeInfo = req.cookies.employeeInfo;
-
-	console.log(employeeInfo)
 
 	return res.status(200).json({ employeeInfo: employeeInfo });
   });
@@ -214,9 +210,6 @@ router.delete("/:internNum", async (req, res) => {
 		const employee = await models.Employee.findOne({
 			where: { internNum: req.params.internNum },
 		});
-		
-		console.log("AAAAAAAAA")
-		console.log(employee)
 
 		if (!employee) {
 			return res.status(404).json({ error: "Employee not found" });
