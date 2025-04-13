@@ -30,6 +30,9 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 			'price': { value: '', matchMode: 'contains' },
 			'releaseYear': { value: '', matchMode: 'contains' },
 			'Brand': { value: '', matchMode: 'contains' },
+            'Barcode': { value: '', matchMode: 'contains' },
+            'EquipmentModel': { value: '', matchMode: 'contains' },
+            'EquipmentType': { value: '', matchMode: 'contains' },
 			'createdAt': { value: '', matchMode: 'equals' },
 			'updatedAt': { value: '', matchMode: 'equals' }
 		}
@@ -236,7 +239,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                                                 label="Delete"
                                                 style={{color: "var(--danger)"}}
                                                 className="custom-icon-button-withtext"
-                                                onClick={() => confirmDelete(rowData.id)}
+                                                onClick={() => confirmDelete(model==="equipmentSheet" ? rowData.Barcode: rowData.id)}
                                             /> 
                                         </> : 
                                     <Button
@@ -246,7 +249,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                                         label="Restore"
                                         style={{color: "var(--valid)"}}
                                         className="custom-icon-button-withtext"
-                                        onClick={() => confirmDelete(rowData.id)}
+                                        onClick={() => confirmDelete(model==="equipmentSheet" ? rowData.Barcode: rowData.id)}
                                     />
                                     }
                                 </div>

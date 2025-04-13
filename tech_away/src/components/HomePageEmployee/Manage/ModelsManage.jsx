@@ -29,10 +29,10 @@ export default function ModelsManage() {
                 // onSelect={handleTabChange}
                 className="custom-manage-tabs mb-3"
             >
-                <Tab eventKey="active" title="Active Equipment Types">
+                <Tab eventKey="active" title="Active Equipment Models">
                     <DisplayTable model="model" params="" key={refreshKey} active="1" refreshAllTables={refreshTable}/>
                 </Tab>
-                <Tab eventKey="inactive" title="Deleted Equipment Types">
+                <Tab eventKey="inactive" title="Deleted Equipment Models">
                     <DisplayTable model="model" params="" key={refreshKey} active="0" refreshAllTables={refreshTable}/>
                 </Tab>
             </Tabs>
