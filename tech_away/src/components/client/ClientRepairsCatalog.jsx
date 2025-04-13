@@ -8,11 +8,11 @@ export default function ClientRepairsCatalog({ repairsList, isActive, onShowDeta
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Descrição</th>
+                        <th>Description</th>
                         <th>Status</th>
                         <th>Data de Criação</th>
                         {!isActive && <th>Data de Fim</th>}
-                        <th></th>
+                        {repairsList.length > 0 && <th></th>}
                     </tr>
                 </thead>
                 <tbody>
