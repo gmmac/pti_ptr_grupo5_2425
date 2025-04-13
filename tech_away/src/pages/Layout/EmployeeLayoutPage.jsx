@@ -44,13 +44,13 @@ export default function EmployeeLayoutPage() {
           basePath="/employee"
         />
 
-        <Container fluid className="vh-100">
+        <Container fluid className="vh-100 p-0">
           <Row className="h-100">
             {/* Sidebar fixa apenas para telas lg+ */}
             <Col
               md={4}
               lg={2}
-              className="bg-light border-end d-none d-lg-block p-0"
+              className="bg-light border-none d-none d-lg-block p-0"
               style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.2)', zIndex: 1 }}
             >
 

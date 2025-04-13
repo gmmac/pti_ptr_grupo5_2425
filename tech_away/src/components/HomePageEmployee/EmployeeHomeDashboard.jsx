@@ -11,11 +11,11 @@ import BrandsManage from './Manage/BrandsManage';
 export default function EmployeeHomeDashboard() {
 
     const sections = [
-        { title: 'Equipment Models', key: 'modelsManage' },
         { title: 'Brands', key: 'brandsManage' },
-        { title: 'Equipment Types', key: 'equipmentType' },
-        { title: 'Equiment Sheet', key: 'equipmentSheet' },
-        { title: 'Parts', key: 'parts' },
+        { title: 'Equipment Models', key: 'modelsManage' },
+        { title: 'Equipment Sheet', key: 'equipmentSheetManage' },
+        { title: 'Equipment Types', key: 'equipmentTypeManage' },
+        { title: 'Parts', key: 'partsManage' },
         { title: 'Clients', key: 'clients' },
     ];
     

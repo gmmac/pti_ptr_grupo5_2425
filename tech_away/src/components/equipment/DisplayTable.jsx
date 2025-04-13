@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button } from "primereact/button";
+import { Button } from 'primereact/button';
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Menu } from "primereact/menu";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { confirmDialog } from "primereact/confirmdialog";
 import { FilterMatchMode } from "primereact/api";
 import api from "../../utils/axios";
 import ModalEdit from "./ModalEdit";
@@ -14,7 +14,7 @@ import "primeicons/primeicons.css";
 import FormsEquipmentModel from "./FormsEquipmentModel";
 import { Calendar } from 'primereact/calendar';
 
-export default function DisplayTable({ model }) {
+export default function DisplayTable({ model, active = "1", refreshAllTables=null}) {
 	const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
 
@@ -56,6 +56,7 @@ export default function DisplayTable({ model }) {
         const pageSize = isNaN(rows) ? 6 : rows; // Se `rows` for inválido, use 6 como padrão
 
         const params = {
+            active: active,
             page: currentPage,
             pageSize: pageSize,
             sortField,
@@ -105,7 +106,7 @@ export default function DisplayTable({ model }) {
 
     const confirmDelete = (id) => {
         confirmDialog({
-            message: (<> Are you sure you want to delete this {model}?<br />This action will erase other items associated with this {model}.</>),
+            message: (<> Are you sure you want to {active == "1" ? "delete" : "restore"} this {model}?<br />This action can erase other items associated with this {model}.</>),
             header: "Confirmation",
             icon: "pi pi-exclamation-triangle",
             accept: () => handleDelete(id),
@@ -118,12 +119,14 @@ export default function DisplayTable({ model }) {
     };
 
     const handleDelete = (id) => {
-        api.delete(`api/${model}/${id}`).then(() => loadLazyData());
+        api.patch(`/api/type/activation/${id}`).then(() => {
+            loadLazyData(); 
+            refreshAllTables();
+        });
     };
 
     return (
         <>
-            <ConfirmDialog />
             <div className="">
                 <DataTable
                     value={data}
@@ -203,36 +206,41 @@ export default function DisplayTable({ model }) {
                     ))}
                     <Column
                         header=""
+                        headerStyle={{ width: '10%' }}
+                        bodyStyle={{padding: '0.7rem', paddingLeft: '0rem'}}
                         body={(rowData, options) => {
-                            const menuItems = [
-                                {
-                                    label: "Edit",
-                                    icon: "pi pi-pencil",
-                                    command: () => handleEdit(rowData),
-                                },
-                                {
-                                    label: "Delete",
-                                    icon: "pi pi-trash",
-                                    command: () => confirmDelete(rowData.id),
-                                },
-                            ];
                             return (
-                                <>
-                                    <Menu
-                                        model={menuItems}
-                                        popup
-                                        ref={(el) => (menuRefs.current[options.rowIndex] = el)}
-                                    />
+                                <div style={{ display: "flex", gap: "0.3rem", justifyContent: "center" }}>
                                     <Button
-                                        icon="pi pi-ellipsis-v"
+                                        icon="pi pi-pencil"
+                                        rounded
                                         text
                                         severity="secondary"
-                                        onClick={(e) =>
-                                            menuRefs.current[options.rowIndex].toggle(e)
-                                        }
-                                        className="rounded-5"
+                                        aria-label="Edit"
+                                        className="custom-icon-button"
+                                        onClick={() => handleEdit(rowData)}
                                     />
-                                </>
+                                    {active=="1" ? 
+                                    <Button
+                                        icon="pi pi-trash"
+                                        text
+                                        severity="danger"
+                                        label="Delete"
+                                        style={{color: "var(--danger)"}}
+                                        className="custom-icon-button-withtext"
+                                        onClick={() => confirmDelete(rowData.id)}
+                                    /> : 
+                                    <Button
+                                        icon="pi pi-check-circle"
+                                        text
+                                        severity="success"
+                                        label="Restore"
+                                        style={{color: "var(--valid)"}}
+                                        className="custom-icon-button-withtext"
+                                        onClick={() => confirmDelete(rowData.id)}
+                                    />
+                                    }
+                                </div>
                             );
                         }}
                     />
@@ -287,6 +295,26 @@ export default function DisplayTable({ model }) {
 							padding-right: 0.05rem;
 							background-color: var(--variant-one);
 						}
+                        .custom-icon-button {
+                            width: 2.5rem;
+                            height: 2.5rem;
+                            border-radius: 50% !important;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 0;
+                        }
+                        .custom-icon-button-withtext {
+                            height: 2.5rem;
+                            border-radius: 20% !important;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 0.2rem;
+                        }
+                        .custom-icon-button .pi {
+                            font-size: 1.1rem;
+                        }
 						`}
 				</style>
             </div>
