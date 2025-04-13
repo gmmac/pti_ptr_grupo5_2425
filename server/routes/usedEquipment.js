@@ -35,6 +35,34 @@ router.get("/:ID", async (req, res) => {
 	}
 });
 
+// ver os que estão disponiveis para compra
+router.get("/in-stock/:ID", async (req, res) => {
+	try {
+		const { ID } = req.params;
+
+		const usedEquipments = await models.UsedEquipment.findAll({
+			where: {
+				equipmentId: ID,
+				purchaseDate: null,
+				putOnSaleDate: { [Op.not]: null },
+			},
+			include: [
+				{ model: models.Store, as: "Store", attributes: ["name"] },
+				{
+					model: models.EquipmentStatus,
+					as: "EquipmentStatus",
+					attributes: ["state"],
+				},
+			],
+		});
+
+		res.json({ usedEquipments });
+	} catch (error) {
+		console.error("Error fetching used equipments:", error);
+		res.status(500).json({ error: "Error fetching used equipments." });
+	}
+});
+
 router.get("/price-range/:equipmentId", async (req, res) => {
 	try {
 		const { equipmentId } = req.params;

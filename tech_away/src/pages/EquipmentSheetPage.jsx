@@ -10,13 +10,8 @@ export default function EquipmentSheetPage() {
 	const barcode = location.state?.barcode;
 
 	const [equipmentSheet, setEquipmentSheet] = useState({});
-	const [refresh, setRefresh] = useState(false);
 
 	const [usedEquipmentList, setUsedEquipmentList] = useState({});
-
-	const handleRefresh = () => {
-		setRefresh(!refresh);
-	};
 
 	useEffect(() => {
 		api
@@ -27,18 +22,18 @@ export default function EquipmentSheetPage() {
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
-	}, [refresh]);
+	}, []);
 
 	useEffect(() => {
 		api
-			.get(`api/usedEquipment/${barcode}`)
+			.get(`api/usedEquipment/in-stock/${barcode}`)
 			.then((res) => {
 				setUsedEquipmentList(res.data.usedEquipments);
 			})
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
-	}, [refresh]);
+	}, []);
 
 	return (
 		<Container>

@@ -85,10 +85,10 @@ router.get("/", async (req, res) => {
 				id: item.EquipmentModel.id,
 				name: item.EquipmentModel.name,
 			},
-            Brand: {
-                id: item.EquipmentModel.Brand.id,
-                name: item.EquipmentModel.Brand.name,
-            },
+			Brand: {
+				id: item.EquipmentModel.Brand.id,
+				name: item.EquipmentModel.Brand.name,
+			},
 			EquipmentType: {
 				id: item.EquipmentType.id,
 				name: item.EquipmentType.name,
@@ -108,75 +108,75 @@ router.get("/", async (req, res) => {
 	}
 });
 
-
 router.get("/teste", async (req, res) => {
-    // try {
-        const {
-            barcode,
-            model,
-            releaseYear,
-            type,
-            page = 1,
-            pageSize = 10,
-            orderBy,
-            orderDirection,
-        } = req.query;
+	// try {
+	const {
+		barcode,
+		model,
+		releaseYear,
+		type,
+		page = 1,
+		pageSize = 10,
+		orderBy,
+		orderDirection,
+	} = req.query;
 
-        console.log('------------------------',req.query)
-        const where = {};
-        const equipmentModelCondition = {};
+	console.log("------------------------", req.query);
+	const where = {};
+	const equipmentModelCondition = {};
 
-        if (barcode) where.barcode = { [Op.like]: `${barcode}%` };
-        if (releaseYear) equipmentModelCondition.releaseYear = { [Op.eq]: releaseYear }
+	if (barcode) where.barcode = { [Op.like]: `${barcode}%` };
+	if (releaseYear)
+		equipmentModelCondition.releaseYear = { [Op.eq]: releaseYear };
 
-        if (model) {
-            where['$EquipmentModel.name$'] = { [Op.like]: `${model}%` };
-        }
-        
-        if (type) {
-            where['$EquipmentType.name$'] = { [Op.like]: `${type}%` };
-        }
+	if (model) {
+		where["$EquipmentModel.name$"] = { [Op.like]: `${model}%` };
+	}
 
-        const offset = (parseInt(page) - 1) * parseInt(pageSize);
+	if (type) {
+		where["$EquipmentType.name$"] = { [Op.like]: `${type}%` };
+	}
 
-        let order = [];
-        if (orderBy && orderDirection) {
-            order = [[orderBy, orderDirection.toUpperCase()]];
-        } else {
-            order = [["barcode", "ASC"]];
-        }
+	const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
-        const { count, rows } = await models.EquipmentSheet.findAndCountAll({
-            where,
+	let order = [];
+	if (orderBy && orderDirection) {
+		order = [[orderBy, orderDirection.toUpperCase()]];
+	} else {
+		order = [["barcode", "ASC"]];
+	}
 
-            include: [
-                {
-                    where: equipmentModelCondition,
-                    model: models.EquipmentModel,
-                    attributes: ["name", "releaseYear"],
-                },
-                {
-                    model: models.EquipmentType,
-                    attributes: ["name"],
-                }
-            ],
+	const { count, rows } = await models.EquipmentSheet.findAndCountAll({
+		where,
 
-            limit: parseInt(pageSize),
-            offset,
-            order,
-        });
+		include: [
+			{
+				where: equipmentModelCondition,
+				model: models.EquipmentModel,
+				attributes: ["name", "releaseYear"],
+			},
+			{
+				model: models.EquipmentType,
+				attributes: ["name"],
+			},
+		],
 
-        res.json({
-            totalItems: count,
-            totalPages: Math.ceil(count / pageSize),
-            currentPage: parseInt(page),
-            pageSize: parseInt(pageSize),
-            data: rows,
-        });
-    // } catch (error) {
-    //     console.error("Error fetching equipments:", error);
-    //     res.status(500).json({ error: "Error fetching equipments." });
-    // }
+		limit: parseInt(pageSize),
+		offset,
+		order,
+	});
+
+	res.json({
+		totalItems: count,
+		totalPages: Math.ceil(count / pageSize),
+		currentPage: parseInt(page),
+		pageSize: parseInt(pageSize),
+		data: rows,
+	});
+	// } catch (error) {
+	//     console.error("Error fetching equipments:", error);
+	//     res.status(500).json({ error: "Error fetching equipments." });
+	// }
 });
 
 router.get("/in-stock", async (req, res) => {
@@ -207,6 +207,7 @@ router.get("/in-stock", async (req, res) => {
 			include: [
 				{
 					model: models.UsedEquipment,
+					where: { purchaseDate: null, putOnSaleDate: { [Op.not]: null } },
 					as: "UsedEquipments",
 					required: true,
 				},
