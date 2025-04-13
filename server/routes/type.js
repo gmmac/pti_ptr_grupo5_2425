@@ -94,7 +94,6 @@ router.get("/", async (req, res) => {
       data: rows,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Error fetching equipment types." });
   }
 });
@@ -158,7 +157,18 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:ID", (req, res) => {});
+router.delete("/:id", async (req, res) => {
+  try {
+    const equipmentType = await models.EquipmentType.findByPk(req.params.id);
+    if (!equipmentType) {
+      return res.status(404).json({ error: "Equipment Type not found" });
+    }
+    await equipmentType.destroy();
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.patch("/activation/:id", async (req, res) => {
   try {

@@ -122,7 +122,6 @@ router.get("/teste", async (req, res) => {
             orderDirection,
         } = req.query;
 
-        console.log('------------------------',req.query)
         const where = {};
         const equipmentModelCondition = {};
 
@@ -283,8 +282,6 @@ router.get("/in-stock", async (req, res) => {
 
 router.post("/", async (req, res) => {
 	try {
-		console.log(req.body);
-
 		const { barcode, model, type } = req.body;
 
 		const newEquipmentSheet = await models.EquipmentSheet.create({

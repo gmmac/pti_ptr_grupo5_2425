@@ -73,7 +73,6 @@ router.get("/", async (req, res) => {
       data: rows,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Error fetching brands." });
   }
 });
@@ -164,7 +163,6 @@ router.delete("/:id", async (req, res) => {
     await brand.destroy();
     res.status(204).send();
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });

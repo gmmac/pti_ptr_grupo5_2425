@@ -125,6 +125,10 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
         });
     };
 
+    const capitalizeFirstLetter = (value) => {
+        return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+    }
+
     return (
         <>
             <div className="">
@@ -153,7 +157,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                         <Column
                             key={index}
                             field={column}
-                            header={column}
+                            header={capitalizeFirstLetter(column)}
                             sortable
                             filter
 							showFilterMenu={false}
@@ -190,6 +194,9 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 								if (typeof value === "object" && value !== null) {
 									return value.name || "N/A";
 								}
+                                if (value && column == "price"){
+                                    return `${value} €`;
+                                }
 								if (dateFields.includes(column) && value) {
 									const date = new Date(value);
 									const formattedDate = date.toLocaleDateString("pt-PT");
@@ -211,25 +218,27 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                         body={(rowData, options) => {
                             return (
                                 <div style={{ display: "flex", gap: "0.3rem", justifyContent: "center" }}>
-                                    <Button
-                                        icon="pi pi-pencil"
-                                        rounded
-                                        text
-                                        severity="secondary"
-                                        aria-label="Edit"
-                                        className="custom-icon-button"
-                                        onClick={() => handleEdit(rowData)}
-                                    />
                                     {active=="1" ? 
-                                    <Button
-                                        icon="pi pi-trash"
-                                        text
-                                        severity="danger"
-                                        label="Delete"
-                                        style={{color: "var(--danger)"}}
-                                        className="custom-icon-button-withtext"
-                                        onClick={() => confirmDelete(rowData.id)}
-                                    /> : 
+                                        <>
+                                          <Button
+                                                icon="pi pi-pencil"
+                                                rounded
+                                                text
+                                                severity="secondary"
+                                                aria-label="Edit"
+                                                className="custom-icon-button"
+                                                onClick={() => handleEdit(rowData)}
+                                            />
+                                            <Button
+                                                icon="pi pi-trash"
+                                                text
+                                                severity="danger"
+                                                label="Delete"
+                                                style={{color: "var(--danger)"}}
+                                                className="custom-icon-button-withtext"
+                                                onClick={() => confirmDelete(rowData.id)}
+                                            /> 
+                                        </> : 
                                     <Button
                                         icon="pi pi-history"
                                         text

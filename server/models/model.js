@@ -17,29 +17,32 @@ module.exports = (sequelize, DataTypes) => {
 		}
 	}
 	EquipmentModel.init(
-		{
-			name: {
-				type: DataTypes.STRING(50),
-				allowNull: true,
-			},
-			brand_id: {
-				type: DataTypes.INTEGER,
-				allowNull: false,
-			},
-			price: {
-				type: DataTypes.FLOAT,
-				allowNull: true,
-			},
-			releaseYear: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-			},
-		},
-		{
-			sequelize,
-			modelName: "EquipmentModel",
-			timestamps: true,
-		}
-	);
+    {
+      name: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
+      brand_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      price: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+      },
+      releaseYear: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      isActive: {
+        type: DataTypes.STRING(1),
+      },
+    },
+    {
+      sequelize,
+      modelName: "EquipmentModel",
+      timestamps: true,
+    }
+  );
 	return EquipmentModel;
 };
