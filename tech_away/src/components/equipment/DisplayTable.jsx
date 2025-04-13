@@ -119,7 +119,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
     };
 
     const handleDelete = (id) => {
-        api.patch(`/api/type/activation/${id}`).then(() => {
+        api.patch(`/api/${model}/activation/${id}`).then(() => {
             loadLazyData(); 
             refreshAllTables();
         });

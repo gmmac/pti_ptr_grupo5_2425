@@ -9,6 +9,7 @@ router.get("/", async (req, res) => {
     const {
       id,
       name,
+      active = "1",
       createdAt,
       updatedAt,
       page = 1,
@@ -37,6 +38,7 @@ router.get("/", async (req, res) => {
         [Op.lt]: new Date(new Date(updatedAt).getTime() + 24 * 60 * 60 * 1000),
       };
     }
+    if (active) where.isActive = { [Op.eq]: active };
 
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
@@ -56,6 +58,9 @@ router.get("/", async (req, res) => {
 
     const { count, rows } = await models.Brand.findAndCountAll({
       where,
+      attributes: {
+        exclude: ["isActive"],
+      },
       limit: parseInt(pageSize),
       offset,
       order: orderClause,
@@ -91,6 +96,7 @@ router.post("/", async (req, res) => {
     }
     const brand = await models.Brand.create({
       name,
+      isActive: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -160,6 +166,21 @@ router.delete("/:id", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.patch("/activation/:id", async (req, res) => {
+  try {
+    const brand = await models.Brand.findByPk(req.params.id);
+    if (!brand) {
+      return res.status(404).json({ error: "Brand not found" });
+    }
+    brand.updatedAt = new Date();
+    brand.isActive = brand.isActive === "1" ? "0" : "1";
+    await brand.save();
+    res.status(200).json(brand);
+  } catch (error) {
+    res.status(500).json({ error: "Error updating brand." });
   }
 });
 
