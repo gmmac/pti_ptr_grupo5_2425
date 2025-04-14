@@ -23,6 +23,8 @@ router.get("/", async (req, res) => {
 		// Construção do objeto 'where' dinamicamente
 		const where = {};
 
+		console.log(req.query);
+
 		if (barcode) where.barcode = barcode;
 		if (createdFrom || createdTo) {
 			where.createdAt = {};

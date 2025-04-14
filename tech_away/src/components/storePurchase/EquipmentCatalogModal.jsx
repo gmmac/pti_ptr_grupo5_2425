@@ -18,9 +18,9 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
     
     const [filters, setFilters] = useState({
       barcode: "",
-      model: "",
-      releaseYear: "",
-      type: "",
+      modelId: "",
+      // releaseYear: "",
+      typeId: "",
       orderDirection: "ASC"
     });
 
@@ -29,6 +29,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
       const fetchEquipments= async () => {
           setLoading(true);
           setError(null);
+          console.log(filters)
           try {
             const response = await api.get(`/api/equipmentSheet`, {
               params: {
