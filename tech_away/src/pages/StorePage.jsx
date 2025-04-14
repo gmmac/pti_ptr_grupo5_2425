@@ -47,9 +47,9 @@ export default function StorePage() {
 		<Container className="mb-5">
 			<Stack gap={4}>
 				{/* Mapa */}
-				
-					<MapProvider />
-				
+				<div className="rounded-sm" style={{ boxShadow: "var(--shadow-default)" }}>
+					<MapProvider  />
+				</div>
 
 				<Filters filters={filters} setFilters={setFilters} />
 

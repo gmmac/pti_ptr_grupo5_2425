@@ -6,8 +6,14 @@ import React, {
 	useCallback,
 	useEffect,
 } from "react";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-
+import {
+	GoogleMap,
+	useJsApiLoader,
+	Marker,
+	InfoWindow,
+} from "@react-google-maps/api";
+import api from "../utils/axios";
+import { Stack } from "react-bootstrap";
 // Cria o contexto
 const MapContext = createContext(null);
 
@@ -22,10 +28,24 @@ const containerStyle = {
 export default function MapProvider({ children }) {
 	const [map, setMap] = useState(null);
 	const [center, setCenter] = useState(null);
+	const [stores, setStores] = useState([]);
+	const [hoveredMarkerId, setHoveredMarkerId] = useState(null);
 
 	const { isLoaded, loadError } = useJsApiLoader({
 		googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
 	});
+
+	// get de todas as stores
+	useEffect(() => {
+		api
+			.get(`api/store`)
+			.then((res) => setStores(res.data.data))
+			.catch((error) => console.error("Error getting stores: ", error));
+	}, []);
+
+	useEffect(() => {
+		console.log(stores);
+	}, [stores]);
 
 	// para a localização atual do utilizador
 	useEffect(() => {
@@ -68,6 +88,47 @@ export default function MapProvider({ children }) {
 				onLoad={onLoad}
 				onUnmount={onUnmount}
 			>
+				{stores &&
+					stores.map((store, index) => {
+						const lat = parseFloat(store.latitude);
+						const lng = parseFloat(store.longitude);
+						const isHovered = hoveredMarkerId === index;
+						return (
+							<React.Fragment key={index}>
+								<Marker
+									position={{ lat, lng }}
+									onClick={() => setHoveredMarkerId(index)}
+									// onMouseOut={() => setHoveredMarkerId(null)}
+								/>
+								{isHovered && (
+									<InfoWindow
+										position={{ lat, lng }}
+										// onCloseClick={() => setHoveredMarkerId(null)}
+										options={{
+											headerDisabled: true,
+										}}
+									>
+										<Stack spacing={1} p={1} sx={{ maxWidth: 250 }}>
+											<Stack
+												direction="horizontal"
+												className="justify-content-between align-items-center"
+											>
+												<h6 className="mb-0">{store.name}</h6>
+												<button
+													className="btn-close btn-sm"
+													aria-label="Close"
+													onClick={() => setHoveredMarkerId(null)}
+												/>
+											</Stack>
+
+											<p className="mb-1">📧 {store.email}</p>
+											<p className="mb-0">📍 {store.address}</p>
+										</Stack>
+									</InfoWindow>
+								)}
+							</React.Fragment>
+						);
+					})}
 				{children}
 			</GoogleMap>
 		</MapContext.Provider>
