@@ -9,10 +9,13 @@ const EmployeeAuthProvider = ({ children }) => {
     const [employee, setEmployee] = useState(null);
     const [loading, setLoading] = useState(true);
     const [refresh, setRefresh] = useState(false);
-
+    const [logoutTag, setLogoutTag] = useState(false);
     const navigate = useNavigate();    
     const { setUserType } = useUserType()
 
+    const toggleLogout = () => {
+        setLogoutTag(prev => !prev);
+    };
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -40,7 +43,7 @@ const EmployeeAuthProvider = ({ children }) => {
         if (!employee) {
           navigate("/employee/login");
         }
-    }, [])
+    }, [logoutTag])
 
     const loginAction = async (formData, setErrors, newErrors) => {
         try {
@@ -70,6 +73,8 @@ const EmployeeAuthProvider = ({ children }) => {
     const logOut = async () => {
         try {
             await api.get('/api/auth/logout?userType=employee');
+            setEmployee(null);
+            toggleLogout();
         } catch (error) {
             console.error("Erro ao fazer logout:", error);
         } finally {

@@ -4,17 +4,11 @@ const models = require('../models');
 
 router.post("/", async (req, res) => {
 
-    // try {
-        const {statusID, price, clientNic, equipmentBarcode} = req.body;        
+    try {
+        const {statusID, price, clientNic, equipmentBarcode} = req.body;
 
-        // const employeeUser = session.get(employeeUser)
-        // const employeeID = employeeUser.internNum
-        // const storeID = employeeUser.storeNIPC
-
-        console.log(req.body)
-
-        const storeID = "123456789"
-        const employeeID = "123456789"
+        const storeID = req.cookies["employeeInfo"].storeNIPC
+        const employeeID = req.cookies["employeeInfo"].nic
 
 
         const usedEquipment = await models.UsedEquipment.create({ statusID: statusID, price: price, purchaseDate: new Date(), equipmentId: equipmentBarcode, storeId: storeID, createdAt: new Date(), updatedAt: new Date() });
@@ -27,9 +21,9 @@ router.post("/", async (req, res) => {
             res.status(400).json({ error: "Error." });
         }
 
-    // } catch (error) {
-    //     res.status(400).json({ error: "Error." });
-    // }
+    } catch (error) {
+        res.status(400).json({ error: "Error." });
+    }
 });
 
 module.exports = router;
