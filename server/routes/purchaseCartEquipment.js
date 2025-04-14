@@ -15,33 +15,42 @@ router.post("/all-actual-cart", async (req, res) => {
 				.status(400)
 				.json({ error: "clientPurchaseId e cartId são obrigatórios." });
 		}
-		console.log("cartId:", cartId);
 
 		// Procura todos os usedEquipmentIds no carrinho
 		const cartEquipments = await models.ActualCartEquipment.findAll({
 			where: { cartId: cartId },
 		});
-		console.log(cartEquipments);
+
 		if (!cartEquipments.length) {
 			return res
 				.status(404)
 				.json({ error: "Nenhum equipamento encontrado no carrinho." });
 		}
 
-		// Prepara os dados para inserção
-		const purchaseEquipments = cartEquipments.map((item) => ({
-			clientPurchaseId,
-			equipmentId: item.equipmentId,
-		}));
-		console.log(purchaseEquipments);
+		let totalItems = 0;
 
-		// Cria todas as entradas em ClientPurchaseEquipment
+		// Loop para criar cada item individualmente e atualizar UsedEquipment
+		for (const item of cartEquipments) {
+			const equipmentId = item.equipmentId;
 
-		await models.PurchaseCartEquipment.bulkCreate(purchaseEquipments);
+			// Criar uma entrada em PurchaseCartEquipment
+			await models.PurchaseCartEquipment.create({
+				clientPurchaseId,
+				equipmentId,
+			});
+
+			// Atualizar a data de compra no equipamento usado
+			await models.UsedEquipment.update(
+				{ purchaseDate: new Date() },
+				{ where: { id: equipmentId } }
+			);
+
+			totalItems++;
+		}
 
 		res.status(201).json({
 			message: "Equipamentos adicionados à compra com sucesso.",
-			totalItems: purchaseEquipments.length,
+			totalItems,
 		});
 	} catch (error) {
 		console.error("Erro ao adicionar equipamentos da compra:", error);
