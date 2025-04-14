@@ -4,6 +4,7 @@ import EquipmentSheetCard from "../components/StorePage/EquipmentSheetCard";
 import PaginationControl from "../components/pagination/PaginationControl";
 import api from "../utils/axios";
 import Filters from "../components/StorePage/Filters";
+import MapProvider from "../contexts/MapProvider";
 
 export default function StorePage() {
 	const [equipmentModelCatalog, setEquipmentModelCatalog] = useState([]);
@@ -46,18 +47,9 @@ export default function StorePage() {
 		<Container className="mb-5">
 			<Stack gap={4}>
 				{/* Mapa */}
-				<div
-					style={{
-						fontFamily: "var(--body-font)",
-						color: "var(--dark-grey)",
-						backgroundColor: "var(--white)",
-						boxShadow: "var(--shadow-default)",
-						height: "300px",
-					}}
-					className="rounded-sm p-4 d-flex justify-content-center align-items-center"
-				>
-					mapa
-				</div>
+				
+					<MapProvider />
+				
 
 				<Filters filters={filters} setFilters={setFilters} />
 
