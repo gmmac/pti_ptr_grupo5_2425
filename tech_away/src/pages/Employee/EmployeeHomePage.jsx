@@ -10,6 +10,7 @@ import EmployeeHomeDashboard from '../../components/HomePageEmployee/EmployeeHom
 import EmployeeCharityProjects from '../../components/HomePageEmployee/EmployeeCharityProjects';
 import EmployeeRepairs from '../../components/HomePageEmployee/EmployeeRepairs';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
+import StorePurchasePage from '../../pages/StorePurchasePage';
 import { IsMobileContext } from '../../contexts/IsMobileContext';
 import "../../styles/pageElements.css"
 
@@ -97,7 +98,7 @@ export default function EmployeeHomePage() {
                     <EmployeeHomeDashboard />
                 </Tab.Pane>
                 <Tab.Pane eventKey="purchases" className='p-4'>
-                    <h5>Purchases Content</h5>
+                    <StorePurchasePage />
                 </Tab.Pane>
                 <Tab.Pane eventKey="repairs" className='p-4'>
                     <h5>Repairs Content</h5>
