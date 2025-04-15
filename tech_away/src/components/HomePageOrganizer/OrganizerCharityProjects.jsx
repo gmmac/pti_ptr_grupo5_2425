@@ -11,7 +11,7 @@ export default function OrganizerCharityProjects() {
   const [showModal, setShowModal] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
-  const { getOrganizerID, isOrganizer } = useOrganizerAuth ();
+  const { user, getOrganizerID, isOrganizer } = useOrganizerAuth ();
 
   const [charityProjects, setCharityProjects] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -109,14 +109,24 @@ export default function OrganizerCharityProjects() {
                   </Button> 
                 </div>
                 }
-                <CharityProjectCatalog 
-                  charityProjects={charityProjects} 
-                  handlePageChange={handlePageChange} 
-                  currentPage={currentPage} 
-                  totalPages={totalPages}
-                  onOpenDetails={handleOpenDetailsModal}
-                  onRefresh={toggleRefresh}
-                />
+                
+              {!loading && (
+                charityProjects.length === 0 ? (
+                  <div className="text-center my-5">
+                    <p>There are no projects created by {user?.firstName} {user?.lastName}.</p>
+                  </div>
+                ) : (
+                  <CharityProjectCatalog 
+                    charityProjects={charityProjects} 
+                    handlePageChange={handlePageChange} 
+                    currentPage={currentPage} 
+                    totalPages={totalPages}
+                    onOpenDetails={handleOpenDetailsModal}
+                    onRefresh={toggleRefresh}
+                  />
+                )
+              )}
+
 
               {/* <ModalCharityProjectDetails
                 show={showDetailsModal}

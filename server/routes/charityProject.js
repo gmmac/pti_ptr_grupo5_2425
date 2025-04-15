@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
       warehouseID,
       organizerNic,
       page = 1,
-      pageSize = 4,
+      pageSize = 5,
       orderBy = "id",
       orderDirection = "ASC",
     } = req.query;

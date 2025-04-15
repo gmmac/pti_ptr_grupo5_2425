@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
             role,
             active = "1",
             page = 1,
-            pageSize = 10,
+            pageSize = 5,
             orderBy = "internNum",
             orderDirection = "ASC",
         } = req.query;
