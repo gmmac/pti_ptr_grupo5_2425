@@ -15,7 +15,7 @@ export default function CharityProjectPage() {
 
   const handleChangePage = () => {
     navigate("/organizer")
-    sessionStorage.setItem("organizerSelectedTab", "charityproject")
+    // sessionStorage.setItem("organizerSelectedTab", "charityproject")
   }
 
   useEffect(() => {
@@ -24,7 +24,6 @@ export default function CharityProjectPage() {
         await api.get(`/api/charityProject?projectName=${encodeURIComponent(projectName)}`)
         .then((response) => {
             setProject(response.data.data[0]);
-            console.log(response.data.data[0])
         })
       } catch (error) {
         console.error('Erro no fetch:', error);

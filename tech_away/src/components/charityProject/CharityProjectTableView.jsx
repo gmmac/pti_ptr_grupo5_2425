@@ -22,8 +22,7 @@ export default function CharityProjectTableView({ projects, onOpenDetails, onDel
               <th>Completion Date</th>
               <th>Status</th>
               <th>Warehouse</th>
-              <th>Created At</th>
-              <th colSpan={2}></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -35,24 +34,25 @@ export default function CharityProjectTableView({ projects, onOpenDetails, onDel
                 <td>{new Date(project.completionDate).toLocaleDateString()}</td>
                 <td>{project.ProjectStatus?.state}</td>
                 <td>{project.Warehouse?.name}</td>
-                <td>{new Date(project.createdAt).toLocaleDateString()}</td>
                 <td>
-                  <Button size="sm" onClick={() => onOpenDetails(project)}>
+                  <Button 
+                  size="sm" 
+                  onClick={() => onOpenDetails(project)}
+                  className="me-md-3"
+                  >
                     See Details
                   </Button>
-                </td>
                 {isOrganizer && (
-                  <td>
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      onClick={() => onDelete(project)}
-                      disabled={deleting}
-                    >
+                  <Button
+                  size="sm"
+                  variant="danger"
+                  onClick={() => onDelete(project)}
+                  disabled={deleting}
+                  >
                       Delete
                     </Button>
-                  </td>
                 )}
+                </td>
               </tr>
             ))}
           </tbody>

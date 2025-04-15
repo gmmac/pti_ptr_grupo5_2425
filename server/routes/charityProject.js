@@ -20,8 +20,6 @@ router.get("/", async (req, res) => {
 
     const where = {};
 
-    console.log(projectName)
-
     if (startDate) where.startDate = { [Op.gte]: startDate };
     if (completionDate) where.completionDate = { [Op.lte]: completionDate };
     if (status) where.status = { [Op.eq]: parseInt(status) };
@@ -325,7 +323,6 @@ router.get("/:ID", async (req, res) => {
       ]
     });
 
-    console.log(project.dataValues)
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }

@@ -71,8 +71,6 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
   };
 
   const toggleSelectSheet = (sheet) => {
-    // console.log("SHEET: ", sheet)
-    // console.log("SELEC SHEETS ", selectedSheets)
     const isAlreadySelected = selectedSheets.some((e) => e.Barcode === sheet.Barcode);
     if (isAlreadySelected) {
       setSelectedSheets((prev) => prev.filter((e) => e.Barcode !== sheet.Barcode));

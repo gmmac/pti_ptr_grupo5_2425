@@ -5,7 +5,12 @@ export default function FlowPane({ elements, isEditing, selectedElements, onTogg
   return (
     <Row>
       {elements.map((e) => (
-        <Col key={e.id || e.barcode} className="mb-3">
+        <Col 
+        key={e.id || e.barcode} 
+        className="mb-3"
+        xs={6}
+        md={e.id ? 4 : 6}
+        >
           {renderCard({
             element: e,
             isSelected: isSelected(e),
