@@ -32,9 +32,9 @@ export default function EmployeeLayoutPage() {
   
 
   return (
-    <Container fluid className="vh-100">
+    <Container fluid className="p-0">
       <Tab.Container activeKey={actualTab}>
-        {/* Sempre renderiza o componente com Offcanvas controlado internamente */}
+        {/* Offcanvas para telas pequenas */}
         <SmSideNavBar
           actualTab={actualTab}
           handleChangeTab={setActualTab}
@@ -43,37 +43,36 @@ export default function EmployeeLayoutPage() {
           title="TechAway"
           basePath="/employee"
         />
-
-        <Container fluid className="vh-100">
-          <Row className="h-100">
-            {/* Sidebar fixa apenas para telas lg+ */}
-            <Col
-              md={4}
-              lg={2}
-              className="bg-light border-end d-none d-lg-block p-0"
-              style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.2)', zIndex: 1 }}
-            >
-
-              <SideBar 
-                title="TechAway"
-                menuItems={menuItems}
-                actualTab={actualTab}
-                handleChangeTab={setActualTab}
-                logOut={logOut}
-                basePath="/employee"
-              />
-            </Col>
-
-            <Col
-              md={8}
-              lg={10}
-            >
-              <Outlet />
-            </Col>
-            
-          </Row>
-        </Container>
+  
+        <Row className="gx-0">
+          {/* Sidebar fixa (visível apenas em telas grandes) */}
+          <Col
+            lg={2}
+            className="d-none d-lg-block bg-light border-end position-fixed h-100 overflow-hidden p-0"
+            style={{ boxShadow: '2px 0 5px rgba(0, 0, 0, 0.2)', zIndex: 1030 }}
+          >
+            <SideBar 
+              title="TechAway"
+              menuItems={menuItems}
+              actualTab={actualTab}
+              handleChangeTab={setActualTab}
+              logOut={logOut}
+              basePath="/employee"
+            />
+          </Col>
+  
+          {/* Conteúdo principal com margem à esquerda */}
+          <Col
+            xs={12}
+            lg={{ span: 10, offset: 2 }}
+            className="ms-auto"
+            style={{ height: '100vh', overflowY: 'auto', padding: '1.5rem' }}
+          >
+            <Outlet />
+          </Col>
+        </Row>
       </Tab.Container>
     </Container>
   );
+  
 }

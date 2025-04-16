@@ -30,7 +30,7 @@ export default function DashboardGridCard({ section }) {
       }}
     >
       <Card.Title>{section.title}</Card.Title>
-      <Card.Text>This is a grid card.</Card.Text>
+      {/* <Card.Text>This is a grid card.</Card.Text> */}
     </Card>
   );
 }
