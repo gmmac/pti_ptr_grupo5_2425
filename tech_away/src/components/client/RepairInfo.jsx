@@ -49,28 +49,28 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
               <Card className="mb-3 shadow-sm">
                 <Card.Body>
                   <p className="fw-bold">
-                    <FileText /> Nº Repair: <span className="fw-normal text-primary">#{repairInfo.id}</span>
+                  <i className="pi pi-wrench" /> Nº Repair: <span className="fw-normal text-primary">#{repairInfo.id}</span>
                   </p>
                   <p className="fw-bold">
-                    <Calendar /> Created At: <span className="fw-normal">{new Date(repairInfo.createdAt).toLocaleDateString()}</span>
+                    <i className="pi pi-calendar"/> Created At: <span className="fw-normal">{new Date(repairInfo.createdAt).toLocaleDateString()}</span>
                   </p>
                   <p className="fw-bold">
-                    <Calendar /> Estimated Delivery: <span className="fw-normal">{new Date(repairInfo.estimatedDeliverDate).toLocaleDateString()}</span>
+                    <i className="pi pi-calendar-clock"/> Estimated Delivery: <span className="fw-normal">{new Date(repairInfo.estimatedDeliverDate).toLocaleDateString()}</span>
                   </p>
                   <p className="fw-bold">
                     <FileText /> Description: <span className="fw-normal">{repairInfo.description}</span>
                   </p>
                   <p className="fw-bold">
-                    <Wallet /> Budget: <span className="fw-normal">${repairInfo.budget}</span>
+                    <i className="pi pi-euro"/> Budget: <span className="fw-normal">${repairInfo.budget}</span>
                   </p>
                   <p className="fw-bold">
-                    <People /> Employee: <span className="fw-normal">{repairInfo.Employee.firstName} {repairInfo.Employee.lastName}</span>
+                    <i className="pi pi-user"/> Employee: <span className="fw-normal">{repairInfo.Employee.firstName} {repairInfo.Employee.lastName}</span>
                   </p>
                   <p className="fw-bold">
                     <Shop /> Store: <span className="fw-normal">{repairInfo.Employee.Store.name}</span>
                   </p>
                   <p className="fw-bold">
-                    <CheckCircle /> Current Status:
+                    <i className="pi pi-check-circle"/> Current Status:
                     <span className={`badge ${repairInfo.RepairStatus?.state === 'Completed' ? 'bg-success' : 'bg-primary'} ms-2`}>
                       {repairInfo.RepairStatus?.state}
                     </span>
