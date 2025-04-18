@@ -77,6 +77,26 @@ router.put("/:NIC", async (req, res) => {
 			return res.status(404).json({ error: "Client not found" });
 		}
 
+		//Verifica se não existe ninguém com aquele nif ou email
+		const whereConditions = [];
+		if (req.body.nif) {
+			whereConditions.push({ nif: req.body.nif });
+		}
+
+		// Verificar se o cliente já existe
+		if (whereConditions.length > 0) {
+			const existingClient = await models.Client.findOne({
+				where: {
+					[Op.or]: whereConditions,
+					nic: { [Op.ne]: req.params.NIC } // opcional: evitar conflito com ele mesmo
+				},
+			});
+
+			if (existingClient) {
+				return res.status(409).json({ errorTag: "nif" });
+			}
+		}
+
 		await client.update(req.body);
 
 		res.cookie("clientInfo", client.dataValues, {

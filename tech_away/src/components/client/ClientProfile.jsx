@@ -91,20 +91,28 @@ export default function ClientProfile({userType="client"}) {
             newErrors[name] = '';
         }
 
+        if(name === 'nif' || name === 'phone'){
+            if(value.length != 9){
+                newErrors[name] = "Este campo deve ter 9 dígitos!";
+            }
+        }
+
         setErrors(newErrors);
     };
     
     const handleSaveChanges = () => {
-        api.put(`/api/${userType}/${formData.nic}`, changedFields)
+        api.put(`/api/client/${formData.nic}`, changedFields)
             .then((res) => {
                 setOriginalData({ ...originalData, ...changedFields });
                 setChangedFields([]);
+                setIsEditing(false);
             })
             .catch((error) => {
-                console.error("Erro ao atualizar os dados:", error.message);
+                let newErrors = { ...errors };
+                newErrors[error.response.data.errorTag] = 'Já existe um utilizador com este ' + error.response.data.errorTag
+                setErrors(newErrors);
+                console.log("Erro ao atualizar os dados:", error.response.data);
             });
-    
-        setIsEditing(false);
     };
 
     return (
@@ -271,16 +279,18 @@ export default function ClientProfile({userType="client"}) {
                     </Card.Body>
                 </Card>
 
-                <div className="text-center">
-                    <button 
-                        type="button" 
-                        className="btn btn-success"
-                        onClick={handleSaveChanges}
-                        disabled={changedFields.length == 0} // Desativa o botão se não houver mudanças
-                    >
-                        Save Changes
-                    </button>
-                </div>
+                {isEditing && (
+                    <div className="text-center">
+                        <button 
+                            type="button" 
+                            className="btn btn-success"
+                            onClick={handleSaveChanges}
+                            disabled={changedFields.length == 0} // Desativa o botão se não houver mudanças
+                        >
+                            Save Changes
+                        </button>
+                    </div>
+                )}
             </Form>
         </Container>
     );
