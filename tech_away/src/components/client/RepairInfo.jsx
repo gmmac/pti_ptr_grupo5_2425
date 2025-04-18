@@ -89,33 +89,29 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
               <Card className="shadow-sm">
                 <Card.Body>
                   <h5 className="fw-bold mb-3">Repair Status History</h5>
-                  <div className="table-responsive overflow-auto" style={{ maxHeight: "300px" }}>
-                    <Table striped bordered hover responsive className="text-center">
-                      <thead className="table-dark">
-                        <tr>
-                          <th>Status</th>
-                          <th>Date</th>
-                          <th>Description</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {repairStatusLogs.length > 0 ? (
-                          repairStatusLogs.map((log) => (
-                            <tr key={log.id}>
-                              <td><span className="fw-bold">{log.RepairStatus.state}</span></td>
-                              <td>{new Date(log.createdAt).toLocaleDateString()}</td>
-                              <td>{log.description}</td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan="3" className="text-muted">No status history available. Please contact the store</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </Table>
-                  </div>
-                  <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages}/>
+                  <div className="overflow-auto" style={{ maxHeight: "300px" }}>
+                      {repairStatusLogs.length > 0 ? (
+                        repairStatusLogs.map((log) => (
+                          <Card key={log.id} className="mb-3 border-0 shadow-sm" style={{ backgroundColor: '#f8f9fa', borderRadius: '0.75rem' }}>
+                            <Card.Body>
+                              <div className="d-flex justify-content-between align-items-center mb-2">
+                                <span className="fw-bold">
+                                  <i className="pi pi-flag me-2" />
+                                  {log.RepairStatus.state}
+                                </span>
+                                <small className="text-muted">
+                                  <i className="pi pi-calendar me-1" />
+                                  {new Date(log.createdAt).toLocaleDateString()}
+                                </small>
+                              </div>
+                              <p className="mb-0">{log.description}</p>
+                            </Card.Body>
+                          </Card>
+                        ))
+                      ) : (
+                        <p className="text-muted">No status history available. Please contact the store.</p>
+                      )}
+                    </div>
                 </Card.Body>
               </Card>
             </Col>
