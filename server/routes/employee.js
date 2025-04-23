@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require("sequelize");
+const { sequelize } = require("../models/index");
 
 router.get("/", async (req, res) => {
     try {
@@ -83,6 +84,109 @@ router.get("/", async (req, res) => {
     }
 });
 
+
+router.get("/displayTable", async (req, res) => {
+  try {
+	const {
+	  internNum,
+	  firstName,
+	  lastName,
+	  storeNIPC,
+	  email,
+	  phone,
+	  role,
+	  createdAt,
+	  page = 1,
+	  pageSize = 10,
+	  sortField = "internNum",
+	  sortOrder = "ASC",
+	} = req.query;
+
+
+	const where = {};
+	const roleCondition =  {};
+
+	if (internNum)
+	  where.internNum = sequelize.where(
+		sequelize.cast(sequelize.col("Employee.internNum"), "varchar"),
+		{ [Op.iLike]: `${internNum}%` }
+	  );
+
+	if (storeNIPC) where.storeNIPC = { [Op.iLike]: `${storeNIPC}%` };
+	if (firstName) where.firstName = { [Op.iLike]: `${firstName}%` };
+	if (lastName) where.lastName = { [Op.iLike]: `${lastName}%` };
+	if (email) where.email = { [Op.iLike]: `%${email}%` };
+	if (phone) where.phone = { [Op.iLike]: `${phone}%` };
+
+	if (role) roleCondition.role = { [Op.iLike]: `%${role}%` };
+
+	if(req.query.isActive) where.isActive = {[Op.eq]: req.query.isActive}
+
+
+	if (createdAt) {
+	  where.createdAt = {
+		[Op.gte]: new Date(createdAt),
+		[Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+	  };
+	}
+
+	const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+	const orderClause = [];
+
+	if (sortField === "name") {
+	  orderClause.push([
+		Sequelize.fn("LOWER", Sequelize.col("Employee.internNum")),
+		sortOrder == -1 ? "DESC" : "ASC",
+	  ]);
+	} else if (sortField) {
+	  orderClause.push([
+		Sequelize.col(sortField),
+		sortOrder == -1 ? "DESC" : "ASC",
+	  ]);
+	}
+
+
+
+	const { count, rows } = await models.Employee.findAndCountAll({
+	  where,
+	  include: [
+		{
+		  model: models.EmployeeRole,
+		  attributes: ["id", "role"],
+		  where: roleCondition
+		},    
+	   ],  
+	  limit: parseInt(pageSize),
+	  offset,
+	  order: orderClause,
+	});
+
+
+	const formattedData = rows.map((item) => ({
+		internNum: item.internNum,
+		firstName: item.firstName,
+		lastName: item.lastName,
+		email: item.email,
+		phone: item.phone,
+		role: item.EmployeeRole.role,
+		storeNIPC: item.storeNipc,
+		isActive: item.isActive
+	}));
+
+	res.status(200).json({
+	  totalItems: count,
+	  totalPages: Math.ceil(count / pageSize),
+	  currentPage: parseInt(page),
+	  pageSize: parseInt(pageSize),
+	  data: formattedData,
+	});
+
+  } catch (error) {
+	console.log(error);
+	res.status(500).json({ error: "Error fetching brands." });
+  }
+});
 
 
 router.post("/", async (req, res) => {
@@ -229,7 +333,6 @@ router.delete("/:internNum", async (req, res) => {
 });
 
 router.patch("/activation/:internNum", async (req, res) => {
-
 	try {
 		const employee = await models.Employee.findOne({
 			where: { internNum: req.params.internNum },
