@@ -104,19 +104,20 @@ router.post("/", async (req, res) => {
 
 router.post("/linkEquipmentType", async (req, res) => {
   try {
-    const { charityProjectId, equipmentTypeIds } = req.body;
+    const { charityProjectId, items } = req.body;
 
-    if (!charityProjectId || !Array.isArray(equipmentTypeIds)) {
-      return res.status(400).json({ error: "charityProjectId and equipmentTypeIds[] are required." });
+    if (!charityProjectId || !Array.isArray(items)) {
+      return res.status(400).json({ error: "charityProjectId and items[] are required." });
     }
 
     await models.CharityProjectEquipmentType.destroy({
       where: { charityProjectId }
     });
 
-    const records = equipmentTypeIds.map((e) => ({
+    const records = items.map(({ id, quantity }) => ({
       charityProjectId,
-      equipmentTypeId: e,
+      equipmentTypeId: id,
+      quantity: quantity || 1,
       createdAt: new Date(),
       updatedAt: new Date()
     }));
@@ -124,33 +125,32 @@ router.post("/linkEquipmentType", async (req, res) => {
     const created = await models.CharityProjectEquipmentType.bulkCreate(records);
 
     res.status(201).json({
-      message: "Tipos de equipamento atualizados com sucesso.",
+      message: "Equipment types linked successfully.",
       insertedCount: created.length,
       data: created
     });
   } catch (error) {
-    console.error("Error updating CharityProjectEquipmentType:", error);
+    console.error("Error linking equipment types:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
 
-
 router.post("/linkEquipmentSheet", async (req, res) => {
   try {
-    const { charityProjectId, equipmentSheetIds } = req.body;
+    const { charityProjectId, items } = req.body;
 
-
-    if (!charityProjectId || !Array.isArray(equipmentSheetIds)) {
-      return res.status(400).json({ error: "charityProjectId and equipmentSheetIds[] are required." });
+    if (!charityProjectId || !Array.isArray(items)) {
+      return res.status(400).json({ error: "charityProjectId and items[] are required." });
     }
 
     await models.EquipmentSheetCharityProject.destroy({
       where: { charityProjectId }
     });
 
-    const records = equipmentSheetIds.map((e) => ({
+    const records = items.map(({ barcode, quantity }) => ({
       charityProjectId,
-      equipmentSheetId: e,
+      equipmentSheetId: barcode,
+      quantity: quantity || 1,
       createdAt: new Date(),
       updatedAt: new Date()
     }));
@@ -158,15 +158,16 @@ router.post("/linkEquipmentSheet", async (req, res) => {
     const created = await models.EquipmentSheetCharityProject.bulkCreate(records);
 
     res.status(201).json({
-      message: "Equipment Sheets update sucessfully.",
+      message: "Equipment sheets linked successfully.",
       insertedCount: created.length,
       data: created
     });
   } catch (error) {
-    console.error("Error updating CharityProjectEquipmentSheet:", error);
+    console.error("Error linking equipment sheets:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
+
 
 
 router.get("/:id/equipmentTypes", async (req, res) => {
@@ -184,20 +185,22 @@ router.get("/:id/equipmentTypes", async (req, res) => {
     const limit = parseInt(pageSize);
 
     const project = await models.CharityProject.findByPk(id);
-
     if (!project) {
       return res.status(404).json({ error: "Charity Project not found." });
     }
 
-    // Buscar IDs vinculados
     const linkedRecords = await models.CharityProjectEquipmentType.findAll({
       where: { charityProjectId: id },
-      attributes: ['equipmentTypeId']
+      attributes: ['equipmentTypeId', 'quantity']
     });
 
-    const equipmentTypeIds = linkedRecords.map(r => r.equipmentTypeId);
+    const idToQtyMap = linkedRecords.reduce((acc, rec) => {
+      acc[rec.equipmentTypeId] = rec.quantity || 1;
+      return acc;
+    }, {});
 
-    // Buscar os EquipmentTypes com os filtros
+    const equipmentTypeIds = Object.keys(idToQtyMap);
+
     const { count, rows } = await models.EquipmentType.findAndCountAll({
       where: {
         id: equipmentTypeIds,
@@ -210,12 +213,17 @@ router.get("/:id/equipmentTypes", async (req, res) => {
       limit
     });
 
+    const dataWithQty = rows.map((type) => ({
+      ...type.toJSON(),
+      quantity: idToQtyMap[type.id] || 1
+    }));
+
     res.json({
       totalItems: count,
       totalPages: Math.ceil(count / limit),
       currentPage: parseInt(page),
       pageSize: limit,
-      data: rows
+      data: dataWithQty
     });
 
   } catch (error) {
@@ -223,6 +231,7 @@ router.get("/:id/equipmentTypes", async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar tipos vinculados ao projeto." });
   }
 });
+
 
 router.get("/:id/equipmentSheet", async (req, res) => {
   try {
@@ -245,10 +254,15 @@ router.get("/:id/equipmentSheet", async (req, res) => {
 
     const linkedRecords = await models.EquipmentSheetCharityProject.findAll({
       where: { charityProjectId: id },
-      attributes: ['equipmentSheetId']
+      attributes: ['equipmentSheetId', 'quantity']
     });
 
-    const equipmentSheetIds = linkedRecords.map(record => record.equipmentSheetId);
+    const idToQtyMap = linkedRecords.reduce((acc, rec) => {
+      acc[rec.equipmentSheetId] = rec.quantity || 1;
+      return acc;
+    }, {});
+
+    const equipmentSheetIds = Object.keys(idToQtyMap);
 
     const { count, rows } = await models.EquipmentSheet.findAndCountAll({
       where: {
@@ -256,7 +270,7 @@ router.get("/:id/equipmentSheet", async (req, res) => {
           [Op.in]: equipmentSheetIds,
           [Op.iLike]: `%${barcode}%`
         }
-      },      
+      },
       include: [
         {
           model: models.EquipmentModel,
@@ -293,7 +307,8 @@ router.get("/:id/equipmentSheet", async (req, res) => {
       EquipmentType: {
         id: item.EquipmentType?.id,
         name: item.EquipmentType?.name
-      }
+      },
+      quantity: idToQtyMap[item.barcode] || 1
     }));
 
     res.json({

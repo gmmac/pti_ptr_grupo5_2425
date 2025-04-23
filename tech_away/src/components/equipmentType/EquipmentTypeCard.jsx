@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Button } from 'react-bootstrap';
 
 export default function EquipmentTypeCard({ element, isSelected, isEditing, onToggle }) {
@@ -15,7 +15,7 @@ export default function EquipmentTypeCard({ element, isSelected, isEditing, onTo
   <Card.Body className="d-flex justify-content-between align-items-start p-3">
     <div>
       <Card.Title className="mb-1 fs-6 fw-semibold text-capitalize">
-        {element.name}
+        {element.name} - {element.quantity}
       </Card.Title>
       <small className="text-muted">ID: {element.id}</small>
     </div>

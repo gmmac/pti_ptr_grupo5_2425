@@ -24,7 +24,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       primaryKey: true,
       allowNull: false,
-    }
+    },
+    quantity:{
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
   }, {
     sequelize,
     modelName: 'EquipmentSheetCharityProject',
