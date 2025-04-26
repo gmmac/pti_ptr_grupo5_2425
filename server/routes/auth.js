@@ -130,8 +130,6 @@ router.post("/login", async (req, res) => {
       const existingEmployee = await models.Employee.findOne({where: {email: email}
       });
 
-      console.log(existingEmployee.dataValues);
-
       if(existingEmployee){
 
         res.cookie("employeeInfo", existingEmployee.dataValues, {
