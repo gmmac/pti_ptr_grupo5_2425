@@ -6,17 +6,7 @@ import PaginationControl from '../pagination/PaginationControl';
 import RepairInfo from './RepairInfo';
 
 export default function ClientRepairs({isSelected}) {
-  const [repairs, setRepairs] = useState([]); // repairs ativas ou terminadas, dependendo da aba
-  const [activeTab, setActiveTab] = useState("active"); // 'active' ou 'inactive'
-  const [selectedRepair, setSelectedRepair] = useState(null); // informação da repair selecionada
-  const [showRepairInfo, setShowRepairInfo] = useState(false); // visibilidade do popup da reparação
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [error, setError] = useState("");
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  const [activeTab, setActiveTab] = useState("active");
 
   const handleTabChange = (key) => {
     setActiveTab(key);
@@ -33,11 +23,11 @@ export default function ClientRepairs({isSelected}) {
             className="mb-3"
           >
             <Tab eventKey="active" title="Active Repairs">
-              <ClientRepairsCatalog/>
+              <ClientRepairsCatalog activeRepairs={true}/>
             </Tab>
-            {/* <Tab eventKey="inactive" title="Repairs History">
-              <ClientRepairsCatalog repairsList={repairs} isActive={activeTab === "active"} onShowDetails={handleShowRepairDetails}/>
-            </Tab> */}
+            <Tab eventKey="inactive" title="History Repairs">
+              <ClientRepairsCatalog activeRepairs={false}/>
+            </Tab>
           </Tabs>
       </div>
     </div>

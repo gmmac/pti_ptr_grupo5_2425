@@ -56,6 +56,7 @@ const AuthProvider = ({ children, userType="client", loginPath }) => {
       navigate(profilePath);
     }else if(user && userType && userType === "client"){
       const profilePath = "/profile";
+      // sessionStorage.setItem("clientSelctedTab", "profile")
       navigate(profilePath);
     }
   }, [user]);

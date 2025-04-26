@@ -114,6 +114,127 @@ router.get("/displayTable", async (req, res) => {
   }
 });
 
+router.get("/displayTable/:clientNIC", async (req, res) => {
+  try {
+    const {
+      id,
+      employeeName,
+      state,
+      modelName,
+      createdAt,
+      page = 1,
+      pageSize = 10,
+      sortField = "id",
+      sortOrder = "ASC",
+      activeRepairs,
+    } = req.query;
+    const { clientNIC } = req.params;
+
+    const where = {
+      clientId: clientNIC,
+    };
+
+    if(activeRepairs === "true"){
+      where.statusID = { [Op.ne]: 5 }
+    }else{
+      where.statusID = { [Op.eq]: 5 }
+    }
+
+    const whereRepairStatus = {};
+    const whereModel = {};
+
+    if (id)
+      where.id = sequelize.where(
+        sequelize.cast(sequelize.col("Repair.id"), "varchar"),
+        { [Op.iLike]: `${id}%` }
+      );
+    if (createdAt) {
+      where.createdAt = {
+        [Op.gte]: new Date(createdAt),
+        [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+      };
+    }
+    if (state) whereRepairStatus.state = { [Op.iLike]: `%${state}%` };
+    if (modelName) whereModel.name = { [Op.iLike]: `%${modelName}%` };
+    if (employeeName) {
+      where[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('firstName'),
+          ' ',
+          Sequelize.col('lastName')
+        ),
+        {
+          [Op.iLike]: `%${employeeName}%`
+        }
+      );
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+    const orderClause = [];
+    if (sortField) {
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
+
+    const { count, rows } = await models.Repair.findAndCountAll({
+      where,
+      include: [
+        {
+          model: models.RepairStatus,
+          attributes: ["id", "state"],
+          where: whereRepairStatus,
+        },
+        {
+          model: models.Employee,
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: models.UsedEquipment,
+          include: [
+            {
+              model: models.EquipmentSheet,
+              include: [
+                {
+                  model: models.EquipmentModel,
+                  attributes: ["name"],
+                  where: whereModel
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      limit: parseInt(pageSize),
+      offset,
+      order: orderClause,
+    });
+
+    const formattedData = rows
+      .filter(item => item.UsedEquipment?.EquipmentSheet?.EquipmentModel)
+      .map((item) => ({
+        id: item.id,
+        employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
+        state: item.RepairStatus?.state,
+        modelName: item.UsedEquipment.EquipmentSheet.EquipmentModel.name,
+        createdAt: item.createdAt,
+      }));
+
+    res.status(200).json({
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+      data: formattedData,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Error fetching repairs." });
+  }
+});
+
 
 router.post("/", async (req, res) => {
   try {

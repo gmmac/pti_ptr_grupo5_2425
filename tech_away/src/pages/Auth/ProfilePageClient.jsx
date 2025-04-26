@@ -6,10 +6,15 @@ import "../../styles/ClientProfilePage.css"
 import ClientRepairs from "../../components/client/ClientRepairs";
 
 export default function ProfilePageClient() {
-    const [activeTab, setActiveTab] = useState("profile");
+    const [activeTab, setActiveTab] = useState(sessionStorage.getItem("clientSelctedTab") || "profile");
+
+    const selectTab = (selectedTab)=>{
+        setActiveTab(selectedTab);
+        sessionStorage.setItem("clientSelctedTab", selectedTab);
+    }
 	return (
 		<Container>
-			<Tab.Container defaultActiveKey="profile" activeKey={activeTab} onSelect={(selectedKey) => setActiveTab(selectedKey)}>
+			<Tab.Container defaultActiveKey="profile" activeKey={activeTab} onSelect={(selectedKey) => selectTab(selectedKey)}>
                 <Nav variant="tabs" className="mb-3 nav-fill">
 					<Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="profile">Profile</Nav.Link>

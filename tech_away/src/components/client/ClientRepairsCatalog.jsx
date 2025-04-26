@@ -10,12 +10,14 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
 import RepairInfo from "./RepairInfo";
+import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 
-export default function ClientRepairsCatalog() {
+export default function ClientRepairsCatalog({activeRepairs}) {
 	const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
     const [showRepairInfo, setShowRepairInfo] = useState(false);
     const [repairID, setRepairID] = useState(null);
+    const {user} = useAuth();
 
     const [lazyState, setLazyState] = useState({
         first: 0,
@@ -35,10 +37,8 @@ export default function ClientRepairsCatalog() {
 
     const [data, setData] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [selectedObj, setSelectedObj] = useState(null);
-    const [showModal, setShowModal] = useState(false);
     const menuRefs = useRef([]);
-	const dateFields = ['createdAt', 'updatedAt']; // adiciona os campos relevantes
+	const dateFields = ['createdAt', 'updatedAt'];
 
     useEffect(() => {
         loadLazyData();
@@ -69,7 +69,7 @@ export default function ClientRepairsCatalog() {
         }
 
         // Faz a requisição ao backend
-        api.get('/api/repair/displayTable', { params }).then((res) => {
+        api.get(`/api/repair/displayTable/${user?.nic}`, { params: { ...params, activeRepairs: activeRepairs } }).then((res) => {
             const responseData = res.data;
             if (responseData.data.length > 0) {
                 const allColumns = Object.keys(responseData.data[0]);
@@ -99,27 +99,9 @@ export default function ClientRepairsCatalog() {
         setLazyState(event);
     };
 
-    const confirmDelete = (id) => {
-        confirmDialog({
-            message: (<> Are you sure you want to delete this repair?<br />This action will erase other items associated with this repair.</>),
-            header: "Confirmation",
-            icon: "pi pi-exclamation-triangle",
-            accept: () => handleDelete(id),
-        });
-    };
-
     const openRepairInfo = (repairID) => {
         setShowRepairInfo(true);
         setRepairID(repairID);
-    };
-
-    const handleEdit = (item) => {
-        setSelectedObj(item);
-        setShowModal(true);
-    };
-
-    const handleDelete = (id) => {
-        api.delete(`api/${model}/${id}`).then(() => loadLazyData());
     };
 
     return (
@@ -211,16 +193,6 @@ export default function ClientRepairsCatalog() {
                                     label: "See Details",
                                     icon: "pi pi-info-circle",
                                     command: () => openRepairInfo(rowData.id),
-                                },
-                                {
-                                    label: "Edit",
-                                    icon: "pi pi-pencil",
-                                    command: () => handleEdit(rowData),
-                                },
-                                {
-                                    label: "Delete",
-                                    icon: "pi pi-trash",
-                                    command: () => confirmDelete(rowData.id),
                                 },
                             ];
                             return (
