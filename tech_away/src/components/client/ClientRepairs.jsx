@@ -23,38 +23,6 @@ export default function ClientRepairs({isSelected}) {
     setCurrentPage(1);
   };
 
-  const handleShowRepairDetails = (repair) => {
-    setSelectedRepair(repair);
-    setShowRepairInfo(true);
-  };
-
-  const fetchRepairs = async () => {
-    try {
-        const activeRepairs = activeTab === "active";
-
-        const response = await api.get('/api/repair', {
-          params: {
-            activeRepairs: activeRepairs,
-            page: currentPage,
-          },
-        });
-        console.log("Dei load das reparações")
-        console.log(response.data.data)
-        setRepairs(response.data.data);
-        setTotalPages(response.data.totalPages);
-        setError('');
-    } catch (error) {
-        console.error('Error fetching repairs:', error);
-        setError('Error fetching repairs. Please try again.');
-    }
-  };
-
-  useEffect(() => {
-    if(isSelected){
-      fetchRepairs();
-    }
-  }, [isSelected, currentPage, activeTab]);
-
   return (
     <div className="m-0 d-flex flex-column w-100">
       <div className="m-0 w-100">
@@ -65,14 +33,12 @@ export default function ClientRepairs({isSelected}) {
             className="mb-3"
           >
             <Tab eventKey="active" title="Active Repairs">
-              <ClientRepairsCatalog repairsList={repairs} isActive={activeTab === "active"} onShowDetails={handleShowRepairDetails}/>
+              <ClientRepairsCatalog/>
             </Tab>
-            <Tab eventKey="inactive" title="Repairs History">
+            {/* <Tab eventKey="inactive" title="Repairs History">
               <ClientRepairsCatalog repairsList={repairs} isActive={activeTab === "active"} onShowDetails={handleShowRepairDetails}/>
-            </Tab>
+            </Tab> */}
           </Tabs>
-          <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages}/>
-          <RepairInfo repairInfo={selectedRepair} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
       </div>
     </div>
   );

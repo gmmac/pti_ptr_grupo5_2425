@@ -4,8 +4,9 @@ import { FileText, Calendar, Wallet, People, Shop, CheckCircle } from 'react-boo
 import PaginationControl from '../pagination/PaginationControl';
 import api from '../../utils/axios';
 
-export default function RepairInfo({ repairInfo, show, onClose }) {
+export default function RepairInfo({ repairID, show, onClose }) {
   const [repairStatusLogs, setRepairStatusLogs] = useState([]);
+  const [repair, setRepair] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState("");
@@ -16,7 +17,7 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
 
   const fetchRepairsLogs = async () => {
     try {
-        const response = await api.get(`/api/repairStatusLogs/${repairInfo.id}`, {
+        const response = await api.get(`/api/repairStatusLogs/${repairID}`, {
           params: {
             page: currentPage,
           },
@@ -30,11 +31,23 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
     }
   };
 
+  const fetchRepair = async () => {
+    try {
+        const response = await api.get(`/api/repair/${repairID}`);
+        setRepair(response.data);
+        setError('');
+    } catch (error) {
+        console.error('Error fetching repair:', error);
+        setError('Error fetching repair. Please try again.');
+    }
+  };
+
   useEffect(() => {
     if(show){
+      fetchRepair();
       fetchRepairsLogs();
     }
-  }, [show, currentPage]);
+  }, [currentPage, repairID]);
 
   return (
     <Modal show={show} onHide={onClose} centered size="xl" >
@@ -42,37 +55,41 @@ export default function RepairInfo({ repairInfo, show, onClose }) {
         <Modal.Title>Repair Details</Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-4">
-        {repairInfo ? (
+        {repair ? (
           <Row>
             {/* Coluna Esquerda: Info da Reparação */}
             <Col md={5}>
               <Card className="mb-3 shadow-sm">
                 <Card.Body>
                   <p className="fw-bold">
-                    <FileText /> Nº Repair: <span className="fw-normal text-primary">#{repairInfo.id}</span>
+                    <FileText /> Nº Repair: <span className="fw-normal text-primary">#{repair.id}</span>
                   </p>
                   <p className="fw-bold">
-                    <Calendar /> Created At: <span className="fw-normal">{new Date(repairInfo.createdAt).toLocaleDateString()}</span>
+                    <Calendar /> Created At: <span className="fw-normal">{new Date(repair.createdAt).toLocaleDateString()}</span>
                   </p>
                   <p className="fw-bold">
-                    <Calendar /> Estimated Delivery: <span className="fw-normal">{new Date(repairInfo.estimatedDeliverDate).toLocaleDateString()}</span>
+                    <Calendar /> Estimated Delivery: <span className="fw-normal">{new Date(repair.estimatedDeliverDate).toLocaleDateString()}</span>
                   </p>
                   <p className="fw-bold">
-                    <FileText /> Description: <span className="fw-normal">{repairInfo.description}</span>
+                    <FileText /> Description: <span className="fw-normal">{repair.description}</span>
                   </p>
                   <p className="fw-bold">
-                    <Wallet /> Budget: <span className="fw-normal">${repairInfo.budget}</span>
+                    <Wallet /> Budget: <span className="fw-normal">${repair.budget}</span>
                   </p>
                   <p className="fw-bold">
-                    <People /> Employee: <span className="fw-normal">{repairInfo.Employee.firstName} {repairInfo.Employee.lastName}</span>
+                    <People /> Employee: <span className="fw-normal">
+                      {repair.Employee ? `${repair.Employee.firstName} ${repair.Employee.lastName}` : 'No Employee Assigned'}
+                    </span>
                   </p>
                   <p className="fw-bold">
-                    <Shop /> Store: <span className="fw-normal">{repairInfo.Employee.Store.name}</span>
+                    <Shop /> Store: <span className="fw-normal">
+                      {repair.Employee && repair.Employee.Store ? repair.Employee.Store.name : 'No Store Assigned'}
+                    </span>
                   </p>
                   <p className="fw-bold">
                     <CheckCircle /> Current Status:
-                    <span className={`badge ${repairInfo.RepairStatus?.state === 'Completed' ? 'bg-success' : 'bg-primary'} ms-2`}>
-                      {repairInfo.RepairStatus?.state}
+                    <span className={`badge ${repair.RepairStatus?.state === 'Completed' ? 'bg-success' : 'bg-primary'} ms-2`}>
+                      {repair.RepairStatus?.state}
                     </span>
                   </p>
                 </Card.Body>
