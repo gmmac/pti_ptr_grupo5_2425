@@ -89,8 +89,9 @@ router.get("/displayTable", async (req, res) => {
   try {
 	const {
 	  internNum,
-	  firstName,
-	  lastName,
+	  employeeName,
+	//   firstName,
+	//   lastName,
 	  storeNIPC,
 	  email,
 	  phone,
@@ -113,8 +114,22 @@ router.get("/displayTable", async (req, res) => {
 	  );
 
 	if (storeNIPC) where.storeNIPC = { [Op.iLike]: `${storeNIPC}%` };
-	if (firstName) where.firstName = { [Op.iLike]: `${firstName}%` };
-	if (lastName) where.lastName = { [Op.iLike]: `${lastName}%` };
+	// if (firstName) where.firstName = { [Op.iLike]: `${firstName}%` };
+	// if (lastName) where.lastName = { [Op.iLike]: `${lastName}%` };
+	if (employeeName) {
+		where[Op.and] = Sequelize.where(
+		  Sequelize.fn(
+			'concat',
+			Sequelize.col('firstName'),
+			' ',
+			Sequelize.col('lastName')
+		  ),
+		  {
+			[Op.iLike]: `%${employeeName}%`
+		  }
+		);
+	  }
+	  
 	if (email) where.email = { [Op.iLike]: `%${email}%` };
 	if (phone) where.phone = { [Op.iLike]: `${phone}%` };
 
@@ -147,7 +162,6 @@ router.get("/displayTable", async (req, res) => {
 	}
 
 
-
 	const { count, rows } = await models.Employee.findAndCountAll({
 	  where,
 	  include: [
@@ -165,8 +179,8 @@ router.get("/displayTable", async (req, res) => {
 
 	const formattedData = rows.map((item) => ({
 		internNum: item.internNum,
-		firstName: item.firstName,
-		lastName: item.lastName,
+		employeeName: item.firstName + " " + item.lastName,
+		// lastName: item.lastName,
 		email: item.email,
 		phone: item.phone,
 		role: item.EmployeeRole.role,
