@@ -3,7 +3,7 @@ import { Container, Stack, Row, Col } from "react-bootstrap";
 import Swirl from "../svg/Swirl";
 import DivTelem from "./DivTelem";
 import DivJoin from "./DivJoin";
-import DivOurServices from "./DivourServices";
+import DivOurServices from "./DivOurServices";
 
 export default function FScontent() {
 	return (
