@@ -3,7 +3,7 @@ import { Modal, Button, Table, Container } from "react-bootstrap";
 import api from "../../utils/axios";
 import PaginationControl from "../pagination/PaginationControl";
 import ClientFilter from "./ClientFilter";
-import ClientTableModal from "./clientTableModal";
+import ClientTableModal from "./ClientTableModal";
 import ClientCardModal from "./ClientCardModal";
 
 export default function ClientCatalogModal({ show, handleClose, handleSelectClient, selectedClient }) {
