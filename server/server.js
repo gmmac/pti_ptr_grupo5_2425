@@ -12,7 +12,7 @@ app.use(cookieParser());
 
 app.use(
 	cors({
-		origin: "http://localhost:5173",
+		origin: ["http://localhost:5173", "http://34.51.129.238", "https://techaway.dev/"],
 		credentials: true,
 	})
 );
