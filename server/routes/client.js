@@ -1,17 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
+const { sequelize } = require("../models/index");
 
 
 router.get("/", async (req, res) => {
 	try {
 		const {
 			nic,
-			firstName,
-			lastName,
+			nif,
+			birthDate,
+			gender,
+			name,
 			email,
 			phone,
+			adress,
+			createdAt,
 			page = 1,
 			pageSize = 10,
 			orderBy,
@@ -23,10 +28,31 @@ router.get("/", async (req, res) => {
 		const where = {};
 
 		if (nic) where.nic = { [Op.like]: `${nic}%` };
-		if (firstName) where.firstName = { [Op.like]: `%${firstName}%` };
-		if (lastName) where.lastName = { [Op.like]: `%${lastName}%` };
+		if (nif) where.nif = { [Op.like]: `${nif}%` };
+		if (gender) where.gender = { [Op.like]: `${gender}%` };
+		if (adress) where.adress = { [Op.like]: `${adress}%` };
 		if (email) where.email = { [Op.like]: `%${email}%` };
 		if (phone) where.phone = { [Op.like]: `%${phone}%` };
+		if (name) {
+			where[Op.and] = Sequelize.where(
+			Sequelize.fn(
+				'concat',
+				Sequelize.col('firstName'),
+				' ',
+				Sequelize.col('lastName')
+			),
+			{
+				[Op.iLike]: `%${name}%`
+			}
+			);
+		}
+
+		if (createdAt) {
+			where.createdAt = {
+				[Op.gte]: new Date(createdAt),
+				[Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+			};
+		}
 
 		const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
@@ -39,18 +65,29 @@ router.get("/", async (req, res) => {
 
 		const { count, rows } = await models.Client.findAndCountAll({
 			where,
-			
 			limit: parseInt(pageSize),
 			offset,
 			order,
 		});
+
+		const formattedData = rows.map((item) => ({
+			nic: item.nic,
+			nif: item.nif,
+			birthDate: item.birthDate,
+			gender: item.gender,
+			name: item.firstName + " " + item.lastName,
+			email: item.email,
+			phone: item.phone,
+			adress: item.adress,
+			createdAt: item.createdAt,
+		}));
 
 		res.json({
 			totalItems: count,
 			totalPages: Math.ceil(count / pageSize),
 			currentPage: parseInt(page),
 			pageSize: parseInt(pageSize),
-			data: rows,
+			data: formattedData,
 		});
 	} catch (error) {
 		console.error("Error fetching clients:", error);

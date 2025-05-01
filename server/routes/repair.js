@@ -10,6 +10,7 @@ router.get("/displayTable", async (req, res) => {
     const {
       id,
       employeeName,
+      clientName,
       state,
       modelName,
       createdAt,
@@ -39,12 +40,25 @@ router.get("/displayTable", async (req, res) => {
       where[Op.and] = Sequelize.where(
         Sequelize.fn(
           'concat',
-          Sequelize.col('firstName'),
+          Sequelize.col('Employee.firstName'),
           ' ',
-          Sequelize.col('lastName')
+          Sequelize.col('Employee.lastName')
         ),
         {
           [Op.iLike]: `%${employeeName}%`
+        }
+      );
+    }
+    if (clientName) {
+      where[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('Client.firstName'),
+          ' ',
+          Sequelize.col('Client.lastName')
+        ),
+        {
+          [Op.iLike]: `%${clientName}%`
         }
       );
     }
@@ -68,6 +82,10 @@ router.get("/displayTable", async (req, res) => {
         },
         {
           model: models.Employee,
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: models.Client,
           attributes: ["firstName", "lastName"],
         },
         {
@@ -96,6 +114,7 @@ router.get("/displayTable", async (req, res) => {
     .map((item) => ({
       id: item.id,
       employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
+      clientName: item.Client?.firstName + " " + item.Client?.lastName,
       state: item.RepairStatus?.state,
       modelName: item.UsedEquipment.EquipmentSheet.EquipmentModel.name,
       createdAt: item.createdAt,
