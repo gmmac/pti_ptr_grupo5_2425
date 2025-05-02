@@ -20,15 +20,21 @@ module.exports = (sequelize, DataTypes) => {
       
     }
   }
-  EquipmentType.init({
-    name: {
-      type: DataTypes.STRING(50),
-      allowNull: true
+  EquipmentType.init(
+    {
+      name: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
+      isActive: {
+        type: DataTypes.STRING(1),
+      }
+    },
+    {
+      sequelize,
+      modelName: "EquipmentType",
+      timestamps: true,
     }
-  }, {
-    sequelize,
-    modelName: 'EquipmentType',
-    timestamps: true,
-  });
+  );
   return EquipmentType;
 };
