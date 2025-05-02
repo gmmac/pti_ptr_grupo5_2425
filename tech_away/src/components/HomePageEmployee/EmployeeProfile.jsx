@@ -99,12 +99,16 @@ export default function EmployeeProfile() {
         let hasError = false;
     
         setErrors(newErrors);
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 56b8d6a99f31d0fcf9c4db5724d81ab784d24c4c
         if (hasError) {
             return;
         }
 
-        api.put(`/api/employee/${formData.internNum}`, changedFields)
+        api.put(`/api/employee/${formData?.internNum}`, changedFields)
             .then((res) => {
                 setOriginalData({ ...originalData, ...changedFields });
                 setChangedFields([]);
@@ -164,7 +168,7 @@ export default function EmployeeProfile() {
                                         className="profile-input" 
                                         type="text" 
                                         name="firstName" 
-                                        value={formData.firstName || ""} 
+                                        value={formData?.firstName || ""} 
                                         disabled={!isEditing}  // Controla se o campo é editável
                                         onChange={handleInputChange}
                                     />
@@ -177,7 +181,7 @@ export default function EmployeeProfile() {
                                         className="profile-input" 
                                         type="text" 
                                         name="lastName" 
-                                        value={formData.lastName || ""} 
+                                        value={formData?.lastName || ""} 
                                         disabled={!isEditing} 
                                         onChange={handleInputChange}
                                     />
@@ -190,7 +194,7 @@ export default function EmployeeProfile() {
                                         className="profile-input" 
                                         type="email" 
                                         name="email" 
-                                        value={formData.email || ""} 
+                                        value={formData?.email || ""} 
                                         disabled
                                         onChange={handleInputChange}
                                     />
@@ -205,7 +209,7 @@ export default function EmployeeProfile() {
                                         className="profile-input" 
                                         type="tel" 
                                         name="phone" 
-                                        value={formData.phone || ""} 
+                                        value={formData?.phone || ""} 
                                         disabled={!isEditing} 
                                         onChange={handleInputChange}
                                         isInvalid={!!errors?.phone}
@@ -222,7 +226,7 @@ export default function EmployeeProfile() {
                                         className="profile-input" 
                                         type="date" 
                                         name="birthDate" 
-                                        value={formData.birthDate ? formData.birthDate.split('T')[0] : ""} 
+                                        value={formData?.birthDate ? formData?.birthDate.split('T')[0] : ""} 
                                         disabled={!isEditing} 
                                         onChange={handleInputChange}
                                     />
@@ -237,7 +241,7 @@ export default function EmployeeProfile() {
                                         className="profile-input" 
                                         type="number" 
                                         name="nic" 
-                                        value={formData.nic || ""} 
+                                        value={formData?.nic || ""} 
                                         disabled
                                         onChange={handleInputChange}
                                     />
@@ -250,7 +254,7 @@ export default function EmployeeProfile() {
                                     className="profile-input" 
                                     type="number" 
                                     name="nif" 
-                                    value={formData.nif || ""} 
+                                    value={formData?.nif || ""} 
                                     disabled={!isEditing} 
                                     onChange={handleInputChange}
                                     isInvalid={!!errors?.nif}
@@ -267,7 +271,7 @@ export default function EmployeeProfile() {
                                         className="profile-input" 
                                         type="text" 
                                         name="address" 
-                                        value={formData.address || ""} 
+                                        value={formData?.address || ""} 
                                         disabled={!isEditing} 
                                         onChange={handleInputChange}
                                     />
@@ -302,7 +306,7 @@ export default function EmployeeProfile() {
                                         className="profile-input" 
                                         type="text" 
                                         name="interNum" 
-                                        value={formData.internNum || ""}
+                                        value={formData?.internNum || ""}
                                         disabled
                                     />
                                 </Form.Group>
@@ -329,7 +333,7 @@ export default function EmployeeProfile() {
                                         className="profile-input" 
                                         type="text" 
                                         name="storeNipc" 
-                                        value={formData.storeNIPC || ""} 
+                                        value={formData?.storeNIPC || ""} 
                                         disabled
                                     />
                                 </Form.Group>
