@@ -123,7 +123,7 @@ export default function Router() {
 
             </Route>
 
-            <Route path="projects/:projectName" element={<CharityProjectPage />} />
+            <Route path="projects/:id" element={<CharityProjectPage />} />
             <Route path="login" element={<OrganizerLoginPage />} />
             <Route path="register" element={<OrganizerRegisterPage />} />
             <Route path="changePassword" element={<ChangePasswordClient userType="organizer" />} />

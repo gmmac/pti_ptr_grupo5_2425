@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { Op } = require("sequelize");
 const models = require("../models");
+const { Op, Sequelize } = require("sequelize");
+const { sequelize } = require("../models/index");
 
 router.get("/", async (req, res) => {
   try {
@@ -9,7 +10,7 @@ router.get("/", async (req, res) => {
       startDate,
       completionDate,
       status,
-      projectName,
+      id,
       warehouseID,
       organizerNic,
       page = 1,
@@ -25,7 +26,7 @@ router.get("/", async (req, res) => {
     if (status) where.status = { [Op.eq]: parseInt(status) };
     if (warehouseID) where.warehouseID = { [Op.eq]: parseInt(warehouseID) };
     if (organizerNic) where.organizerNic = { [Op.like]: `%${organizerNic}%` };
-    if (projectName) where.name = { [Op.like]: `%${projectName}%` };
+    if (id) where.id = { [Op.eq]: id };
 
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
     const order = [[orderBy, orderDirection.toUpperCase()]];
@@ -64,7 +65,130 @@ router.get("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+router.get("/displayTable", async (req, res) => {
+  try {
+  const {
+    id,
+    startDate,
+    completionDate,
+    status,
+    projectName,
+    warehouse,
+    organizerName,
+	  createdAt,
+    totalSpace,
+    page = 1,
+    pageSize = 10,
+    sortField = "id",
+    sortOrder = "ASC",
+  } = req.query;
+
+
+  const where = {};
+  const warehouseCondition = {};
+  const statusCondition = {};
+
+  if (id)
+    where.id = sequelize.where(
+    sequelize.cast(sequelize.col("CharityProject.id"), "varchar"),
+    { [Op.iLike]: `${id}%` }
+    );
+
+  if (totalSpace) where.totalSpace = { [Op.eq]: totalSpace };
+  if (startDate) where.startDate = { [Op.lte]: startDate };
+  if (completionDate) where.completionDate = { [Op.gte]: completionDate };
+  if (status) statusCondition.state = { [Op.like]: `%${status}%` };
+  if (warehouse) warehouseCondition.name = { [Op.like]: `%${warehouse}%` };
+  if (projectName) where.name = { [Op.like]: `%${projectName}%` };
+
+  if (organizerName) {
+    where[Op.and] = Sequelize.where(
+      Sequelize.fn(
+      'concat',
+      Sequelize.col('firstName'),
+      ' ',
+      Sequelize.col('lastName')
+      ),
+      {
+      [Op.iLike]: `%${organizerName}%`
+      }
+    );
+    }
+    
+  if (createdAt) {
+    where.createdAt = {
+    [Op.gte]: new Date(createdAt),
+    [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+    };
+  }
+
+  const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+  const orderClause = [];
+
+  if (sortField === "name") {
+    orderClause.push([
+    Sequelize.fn("LOWER", Sequelize.col("CharityProject.id")),
+    sortOrder == -1 ? "DESC" : "ASC",
+    ]);
+  } else if (sortField) {
+    orderClause.push([
+    Sequelize.col(sortField),
+    sortOrder == -1 ? "DESC" : "ASC",
+    ]);
+  }
+
+
+  const { count, rows } = await models.CharityProject.findAndCountAll({
+    where,
+    include: [
+      {
+        model: models.ProjectStatus,
+        attributes: ["id", "state"],
+        where: statusCondition
+      },
+      {
+        model: models.Warehouse,
+        attributes: ["id", "name"],
+        where: warehouseCondition
+      },
+      {
+        model: models.Organizer,
+        attributes: ["nic", "firstName", "lastName", "email"],
+      },
+    ],
+    limit: parseInt(pageSize),
+    offset,
+    order: orderClause,
+  });
+
+
+  const formattedData = rows.map((item) => ({
+    id: item.id,
+    name: item.name,
+    organizerName: item.Organizer.firstName + " " + item.Organizer.lastName,
+    status: item.ProjectStatus.state,
+    statusID: item.ProjectStatus.id,
+    totalSpace: item.totalSpace,
+    warehouse: item.Warehouse.name,
+    warehouseID: item.Warehouse.id,
+    startDate: item.startDate,
+    completionDate: item.completionDate
+  }));
+
+  res.status(200).json({
+    totalItems: count,
+    totalPages: Math.ceil(count / pageSize),
+    currentPage: parseInt(page),
+    pageSize: parseInt(pageSize),
+    data: formattedData,
+  });
+
+  } catch (error) {
+  console.log(error);
+  res.status(500).json({ error: "Error fetching brands." });
+  }
+});
 
 
 router.post("/", async (req, res) => {

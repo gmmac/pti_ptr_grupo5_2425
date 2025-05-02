@@ -5,6 +5,7 @@ import PaginationControl from '../pagination/PaginationControl';
 import CharityProjectTableView from './CharityProjectTableView';
 import CharityProjectCardView from './CharityProjectCardView';
 import ConfirmationModal from '../modals/ConfirmationModal';
+import CharityProjectDisplayTable from './CharityProjectDisplayTable';
 
 export default function CharityProjectCatalog({
   charityProjects,
@@ -49,13 +50,11 @@ export default function CharityProjectCatalog({
 
   return (
     <Container className="py-4">
-      <CharityProjectTableView
-        projects={charityProjects}
+
+      <CharityProjectDisplayTable
         onOpenDetails={onOpenDetails}
-        onDelete={handleDelete}
-        deleting={deleting}
       />
-      <CharityProjectCardView
+      {/* <CharityProjectCardView
         projects={charityProjects}
         onOpenDetails={onOpenDetails}
         onDelete={handleDelete}
@@ -65,7 +64,7 @@ export default function CharityProjectCatalog({
         handlePageChange={handlePageChange}
         currentPage={currentPage}
         totalPages={totalPages}
-      />
+      /> */}
 
       {/* Modal de confirmação */}
       <ConfirmationModal

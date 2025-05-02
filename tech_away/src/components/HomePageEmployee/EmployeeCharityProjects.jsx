@@ -39,7 +39,7 @@ export default function OrganizerCharityProjects() {
   const fetchCharityProjects = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/charityProject/', {
+      const response = await api.get('/api/charityProject/displayTable', {
         params: {
           ...filters,
           page: currentPage
@@ -67,6 +67,7 @@ export default function OrganizerCharityProjects() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
 
     const handleOpenDetailsModal = (project) => {
+    console.log("ASAJSHAKH ", project)
     setSelectedProject(project);
     setShowDetailsModal(true);
     };

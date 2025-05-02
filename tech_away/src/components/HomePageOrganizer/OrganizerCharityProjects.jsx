@@ -76,9 +76,9 @@ export default function OrganizerCharityProjects() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
 
     const handleOpenDetailsModal = (project) => {
-    navigate(`/organizer/projects/${project.name}`)
-    setSelectedProject(project);
-    setShowDetailsModal(true);
+    navigate(`/organizer/projects/${project}`)
+    // setSelectedProject(project);
+    // setShowDetailsModal(true);
     };
 
     const handleCloseDetailsModal = () => {
@@ -126,15 +126,6 @@ export default function OrganizerCharityProjects() {
                   />
                 )
               )}
-
-
-              {/* <ModalCharityProjectDetails
-                show={showDetailsModal}
-                handleClose={handleCloseDetailsModal}
-                project={selectedProject}
-                onRefresh={toggleRefresh}
-                setSelectedProject={setSelectedProject}
-              /> */}
 
             </>
 

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
 import EmployeeDisplayTable from './EmployeeDisplayTable';
 import EmployeeEditModal from './EmployeeEditModal';
+import EmployeeCardView from './EmployeeCardView'
 
 export default function EmployeeCatalog() {
   const navigate = useNavigate();
@@ -15,6 +16,18 @@ export default function EmployeeCatalog() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   
+  // api.get('/api/employee/', { params })
+  // .then((res) => {
+  //   const items = res.data.data || [];
+  //   setData(items);
+  //   setTotalRecords(res.data.totalItems || 0);
+  //   if (items.length) {
+  //     const keys = Object.keys(items[0]).filter(k => k !== "CreatedAt");
+  //     setColumns(keys);
+  //   }
+  // })
+  // .catch((err) => console.error('Erro:', err))
+  // .finally(() => setLoading(false));
 
   const handleCreateEmployee = () => navigate('/employee/register');
 
@@ -61,6 +74,11 @@ export default function EmployeeCatalog() {
           onDelete={handleToggleActivationAccount}
           refreshKey={refreshKey}
         />
+        {/* <EmployeeCardView 
+          employee={employee}
+
+        /> */}
+
         </Tab>
         <Tab eventKey="inactive" title="Inactive Employees">
           <EmployeeDisplayTable
