@@ -104,9 +104,7 @@ export default function EmployeeHomePage() {
                 </Tab.Pane>
                 <Tab.Pane eventKey="repairs" className='p-4'>
                     <h3>Repairs</h3>
-                    <ModalProvider>
                         <EmployeeRepairs />
-                    </ModalProvider>
                 </Tab.Pane>
                 <Tab.Pane eventKey="sales" className='p-4'>
                     <h3>Sales Content</h3>

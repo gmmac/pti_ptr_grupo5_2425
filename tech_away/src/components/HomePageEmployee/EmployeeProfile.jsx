@@ -99,11 +99,7 @@ export default function EmployeeProfile() {
         let hasError = false;
     
         setErrors(newErrors);
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> 56b8d6a99f31d0fcf9c4db5724d81ab784d24c4c
         if (hasError) {
             return;
         }
