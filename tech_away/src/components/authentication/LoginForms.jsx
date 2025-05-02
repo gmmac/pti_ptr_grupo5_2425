@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/axios";
 import "../../styles/index.css";
 import "../../styles/AuthPage.css";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
+import { IsMobileContext } from "../../contexts/IsMobileContext";
 
 export default function LoginForms({
   registerPath = "/register",
   changePasswordPath = "/changePassword",
 }) {
+  const isMobile = useContext(IsMobileContext);
   const { loginAction } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -86,10 +88,11 @@ export default function LoginForms({
 
   return (
     <div
-      className="bg-white w-100 p-md-5 p-3 rounded-lg"
+      className="bg-white w-100 p-md-5 p-4"
       style={{
         boxShadow: "var(--shadow-default)",
         fontFamily: "var(--body-font)",
+        borderRadius: isMobile ? "var(--rounded-sm)" : "var(--rounded-lg)",
       }}
     >
       <h1 className="mb-2" style={{ fontFamily: "var(--title-font)" }}>

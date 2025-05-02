@@ -1,12 +1,25 @@
-import React from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import React, { useContext } from "react";
+import { Container, Row, Col, Stack } from "react-bootstrap";
 import LoginForms from "../../components/authentication/LoginForms";
 import WelcomeBackLg from "../../components/decoration/welcomeBackLg";
-
+import { IsMobileContext } from "../../contexts/IsMobileContext";
+import WelcomeBackSm from "../../components/decoration/WelcomeBackSm";
 export default function LoginPageClient() {
-  return (
-    <Container className="d-flex align-items-center justify-content-center mt-5">
-      <Row className="w-100 mt-4 g-5">
+  const isMobile = useContext(IsMobileContext);
+
+  return isMobile ? (
+    <Container>
+      <Stack
+        gap={5}
+        className="d-flex align-items-center justify-content-center mb-5"
+      >
+        <WelcomeBackSm />
+        <LoginForms />
+      </Stack>
+    </Container>
+  ) : (
+    <Container className="d-flex align-items-center justify-content-center my-5">
+      <Row className="w-100 my-5 g-5">
         <Col
           sm={12}
           md={6}

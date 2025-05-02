@@ -64,7 +64,7 @@ export default function BottomNavBar() {
                 href={item.path}
                 style={{
                   backgroundColor: isActive
-                    ? "rgb(64, 153, 102, 0.25)"
+                    ? "var(--variant-one)"
                     : "transparent",
                 }}
                 className={user ? "rounded-pill px-2" : "rounded-pill px-3"}
@@ -77,18 +77,14 @@ export default function BottomNavBar() {
                     className={item.icon}
                     style={{
                       fontSize: "1.3rem",
-                      color: isActive
-                        ? "var(--variant-one)"
-                        : "var(--dark-grey)",
+                      color: "var(--dark-grey)",
                     }}
                   ></i>
                   <p
                     className="m-0"
                     style={{
                       fontSize: "9px",
-                      color: isActive
-                        ? "var(--variant-one)"
-                        : "var(--dark-grey)",
+                      color: "var(--dark-grey)",
                     }}
                   >
                     {item.name}
