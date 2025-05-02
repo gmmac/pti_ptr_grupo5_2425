@@ -49,7 +49,7 @@ export default function Router() {
         <Routes>
 
           <Route path="*" element={<NotFoundPage />} />
-
+		  <Route path="teste" element={<TestPage />} />
 					{/* Rotas do Client */}
 					<Route
 						path="/"
@@ -104,7 +104,6 @@ export default function Router() {
 
 						<Route path="login" element={<EmployeeLoginPage />} />
 						<Route path="register" element={<EmployeeRegisterPage />} />
-            <Route path="teste" element={<TestPage />} />
 					</Route>
 
           {/* Rotas do organizador */}

@@ -9,15 +9,13 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
-import RepairInfo from "./RepairInfo";
-import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
+import RepairInfo from "../client/RepairInfo";
 
-export default function ClientRepairsCatalog({activeRepairs}) {
+export default function EmployeeRepairsCatalog() {
 	const [loading, setLoading] = useState(false);
-    const [totalRecords, setTotalRecords] = useState(0);
-    const [showRepairInfo, setShowRepairInfo] = useState(false);
-    const [repairID, setRepairID] = useState(null);
-    const {user} = useAuth();
+	const [totalRecords, setTotalRecords] = useState(0);
+	const [showRepairInfo, setShowRepairInfo] = useState(false);
+	const [repairID, setRepairID] = useState(null);
 
     const [lazyState, setLazyState] = useState({
         first: 0,
@@ -28,6 +26,7 @@ export default function ClientRepairsCatalog({activeRepairs}) {
         filters: {
 			'id': { value: '', matchMode: 'contains' },
             'employeeName': { value: '', matchMode: 'contains' },
+			'clientName': { value: '', matchMode: 'contains' },
             'description': { value: '', matchMode: 'contains' },
             'state': { value: '', matchMode: 'contains' },
             'modelName': { value: '', matchMode: 'contains' },
@@ -69,7 +68,7 @@ export default function ClientRepairsCatalog({activeRepairs}) {
         }
 
         // Faz a requisição ao backend
-        api.get(`/api/repair/displayTable/${user?.nic}`, { params: { ...params, activeRepairs: activeRepairs } }).then((res) => {
+        api.get("/api/repair/displayTable/", { params: params }).then((res) => {
             const responseData = res.data;
             if (responseData.data.length > 0) {
                 const allColumns = Object.keys(responseData.data[0]);
@@ -95,6 +94,7 @@ export default function ClientRepairsCatalog({activeRepairs}) {
     };
 
     const onFilter = (event) => {
+        console.log("estou a filtrar no bom")
         event['first'] = 0; // Resetar a página quando o filtro mudar
         setLazyState(event);
     };

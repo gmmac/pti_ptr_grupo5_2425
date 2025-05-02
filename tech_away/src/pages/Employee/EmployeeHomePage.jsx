@@ -13,6 +13,7 @@ import { useAuthEmployee } from '../../contexts/AuthenticationProviders/Employee
 import StorePurchasePage from '../../pages/StorePurchasePage';
 import { IsMobileContext } from '../../contexts/IsMobileContext';
 import "../../styles/pageElements.css"
+import { ModalProvider } from '../../contexts/ModalContext';
 
 
 export default function EmployeeHomePage() {
@@ -101,10 +102,13 @@ export default function EmployeeHomePage() {
                     <StorePurchasePage />
                 </Tab.Pane>
                 <Tab.Pane eventKey="repairs" className='p-4'>
-                    <h5>Repairs Content</h5>
+                    <h3>Repairs</h3>
+                    <ModalProvider>
+                        <EmployeeRepairs />
+                    </ModalProvider>
                 </Tab.Pane>
                 <Tab.Pane eventKey="sales" className='p-4'>
-                    <h5>Sales Content</h5>
+                    <h3>Sales Content</h3>
                 </Tab.Pane>
                 <Tab.Pane eventKey="charityproject" className='p-4'>
                     <EmployeeCharityProjects />
