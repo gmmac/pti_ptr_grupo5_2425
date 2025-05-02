@@ -15,7 +15,6 @@ import EmployeeHomePage from "./pages/Employee/EmployeeHomePage";
 
 import InterestsPage from "./pages/InterestsPage";
 import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
-import StorePurchasePage from "./pages/StorePurchasePage";
 import StorePage from "./pages/StorePage";
 import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 import UsedEquipmentPage from "./pages/UsedEquipmentPage";
@@ -70,7 +69,6 @@ export default function Router() {
 							element={<UsedEquipmentPage />}
 						/>
 						<Route path="changePassword" element={<ChangePasswordClient />} />
-						<Route path="storePurchasePage" element={<StorePurchasePage />} />
 						<Route path="register" element={<RegisterPageClient />} />
 						<Route path="login" element={<LoginPageClient />} />
 						<Route path="profile" element={<ProfilePageClient />} />

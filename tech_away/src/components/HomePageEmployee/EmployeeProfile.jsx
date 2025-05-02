@@ -66,10 +66,6 @@ export default function EmployeeProfile() {
 
     }, [formData])
 
-    useEffect(() => {
-        console.log(formData)
-    }, [formData])
-
     const handleEditClick = () => {
         if (isEditing) {
             setFormData({ ...originalData });
@@ -82,7 +78,6 @@ export default function EmployeeProfile() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
-        console.log({ ...formData, [name]: value })
         setFormData({ ...formData, [name]: value });
     
         if (value !== originalData[name]) {
@@ -104,9 +99,6 @@ export default function EmployeeProfile() {
         let hasError = false;
     
         setErrors(newErrors);
-        
-        console.log(hasError)
-        console.log(errors);
         
         if (hasError) {
             return;
