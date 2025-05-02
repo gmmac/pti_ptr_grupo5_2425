@@ -27,7 +27,7 @@ export default function BottomNavBar() {
     if (user) {
       logOut();
     }
-    navigate("/");
+    navigate("/login");
   };
 
   const authNavItem = user
@@ -64,10 +64,10 @@ export default function BottomNavBar() {
                 href={item.path}
                 style={{
                   backgroundColor: isActive
-                    ? "var(--variant-one)"
+                    ? "rgb(64, 153, 102, 0.25)"
                     : "transparent",
                 }}
-                className="px-4 rounded-pill"
+                className={user ? "rounded-pill px-2" : "rounded-pill px-3"}
               >
                 <Stack
                   direction="vertical"
@@ -75,9 +75,22 @@ export default function BottomNavBar() {
                 >
                   <i
                     className={item.icon}
-                    style={{ fontSize: "1.3rem", color: "var(--dark-grey)" }}
+                    style={{
+                      fontSize: "1.3rem",
+                      color: isActive
+                        ? "var(--variant-one)"
+                        : "var(--dark-grey)",
+                    }}
                   ></i>
-                  <p className="m-0" style={{ fontSize: "9px" }}>
+                  <p
+                    className="m-0"
+                    style={{
+                      fontSize: "9px",
+                      color: isActive
+                        ? "var(--variant-one)"
+                        : "var(--dark-grey)",
+                    }}
+                  >
                     {item.name}
                   </p>
                 </Stack>
@@ -93,7 +106,7 @@ export default function BottomNavBar() {
                 backgroundColor: "transparent",
                 cursor: "pointer",
               }}
-              className="px-4 rounded-pill"
+              className="px-2 rounded-pill"
             >
               <Stack
                 direction="vertical"
