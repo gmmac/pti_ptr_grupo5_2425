@@ -1,66 +1,116 @@
 import React from "react";
 import { Navbar, Nav, Stack } from "react-bootstrap";
-import Icon from "../svg/Icon";
+import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 
-const navItems = [
-	{
-		name: "Home",
-		path: "/",
-		svg: "M3.99999 10L12 3L20 10L20 20H15V16C15 15.2044 14.6839 14.4413 14.1213 13.8787C13.5587 13.3161 12.7956 13 12 13C11.2043 13 10.4413 13.3161 9.87868 13.8787C9.31607 14.4413 9 15.2043 9 16V20H4L3.99999 10Z",
-	},
-	{
-		name: "Store",
-		path: "/store",
-		svg: "M20 11.6211V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V11.6211M7.5 9.75C7.5 10.9926 6.49264 12 5.25 12C4.09397 12 3.14157 11.1282 3.01442 10.0062C2.99524 9.83688 3.02176 9.66657 3.06477 9.50173L4.10996 5.49516C4.3397 4.6145 5.13506 4 6.04519 4H17.9548C18.8649 4 19.6603 4.6145 19.89 5.49516L20.9352 9.50173C20.9782 9.66657 21.0048 9.83688 20.9856 10.0062C20.8584 11.1282 19.906 12 18.75 12C17.5074 12 16.5 10.9926 16.5 9.75M7.5 9.75C7.5 10.9926 8.50736 12 9.75 12C10.9926 12 12 10.9926 12 9.75M7.5 9.75L8 4M12 9.75C12 10.9926 13.0074 12 14.25 12C15.4926 12 16.5 10.9926 16.5 9.75M12 9.75V4M16.5 9.75L16 4",
-	},
-	{
-		name: "Our Services",
-		path: "/services",
-		svg: "M8 5.00005C7.01165 5.00082 6.49359 5.01338 6.09202 5.21799C5.71569 5.40973 5.40973 5.71569 5.21799 6.09202C5 6.51984 5 7.07989 5 8.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.07989 21 8.2 21H15.8C16.9201 21 17.4802 21 17.908 20.782C18.2843 20.5903 18.5903 20.2843 18.782 19.908C19 19.4802 19 18.9201 19 17.8V8.2C19 7.07989 19 6.51984 18.782 6.09202C18.5903 5.71569 18.2843 5.40973 17.908 5.21799C17.5064 5.01338 16.9884 5.00082 16 5.00005M8 5.00005V7H16V5.00005M8 5.00005V4.70711C8 4.25435 8.17986 3.82014 8.5 3.5C8.82014 3.17986 9.25435 3 9.70711 3H14.2929C14.7456 3 15.1799 3.17986 15.5 3.5C15.8201 3.82014 16 4.25435 16 4.70711V5.00005M12 15H9M15 11H9",
-	},
-	{
-		name: "Profile",
-		path: "/profile",
-		svg: "M3.75 18.8747C10.6401 13.9139 14.2187 14.2994 20.25 18.8747M23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12ZM15.6667 9.25C15.6667 11.275 14.025 12.9167 12 12.9167C9.97496 12.9167 8.33333 11.275 8.33333 9.25C8.33333 7.22496 9.97496 5.58333 12 5.58333C14.025 5.58333 15.6667 7.22496 15.6667 9.25Z",
-	},
+const baseNavItems = [
+  {
+    name: "Home",
+    path: "/",
+    icon: "pi pi-home",
+  },
+  {
+    name: "Store",
+    path: "/store",
+    icon: "pi pi-shopping-bag",
+  },
+  {
+    name: "Our Stores",
+    path: "/our-stores",
+    icon: "pi pi-map-marker",
+  },
 ];
 
 export default function BottomNavBar() {
-	return (
-		<Navbar
-			fixed="bottom"
-			className=" m-3 d-flex justify-content-center align-items-center"
-		>
-			<Nav
-				className="p-2 rounded-pill justify-content-center align-items-center"
-				style={{
-					backgroundColor: "var(--white)",
-					boxShadow: "var(--shadow-default)",
-				}}
-			>
-				{navItems.map((item, index) => {
-					const isActive = location.pathname === item.path;
-					return (
-						<Nav.Item key={index} className="mx-2">
-							<Nav.Link
-								style={{
-									backgroundColor: isActive
-										? "var(--variant-one)"
-										: "transparent",
-								}}
-								className="px-4 rounded-pill"
-							>
-								<Icon
-									d={item.svg}
-									w={"24"}
-									h={"24"}
-									color={"var(--dark-grey)"}
-								/>
-							</Nav.Link>
-						</Nav.Item>
-					);
-				})}
-			</Nav>
-		</Navbar>
-	);
+  const { user, logOut } = useAuth();
+
+  const handleLogout = () => {
+    if (user) {
+      logOut();
+    }
+    navigate("/");
+  };
+
+  const authNavItem = user
+    ? {
+        name: user.firstName,
+        path: "/profile",
+        icon: "pi pi-user",
+      }
+    : {
+        name: "Login",
+        path: "/login",
+        icon: "pi pi-sign-in",
+      };
+
+  const navItemsToShow = [...baseNavItems, authNavItem];
+
+  return (
+    <Navbar
+      fixed="bottom"
+      className=" m-3 d-flex justify-content-center align-items-center"
+    >
+      <Nav
+        className="p-1 rounded-pill justify-content-center align-items-center"
+        style={{
+          backgroundColor: "var(--white)",
+          boxShadow: "var(--shadow-default)",
+        }}
+      >
+        {navItemsToShow.map((item, index) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Nav.Item key={index} className="mx-2">
+              <Nav.Link
+                href={item.path}
+                style={{
+                  backgroundColor: isActive
+                    ? "var(--variant-one)"
+                    : "transparent",
+                }}
+                className="px-4 rounded-pill"
+              >
+                <Stack
+                  direction="vertical"
+                  className="text-center align-items-center justify-content-center"
+                >
+                  <i
+                    className={item.icon}
+                    style={{ fontSize: "1.3rem", color: "var(--dark-grey)" }}
+                  ></i>
+                  <p className="m-0" style={{ fontSize: "9px" }}>
+                    {item.name}
+                  </p>
+                </Stack>
+              </Nav.Link>
+            </Nav.Item>
+          );
+        })}
+        {user && (
+          <Nav.Item className="mx-2">
+            <Nav.Link
+              onClick={handleLogout}
+              style={{
+                backgroundColor: "transparent",
+                cursor: "pointer",
+              }}
+              className="px-4 rounded-pill"
+            >
+              <Stack
+                direction="vertical"
+                className="text-center align-items-center justify-content-center"
+              >
+                <i
+                  className="pi pi-sign-out"
+                  style={{ fontSize: "1.3rem", color: "var(--dark-grey)" }}
+                ></i>
+                <p className="m-0" style={{ fontSize: "9px" }}>
+                  Logout
+                </p>
+              </Stack>
+            </Nav.Link>
+          </Nav.Item>
+        )}
+      </Nav>
+    </Navbar>
+  );
 }
