@@ -22,6 +22,11 @@ module.exports = {
 					updatedAt: new Date(),
 				},
 				{
+					clientNIC: "895235711",
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+				{
 					clientNIC: "987654321",
 					createdAt: new Date(),
 					updatedAt: new Date(),

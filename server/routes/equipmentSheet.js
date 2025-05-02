@@ -198,104 +198,105 @@ router.get("/", async (req, res) => {
       order: orderClause,
     });
 
-    const formattedData = rows.map((item) => ({
-      Barcode: item.barcode,
-      EquipmentModel: {
-        id: item.EquipmentModel.id,
-        name: item.EquipmentModel.name,
-      },
-      Brand: {
-        id: item.EquipmentModel.Brand.id,
-        name: item.EquipmentModel.Brand.name,
-      },
-      EquipmentType: {
-        id: item.EquipmentType.id,
-        name: item.EquipmentType.name,
-      },
-    }));
-
-    // Retorno da resposta formatada
-    res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: parseInt(page),
-      pageSize: parseInt(pageSize),
-      data: formattedData,
-    });
-  } catch (error) {
-    console.error("Error fetching equipment sheets:", error);
-    res.status(500).json({ error: "Error fetching equipment sheets." });
-  }
+		const formattedData = rows.map((item) => ({
+			Barcode: item.barcode,
+			CreatedAt: item.createdAt,
+			UpdatedAt: item.updatedAt,
+			EquipmentModel: {
+				id: item.EquipmentModel.id,
+				name: item.EquipmentModel.name,
+			},
+			Brand: {
+				id: item.EquipmentModel.Brand.id,
+				name: item.EquipmentModel.Brand.name,
+			},
+			EquipmentType: {
+				id: item.EquipmentType.id,
+				name: item.EquipmentType.name,
+			},
+		}));
+		// Retorno da resposta formatada
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: formattedData,
+		});
+	} catch (error) {
+		console.error("Error fetching equipment sheets:", error);
+		res.status(500).json({ error: "Error fetching equipment sheets." });
+	}
 });
 
 router.get("/teste", async (req, res) => {
-  // try {
-  const {
-    barcode,
-    model,
-    releaseYear,
-    type,
-    page = 1,
-    pageSize = 10,
-    orderBy,
-    orderDirection,
-  } = req.query;
+	// try {
+	const {
+		barcode,
+		model,
+		releaseYear,
+		type,
+		page = 1,
+		pageSize = 10,
+		orderBy,
+		orderDirection,
+	} = req.query;
 
   const where = {};
   const equipmentModelCondition = {};
 
-  if (barcode) where.barcode = { [Op.like]: `${barcode}%` };
-  if (releaseYear)
-    equipmentModelCondition.releaseYear = { [Op.eq]: releaseYear };
+	if (barcode) where.barcode = { [Op.like]: `${barcode}%` };
+	if (releaseYear)
+		equipmentModelCondition.releaseYear = { [Op.eq]: releaseYear };
 
-  if (model) {
-    where["$EquipmentModel.name$"] = { [Op.like]: `${model}%` };
-  }
+	if (model) {
+		where["$EquipmentModel.name$"] = { [Op.like]: `${model}%` };
+	}
 
-  if (type) {
-    where["$EquipmentType.name$"] = { [Op.like]: `${type}%` };
-  }
+	if (type) {
+		where["$EquipmentType.name$"] = { [Op.like]: `${type}%` };
+	}
 
-  const offset = (parseInt(page) - 1) * parseInt(pageSize);
+	const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
-  let order = [];
-  if (orderBy && orderDirection) {
-    order = [[orderBy, orderDirection.toUpperCase()]];
-  } else {
-    order = [["barcode", "ASC"]];
-  }
+	let order = [];
+	if (orderBy && orderDirection) {
+		order = [[orderBy, orderDirection.toUpperCase()]];
+	} else {
+		order = [["barcode", "ASC"]];
+	}
 
-  const { count, rows } = await models.EquipmentSheet.findAndCountAll({
-    where,
+	const { count, rows } = await models.EquipmentSheet.findAndCountAll({
+		where,
 
-    include: [
-      {
-        where: equipmentModelCondition,
-        model: models.EquipmentModel,
-        attributes: ["name", "releaseYear"],
-      },
-      {
-        model: models.EquipmentType,
-        attributes: ["name"],
-      },
-    ],
+		include: [
+			{
+				where: equipmentModelCondition,
+				model: models.EquipmentModel,
+				attributes: ["name", "releaseYear"],
+			},
+			{
+				model: models.EquipmentType,
+				attributes: ["name"],
+			},
+		],
 
-    limit: parseInt(pageSize),
-    offset,
-    order,
-  });
+		limit: parseInt(pageSize),
+		offset,
+		order,
+	});
 
-  res.json({
-    totalItems: count,
-    totalPages: Math.ceil(count / pageSize),
-    currentPage: parseInt(page),
-    pageSize: parseInt(pageSize),
-    data: rows,
-  });
-  // } catch (error) {
-  //     console.error("Error fetching equipments:", error);
-  //     res.status(500).json({ error: "Error fetching equipments." });
-  // }
+	res.json({
+		totalItems: count,
+		totalPages: Math.ceil(count / pageSize),
+		currentPage: parseInt(page),
+		pageSize: parseInt(pageSize),
+		data: rows,
+	});
+	// } catch (error) {
+	//     console.error("Error fetching equipments:", error);
+	//     res.status(500).json({ error: "Error fetching equipments." });
+	// }
 });
 
 router.get("/in-stock", async (req, res) => {
@@ -320,39 +321,40 @@ router.get("/in-stock", async (req, res) => {
     // Calculando o offset com base na página
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
-    // Consulta ao banco de dados
-    const { count, rows } = await models.EquipmentSheet.findAndCountAll({
-      where,
-      include: [
-        {
-          model: models.UsedEquipment,
-          as: "UsedEquipments",
-          required: true,
-        },
-        {
-          model: models.EquipmentModel,
-          as: "EquipmentModel",
-          where: modelCondition,
-          attributes: ["name", "price", "releaseYear"],
-          include: [
-            {
-              model: models.Brand,
-              as: "Brand",
-              where: brandCondition,
-              attributes: ["name"],
-            },
-          ],
-        },
-        {
-          model: models.EquipmentType,
-          as: "EquipmentType",
-          where: typeCondition,
-          attributes: ["name"],
-        },
-      ],
-      limit: parseInt(pageSize),
-      offset,
-    });
+		// Consulta ao banco de dados
+		const { count, rows } = await models.EquipmentSheet.findAndCountAll({
+			where,
+			include: [
+				{
+					model: models.UsedEquipment,
+					where: { purchaseDate: null, putOnSaleDate: { [Op.not]: null } },
+					as: "UsedEquipments",
+					required: true,
+				},
+				{
+					model: models.EquipmentModel,
+					as: "EquipmentModel",
+					where: modelCondition,
+					attributes: ["name", "price", "releaseYear"],
+					include: [
+						{
+							model: models.Brand,
+							as: "Brand",
+							where: brandCondition,
+							attributes: ["name"],
+						},
+					],
+				},
+				{
+					model: models.EquipmentType,
+					as: "EquipmentType",
+					where: typeCondition,
+					attributes: ["name"],
+				},
+			],
+			limit: parseInt(pageSize),
+			offset,
+		});
 
     const formattedData = rows.map((item) => ({
       Barcode: item.barcode,
