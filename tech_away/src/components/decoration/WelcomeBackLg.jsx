@@ -14,7 +14,7 @@ export default function WelcomeBackLg() {
         position: "relative",
         overflow: "hidden",
         width: "100%",
-        height: "120%",
+        height: "130%",
       }}
     >
       <div

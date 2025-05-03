@@ -18,7 +18,7 @@ export default function LoginPageClient() {
       </Stack>
     </Container>
   ) : (
-    <Container className="d-flex align-items-center justify-content-center my-5">
+    <Container className="d-flex align-items-center justify-content-center my-4">
       <Row className="w-100 my-5 g-5">
         <Col
           sm={12}
