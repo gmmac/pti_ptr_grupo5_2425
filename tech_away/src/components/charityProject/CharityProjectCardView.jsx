@@ -20,8 +20,6 @@ export default function CharityProjectCardView({ projects, onOpenDetails, onDele
                 {project.completionDate ? new Date(project.completionDate).toLocaleDateString() : "—"} <br />
                 <strong>Status:</strong> {project.ProjectStatus?.state || "—"} <br />
                 <strong>Warehouse:</strong> {project.Warehouse?.name || "—"} <br />
-                <strong>Created At:</strong>{" "}
-                {project.createdAt ? new Date(project.createdAt).toLocaleDateString() : "—"}
               </Card.Text>
               <div className="d-flex justify-content-end gap-2">
                 <Button size="sm" onClick={() => onOpenDetails(project)}>

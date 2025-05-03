@@ -12,7 +12,7 @@ app.use(cookieParser());
 
 app.use(
 	cors({
-		origin: "http://localhost:5173",
+		origin: ["http://localhost:5173", "https://techaway.dev", "https://techaway.dev"],
 		credentials: true,
 	})
 );
@@ -94,6 +94,6 @@ app.get("/status", (req, res) => {
 	});
 });
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
 	console.log("listening on port " + port);
 });

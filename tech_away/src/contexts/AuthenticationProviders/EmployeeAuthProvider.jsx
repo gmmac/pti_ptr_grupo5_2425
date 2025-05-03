@@ -9,29 +9,28 @@ const EmployeeAuthProvider = ({ children }) => {
     const [employee, setEmployee] = useState(null);
     const [loading, setLoading] = useState(true);
     const [refresh, setRefresh] = useState(false);
-
     const navigate = useNavigate();    
     const { setUserType } = useUserType()
 
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const response = await api.get("/api/employee/user-info", { withCredentials: true });
-                if (response.data?.employeeInfo) {
-                    setEmployee(response.data.employeeInfo);
-                } else {
-                    setEmployee(null);
-                }
-            } catch (err) {
-                console.error("Erro ao buscar usuário:", err);
+    const fetchUser = async () => {
+        try {
+            const response = await api.get("/api/employee/user-info", { withCredentials: true });
+            if (response.data?.employeeInfo) {
+                setEmployee(response.data.employeeInfo);
+            } else {
                 setEmployee(null);
-            } finally {
-                setLoading(false);
-                setRefresh(false);
             }
-        };
-    
+        } catch (err) {
+            console.error("Erro ao buscar usuário:", err);
+            setEmployee(null);
+        } finally {
+            setLoading(false);
+            setRefresh(false);
+        }
+    };
+
+    useEffect(() => {
         setUserType("employee")
         fetchUser();
     }, [refresh]);
@@ -40,17 +39,18 @@ const EmployeeAuthProvider = ({ children }) => {
         if (!employee) {
           navigate("/employee/login");
         }
-    }, [])
+    }, [employee, refresh, navigate])
 
     const loginAction = async (formData, setErrors, newErrors) => {
         try {
-            const response = await api.post('/api/auth/login', {
+            await api.post('/api/auth/login', {
                 email: formData.email,
                 password: formData.password,
                 userType: "employee"
             });
     
-            setRefresh(true);
+            await fetchUser();
+
             return true;
     
         } catch (error) {
@@ -129,7 +129,6 @@ const EmployeeAuthProvider = ({ children }) => {
 
 
     const isEmployeeLoggedIn = () => {
-        console.log(employee)
         return!!employee;
     }
 

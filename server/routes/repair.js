@@ -1,29 +1,75 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
+const { sequelize } = require("../models/index");
 
-router.get("/", async (req, res) => {
+
+router.get("/displayTable", async (req, res) => {
   try {
-    const { page = 1, pageSize = 10, orderBy, orderDirection} = req.query;
-    const activeRepairs = req.query.activeRepairs === "true";
-
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-
-    let order = [];
+    const {
+      id,
+      employeeName,
+      clientName,
+      state,
+      modelName,
+      createdAt,
+      page = 1,
+      pageSize = 10,
+      sortField = "id",
+      sortOrder = "ASC",
+    } = req.query;
     const where = {};
+    const whereRepairStatus = {};
+    const whereModel = {};
 
-    if (orderBy && orderDirection) {
-      order = [[orderBy, orderDirection.toUpperCase()]];
-    } else {
-      order = [["id", "ASC"]];
+    if (id)
+      where.id = sequelize.where(
+        sequelize.cast(sequelize.col("Repair.id"), "varchar"),
+        { [Op.iLike]: `${id}%` }
+      );
+    if (createdAt) {
+      where.createdAt = {
+        [Op.gte]: new Date(createdAt),
+        [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+      };
     }
-    if(activeRepairs){
-      where.statusID = { [Op.ne]: "5" };
-      where.clientId = req.cookies.clientInfo.nic;
-    } else {
-      where.statusID = "5";
-      where.clientId = req.cookies.clientInfo.nic;
+    if (state) whereRepairStatus.state = { [Op.iLike]: `%${state}%` };
+    if (modelName) whereModel.name = { [Op.iLike]: `%${modelName}%` };
+    if (employeeName) {
+      where[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('Employee.firstName'),
+          ' ',
+          Sequelize.col('Employee.lastName')
+        ),
+        {
+          [Op.iLike]: `%${employeeName}%`
+        }
+      );
+    }
+    if (clientName) {
+      where[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('Client.firstName'),
+          ' ',
+          Sequelize.col('Client.lastName')
+        ),
+        {
+          [Op.iLike]: `%${clientName}%`
+        }
+      );
+    }
+    
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+    const orderClause = [];
+    if (sortField) {
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
     }
 
     const { count, rows } = await models.Repair.findAndCountAll({
@@ -32,34 +78,182 @@ router.get("/", async (req, res) => {
         {
           model: models.RepairStatus,
           attributes: ["id", "state"],
+          where: whereRepairStatus,
         },
         {
           model: models.Employee,
           attributes: ["firstName", "lastName"],
+        },
+        {
+          model: models.Client,
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: models.UsedEquipment,
           include: [
             {
-              model: models.Store,
-              attributes: ["name"],
+              model: models.EquipmentSheet,
+              include: [
+                {
+                  model: models.EquipmentModel,
+                  attributes: ["name"],
+                  where: whereModel
+                }
+              ]
             }
           ]
         }
       ],
       limit: parseInt(pageSize),
       offset,
-      order,
+      order: orderClause,
     });
+
+    const formattedData = rows
+    .filter(item => item.UsedEquipment?.EquipmentSheet?.EquipmentModel)
+    .map((item) => ({
+      id: item.id,
+      employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
+      clientName: item.Client?.firstName + " " + item.Client?.lastName,
+      state: item.RepairStatus?.state,
+      modelName: item.UsedEquipment.EquipmentSheet.EquipmentModel.name,
+      createdAt: item.createdAt,
+    }));
+
     res.status(200).json({
       totalItems: count,
       totalPages: Math.ceil(count / pageSize),
       currentPage: parseInt(page),
       pageSize: parseInt(pageSize),
-      data: rows,
+      data: formattedData,
     });
   } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Error fetching brands." });
+  }
+});
+
+router.get("/displayTable/:clientNIC", async (req, res) => {
+  try {
+    const {
+      id,
+      employeeName,
+      state,
+      modelName,
+      createdAt,
+      page = 1,
+      pageSize = 10,
+      sortField = "id",
+      sortOrder = "ASC",
+      activeRepairs,
+    } = req.query;
+    const { clientNIC } = req.params;
+
+    const where = {
+      clientId: clientNIC,
+    };
+
+    if(activeRepairs === "true"){
+      where.statusID = { [Op.ne]: 5 }
+    }else{
+      where.statusID = { [Op.eq]: 5 }
+    }
+
+    const whereRepairStatus = {};
+    const whereModel = {};
+
+    if (id)
+      where.id = sequelize.where(
+        sequelize.cast(sequelize.col("Repair.id"), "varchar"),
+        { [Op.iLike]: `${id}%` }
+      );
+    if (createdAt) {
+      where.createdAt = {
+        [Op.gte]: new Date(createdAt),
+        [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+      };
+    }
+    if (state) whereRepairStatus.state = { [Op.iLike]: `%${state}%` };
+    if (modelName) whereModel.name = { [Op.iLike]: `%${modelName}%` };
+    if (employeeName) {
+      where[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('firstName'),
+          ' ',
+          Sequelize.col('lastName')
+        ),
+        {
+          [Op.iLike]: `%${employeeName}%`
+        }
+      );
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+    const orderClause = [];
+    if (sortField) {
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
+
+    const { count, rows } = await models.Repair.findAndCountAll({
+      where,
+      include: [
+        {
+          model: models.RepairStatus,
+          attributes: ["id", "state"],
+          where: whereRepairStatus,
+        },
+        {
+          model: models.Employee,
+          attributes: ["firstName", "lastName"],
+        },
+        {
+          model: models.UsedEquipment,
+          include: [
+            {
+              model: models.EquipmentSheet,
+              include: [
+                {
+                  model: models.EquipmentModel,
+                  attributes: ["name"],
+                  where: whereModel
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      limit: parseInt(pageSize),
+      offset,
+      order: orderClause,
+    });
+
+    const formattedData = rows
+      .filter(item => item.UsedEquipment?.EquipmentSheet?.EquipmentModel)
+      .map((item) => ({
+        id: item.id,
+        employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
+        state: item.RepairStatus?.state,
+        modelName: item.UsedEquipment.EquipmentSheet.EquipmentModel.name,
+        createdAt: item.createdAt,
+      }));
+
+    res.status(200).json({
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+      data: formattedData,
+    });
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Error fetching repairs." });
   }
 });
-//falta a paginação
+
 
 router.post("/", async (req, res) => {
   try {
@@ -91,10 +285,32 @@ router.post("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const repair = await models.Repair.findByPk(req.params.id);
-    if (!repair) return res.status(404).json({ error: "Repair not found." });
+    const repair = await models.Repair.findByPk(req.params.id, {
+      include: [
+        {
+          model: models.RepairStatus,
+          attributes: ["id", "state"],
+        },
+        {
+          model: models.Employee,
+          attributes: ["firstName", "lastName"],
+          include: [
+            {
+              model: models.Store,
+              attributes: ["name"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!repair) {
+      return res.status(404).json({ error: "Repair not found." });
+    }
+
     res.status(200).json(repair);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Error fetching repair." });
   }
 });

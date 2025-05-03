@@ -52,7 +52,10 @@ const AuthProvider = ({ children, userType="client", loginPath }) => {
   useEffect(() => { // is logged
     if (user && userType && userType !== "client") {
       const profilePath = userType === "client" ? "/profile" : "/organizer";
-      sessionStorage.setItem("organizerSelectedTab", "dashboard")
+      navigate(profilePath);
+    }else if(user && userType && userType === "client"){
+      const profilePath = "/profile";
+      // sessionStorage.setItem("clientSelctedTab", "profile")
       navigate(profilePath);
     }
   }, [user]);
@@ -60,7 +63,7 @@ const AuthProvider = ({ children, userType="client", loginPath }) => {
   
   const loginAction = async (formData, setErrors, newErrors = {}) => {
     try {
-      await api.post("/api/auth/login", {
+      const response = await api.post("/api/auth/login", {
         email: formData.email,
         password: formData.password,
         userType,
@@ -69,7 +72,7 @@ const AuthProvider = ({ children, userType="client", loginPath }) => {
       await fetchUser();
   
     } catch (error) {
-      if (error.response?.status === 403) {
+      if (error.response?.status === 401) {
         newErrors.invalidCredentials = "Invalid credentials!";
       } else if (error.response?.status === 429) {
         newErrors.invalidCredentials = "Too many attempts. Try again later!";
@@ -78,7 +81,6 @@ const AuthProvider = ({ children, userType="client", loginPath }) => {
       }
   
       setErrors(newErrors);
-      return false;
     }
   };
   

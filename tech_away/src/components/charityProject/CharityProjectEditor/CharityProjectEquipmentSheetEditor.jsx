@@ -18,7 +18,6 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
 
   const {isOrganizer} = useSafeOrganizerAuth()
 
-
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -35,14 +34,8 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
   const fetchLinkedSheets = async () => {
     try {
       const res = await api.get(`/api/charityProject/${projectId}/equipmentSheet`);
-      const normalized = (res.data?.data || []).map((item) => ({
-        Barcode: item.Barcode,
-        EquipmentModel: item.EquipmentModel,
-        EquipmentType: item.EquipmentType,
-        Brand: item.Brand,
-      }));
-      setSelectedSheets(normalized);
-      setOriginalSheets(normalized);
+      setSelectedSheets(res.data.data);
+      setOriginalSheets(res.data.data);
     } catch (error) {
       console.error('Error fetching linked equipment sheets:', error);
     }
@@ -71,21 +64,40 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
   };
 
   const toggleSelectSheet = (sheet) => {
-    // console.log("SHEET: ", sheet)
-    // console.log("SELEC SHEETS ", selectedSheets)
     const isAlreadySelected = selectedSheets.some((e) => e.Barcode === sheet.Barcode);
     if (isAlreadySelected) {
       setSelectedSheets((prev) => prev.filter((e) => e.Barcode !== sheet.Barcode));
     } else {
-      setSelectedSheets((prev) => [...prev, sheet]);
+      setSelectedSheets((prev) => [...prev, { ...sheet, quantity: 1 }]);
     }
+  };
+  
+  const handleQuantityChange = (sheet, qty) => {
+    setSelectedSheets((prev) =>
+      prev.map((item) =>
+        item.Barcode === sheet.Barcode ? { ...item, quantity: qty } : item
+      )
+    );
   };
 
   const haveChanges = () => {
-    const a = selectedSheets.map((s) => s.Barcode).sort();
-    const b = originalSheets.map((s) => s.Barcode).sort();
-    return a.length !== b.length || !a.every((val, i) => val === b[i]);
+    if (selectedSheets.length !== originalSheets.length) return true;
+  
+    const sortByBarcode = (arr) => [...arr].sort((a, b) => a.Barcode.localeCompare(b.Barcode));
+  
+    const sortedSelected = sortByBarcode(selectedSheets);
+    const sortedOriginal = sortByBarcode(originalSheets);
+  
+    for (let i = 0; i < sortedSelected.length; i++) {
+      const s = sortedSelected[i];
+      const o = sortedOriginal[i];
+      if (s.Barcode !== o.Barcode || s.quantity !== o.quantity) {
+        return true;
+      }
+    }
+    return false;
   };
+  
 
   const handleSave = async () => {
     if (!haveChanges()) {
@@ -96,9 +108,12 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
     try {
       await api.post('/api/charityProject/linkEquipmentSheet', {
         charityProjectId: projectId,
-        equipmentSheetIds: selectedSheets.map((s) => s.Barcode),
+        items: selectedSheets.map((s) => ({
+          barcode: s.Barcode,
+          quantity: s.quantity
+        })),
       });
-
+      
       setOriginalSheets(selectedSheets);
       showAlert('Equipment sheets updated!', 'success');
       onChangeAlert?.({ message: 'Equipment sheets updated!', variant: 'success' });
@@ -124,16 +139,6 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
   const handleSearch = (value = search) => {
     fetchSheets(1, value);
   };
-
-  // const renderEquipmentSheetCard = (sheet) => (
-  //   <>
-  //     <div className="fw-semibold">{sheet.Barcode}</div>
-  //     <div className="small text-muted">
-  //       {sheet.EquipmentModel?.name} - {sheet.Brand?.name}
-  //     </div>
-  //     <div className="small text-muted">{sheet.EquipmentType?.name}</div>
-  //   </>
-  // );
 
   return (
     <>
@@ -163,21 +168,20 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
         </Alert>
       )}
 
-      <SelectedCardList
-        selectedElements={selectedSheets}
-        isEditing={isEditing}
-        onRemove={toggleSelectSheet}
-        renderCard={(sheet) => (
-          <div style={{cursor: "pointer"}}>
-            <div className="fw-semibold">{sheet.EquipmentModel?.name} - {sheet?.Brand?.name}</div>
-            <div className="small text-muted">
-              {sheet.EquipmentType?.name}
-            </div>
-            <div className="small text-muted">{sheet.Barcode}</div>
-          </div>
-        )}
-      />
-
+    <SelectedCardList
+      selectedElements={selectedSheets}
+      isEditing={isEditing}
+      onRemove={toggleSelectSheet}
+      onQuantityChange={handleQuantityChange}
+      renderCard={(sheet) => (
+        <>
+          <div className="fw-semibold">{sheet.EquipmentModel?.name} - {sheet?.Brand?.name}</div>
+          <div> Quantity: {sheet.quantity} </div>
+          <div className="small text-muted">{sheet.EquipmentType?.name}</div>
+          <div className="small text-muted">{sheet.Barcode}</div>
+        </>
+      )}
+    />
 
       {isEditing && (
         <Accordion defaultActiveKey="1" className="mt-4 border rounded-sm shadow-sm overflow-hidden">

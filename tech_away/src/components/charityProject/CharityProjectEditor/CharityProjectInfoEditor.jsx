@@ -5,7 +5,7 @@ import DatePicker from '../../elements/DatePicker';
 import WarehouseCatalogModal from '../../warehouse/WarehouseCatalogModal';
 import useSafeOrganizerAuth from '../../../utils/auth';
 
-export default function CharityProjectInfoEditor({ project, onChangeAlert, onRefresh, setProject, setSelectedProject }) {
+export default function CharityProjectInfoEditor({ project, onChangeAlert, onRefresh, setProject }) {
     const [editing, setEditing] = useState(false);
     const [alert, setAlert] = useState({ show: false, message: '', variant: '' });
     const [errors, setErrors] = useState({});
@@ -153,7 +153,6 @@ export default function CharityProjectInfoEditor({ project, onChangeAlert, onRef
             };
     
             setProject(updatedProject.data);
-            setSelectedProject(updatedProject.data);
             setFormData(updatedData);
             setOriginalData(updatedData);
             setErrors({});

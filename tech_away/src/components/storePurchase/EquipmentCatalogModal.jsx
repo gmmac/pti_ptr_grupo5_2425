@@ -24,13 +24,23 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
       orderDirection: "ASC"
     });
 
+    const handleClosePopUp = () => {
+      handleClose()
+      setFilters({
+        barcode: "",
+        model: "",
+        releaseYear: "",
+        type: "",
+        orderDirection: "ASC"
+      })
+    }
   
     useEffect(() => {
       const fetchEquipments= async () => {
           setLoading(true);
           setError(null);
           try {
-            const response = await api.get(`/api/equipmentSheet`, {
+            const response = await api.get(`/api/equipmentSheet/teste`, {
               params: {
                 ...filters,
                 page: currentPage,
@@ -101,7 +111,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Fechar</Button>
+        <Button variant="secondary" onClick={handleClosePopUp}>Fechar</Button>
       </Modal.Footer>
     </Modal>
   );

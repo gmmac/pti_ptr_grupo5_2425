@@ -5,9 +5,7 @@ const models = require("../models");
 router.get("/", async (req, res) => {
   try {
     const repairStatus = await models.RepairStatus.findAll();
-    res.status(200).json({
-      data: repairStatus,
-    });
+    res.status(200).json(repairStatus);
   } catch (error) {
     res.status(500).json({ error: "Error fetching repair status." });
   }
@@ -16,6 +14,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { state } = req.body;
+    console.log(req.body)
     const repairStatus = await models.RepairStatus.create({
       state,
       createdAt: new Date(),
@@ -59,10 +58,19 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
+    const repairStatusLogs = await models.RepairStatusLog.count({ where: { statusId: req.params.id } });
+    if(repairStatusLogs > 0){
+      return res.status(400).json({ 
+        message: "Cannot delete status. There are repair logs with this status." 
+      });
+    }
+
+    //Verifica se o status existe
     const repairStatus = await models.RepairStatus.findByPk(req.params.id);
     if (!repairStatus) {
       return res.status(404).json({ error: "Repair status not found" });
     }
+
     await repairStatus.destroy();
     res.status(204).send();
   } catch (error) {

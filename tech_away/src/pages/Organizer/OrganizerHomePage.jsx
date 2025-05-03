@@ -1,21 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { Tab } from 'react-bootstrap';
 import ClientProfile from '../../components/client/ClientProfile';
-import { useAuth } from '../../contexts/AuthenticationProviders/AuthProvider';
+import { useOrganizerAuth } from '../../contexts/AuthenticationProviders/OrganizerAuthProvider';
 import OrganizerCharityProjects from '../../components/HomePageOrganizer/OrganizerCharityProjects';
+import WarehouseCatalog from '../../components/warehouse/WarehouseCatalog';
 
 export default function OrganizerHomePage() {
-    const { user } = useAuth;
+    const { user } = useOrganizerAuth();
 
     return (
-
     <Tab.Content className="custom-tab-content">
         <Tab.Pane eventKey="dashboard" className='p-4'>
             Dashboard
         </Tab.Pane>
         <Tab.Pane eventKey="warehouses" className='p-4'>
-            <h5>Warehouses Content</h5>
+            <WarehouseCatalog />
         </Tab.Pane>
         <Tab.Pane eventKey="charityproject" className='p-4'>
             <OrganizerCharityProjects />

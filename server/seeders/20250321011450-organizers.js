@@ -50,6 +50,30 @@ module.exports = {
         phone: '965432137',
         createdAt: new Date(),
         updatedAt: new Date()
+      },
+      {
+        nic: '511124359',
+        nif: '511124359',
+        birthDate: new Date('1997-01-20'),
+        gender: 'M',
+        firstName: 'Júlio',
+        lastName: 'Almeida',
+        email: 'jalmeida@gmail.com',
+        phone: '965432145',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        nic: '111479985',
+        nif: '111479985',
+        birthDate: new Date('1982-07-12'),
+        gender: 'O',
+        firstName: 'Aurélio',
+        lastName: 'Túlio',
+        email: 'aurelio.t@gmail.com',
+        phone: '965444145',
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     ]);
   },

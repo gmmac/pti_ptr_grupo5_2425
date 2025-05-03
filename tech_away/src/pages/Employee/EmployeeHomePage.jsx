@@ -10,8 +10,10 @@ import EmployeeHomeDashboard from '../../components/HomePageEmployee/EmployeeHom
 import EmployeeCharityProjects from '../../components/HomePageEmployee/EmployeeCharityProjects';
 import EmployeeRepairs from '../../components/HomePageEmployee/EmployeeRepairs';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
+// import PurchasesTable from '../../components/storePurchase/DisplayTablePurchases';
 import { IsMobileContext } from '../../contexts/IsMobileContext';
 import "../../styles/pageElements.css"
+import EmployeeStorePurchase from '../../components/HomePageEmployee/EmployeeStorePurchase';
 
 
 export default function EmployeeHomePage() {
@@ -97,13 +99,15 @@ export default function EmployeeHomePage() {
                     <EmployeeHomeDashboard />
                 </Tab.Pane>
                 <Tab.Pane eventKey="purchases" className='p-4'>
-                    <h5>Purchases Content</h5>
+                    <h3>Store Purchases</h3>
+                    <EmployeeStorePurchase/>
                 </Tab.Pane>
                 <Tab.Pane eventKey="repairs" className='p-4'>
-                    <h5>Repairs Content</h5>
+                    <h3>Repairs</h3>
+                        <EmployeeRepairs />
                 </Tab.Pane>
                 <Tab.Pane eventKey="sales" className='p-4'>
-                    <h5>Sales Content</h5>
+                    <h3>Sales Content</h3>
                 </Tab.Pane>
                 <Tab.Pane eventKey="charityproject" className='p-4'>
                     <EmployeeCharityProjects />

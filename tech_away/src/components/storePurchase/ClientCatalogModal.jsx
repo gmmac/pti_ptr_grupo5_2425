@@ -3,7 +3,7 @@ import { Modal, Button, Table, Container } from "react-bootstrap";
 import api from "../../utils/axios";
 import PaginationControl from "../pagination/PaginationControl";
 import ClientFilter from "./ClientFilter";
-import ClientTableModal from "./clientTableModal";
+import ClientTableModal from "./ClientTableModal";
 import ClientCardModal from "./ClientCardModal";
 
 export default function ClientCatalogModal({ show, handleClose, handleSelectClient, selectedClient }) {
@@ -24,6 +24,19 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
       orderBy: "nic",
       orderDirection: "ASC"
     });
+
+    const handleClosePopUp = () => {
+      handleClose()
+      setFilters({
+        nic: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        orderBy: "nic",
+        orderDirection: "ASC"
+      })
+    }
   
     useEffect(() => {
       const fetchClients = async () => {
@@ -100,7 +113,7 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Fechar</Button>
+        <Button variant="secondary" onClick={handleClosePopUp}>Fechar</Button>
       </Modal.Footer>
     </Modal>
   );

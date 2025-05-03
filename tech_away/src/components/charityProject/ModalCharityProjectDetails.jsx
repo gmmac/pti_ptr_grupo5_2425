@@ -4,13 +4,23 @@ import './../../styles/pageElements.css';
 import CharityProjectInfoEditor from './CharityProjectEditor/CharityProjectInfoEditor';
 import CharityProjectEquipmentTypeEditor from './CharityProjectEditor/CharityProjectEquipmentTypeEditor';
 import CharityProjectEquipmentSheetEditor from './CharityProjectEditor/CharityProjectEquipmentSheetEditor';
+import api from '../../utils/axios';
 
 export default function ModalCharityProjectDetails({ show, handleClose, project, onRefresh, setSelectedProject }) {
+  const [projectData, setProjectData] = useState(null);
   const [infoAlert, setInfoAlert] = useState({ message: '', variant: '', show: false });
   const [equipmentAlert, setEquipmentAlert] = useState({ message: '', variant: '', show: false });
   const [equipmentSheetAlert, setEquipmentSheetAlert] = useState({ message: '', variant: '', show: false });
+  const [localProject, setLocalProject] = useState();
 
-  const [localProject, setLocalProject] = useState(project);
+
+  useEffect(() => {
+    if (!project || !show) return;
+    api.get(`/api/charityProject/${project}`)
+      .then(res => {setProjectData(res.data); setLocalProject(res.data)})
+      .catch(console.error);
+  }, [project, show]);
+  
 
   const handleInfoAlert = ({ message, variant }) => {
     setInfoAlert({ message, variant, show: true });
@@ -28,51 +38,45 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
     setTimeout(() => setEquipmentSheetAlert({ message: '', variant: '', show: false }), 4000);
   };
 
-  useEffect(() => {
-    setLocalProject(project);
-  }, [project]);
-
-
-  if (!project) return null;
-
   return (
-    <Modal show={show} onHide={handleClose} size="xl" centered>
-      <Modal.Header closeButton className="bg-light border-0">
-        <Modal.Title className="fw-bold">{project.name} Details</Modal.Title>
-      </Modal.Header>
-    
-      <Modal.Body className="px-4">
-        <CharityProjectInfoEditor
-          project={localProject}
-          setProject={setLocalProject}
-          alert={infoAlert}
-          onChangeAlert={handleInfoAlert}
-          onRefresh={onRefresh}
-          setSelectedProject={setSelectedProject}
-        />
-    
-        <hr className="my-4" />
-    
-        <Row>
-          <Col md={12} lg={6} className="mb-4">
-            <CharityProjectEquipmentTypeEditor
-              projectId={project.id}
-              isEditing={true}
-              alert={equipmentAlert}
-              onChangeAlert={handleEquipmentAlert}
-            />
-          </Col>
-    
-          <Col md={12} lg={6} className="mb-4">
-            <CharityProjectEquipmentSheetEditor
-              projectId={project.id}
-              alert={equipmentSheetAlert}
-              onChangeAlert={handleEquipmentSheetAlert}
-            />
-          </Col>
-        </Row>
-      </Modal.Body>
-    </Modal>
-    
+    <>
+      {projectData &&
+      <Modal show={show} onHide={handleClose} size="xl" centered>
+        <Modal.Header closeButton className="bg-light border-0">
+          <Modal.Title className="fw-bold">{projectData.name} Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="px-4">
+          <CharityProjectInfoEditor
+            project={localProject}
+            setProject={setProjectData}
+            alert={infoAlert}
+            onChangeAlert={handleInfoAlert}
+            onRefresh={onRefresh}
+            setSelectedProject={setSelectedProject}
+          />
+          <hr className="my-4" />
+          <Row>
+            <Col md={12} lg={6} className="mb-4">
+              <CharityProjectEquipmentTypeEditor
+                projectId={projectData.id}
+                isEditing={true}
+                alert={equipmentAlert}
+                onChangeAlert={handleEquipmentAlert}
+              />
+            </Col>
+            <Col md={12} lg={6} className="mb-4">
+              <CharityProjectEquipmentSheetEditor
+                projectId={projectData.id}
+                alert={equipmentSheetAlert}
+                onChangeAlert={handleEquipmentSheetAlert}
+              />
+            </Col>
+          </Row>
+        </Modal.Body>
+      </Modal>
+      }
+    </>
+
   );
+  
 }

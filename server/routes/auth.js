@@ -97,7 +97,6 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password, userType } = req.body;
-
     // Login User
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
       client_id: process.env.AUTH0_CLIENT_ID,
@@ -111,7 +110,6 @@ router.post("/login", async (req, res) => {
     });
     if(userType === "client"){
       const existingClient = await models.Client.findOne({where: {email: email}});
-
       if(existingClient){
         res.cookie("clientInfo", existingClient.dataValues, {
           httpOnly: true,    
@@ -122,15 +120,13 @@ router.post("/login", async (req, res) => {
         
         return res.status(201).json(existingClient.dataValues);
       } else{
-        return res.status(401);
+        return res.status(401).json({ message: "Invalid Credentials" });
       }
     }
 
     else if(userType === "employee"){
       const existingEmployee = await models.Employee.findOne({where: {email: email}
       });
-
-      console.log(existingEmployee.dataValues);
 
       if(existingEmployee){
 
@@ -166,7 +162,7 @@ router.post("/login", async (req, res) => {
     console.error(error);
   
     if (error.response?.status === 403) {
-      return res.status(403).json({ message: "Invalid Credentials" });
+      return res.status(401).json({ message: "Invalid Credentials" });
     }
   
     return res.status(500).json({ message: "Internal Server Error" });
