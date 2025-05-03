@@ -108,136 +108,132 @@ export default function SelectClientModal({ showModal, closeModal, onSelect }) {
     };
 
     return (
-        <>
-            <ConfirmDialog />
-            <Dialog
-                header="Selecionar Cliente"
-                visible={showModal}
-                onHide={closeModal}
-                style={{ width: '80vw' }}
-                modal
-                className="p-fluid"
-            >
-                <div>
-                    <DataTable
-                        value={data}
-                        lazy
-                        filterDisplay="row"
-                        dataKey="id"
-                        paginator
-                        first={lazyState.first}
-                        rows={lazyState.rows}
-                        totalRecords={totalRecords}
-                        onPage={onPage}
-                        onSort={onSort}
-                        sortField={lazyState.sortField}
-                        sortOrder={lazyState.sortOrder}
-                        onFilter={onFilter}
-                        filters={lazyState.filters}
-                        stripedRows
-                        removableSort
-                        rowsPerPageOptions={[5, 10, 25, 50]}
-                        paginatorTemplate=" FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="{first} to {last} of {totalRecords}"
-                    >
-                        {columns.map((column, index) => (
-                            <Column
-                                key={index}
-                                field={column}
-                                header={column}
-                                sortable
-                                filter
-                                showFilterMenu={false}
-                                filterMatchMode={dateFields.includes(column) ? 'equals' : 'contains'}
-                                filterElement={dateFields.includes(column) ? (options) => (
-                                    <Calendar
-                                        value={options.value ? new Date(options.value) : null}
-                                        onChange={(e) => {
-                                            const selectedDate = e.value;
-                                            if (selectedDate) {
-                                                selectedDate.setHours(12, 0, 0, 0);
-                                            }
-                                            const isoDate = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
-                                            options.filterCallback(isoDate, options.index);
+		<>
+			<ConfirmDialog />
 
-                                            const newFilters = { ...lazyState.filters };
-                                            newFilters[column].value = isoDate;
-                                            setLazyState({
-                                                ...lazyState,
-                                                filters: newFilters,
-                                            });
-                                        }}
-                                        dateFormat="dd/mm/yy"
-                                        placeholder="Date"
-                                        showIcon
-                                        panelStyle={{
-                                            borderRadius: "10px",
-                                        }}
-                                    />
-                                ) : undefined}
-                                filterPlaceholder={dateFields.includes(column) ? undefined : "Search"}
-                                body={(rowData) => {
-                                    const value = rowData[column];
-                                    if (typeof value === "object" && value !== null) {
-                                        const firstTextField = Object.values(value).find(val => typeof val === "string" || typeof val === "number");
-                                        return firstTextField ?? "N/A";
-                                    }
-                                    if (dateFields.includes(column) && value) {
-                                        const date = new Date(value);
-                                        const formattedDate = date.toLocaleDateString("pt-PT");
-                                        const formattedTime = date.toLocaleTimeString("pt-PT", {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                            hour12: false,
-                                        });
-                                        return `${formattedDate} ${formattedTime}`;
-                                    }			
-                                    return value;
-                                }}
-                            />
-                        ))}
-                        <Column
-                            header=""
-                            body={(rowData, options) => {
-                                const menuItems = [
-                                    {
-                                        label: "Selecionar",
-                                        icon: "pi pi-check",
-                                        command: () => {
-                                            onSelect({ id: rowData.clientId || rowData.id, name: rowData.clientName || rowData.name });
-                                            closeModal();
-                                        }
-                                    },
-                                    {
-                                        label: "Ver detalhes",
-                                        icon: "pi pi-info-circle",
-                                        command: () => openRepairInfo(rowData.id),
-                                    }
-                                ];
-                                return (
-                                    <>
-                                        <Menu
-                                            model={menuItems}
-                                            popup
-                                            ref={(el) => (menuRefs.current[options.rowIndex] = el)}
-                                        />
-                                        <Button
-                                            icon="pi pi-ellipsis-v"
-                                            text
-                                            severity="secondary"
-                                            onClick={(e) =>
-                                                menuRefs.current[options.rowIndex].toggle(e)
-                                            }
-                                            className="rounded-5"
-                                        />
-                                    </>
-                                );
-                            }}
-                        />
-                    </DataTable>
-                </div>
-                <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)} />
-            </Dialog>
-        </>
-    );    
+			{showModal && (
+				<div className="p-fluid" style={{ padding: '2rem' }}>
+					<h2>Selecionar Cliente</h2>
+					<DataTable
+						value={data}
+						lazy
+						filterDisplay="row"
+						dataKey="id"
+						paginator
+						first={lazyState.first}
+						rows={lazyState.rows}
+						totalRecords={totalRecords}
+						onPage={onPage}
+						onSort={onSort}
+						sortField={lazyState.sortField}
+						sortOrder={lazyState.sortOrder}
+						onFilter={onFilter}
+						filters={lazyState.filters}
+						stripedRows
+						removableSort
+						rowsPerPageOptions={[5, 10, 25, 50]}
+						paginatorTemplate=" FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+						currentPageReportTemplate="{first} to {last} of {totalRecords}"
+					>
+						{columns.map((column, index) => (
+							<Column
+								key={index}
+								field={column}
+								header={column}
+								sortable
+								filter
+								showFilterMenu={false}
+								filterMatchMode={dateFields.includes(column) ? 'equals' : 'contains'}
+								filterElement={dateFields.includes(column) ? (options) => (
+									<Calendar
+										value={options.value ? new Date(options.value) : null}
+										onChange={(e) => {
+											const selectedDate = e.value;
+											if (selectedDate) {
+												selectedDate.setHours(12, 0, 0, 0);
+											}
+											const isoDate = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
+											options.filterCallback(isoDate, options.index);
+
+											const newFilters = { ...lazyState.filters };
+											newFilters[column].value = isoDate;
+											setLazyState({
+												...lazyState,
+												filters: newFilters,
+											});
+										}}
+										dateFormat="dd/mm/yy"
+										placeholder="Date"
+										showIcon
+										panelStyle={{
+											borderRadius: "10px",
+										}}
+									/>
+								) : undefined}
+								filterPlaceholder={dateFields.includes(column) ? undefined : "Search"}
+								body={(rowData) => {
+									const value = rowData[column];
+									if (typeof value === "object" && value !== null) {
+										const firstTextField = Object.values(value).find(val => typeof val === "string" || typeof val === "number");
+										return firstTextField ?? "N/A";
+									}
+									if (dateFields.includes(column) && value) {
+										const date = new Date(value);
+										const formattedDate = date.toLocaleDateString("pt-PT");
+										const formattedTime = date.toLocaleTimeString("pt-PT", {
+											hour: "2-digit",
+											minute: "2-digit",
+											hour12: false,
+										});
+										return `${formattedDate} ${formattedTime}`;
+									}			
+									return value;
+								}}
+							/>
+						))}
+						<Column
+							header=""
+							body={(rowData, options) => {
+								const menuItems = [
+									{
+										label: "Selecionar",
+										icon: "pi pi-check",
+										command: () => {
+											onSelect({ id: rowData.clientId || rowData.id, name: rowData.clientName || rowData.name });
+											closeModal();
+										}
+									},
+									{
+										label: "Ver detalhes",
+										icon: "pi pi-info-circle",
+										command: () => openRepairInfo(rowData.id),
+									}
+								];
+								return (
+									<>
+										<Menu
+											model={menuItems}
+											popup
+											ref={(el) => (menuRefs.current[options.rowIndex] = el)}
+										/>
+										<Button
+											icon="pi pi-ellipsis-v"
+											text
+											severity="secondary"
+											onClick={(e) =>
+												menuRefs.current[options.rowIndex].toggle(e)
+											}
+											className="rounded-5"
+										/>
+									</>
+								);
+							}}
+						/>
+					</DataTable>
+
+					<RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)} />
+				</div>
+			)}
+		</>
+	);
 }

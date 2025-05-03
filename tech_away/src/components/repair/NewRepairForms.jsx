@@ -3,7 +3,7 @@ import { Form, Modal, Button } from "react-bootstrap";
 import api from "../../utils/axios";
 import SelectClientModal from "../client/SelectClientModal";
 
-export default function NewRepairForms({ showModal, closeModal, setShowClientModal}) {
+export default function NewRepairForms({ showModal, closeModal}) {
 	const [repair, setRepair] = useState(() => {
 		return {
 			description: "",
@@ -16,14 +16,6 @@ export default function NewRepairForms({ showModal, closeModal, setShowClientMod
 		};
 	});
 	const [errors, setErrors] = useState({});
-
-	const handleClientModal = ({ id, name }) => {
-		setRepair((prev) => ({
-		  ...prev,
-		  clientId: id,
-		  clientName: name
-		}));
-	};
 
 	const handleChanges = (e) => {
 		const { name, value } = e.target;
@@ -83,7 +75,7 @@ export default function NewRepairForms({ showModal, closeModal, setShowClientMod
 	};
 
 	return (
-		<Modal show={showModal} onHide={closeModal}>
+		<Modal show={showModal} onHide={closeModal} dialogClassName="modal-xl">
 			<Modal.Header closeButton>
 				<Modal.Title>Create New Repair</Modal.Title>
 			</Modal.Header>
@@ -102,7 +94,7 @@ export default function NewRepairForms({ showModal, closeModal, setShowClientMod
 						<Button
 							className="rounded-pill"
 							style={{ backgroundColor: "var(--variant-two", border: "none" , width: "100px"}}
-							onClick={() => setShowClientModal(true)}
+							// onClick={() => setShowClientModal(prev => !prev)}
 						>Select
 						</Button>
 					</div>
