@@ -10,12 +10,25 @@ router.get("/", async (req, res) => {
 		res.status(500).json({ error: error.message });
 	}
 });
-
 router.post("/", async (req, res) => {
 	try {
-		const purchase = await models.ClientPurchase.create(req.body);
-		res.status(201).json(purchase);
+		const { clientNIC, totalPrice, employeeID } = req.body;
+
+		if (!clientNIC || !totalPrice) {
+			return res
+				.status(400)
+				.json({ error: "clientNIC e totalPrice são obrigatórios." });
+		}
+
+		const purchase = await models.ClientPurchase.create({
+			clientNIC,
+			total: totalPrice,
+			employeeID: employeeID ?? "123456789", // padrão
+		});
+
+		res.status(201).json({ id: purchase.id });
 	} catch (error) {
+		console.error("Erro ao criar compra:", error);
 		res.status(400).json({ error: error.message });
 	}
 });

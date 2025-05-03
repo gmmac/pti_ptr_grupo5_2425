@@ -3,19 +3,19 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert('EquipmentTypes', [
-      { name: 'Smartphone', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Game Console', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'TV', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Laptop', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Smartwatch', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Headphones', createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Smartphone', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Game Console', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'TV', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Laptop', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Smartwatch', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Headphones', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
       
-      { name: 'Tablet', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Camera', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Printer', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Monitor', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Speaker', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Projector', createdAt: new Date(), updatedAt: new Date() }
+      { name: 'Tablet', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Camera', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Printer', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Monitor', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Speaker', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Projector', isActive: "1", createdAt: new Date(), updatedAt: new Date() }
     ]);
   },
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Button } from 'react-bootstrap';
 
 export default function EquipmentSheetFlowCard({ element, isSelected, isEditing, onToggle }) {
@@ -8,7 +8,7 @@ export default function EquipmentSheetFlowCard({ element, isSelected, isEditing,
       className={`shadow-sm border ${isSelected ? 'border-success' : 'border-light'} rounded-sm`}
       style={{ cursor: isEditing ? 'pointer' : 'default', transition: '0.2s' }}
     >
-    <Card.Body className="d-flex justify-content-between align-items-start p-3">
+    <Card.Body onClick={console.log(element)} className="d-flex justify-content-between align-items-start p-3">
       <div>
         <Card.Title className="mb-1 fs-6 fw-semibold">
           {element.EquipmentModel?.name} - {element.Brand?.name}

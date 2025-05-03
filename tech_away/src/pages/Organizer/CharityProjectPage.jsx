@@ -5,9 +5,8 @@ import api from '../../utils/axios';
 import { Button } from 'react-bootstrap';
 
 export default function CharityProjectPage() {
-  const { projectName } = useParams();
+  // const { id } = useParams();
   const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
   const navigate = useNavigate()
 
@@ -15,32 +14,26 @@ export default function CharityProjectPage() {
 
   const handleChangePage = () => {
     navigate("/organizer")
-    sessionStorage.setItem("organizerSelectedTab", "charityproject")
+    // sessionStorage.setItem("organizerSelectedTab", "charityproject")
   }
+  const { id } = useParams();
 
   useEffect(() => {
-    const fetchProject = async () => {
-      try {
-        await api.get(`/api/charityProject?projectName=${encodeURIComponent(projectName)}`)
-        .then((response) => {
-            setProject(response.data.data[0]);
-            console.log(response.data.data[0])
-        })
-      } catch (error) {
-        console.error('Erro no fetch:', error);
-        setProject(null);
-      } finally {
-        setLoading(false);
+    
+    if (id) {
+        try {
+          api.get(`/api/charityProject?id=${id}`)
+          .then((response) => {
+              console.log(response.data)
+              setProject(response.data.data[0]);
+          })
+        } catch (error) {
+          console.error('Erro no fetch:', error);
+          setProject(null);
       }
-    };
-
-    if (projectName) {
-      setLoading(true); // reset loading ao mudar o nome
-      fetchProject();
     }
-  }, [projectName, refresh]);
+  }, [id, refresh]);
 
-  if (loading) return <div className="text-center mt-5">Carregando projeto...</div>;
   if (!project) return <div className="text-center mt-5 text-danger">Projeto não encontrado.</div>;
 
   return (

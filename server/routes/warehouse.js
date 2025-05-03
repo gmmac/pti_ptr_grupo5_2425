@@ -45,11 +45,6 @@ router.get("/", async (req, res) => {
 });
 
 
-router.post("/", (req, res) => {
-
-});
-
-
 //EXEMPLO DE ROTA PARA À PARTIR DAS WAREHOUSES TER ACESSO AOS SEUS USED_EQUIPMENTS
 router.get("/:ID", async (req, res) => {
   const warehouse = await models.Warehouse.findByPk(req.params.ID, {
@@ -64,13 +59,83 @@ router.get("/:ID", async (req, res) => {
   res.json(warehouse);
 });
 
-router.put("/:ID", (req, res) => {
+router.post("/", async (req, res) => {
+  try {
+    const { name, totalSlots, availableSlots } = req.body;
 
+    if (!name || totalSlots == null || availableSlots == null) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
+
+    const newWarehouse = await models.Warehouse.create({
+      name: name,
+      totalSlots,
+      availableSlots,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    res.status(201).json(newWarehouse);
+  } catch (error) {
+    console.error("Error creating warehouse:", error);
+    res.status(500).json({ error: "Error creating warehouse." });
+  }
 });
 
-router.delete("/:ID", (req, res) => {
-    
+
+router.put("/:ID", async (req, res) => {
+  try {
+    const { ID } = req.params;
+    const { name, totalSlots, availableSlots } = req.body;
+
+    const warehouse = await models.Warehouse.findByPk(ID);
+    if (!warehouse) {
+      return res.status(404).json({ error: "Warehouse does not exists." });
+    }
+
+    await warehouse.update({
+      name: name ?? warehouse.name,
+      totalSlots: totalSlots ?? warehouse.totalSlots,
+      availableSlots: availableSlots ?? warehouse.availableSlots,
+    });
+
+    res.json(warehouse);
+  } catch (error) {
+    console.error("Error updating warehouse:", error);
+    res.status(500).json({ error: "Error updating warehouse." });
+  }
 });
+
+
+router.delete("/:ID", async (req, res) => {
+  try {
+    const { ID } = req.params;
+
+    // Verificar se existe algum projeto associado a este armazém
+    const projectsUsingWarehouse = await models.CharityProject.findOne({
+      where: { warehouseID: ID }
+    });
+
+    if (projectsUsingWarehouse) {
+      return res.status(400).json({
+        message: "This warehouse is linked to one or more charity projects and cannot be deleted."
+      });
+    }
+
+    const warehouse = await models.Warehouse.findByPk(ID);
+    if (!warehouse) {
+      return res.status(404).json({ error: "Warehouse not found." });
+    }
+
+    await warehouse.destroy();
+    res.json({ message: "Warehouse deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting warehouse:", error);
+    res.status(500).json({ error: "Error deleting warehouse." });
+  }
+});
+
+
 
 
 module.exports = router;

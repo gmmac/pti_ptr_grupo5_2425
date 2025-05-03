@@ -92,9 +92,9 @@ export default function ModalEdit({
 		<Modal show={show} onHide={handleClose}>
 			<Modal.Header closeButton>
 				<Modal.Title>
-					Editar {modelToEdit}
+					Edit {modelToEdit}
 					<br />
-					{id}
+					ID: {id}
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>

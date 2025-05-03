@@ -1,3 +1,4 @@
+// CharityProjectEquipmentTypeEditor.jsx
 import React, { useEffect, useState } from 'react';
 import { Accordion, Alert, Button } from 'react-bootstrap';
 import SearchBar from '../../searchBar/SearchBar';
@@ -15,7 +16,7 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
   const [search, setSearch] = useState('');
   const [alert, setAlert] = useState({ show: false, message: '', variant: '' });
   const [isEditing, setIsEditing] = useState(false);
-  const {isOrganizer} = useSafeOrganizerAuth()
+  const { isOrganizer } = useSafeOrganizerAuth();
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -33,8 +34,9 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
   const fetchLinkedEquipmentTypes = async () => {
     try {
       const res = await api.get(`/api/charityProject/${projectId}/equipmentTypes`);
-      setSelectedTypes(res.data?.data || []);
-      setOriginalTypes(res.data?.data || []);
+      const dataWithQty = res.data?.data?.map(t => ({ ...t, quantity: t.quantity || 1 })) || [];
+      setSelectedTypes(dataWithQty);
+      setOriginalTypes(dataWithQty);
     } catch (error) {
       console.error('Error fetching linked equipment types:', error);
     }
@@ -63,18 +65,39 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
   };
 
   const toggleSelectType = (type) => {
-    const isAlreadySelected = selectedTypes.find((e) => e.id === type.id);
-    if (isAlreadySelected) {
+    const found = selectedTypes.find((e) => e.id === type.id);
+    if (found) {
       setSelectedTypes((prev) => prev.filter((e) => e.id !== type.id));
     } else {
-      setSelectedTypes((prev) => [...prev, type]);
+      setSelectedTypes((prev) => [...prev, { ...type, quantity: 1 }]);
     }
   };
 
+  const handleQuantityChange = (type, qty) => {
+    setSelectedTypes((prev) =>
+      prev.map((item) =>
+        item.id === type.id ? { ...item, quantity: qty } : item
+      )
+    );
+  };
+
   const haveChanges = () => {
-    const a = selectedTypes.map((t) => t.id).sort();
-    const b = originalTypes.map((t) => t.id).sort();
-    return a.length !== b.length || !a.every((id, i) => id === b[i]);
+    if (selectedTypes.length !== originalTypes.length) return true;
+  
+    const sortById = (arr) => [...arr].sort((a, b) => a.id - b.id);
+  
+    const sortedSelected = sortById(selectedTypes);
+    const sortedOriginal = sortById(originalTypes);
+  
+    for (let i = 0; i < sortedSelected.length; i++) {
+      const selected = sortedSelected[i];
+      const original = sortedOriginal[i];
+      if (selected.id !== original.id || selected.quantity !== original.quantity) {
+        return true;
+      }
+    }
+  
+    return false;
   };
 
   const handleSave = async () => {
@@ -86,7 +109,10 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
     try {
       await api.post('/api/charityProject/linkEquipmentType', {
         charityProjectId: projectId,
-        equipmentTypeIds: selectedTypes.map((t) => t.id),
+        items: selectedTypes.map((t) => ({
+          id: t.id,
+          quantity: t.quantity,
+        })),
       });
 
       setOriginalTypes(selectedTypes);
@@ -119,30 +145,22 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
     <>
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h5 className="fw-semibold mb-0">Selected Equipment Types</h5>
-                {isOrganizer && (
-                    !isEditing ? (
-                    <Button variant="primary" size="sm" onClick={() => setIsEditing(true)}>
-                        Edit
-                    </Button>
-                    ) : (
-                    <div className="d-flex gap-2">
-                        <Button variant="success" size="sm" onClick={handleSave}>
-                        Save
-                        </Button>
-                        <Button variant="outline-secondary" size="sm" onClick={handleCancel}>
-                        Cancel
-                        </Button>
-                    </div>
-                    )
-                )}
+        {isOrganizer && (
+          !isEditing ? (
+            <Button variant="primary" size="sm" onClick={() => setIsEditing(true)}>
+              Edit
+            </Button>
+          ) : (
+            <div className="d-flex gap-2">
+              <Button variant="success" size="sm" onClick={handleSave}>Save</Button>
+              <Button variant="outline-secondary" size="sm" onClick={handleCancel}>Cancel</Button>
+            </div>
+          )
+        )}
       </div>
 
       {alert.show && (
-        <Alert
-          variant={alert.variant}
-          onClose={() => setAlert({ ...alert, show: false })}
-          dismissible
-        >
+        <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>
           {alert.message}
         </Alert>
       )}
@@ -151,12 +169,13 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
         selectedElements={selectedTypes}
         isEditing={isEditing}
         onRemove={toggleSelectType}
+        onQuantityChange={handleQuantityChange}
         renderCard={(type) => (
-          <div
-            className="fw-semibold text-capitalize"
-            style={{cursor: "pointer"}}
-          >
-            {type.name}</div>
+          <div className="fw-semibold text-capitalize">
+            {type.name}
+            <div> Quantity: {type.quantity} </div>
+            <div className="small text-muted">ID: {type.id}</div>
+          </div>
         )}
       />
 

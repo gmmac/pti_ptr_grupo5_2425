@@ -53,6 +53,7 @@ router.get("/", async (req, res) => {
       Brand,
       price,
       releaseYear,
+      active = "1",
       page = 1,
       pageSize = 10,
       sortField = "name",
@@ -78,6 +79,7 @@ router.get("/", async (req, res) => {
         sequelize.cast(sequelize.col("releaseYear"), "varchar"),
         { [Op.iLike]: `%${releaseYear}%` }
       );
+    if (active) where.isActive = { [Op.eq]: active };
 
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
@@ -167,6 +169,7 @@ router.post("/", async (req, res) => {
       brand_id: brand,
       price,
       releaseYear,
+      isActive: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -234,6 +237,21 @@ router.delete("/:id", async (req, res) => {
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.patch("/activation/:id", async (req, res) => {
+  try {
+    const model = await models.EquipmentModel.findByPk(req.params.id);
+    if (!model) {
+      return res.status(404).json({ error: "Equipment Model not found" });
+    }
+    model.updatedAt = new Date();
+    model.isActive = model.isActive === "1" ? "0" : "1";
+    await model.save();
+    res.status(200).json(model);
+  } catch (error) {
+    res.status(500).json({ error: "Error updating equipment model." });
   }
 });
 

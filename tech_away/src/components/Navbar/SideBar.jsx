@@ -28,18 +28,18 @@ export default function SideBar({
       <h2 className="mb-4 p-3 fs-2" style={{ fontWeight: "bold" }}>{title}</h2>
       <Nav className="flex-column">
         {menuItems.map(({ key, label, icon, path }) => (
-          <Nav.Item key={key} className="employee-custom-tabs fs-5">
+          <Nav.Item key={key} className="employee-custom-tabs fs-5 m-0">
             <Nav.Link
               onClick={() => handleTabClick(key, path)}
-              className={actualTab === key ? 'active-manual' : ''}
+              className={actualTab === key ? 'active-manual py-3' : 'py-3'}
             >
               {icon && <span className="me-2">{icon}</span>} {label}
             </Nav.Link>
           </Nav.Item>
         ))}
 
-        <Nav.Item className="mt-3 employee-custom-tabs fs-5">
-          <Nav.Link className="text-danger" onClick={handleLogOut}>
+        <Nav.Item className="employee-custom-tabs fs-5 m-0">
+          <Nav.Link className="text-danger py-3" onClick={handleLogOut}>
             <BoxArrowRight className="me-2" /> Logout
           </Nav.Link>
         </Nav.Item>

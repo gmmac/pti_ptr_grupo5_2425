@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Container, Alert, Row, Col } from 'react-bootstrap';
-import api from '../utils/axios';
-import ClientCatalogModal from '../components/storePurchase/ClientCatalogModal';
-import EquipmentCatalogModal from '../components/storePurchase/EquipmentCatalogModal';
+import { Form, Button, Modal, Alert, Row, Col } from 'react-bootstrap';
+import api from '../../utils/axios';
+import ClientCatalogModal from './ClientCatalogModal';
+import EquipmentCatalogModal from './EquipmentCatalogModal';
 
-export default function StorePurchasePage() {
+export default function StorePurchaseForms({show, handleClose}) {
     const [form, setForm] = useState({
         statusID: '',
         price: '',
@@ -210,138 +210,81 @@ export default function StorePurchasePage() {
     };
 
     return (
-        <Container>
-            <h2>Registar Venda de Produto</h2>
+        <>
+            <Modal show={show} onHide={handleClose} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Registar Venda de Produto</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
 
-            {successMessage && (
-                <Alert variant="success" className="mt-3 text-center">
-                    {successMessage}
-                </Alert>
-            )}
+                    <Form onSubmit={handleSubmit}>
+                        <Row className="mb-3">
+                            <Form.Group controlId="formEstado">
+                                <Form.Label>Estado do Equipamento</Form.Label>
+                                <Form.Control as="select" name="statusID" value={form.statusID} onChange={handleChange} required>
+                                    <option value="">Selecione...</option>
+                                    {statusList.map((s, idx) => <option key={idx} value={s.id}>{s.state}</option>)}
+                                </Form.Control>
+                            </Form.Group>
+                        </Row>
 
-            <Form onSubmit={handleSubmit}>
+                        <Row className="mb-3">
+                            <Form.Group controlId="formPreco">
+                                <Form.Label>Preço</Form.Label>
+                                <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Digite o preço" required />
+                            </Form.Group>
+                        </Row>
 
-                <Row className="mb-3">
-                    <Form.Group controlId="formEstado">
-                        <Form.Label>Estado do Equipamento</Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="statusID"
-                            value={form.statusID}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Selecione...</option>
-                            {statusList.map((s, index) => (
-                                <option key={index} value={s.id}>
-                                    {s.state}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
-                </Row>
+                        <Row className="mb-3">
+                            <Col md={6}>
+                                <Form.Group controlId="formClientNic">
+                                    <Form.Label>NIC do cliente</Form.Label>
+                                    <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Digite o NIC" required />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6} className="d-flex align-items-end">
+                                <Button onClick={() => setShowModal(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
+                                    Procurar cliente
+                                </Button>
+                            </Col>
+                        </Row>
 
-                <Row className="mb-3">
-                    <Form.Group controlId="formPreco">
-                        <Form.Label>Preço</Form.Label>
-                        <Form.Control
-                            type="number"
-                            name="price"
-                            value={form.price}
-                            onChange={handleChange}
-                            placeholder="Digite o preço"
-                            required
-                        />
-                    </Form.Group>
-                </Row>
+                        <Row className="mb-3">
+                            <Col md={6}>
+                                <Form.Group controlId="formBarcodeEquipamento">
+                                    <Form.Label>Código de barras do Equipamento</Form.Label>
+                                    <Form.Control type="number" name="equipmentBarcode" value={form.equipmentBarcode} onChange={handleChange} placeholder="Digite o código de barras" required />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6} className="d-flex align-items-end">
+                                <Button onClick={() => setShowModalEq(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
+                                    Procurar equipamento
+                                </Button>
+                            </Col>
+                        </Row>
 
-                <Row className="mb-3">
-                    <Col sm={12} md={6}>
-                        <Form.Group controlId="formClientNic">
-                            <Form.Label>NIC do cliente</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="clientNic"
-                                value={form.clientNic}
-                                onChange={handleChange}
-                                placeholder="Digite o NIC do cliente"
-                                required
-                            />
-                        </Form.Group>
-                    </Col>
+                        {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
-                    <Col sm={12} md={6} className='d-flex align-items-end justify-content-start mt-3 mt-md-0'>
-                        <Button
-                            onClick={() => setShowModal(true)}
-                            className='w-100 rounded-pill forms-btn shadow-lg'
-                            style={{
-                                backgroundColor:'white', 
-                                color: '#b5a8c9',
-                                borderColor: '#b5a8c9',
-                                borderWidth: '2px',
-                                borderStyle: 'solid',
-                              }} 
-                        >
-                            Procurar cliente
+                        <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg">
+                            Registar Venda
                         </Button>
-                    </Col>
-                </Row>
-
-                <Row className="mb-3">
-                    <Col sm={12} md={6}>
-                        <Form.Group controlId="formBarcodeEquipamento">
-                            <Form.Label>Código de barras do Equipamento</Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="equipmentBarcode"
-                                value={form.equipmentBarcode}
-                                onChange={handleChange}
-                                placeholder="Digite o Código de barras do equipamento"
-                                required
-                            />
-                        </Form.Group>
-                    </Col>
-
-                    <Col sm={12} md={6} className='d-flex align-items-end justify-content-start mt-3 mt-md-0'>
-                        <Button
-                            onClick={() => setShowModalEq(true)}
-                            className='w-100 rounded-pill forms-btn shadow-lg'
-                            style={{
-                                backgroundColor:'white', 
-                                color: '#b5a8c9',
-                                borderColor: '#b5a8c9',
-                                borderWidth: '2px',
-                                borderStyle: 'solid',
-                              }} 
-                        >
-                            Procurar equipamento
-                        </Button>
-                    </Col>
-                </Row>
-
-                {error && (
-                    <Alert variant="danger" className="mt-2 text-center">
-                        {error}
-                    </Alert>
-                )}
-
-                <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill forms-btn shadow-lg">
-                    Registar Venda
-                </Button>
-            </Form>
+                    </Form>
+                </Modal.Body>
+            </Modal>
 
             <ClientCatalogModal
                 show={showModal}
-                handleClose={handleCloseModal}
+                handleClose={() => setShowModal(false)}
                 handleSelectClient={handleSelectClient}
                 selectedClient={clientData.nic}
             />
             <EquipmentCatalogModal
                 show={showModalEq}
-                handleClose={handleCloseModalEq}
+                handleClose={() => setShowModalEq(false)}
                 handleSelectEquipment={handleSelectEquipment}
                 selectedEquipment={equipmentData.barcode}
             />
-        </Container>
+        </>
     );
 }

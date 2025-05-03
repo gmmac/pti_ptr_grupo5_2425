@@ -10,9 +10,10 @@ import EmployeeHomeDashboard from '../../components/HomePageEmployee/EmployeeHom
 import EmployeeCharityProjects from '../../components/HomePageEmployee/EmployeeCharityProjects';
 import EmployeeRepairs from '../../components/HomePageEmployee/EmployeeRepairs';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
+// import PurchasesTable from '../../components/storePurchase/DisplayTablePurchases';
 import { IsMobileContext } from '../../contexts/IsMobileContext';
 import "../../styles/pageElements.css"
-import { ModalProvider } from '../../contexts/ModalContext';
+import EmployeeStorePurchase from '../../components/HomePageEmployee/EmployeeStorePurchase';
 
 
 export default function EmployeeHomePage() {
@@ -98,13 +99,12 @@ export default function EmployeeHomePage() {
                     <EmployeeHomeDashboard />
                 </Tab.Pane>
                 <Tab.Pane eventKey="purchases" className='p-4'>
-                    <h3>Purchases Content</h3>
+                    <h3>Store Purchases</h3>
+                    <EmployeeStorePurchase/>
                 </Tab.Pane>
                 <Tab.Pane eventKey="repairs" className='p-4'>
                     <h3>Repairs</h3>
-                    <ModalProvider>
                         <EmployeeRepairs />
-                    </ModalProvider>
                 </Tab.Pane>
                 <Tab.Pane eventKey="sales" className='p-4'>
                     <h3>Sales Content</h3>

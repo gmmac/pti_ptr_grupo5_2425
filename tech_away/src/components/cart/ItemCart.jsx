@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Button,
 	Col,
@@ -17,11 +17,13 @@ export default function ItemCart({ equipment, onRemove }) {
 		onRemove(equipment.lineId);
 		setShowModal(false);
 	};
-
+	useEffect(() => {
+		console.log(equipment);
+	}, []);
 	return (
 		<Container
 			className="p-2  border-bottom"
-			style={{ fontFamily: "var(--body-font)" }}
+			style={{ fontFamily: "var(--body-font)", position: "relative" }}
 		>
 			<Modal show={showModal} onHide={() => setShowModal(false)}>
 				<Modal.Header closeButton>
@@ -56,8 +58,41 @@ export default function ItemCart({ equipment, onRemove }) {
 					</Button>
 				</Modal.Footer>
 			</Modal>
+			{/* se estiver comprado*/}
+			{(equipment.purchaseDate || !equipment.putOnSaleDate) && (
+				<Stack
+					direction="vertical"
+					className="justify-content-center align-items-center"
+					style={{
+						position: "absolute",
+						top: 0,
+						left: 0,
+						width: "100%",
+						height: "100%",
+						backgroundColor: "rgba(16, 16, 18, 0.7)",
+						color: "#fff",
+						zIndex: 10,
+					}}
+				>
+					<p className="mb-3 text-center">This equipment is not available</p>
 
-			<Row>
+					<Button
+						style={{ backgroundColor: "var(--danger)", border: "none" }}
+						className="rounded-pill d-flex justify-content-center align-items-center gap-2"
+						onClick={handleRemove}
+					>
+						<i className="pi pi-trash"></i>
+						<p className="m-0">Remove from cart</p>
+					</Button>
+				</Stack>
+			)}
+			<Row
+				style={{
+					filter: equipment.purchaseDate ? "grayscale(100%)" : "none",
+					opacity: equipment.purchaseDate ? 0.6 : 1,
+					pointerEvents: equipment.purchaseDate ? "none" : "auto",
+				}}
+			>
 				<Col
 					className="d-flex justify-content-center align-items-center"
 					xs={4}
@@ -74,43 +109,48 @@ export default function ItemCart({ equipment, onRemove }) {
 					/>
 				</Col>
 				<Col>
-					<Row className="mb-2">
-						<Stack direction="verrical" className="align-items-start">
-							<p className="m-0">{equipment.modelName}</p>
-							<p>{equipment.price} €</p>
-							<Tag
-								style={{
-									backgroundColor: "var(--variant-one)",
-									fontFamily: "var(--body-font)",
-								}}
-								value={equipment.statusName}
-							></Tag>
-						</Stack>
-					</Row>
-					<Row>
-						<Stack
-							direction="horizontal"
-							className="justify-content-end"
-							gap={2}
-						>
-							<Button
-								className="rounded-circle"
-								style={{
-									backgroundColor: "var(--variant-two)",
-									border: "none",
-								}}
-							>
-								<i className="pi pi-heart"></i>
-							</Button>
-							<Button
-								onClick={() => setShowModal(true)}
-								className="rounded-circle"
-								style={{ backgroundColor: "var(--danger)", border: "none" }}
-							>
-								<i className="pi pi-trash"></i>
-							</Button>
-						</Stack>
-					</Row>
+					<Stack direction="verrical" className="align-items-start">
+						<p className="m-0">{equipment.modelName}</p>
+						<p>{equipment.price} €</p>
+						<Tag
+							style={{
+								backgroundColor: "var(--variant-one)",
+								fontFamily: "var(--body-font)",
+							}}
+							value={equipment.statusName}
+						></Tag>
+					</Stack>
+				</Col>
+				<Col
+					xs={3}
+					sm={3}
+					md={3}
+					lg={3}
+					className="d-flex flex-column justify-content-between align-items-center"
+				>
+					<Button
+						onClick={() => setShowModal(true)}
+						style={{ background: "none", border: "none" }}
+						className="d-flex justify-content-center align-items-start"
+					>
+						<i
+							className="pi pi-times"
+							style={{ color: "var(--dark-grey)" }}
+						></i>
+					</Button>
+
+					<Button
+						className="rounded-circle d-flex justify-content-center align-items-center"
+						style={{
+							backgroundColor: "var(--variant-two)",
+							border: "none",
+							width: "35px",
+							height: "35px",
+							padding: 0,
+						}}
+					>
+						<i className="pi pi-heart"></i>
+					</Button>
 				</Col>
 			</Row>
 		</Container>

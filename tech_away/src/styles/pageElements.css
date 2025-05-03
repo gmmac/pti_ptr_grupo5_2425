@@ -54,6 +54,30 @@
 }
 
 
+
+.custom-manage-tabs .nav-link {
+    /* background-color: var(--variant-one); */
+    color: var(--dark-grey);
+    font-weight: bold;
+}
+
+    .custom-manage-tabs .nav-link:hover {
+        background-color: var(--variant-green-hover);
+        color: var(--dark-grey);
+        font-weight: bold;
+    }
+
+        
+    /* selected tab */
+    .custom-manage-tabs .nav-item .nav-link.active,
+    .custom-manage-tabs .nav-link[aria-selected="true"] {
+        background-color: var(--variant-one);
+        color: var(--dark-grey);
+        font-weight: bold;
+    }
+
+
+
 /* ------------------------------------ */
 /*                Navs                  */
 /* ------------------------------------ */
@@ -71,7 +95,7 @@
     }
     
         .employee-custom-tabs .nav-link:hover {
-            background-color: var(--variant-one);
+            background-color: var(--variant-green-hover);
         
             color: var(--dark-grey);
             font-weight: bold;
@@ -91,8 +115,7 @@
             color: var(--dark-grey);
             font-weight: bold;
           }
-          
-
+     
 
 /* ------------------------------------ */
 /*                Cards                  */
