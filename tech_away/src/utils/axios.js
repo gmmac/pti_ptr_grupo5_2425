@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 axios.defaults.baseURL =
-  'http://' +
+  window.location.protocol + '//' +
   window.location.hostname + ':' + 4005;
 
 axios.defaults.withCredentials = true;
