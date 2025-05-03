@@ -3,12 +3,66 @@ const router = express.Router();
 const models = require("../models");
 const { Op, where } = require("sequelize");
 
-router.get("/", async (req, res) => {
+router.get("/usedEquipmentRepairs", async (req, res) => {
 	try {
-		const usedEquipment = await models.UsedEquipment.findAll();
-		res.status(200).json(usedEquipment);
+		const {
+			id,
+			price,
+			equipmentId,
+			storeId,
+			page = 1,
+			pageSize = 10,
+			orderBy,
+			orderDirection,
+		} = req.query;
+
+		const where = {};
+
+		// if (id) where.id = { [Op.like]: `${id}%` };
+		// if (price) where.price = { [Op.like]: `${price}%` };
+		// if (equipmentId) where.equipmentId = { [Op.like]: `${equipmentId}%` };
+		// if (storeId) where.storeId = { [Op.like]: `%${storeId}%` };
+
+		// if (putOnSaleDate) {
+		// 	where.putOnSaleDate = {
+		// 		[Op.gte]: new Date(putOnSaleDate),
+		// 		[Op.lt]: new Date(new Date(putOnSaleDate).getTime() + 24 * 60 * 60 * 1000),
+		// 	};
+		// }
+
+		const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+		let order = [];
+		if (orderBy && orderDirection) {
+			order = [[orderBy, orderDirection.toUpperCase()]];
+		} else {
+			order = [["id", "ASC"]];
+		}
+
+		const { count, rows } = await models.UsedEquipment.findAndCountAll({
+			where,
+			limit: parseInt(pageSize),
+			offset,
+			order,
+		});
+		
+		const formattedData = rows.map((item) => ({
+			id: item.id,
+			price: item.price,
+			equipmentId: item.equipmentId,
+			storeId: item.storeId,
+		}));
+		console.log("DATA: ", formattedData)
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: formattedData,
+		});
 	} catch (error) {
-		res.status(500).json({ message: "Error." });
+		console.error("Error fetching clients:", error);
+		res.status(500).json({ error: "Error fetching clients." });
 	}
 });
 

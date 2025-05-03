@@ -14,6 +14,7 @@ export default function ModalToSelect({
 	const [search, setSearch] = useState("");
 
 	useEffect(() => {
+		console.log("MOSTRO: " + showModal)
 		if (!showModal) return; // Evita chamadas desnecessárias
 
 		api

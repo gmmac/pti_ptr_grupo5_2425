@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Table, Container } from "react-bootstrap";
 import api from "../../utils/axios";
 import PaginationControl from "../pagination/PaginationControl";
-import ClientFilter from "./ClientFilter";
-import ClientTableModal from "./ClientTableModal";
-import ClientCardModal from "./ClientCardModal";
+import UsedEquipmentFilter from "./UsedEquipmentFilter";
+import UsedEquipmentTableModal from "./UsedEquipmentTableModal";
+import UsedEquipmentCardModal from "./UsedEquipmentCardModal";
 
-export default function ClientCatalogModal({ show, handleClose, handleSelectClient, selectedClient }) {
-    const [clients, setClients] = useState([]);
+export default function UsedEquipmentSelect({ show, handleClose, handleSelectUsedEquipment, selectedUsedEquipment }) {
+    const [usedEquipments, setUsedEquipments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
   
@@ -16,48 +16,46 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
     const itemsPerPage = 4;
     
     const [filters, setFilters] = useState({
-      nic: "",
-      name: "",
-      email: "",
-      phone: "",
-      orderBy: "nic",
-      orderDirection: "ASC"
+        id: "",
+        price: "",
+        equipmentId: "",
+        storeId: "nic",
+        orderDirection: "ASC"
     });
 
     const handleClosePopUp = () => {
       handleClose()
       setFilters({
-        nic: "",
-        name: "",
-        email: "",
-        phone: "",
-        orderBy: "nic",
+        id: "",
+        price: "",
+        equipmentId: "",
+        storeId: "nic",
         orderDirection: "ASC"
       })
     }
   
     useEffect(() => {
-      const fetchClients = async () => {
+      const fetchUsedEquipments = async () => {
           setLoading(true);
           setError(null);
           try {
-            const response = await api.get(`/api/client`, {
+            const response = await api.get(`/api/usedEquipment/usedEquipmentRepairs`, {
               params: {
                 ...filters,
                 page: currentPage,
                 pageSize: itemsPerPage
               }
             });
-            setClients(response.data.data || []);
+            setUsedEquipments(response.data.data || []);
             setTotalPages(response.data.totalPages);
           } catch (err) {
-            setError("Erro ao carregar os clientes");
+            setError("Error loading used equipments");
           }
           setLoading(false);
       };
   
       if (show) {
-        fetchClients();
+        fetchUsedEquipments();
       }
     }, [show, currentPage, filters]);
 
@@ -67,38 +65,38 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
     }
   };
 
-  const handleClientSelection = (client) => {
-    if (selectedClient === client.nic) {
-      handleSelectClient(null);
+  const handleUsedEquipmentSelection = (usedEquipment) => {
+    if (selectedUsedEquipment === usedEquipment.id) {
+        handleSelectUsedEquipment(null);
     } else {
-      handleSelectClient(client);
+        handleSelectUsedEquipment(usedEquipment);
     }
   };
 
   return (
-    <Modal show={show} onHide={handleClose} size="xl" centered>
+    <Modal show={show} onHide={handleClose} size="lg" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Catálogo de Clientes</Modal.Title>
+        <Modal.Title>Used Equipments Catalog</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <ClientFilter setFilters={setFilters} />
+        <UsedEquipmentFilter setFilters={setFilters} />
         {loading ? (
           <p>Loading Data...</p>
         ) : error ? (
           <p className="text-danger">{error}</p>
-        ) : clients.length === 0 ? (
+        ) : usedEquipments.length === 0 ? (
           <p>Data not found.</p>
         ) : (
           <Container>
               {/* Desktop */}
-              <ClientTableModal clients={clients} selectedClient={selectedClient} handleClientSelection={handleClientSelection} /> 
+              <UsedEquipmentTableModal usedEquipments={usedEquipments} selectedUsedEquipment={selectedUsedEquipment} handleUsedEquipmentSelection={handleUsedEquipmentSelection} /> 
               {/* Mobile */}
-              {clients.map((c) => {
-                return <ClientCardModal 
-                  key={c.nic} 
-                  client={c} 
-                  selectedClient={selectedClient} 
-                  handleClientSelection={handleClientSelection} 
+              {usedEquipments.map((usedEquipment) => {
+                return <UsedEquipmentCardModal 
+                  key={usedEquipment.id} 
+                  usedEquipment={usedEquipment} 
+                  selectedUsedEquipment={selectedUsedEquipment} 
+                  handleUsedEquipmentSelection={handleUsedEquipmentSelection} 
                   />
               })}
 

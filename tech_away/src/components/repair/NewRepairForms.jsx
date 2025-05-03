@@ -1,123 +1,275 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Modal, Button } from "react-bootstrap";
 import api from "../../utils/axios";
-import SelectClientModal from "../client/SelectClientModal";
+import ClientCatalogModal from "../storePurchase/ClientCatalogModal";
+import UsedEquipmentSelect from "../equipment/UsedEquipmentSelect";
 
-export default function NewRepairForms({ showModal, closeModal}) {
-	const [repair, setRepair] = useState(() => {
-		return {
-			description: "",
-			budget: "",
-			estimatedDeliverDate: "",
-			employeeId: "",
-			clientId: "",
-			clientName : "",
-			usedEquipmentId: "",
-		};
+export default function NewRepairForms({ showModal, closeModal }) {
+	const [newRepairInfo, setNewRepairInfo] = useState({
+		description: '',
+		clientId: '',
+		statusID: 1,
+		usedEquipmentId: '',
+		budget: '',
+		estimatedDeliverDate: '',
 	});
+
 	const [errors, setErrors] = useState({});
+	const [touchedFields, setTouchedFields] = useState({});
+	const [showClientModal, setShowClientModal] = useState(false);
+	const [showUsedEquipmentModal, setShowUsedEquipmentModal] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	useEffect(() => {
+		if (showModal) {
+			resetForm();
+		}
+	}, [showModal]);
+
+	const today = new Date().toISOString().split("T")[0];
 
 	const handleChanges = (e) => {
 		const { name, value } = e.target;
-		setBrand((prev) => ({ ...prev, [name]: value }));
 
+		setNewRepairInfo(prev => ({
+			...prev,
+			[name]: value
+		}));
+
+		setTouchedFields(prev => ({
+			...prev,
+			[name]: true
+		}));
+
+		if (touchedFields[name]) {
+			setErrors(prev => ({
+				...prev,
+				[name]: value ? "" : "Este campo é obrigatório"
+			}));
+		}
+	};
+
+	const validateFields = () => {
 		let newErrors = {};
+		let hasError = false;
 
-		if (!value) {
-			newErrors[name] = "This field is required";
-		} else {
-			newErrors[name] = "";
+		for (const field in newRepairInfo) {
+			if (!newRepairInfo[field]) {
+				newErrors[field] = "Este campo é obrigatório";
+				hasError = true;
+			}
+			if (field === "budget" && isNaN(newRepairInfo[field])) {
+				newErrors[field] = "Orçamento inválido";
+				hasError = true;
+			}
 		}
 
 		setErrors(newErrors);
+		setTouchedFields({
+			clientId: true,
+			description: true,
+			budget: true,
+			estimatedDeliverDate: true
+		});
+
+		return !hasError;
+	};
+
+	const handleSelectClient = (client) => {
+		setNewRepairInfo(prev => ({
+			...prev,
+			clientId: client?.nic || ''
+		}));
+		setShowClientModal(false);
+	};
+
+	const handleSelectUsedEquipment = (usedEquipment) => {
+		setNewRepairInfo(prev => ({
+			...prev,
+			usedEquipmentId: usedEquipment?.id || ''
+		}));
+		setShowUsedEquipmentModal(false);
+	};
+
+	const resetForm = () => {
+		setNewRepairInfo({ description: '', clientId: '', budget: '', estimatedDeliverDate: '' });
+		setErrors({});
+		setTouchedFields({});
+	};
+
+	const handleClose = () => {
+		resetForm();
+		closeModal();
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		// Validação antes do envio
-		let hasError = false;
-		let newErrors = {};
+		if (!validateFields()) return;
 
-		Object.keys(brand).forEach((field) => {
-			if (!brand[field]) {
-				newErrors[field] = "This field is required";
-				hasError = true;
+		setIsSubmitting(true);
+
+		try {
+			await api.post("/api/repair/", newRepairInfo);
+			handleClose();
+		} catch (error) {
+			if (error.response?.status === 400) {
+				setErrors(prev => ({
+					...prev,
+					exist: error.response.data.error
+				}));
+			} else {
+				console.error("API error:", error.message);
 			}
-		});
-
-		setErrors(newErrors);
-		if (hasError) return;
-
-		const dataToSubmit = {
-			name: brand.name,
-		};
-
-		await api
-			.post("api/brand/", dataToSubmit)
-			.then(() => {
-				handleRefresh();
-				refreshTable();
-				closeModal();
-			})
-			.catch((error) => {
-                if (error.response && error.response.status === 400) {
-                    // Se for erro 400, mostra a mensagem vinda do backend
-                    setErrors((prevErrors) => ({
-                        ...prevErrors,
-                        exist: error.response.data.error
-                    }));
-                    } else {
-                        console.error("API error:", error.message);
-                    }
-				
-			});
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	return (
-		<Modal show={showModal} onHide={closeModal} dialogClassName="modal-xl">
+		<Modal show={showModal} onHide={handleClose} dialogClassName="modal-xl">
 			<Modal.Header closeButton>
 				<Modal.Title>Create New Repair</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<Form.Group className="mb-3">
-					<Form.Label>Choose Client</Form.Label>
-					<div className="d-flex">
-						<Form.Control
-							type="text"
-							name="client"
-							value={repair.clientId}
-							isInvalid={!!errors.clientId}
-							readOnly
-							className="rounded-pill me-2"
-						/>
-						<Button
-							className="rounded-pill"
-							style={{ backgroundColor: "var(--variant-two", border: "none" , width: "100px"}}
-							// onClick={() => setShowClientModal(prev => !prev)}
-						>Select
-						</Button>
-					</div>
-					{/* <Form.Control.Feedback type="invalid">
-						{errors.brand}
-					</Form.Control.Feedback> */}
-				</Form.Group>
+				<Form onSubmit={handleSubmit}>
+					<Form.Group className="mb-3">
+						<Form.Label>Choose Client</Form.Label>
+						<div className="d-flex align-items-start">
+							<div className="flex-grow-1 me-2">
+								<Form.Control
+									className="rounded-pill"
+									type="text"
+									name="clientId"
+									value={newRepairInfo.clientId}
+									isInvalid={!!errors.clientId && touchedFields.clientId}
+									onChange={handleChanges}
+									placeholder="Digite o NIC"
+									readOnly
+								/>
+								{errors.clientId && touchedFields.clientId && (
+									<div className="invalid-feedback d-block">{errors.clientId}</div>
+								)}
+							</div>
+							<Button
+								className="rounded-pill"
+								style={{ backgroundColor: "var(--variant-two)", border: "none", width: "100px" }}
+								onClick={() => setShowClientModal(true)}
+								type="button"
+							>
+								Select
+							</Button>
+						</div>
+					</Form.Group>
 
-				<Form.Group className="mt-4 ">
-                    {errors.exist && (
-                        <div className="text-danger mb-3">
-                            {errors.exist}
-                        </div>
-                     )}
+					<Form.Group className="mb-3">
+						<Form.Label>Choose Used Equipment</Form.Label>
+						<div className="d-flex align-items-start">
+							<div className="flex-grow-1 me-2">
+								<Form.Control
+									className="rounded-pill"
+									type="text"
+									name="usedEquipmentId"
+									value={newRepairInfo.usedEquipmentId}
+									isInvalid={!!errors.usedEquipmentId && touchedFields.usedEquipmentId}
+									onChange={handleChanges}
+									placeholder="Selected a used equipment"
+									readOnly
+								/>
+								{errors.usedEquipmentId && touchedFields.usedEquipmentId && (
+									<div className="invalid-feedback d-block">{errors.usedEquipmentId}</div>
+								)}
+							</div>
+							<Button
+								className="rounded-pill"
+								style={{ backgroundColor: "var(--variant-two)", border: "none", width: "100px" }}
+								onClick={() => setShowUsedEquipmentModal(true)}
+								type="button"
+							>
+								Select
+							</Button>
+						</div>
+					</Form.Group>
+
+					<Form.Group className="mb-3">
+						<Form.Label>Description</Form.Label>
+						<Form.Control
+							as="textarea"
+							rows={3}
+							name="description"
+							value={newRepairInfo.description}
+							isInvalid={!!errors.description && touchedFields.description}
+							onChange={handleChanges}
+							placeholder="Enter a summary of the problem"
+							className="rounded"
+						/>
+						<Form.Control.Feedback type="invalid">
+							{errors.description}
+						</Form.Control.Feedback>
+					</Form.Group>
+
+					<Form.Group className="mb-3">
+						<Form.Label>Budget</Form.Label>
+						<Form.Control
+							type="number"
+							name="budget"
+							value={newRepairInfo.budget}
+							isInvalid={!!errors.budget && touchedFields.budget}
+							onChange={handleChanges}
+							placeholder="Enter the client estimated budget"
+							className="rounded"
+							min="0"
+							step="0.01"
+						/>
+						<Form.Control.Feedback type="invalid">
+							{errors.budget}
+						</Form.Control.Feedback>
+					</Form.Group>
+
+					<Form.Group className="mb-3">
+						<Form.Label>Estimated Delivery Date</Form.Label>
+						<Form.Control
+							type="date"
+							name="estimatedDeliverDate"
+							value={newRepairInfo.estimatedDeliverDate}
+							isInvalid={!!errors.estimatedDeliverDate && touchedFields.estimatedDeliverDate}
+							onChange={handleChanges}
+							className="rounded"
+							min={today}
+						/>
+						<Form.Control.Feedback type="invalid">
+							{errors.estimatedDeliverDate}
+						</Form.Control.Feedback>
+					</Form.Group>
+
+					{errors.exist && (
+						<div className="text-danger mb-3">{errors.exist}</div>
+					)}
+
 					<Button
 						className="w-100 rounded-pill"
-						style={{ backgroundColor: "var(--variant-two", border: "none" }}
-						onClick={handleSubmit}
+						style={{ backgroundColor: "var(--variant-two)", border: "none" }}
+						type="submit"
+						disabled={isSubmitting}
 					>
-						Create Repair
+						{isSubmitting ? "Creating..." : "Create Repair"}
 					</Button>
-				</Form.Group>
+				</Form>
 			</Modal.Body>
+
+			<ClientCatalogModal
+				show={showClientModal}
+				handleClose={() => setShowClientModal(false)}
+				handleSelectClient={handleSelectClient}
+				selectedClient={newRepairInfo.clientId}
+			/>
+
+			<UsedEquipmentSelect
+				show={showUsedEquipmentModal}
+				handleClose={() => setShowUsedEquipmentModal(false)}
+				handleSelectUsedEquipment={handleSelectUsedEquipment}
+				selectedUsedEquipment={newRepairInfo.usedEquipmentId}
+			/>
 		</Modal>
 	);
 }
