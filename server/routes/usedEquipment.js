@@ -18,17 +18,10 @@ router.get("/usedEquipmentRepairs", async (req, res) => {
 
 		const where = {};
 
-		// if (id) where.id = { [Op.like]: `${id}%` };
-		// if (price) where.price = { [Op.like]: `${price}%` };
-		// if (equipmentId) where.equipmentId = { [Op.like]: `${equipmentId}%` };
-		// if (storeId) where.storeId = { [Op.like]: `%${storeId}%` };
-
-		// if (putOnSaleDate) {
-		// 	where.putOnSaleDate = {
-		// 		[Op.gte]: new Date(putOnSaleDate),
-		// 		[Op.lt]: new Date(new Date(putOnSaleDate).getTime() + 24 * 60 * 60 * 1000),
-		// 	};
-		// }
+		if (id && !isNaN(parseInt(id))) where.id = parseInt(id);
+		if (price && !isNaN(parseFloat(price))) where.price = parseFloat(price);
+		if (equipmentId) where.equipmentId = equipmentId;
+		if (storeId) where.storeId = storeId;
 
 		const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
@@ -52,7 +45,7 @@ router.get("/usedEquipmentRepairs", async (req, res) => {
 			equipmentId: item.equipmentId,
 			storeId: item.storeId,
 		}));
-		console.log("DATA: ", formattedData)
+
 		res.json({
 			totalItems: count,
 			totalPages: Math.ceil(count / pageSize),

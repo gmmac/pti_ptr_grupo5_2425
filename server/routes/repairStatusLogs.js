@@ -44,4 +44,28 @@ router.get("/:repairId", async (req, res) => {
     }
 });
 
+router.post("/", async (req, res) => {
+    try {
+        const {
+            statusId,
+            description,
+            repairId,
+        } = req.body;
+
+        const newRepairStatusLog = await models.RepairStatusLog.create({
+            statusId,
+            description,
+            repairId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+        
+        res.status(200).json({
+            data: newRepairStatusLog,
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Error creating repair." });
+    }
+});
+
 module.exports = router;

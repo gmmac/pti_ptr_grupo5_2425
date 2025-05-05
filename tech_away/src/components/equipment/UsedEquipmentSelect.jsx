@@ -19,7 +19,7 @@ export default function UsedEquipmentSelect({ show, handleClose, handleSelectUse
         id: "",
         price: "",
         equipmentId: "",
-        storeId: "nic",
+        storeId: "",
         orderDirection: "ASC"
     });
 
@@ -29,7 +29,7 @@ export default function UsedEquipmentSelect({ show, handleClose, handleSelectUse
         id: "",
         price: "",
         equipmentId: "",
-        storeId: "nic",
+        storeId: "",
         orderDirection: "ASC"
       })
     }

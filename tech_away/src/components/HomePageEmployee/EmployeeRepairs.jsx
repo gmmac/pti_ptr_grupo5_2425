@@ -5,7 +5,7 @@ import NewRepairForms from '../repair/NewRepairForms';
 
 export default function EmployeeRepairs() {
 	const [show, setShow] = useState(false);
-	
+	const [refreshRepairs, setRefreshRepairs] = useState(false)
 
 	const handleShow = () => setShow(true);
 	const handleClose = () => setShow(false);
@@ -18,9 +18,9 @@ export default function EmployeeRepairs() {
 				</Col>
 			</Row>
 
-			<EmployeeRepairsCatalog />
+			<EmployeeRepairsCatalog refreshRepairs={refreshRepairs}/>
 
-			<NewRepairForms showModal={show} closeModal={handleClose}/>
+			<NewRepairForms showModal={show} closeModal={handleClose} setRefreshRepairs={setRefreshRepairs}/>
 		</Container>
 	)
 }

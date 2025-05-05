@@ -6,18 +6,16 @@ export default function UsedEquipmentFilter({ setFilters }) {
         id: "",
         price: "",
         equipmentId: "",
-        storeId: "nic",
+        storeId: "",
         orderDirection: "ASC"
     });
     
-    const [orderField, setOrderField] = useState("nic");
+    const [orderField, setOrderField] = useState("id");
     const [orderDirection, setOrderDirection] = useState("ASC");
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLocalFilters((prev) => ({ ...prev, [name]: value }));
-
-        console.log(localFilters)
     };
 
     const handleSubmit = (e) => {
@@ -28,7 +26,6 @@ export default function UsedEquipmentFilter({ setFilters }) {
             orderBy: orderField,
             orderDirection: orderDirection,
         }));
-        
     };
     
 
@@ -37,13 +34,13 @@ export default function UsedEquipmentFilter({ setFilters }) {
             id: "",
             price: "",
             equipmentId: "",
-            storeId: "nic",
+            storeId: "",
             orderDirection: "ASC"
         };
 
         setLocalFilters(clearedFilters);
         setFilters(clearedFilters);
-        setOrderField("nic");
+        setOrderField("id");
         setOrderDirection("ASC");
     };
 

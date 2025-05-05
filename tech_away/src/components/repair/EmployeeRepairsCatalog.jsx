@@ -11,7 +11,7 @@ import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
 import RepairInfo from "../client/RepairInfo";
 
-export default function EmployeeRepairsCatalog() {
+export default function EmployeeRepairsCatalog({refreshRepairs}) {
 	const [loading, setLoading] = useState(false);
 	const [totalRecords, setTotalRecords] = useState(0);
 	const [showRepairInfo, setShowRepairInfo] = useState(false);
@@ -41,7 +41,7 @@ export default function EmployeeRepairsCatalog() {
 
     useEffect(() => {
         loadLazyData();
-    }, [lazyState]);
+    }, [refreshRepairs, lazyState]);
 
     const loadLazyData = () => {
         setLoading(true);
