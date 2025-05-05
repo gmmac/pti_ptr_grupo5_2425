@@ -19,7 +19,7 @@ export default function RegisterPageClient() {
       </Stack>
     </Container>
   ) : (
-    <Container className="d-flex align-items-center justify-content-center ">
+    <Container className="d-flex align-items-center justify-content-center mb-4 ">
       <Row className="w-100 mt-2 g-5">
         <Col
           sm={12}
