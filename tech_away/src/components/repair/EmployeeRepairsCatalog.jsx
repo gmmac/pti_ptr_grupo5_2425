@@ -9,12 +9,14 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
-import RepairInfo from "../client/RepairInfo";
+import RepairInfo from "./RepairInfo";
+import NewRepairStatusLog from "./NewRepairStatusLog";
 
 export default function EmployeeRepairsCatalog({refreshRepairs}) {
 	const [loading, setLoading] = useState(false);
 	const [totalRecords, setTotalRecords] = useState(0);
 	const [showRepairInfo, setShowRepairInfo] = useState(false);
+    const [showChangeRepairStatus, setShowChangeRepairStatus] = useState(false);
 	const [repairID, setRepairID] = useState(null);
 
     const [lazyState, setLazyState] = useState({
@@ -94,7 +96,6 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
     };
 
     const onFilter = (event) => {
-        console.log("estou a filtrar no bom")
         event['first'] = 0; // Resetar a página quando o filtro mudar
         setLazyState(event);
     };
@@ -102,6 +103,15 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
     const openRepairInfo = (repairID) => {
         setShowRepairInfo(true);
         setRepairID(repairID);
+    };
+
+    const changeRepairStatus = (repairID) => {
+        setShowChangeRepairStatus(true);
+        setRepairID(repairID);
+    };
+
+    const refreshTable = () => {
+        loadLazyData();
     };
 
     return (
@@ -194,6 +204,11 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
                                     icon: "pi pi-info-circle",
                                     command: () => openRepairInfo(rowData.id),
                                 },
+                                {
+                                    label: "Change Status",
+                                    icon: "pi pi-sync",
+                                    command: () => changeRepairStatus(rowData.id),
+                                }
                             ];
                             return (
                                 <>
@@ -266,10 +281,24 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
 							padding-right: 0.05rem;
 							background-color: var(--variant-one);
 						}
+                        .p-menu {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                        .p-menu ul {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            list-style: none;
+                        }
+                        .p-menu .p-menuitem-link {
+                            text-decoration: none !important;
+                            color: #374151 !important; /* Ajuste conforme seu tema */
+                        }
 						`}
 				</style>
             </div>
             <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
+            <NewRepairStatusLog repairId={repairID} showModal={showChangeRepairStatus} closeModal={() => setShowChangeRepairStatus(false)} setRefreshRepairs={refreshTable}/>
         </>
     );
 }

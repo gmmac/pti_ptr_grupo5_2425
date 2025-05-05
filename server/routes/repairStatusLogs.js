@@ -59,6 +59,12 @@ router.post("/", async (req, res) => {
             createdAt: new Date(),
             updatedAt: new Date(),
         });
+
+        // Atualizar a Repair associada com o novo statusId
+        await models.Repair.update(
+            { statusID: statusId },
+            { where: { id: repairId } }
+        );
         
         res.status(200).json({
             data: newRepairStatusLog,

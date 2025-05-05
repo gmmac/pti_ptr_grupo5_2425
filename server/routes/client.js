@@ -163,8 +163,6 @@ router.delete("/:NIC", async (req, res) => {
 
 router.post("/", async (req, res) => {
 	try {
-		console.log(req.body);
-
 		const {
 			nic,
 			nif,

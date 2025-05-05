@@ -9,7 +9,6 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
-import RepairInfo from "../client/RepairInfo";
 
 export default function DisplayTablePurchases() {
 	const [loading, setLoading] = useState(false);
@@ -271,7 +270,7 @@ export default function DisplayTablePurchases() {
 						`}
 				</style>
             </div>
-            <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
+            {/* <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/> */}
         </>
     );
 }
