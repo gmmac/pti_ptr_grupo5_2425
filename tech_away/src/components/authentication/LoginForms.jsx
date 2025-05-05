@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import api from "../../utils/axios";
 import "../../styles/index.css";
 import "../../styles/AuthPage.css";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
