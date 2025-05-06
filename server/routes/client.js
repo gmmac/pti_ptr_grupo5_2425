@@ -23,8 +23,6 @@ router.get("/", async (req, res) => {
 			orderDirection,
 		} = req.query;
 
-
-		console.log(req.query)
 		const where = {};
 
 		if (nic) where.nic = { [Op.like]: `${nic}%` };
