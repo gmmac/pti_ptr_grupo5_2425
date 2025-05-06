@@ -41,7 +41,7 @@ export default function SearchableCheckboxList({
 
 	return (
 		<div
-			className="position-relative"
+			className="position-relative "
 			ref={ref}
 			style={{ fontFamily: "var(--body-font)" }}
 		>

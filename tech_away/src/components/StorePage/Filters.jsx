@@ -4,6 +4,7 @@ import api from "../../utils/axios";
 import { IsMobileContext } from "../../contexts/IsMobileContext";
 import SearchableSelect from "./SearchableSelect";
 import OrderBySelect from "./OrderBySelect";
+import CustomAccordionFilters from "./CustomAccordionFilters";
 
 export default function Filters({ filters, setFilters }) {
 	const [types, SetTypes] = useState([]);
@@ -65,65 +66,14 @@ export default function Filters({ filters, setFilters }) {
 	};
 
 	return isMobile ? (
-		<Accordion className="rounded-pill">
-			<Accordion.Item eventKey="0" >
-				<Accordion.Header className="rounded-pill">Filters</Accordion.Header>
-				<Accordion.Body>
-					<Stack gap={3}>
-						<Stack gap={4} direction="horizontal" className="flex-wrap">
-							<OrderBySelect
-								label="Order By"
-								value={filters.orderBy}
-								onChange={(val) => setFilters({ ...filters, orderBy: val })}
-								options={[
-									{ label: "Alphabetical", value: "ASC" },
-									{ label: "Reverse Alphabetical", value: "DESC" },
-									{ label: "Recent Date", value: "recent-date" },
-									{ label: "Oldest Date", value: "oldest-date" },
-								]}
-							/>
-
-							<SearchableSelect
-								label="Type"
-								options={types}
-								selected={filters.type}
-								onChange={(value) => setFilters({ ...filters, type: value })}
-							/>
-
-							<SearchableSelect
-								label="Model"
-								options={models}
-								selected={filters.model}
-								onChange={(value) => setFilters({ ...filters, model: value })}
-							/>
-
-							<SearchableSelect
-								label="Brand"
-								options={brands}
-								selected={filters.brand}
-								onChange={(value) => setFilters({ ...filters, brand: value })}
-							/>
-						</Stack>
-						<Button
-							className="rounded-pill w-100"
-							style={{ color: "var(--white)", border: "none" }}
-							variant="secondary"
-							disabled={
-								!filters.orderBy &&
-								!filters.model &&
-								!filters.type &&
-								!filters.brand
-							}
-							onClick={clearFilters}
-						>
-							Clear
-						</Button>
-					</Stack>
-				</Accordion.Body>
-			</Accordion.Item>
-		</Accordion>
+		<CustomAccordionFilters
+			filters={filters}
+			setFilters={setFilters}
+			types={types}
+			models={models}
+			brands={brands}
+		/>
 	) : (
-		// Mantém o layout horizontal atual
 		<Stack
 			direction="horizontal"
 			style={{
