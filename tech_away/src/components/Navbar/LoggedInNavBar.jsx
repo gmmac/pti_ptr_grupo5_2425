@@ -49,6 +49,8 @@ export default function LoggedInNavBar() {
 			>
 				<Container>
 					<Navbar.Brand
+						as={Link}
+						to={"/"}
 						style={{
 							color: "var(--dark-grey)",
 							fontFamily: "var(--title-font)",
