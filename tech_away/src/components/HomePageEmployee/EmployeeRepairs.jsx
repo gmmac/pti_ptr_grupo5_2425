@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import EmployeeRepairsCatalog from '../repair/EmployeeRepairsCatalog'
 import { Button, Col, Container, Row } from 'react-bootstrap'
-import NewRepairForms from '../repair/NewRepairForms';
+import EditRepairForms from '../repair/EditRepairForms';
 
 export default function EmployeeRepairs() {
 	const [show, setShow] = useState(false);
@@ -20,7 +20,7 @@ export default function EmployeeRepairs() {
 
 			<EmployeeRepairsCatalog refreshRepairs={refreshRepairs}/>
 
-			<NewRepairForms showModal={show} closeModal={handleClose} setRefreshRepairs={setRefreshRepairs}/>
+			<EditRepairForms repairID={null} showModal={show} closeModal={handleClose} setRefreshRepairs={setRefreshRepairs}/>
 		</Container>
 	)
 }

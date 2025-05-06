@@ -4,11 +4,11 @@ import api from "../../utils/axios";
 import ClientCatalogModal from "../storePurchase/ClientCatalogModal";
 import UsedEquipmentSelect from "../equipment/UsedEquipmentSelect";
 
-export default function NewRepairForms({ showModal, closeModal, setRefreshRepairs }) {
-  const [newRepairInfo, setNewRepairInfo] = useState({
+export default function EditRepairForms({ repairID, showModal, closeModal, setRefreshRepairs }) {
+  const [repairInfo, setRepairInfo] = useState({
     description: '',
     clientId: '',
-    statusID: 1,  // Definindo statusID como 1
+    statusID: 1,
     usedEquipmentId: '',
     budget: '',
     estimatedDeliverDate: '',
@@ -20,18 +20,38 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
   const [showUsedEquipmentModal, setShowUsedEquipmentModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const today = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
-    if (showModal) {
+    if (showModal && repairID) {
+      fetchRepair();
+    } else if (showModal) {
       resetForm();
     }
-  }, [showModal]);
+  }, [showModal, repairID]);
 
-  const today = new Date().toISOString().split("T")[0];
+  const fetchRepair = async () => {
+    try {
+      const response = await api.get(`/api/repair/${repairID}`);
+      const data = response.data;
+
+      setRepairInfo({
+        description: data.description || '',
+        clientId: data.clientId || '',
+        statusID: data.statusID || 1,
+        usedEquipmentId: data.usedEquipmentId || '',
+        budget: data.budget || '',
+        estimatedDeliverDate: data.estimatedDeliverDate?.split("T")[0] || '',
+      });
+    } catch (error) {
+      console.error("Erro ao buscar os dados da reparação:", error);
+    }
+  };
 
   const handleChanges = (e) => {
     const { name, value } = e.target;
 
-    setNewRepairInfo(prev => ({
+    setRepairInfo(prev => ({
       ...prev,
       [name]: value
     }));
@@ -53,12 +73,12 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
     let newErrors = {};
     let hasError = false;
 
-    for (const field in newRepairInfo) {
-      if (!newRepairInfo[field] && field !== 'statusID') {  // Não validar o statusID
+    for (const field in repairInfo) {
+      if (!repairInfo[field] && field !== 'statusID') {
         newErrors[field] = "Este campo é obrigatório";
         hasError = true;
       }
-      if (field === "budget" && isNaN(newRepairInfo[field])) {
+      if (field === "budget" && isNaN(repairInfo[field])) {
         newErrors[field] = "Orçamento inválido";
         hasError = true;
       }
@@ -76,7 +96,7 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
   };
 
   const handleSelectClient = (client) => {
-    setNewRepairInfo(prev => ({
+    setRepairInfo(prev => ({
       ...prev,
       clientId: client?.nic || ''
     }));
@@ -84,7 +104,7 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
   };
 
   const handleSelectUsedEquipment = (usedEquipment) => {
-    setNewRepairInfo(prev => ({
+    setRepairInfo(prev => ({
       ...prev,
       usedEquipmentId: usedEquipment?.id || ''
     }));
@@ -92,7 +112,14 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
   };
 
   const resetForm = () => {
-    setNewRepairInfo({ description: '', clientId: '', budget: '', estimatedDeliverDate: '', statusID: 1 });
+    setRepairInfo({
+      description: '',
+      clientId: '',
+      statusID: 1,
+      usedEquipmentId: '',
+      budget: '',
+      estimatedDeliverDate: '',
+    });
     setErrors({});
     setTouchedFields({});
   };
@@ -111,10 +138,14 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
     setIsSubmitting(true);
 
     try {
-      // Garantir que statusID seja 1
-      const repairInfo = { ...newRepairInfo, statusID: 1 };
+      const payload = { ...repairInfo, statusID: 1 };
 
-      await api.post("/api/repair/", repairInfo);
+      if (repairID) {
+        await api.put(`/api/repair/${repairID}`, payload);
+      } else {
+        await api.post("/api/repair/", payload);
+      }
+
       handleClose();
     } catch (error) {
       if (error.response?.status === 400) {
@@ -133,7 +164,7 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
   return (
     <Modal show={showModal} onHide={handleClose} dialogClassName="modal-xl">
       <Modal.Header closeButton>
-        <Modal.Title>Create New Repair</Modal.Title>
+        <Modal.Title>{repairID ? "Edit Repair" : "Create New Repair"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
@@ -145,7 +176,7 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
                   className="rounded-pill"
                   type="text"
                   name="clientId"
-                  value={newRepairInfo.clientId}
+                  value={repairInfo.clientId}
                   isInvalid={!!errors.clientId && touchedFields.clientId}
                   onChange={handleChanges}
                   placeholder="Digite o NIC"
@@ -174,7 +205,7 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
                   className="rounded-pill"
                   type="text"
                   name="usedEquipmentId"
-                  value={newRepairInfo.usedEquipmentId}
+                  value={repairInfo.usedEquipmentId}
                   isInvalid={!!errors.usedEquipmentId && touchedFields.usedEquipmentId}
                   onChange={handleChanges}
                   placeholder="Selected a used equipment"
@@ -201,7 +232,7 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
               as="textarea"
               rows={3}
               name="description"
-              value={newRepairInfo.description}
+              value={repairInfo.description}
               isInvalid={!!errors.description && touchedFields.description}
               onChange={handleChanges}
               placeholder="Enter a summary of the problem"
@@ -217,7 +248,7 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
             <Form.Control
               type="number"
               name="budget"
-              value={newRepairInfo.budget}
+              value={repairInfo.budget}
               isInvalid={!!errors.budget && touchedFields.budget}
               onChange={handleChanges}
               placeholder="Enter the client estimated budget"
@@ -235,7 +266,7 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
             <Form.Control
               type="date"
               name="estimatedDeliverDate"
-              value={newRepairInfo.estimatedDeliverDate}
+              value={repairInfo.estimatedDeliverDate}
               isInvalid={!!errors.estimatedDeliverDate && touchedFields.estimatedDeliverDate}
               onChange={handleChanges}
               className="rounded"
@@ -256,7 +287,7 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Creating..." : "Create Repair"}
+            {isSubmitting ? (repairID ? "Updating..." : "Creating...") : (repairID ? "Update Repair" : "Create Repair")}
           </Button>
         </Form>
       </Modal.Body>
@@ -265,14 +296,14 @@ export default function NewRepairForms({ showModal, closeModal, setRefreshRepair
         show={showClientModal}
         handleClose={() => setShowClientModal(false)}
         handleSelectClient={handleSelectClient}
-        selectedClient={newRepairInfo.clientId}
+        selectedClient={repairInfo.clientId}
       />
 
       <UsedEquipmentSelect
         show={showUsedEquipmentModal}
         handleClose={() => setShowUsedEquipmentModal(false)}
         handleSelectUsedEquipment={handleSelectUsedEquipment}
-        selectedUsedEquipment={newRepairInfo.usedEquipmentId}
+        selectedUsedEquipment={repairInfo.usedEquipmentId}
       />
     </Modal>
   );

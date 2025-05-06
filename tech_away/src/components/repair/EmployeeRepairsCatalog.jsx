@@ -11,12 +11,14 @@ import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
 import RepairInfo from "./RepairInfo";
 import NewRepairStatusLog from "./NewRepairStatusLog";
+import EditRepairForms from "./EditRepairForms";
 
 export default function EmployeeRepairsCatalog({refreshRepairs}) {
 	const [loading, setLoading] = useState(false);
 	const [totalRecords, setTotalRecords] = useState(0);
 	const [showRepairInfo, setShowRepairInfo] = useState(false);
     const [showChangeRepairStatus, setShowChangeRepairStatus] = useState(false);
+    const [showEditRepair, setShowEditRepair] = useState(false);
 	const [repairID, setRepairID] = useState(null);
 
     const [lazyState, setLazyState] = useState({
@@ -107,6 +109,11 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
 
     const changeRepairStatus = (repairID) => {
         setShowChangeRepairStatus(true);
+        setRepairID(repairID);
+    };
+
+    const openEditRepairModal = (repairID) => {
+        setShowEditRepair(true);
         setRepairID(repairID);
     };
 
@@ -208,6 +215,11 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
                                     label: "Change Status",
                                     icon: "pi pi-sync",
                                     command: () => changeRepairStatus(rowData.id),
+                                },
+                                {
+                                    label: "Edit Repair",
+                                    icon: "pi pi-pencil",
+                                    command: () => openEditRepairModal(rowData.id),
                                 }
                             ];
                             return (
@@ -299,6 +311,7 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
             </div>
             <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
             <NewRepairStatusLog repairId={repairID} showModal={showChangeRepairStatus} closeModal={() => setShowChangeRepairStatus(false)} setRefreshRepairs={refreshTable}/>
+            <EditRepairForms repairID={repairID} showModal={showEditRepair} closeModal={() => setShowEditRepair(false)} setRefreshRepairs={refreshTable}/>
         </>
     );
 }

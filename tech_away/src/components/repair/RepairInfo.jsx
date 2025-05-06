@@ -46,7 +46,7 @@ export default function RepairInfo({ repairID, show, onClose }) {
       fetchRepair();
       fetchRepairsLogs();
     }
-  }, [currentPage, repairID]);
+  }, [show, currentPage, repairID]);
 
   return (
     <Modal show={show} onHide={onClose} centered size="xl" >
