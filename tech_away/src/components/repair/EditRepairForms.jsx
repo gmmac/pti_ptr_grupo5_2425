@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Form, Modal, Button } from "react-bootstrap";
 import api from "../../utils/axios";
 import ClientCatalogModal from "../storePurchase/ClientCatalogModal";
 import UsedEquipmentSelect from "../equipment/UsedEquipmentSelect";
+import { Toast } from "primereact/toast";
 
 export default function EditRepairForms({ repairID, showModal, closeModal, setRefreshRepairs }) {
   const [repairInfo, setRepairInfo] = useState({
@@ -19,6 +20,8 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
   const [showClientModal, setShowClientModal] = useState(false);
   const [showUsedEquipmentModal, setShowUsedEquipmentModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const toast = useRef(null); // Ref para o Toast
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -130,6 +133,24 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
     setRefreshRepairs(true);
   };
 
+  const showSuccess = () => {
+    toast.current.show({
+      severity: "success",
+      summary: repairID ? "Repair updated successfully" : "Repair created successfully",
+      detail: "The repair has been successfully processed.",
+      life: 3000,
+    });
+  };
+
+  const showError = (message) => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: message,
+      life: 3000,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -146,7 +167,11 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
         await api.post("/api/repair/", payload);
       }
 
-      handleClose();
+      showSuccess();  // Exibe a notificação de sucesso após o envio
+
+      setTimeout(() => {
+        handleClose();
+      }, 2000);
     } catch (error) {
       if (error.response?.status === 400) {
         setErrors(prev => ({
@@ -154,6 +179,7 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
           exist: error.response.data.error
         }));
       } else {
+        showError("An error occurred while processing your request.");
         console.error("API error:", error.message);
       }
     } finally {
@@ -305,6 +331,8 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
         handleSelectUsedEquipment={handleSelectUsedEquipment}
         selectedUsedEquipment={repairInfo.usedEquipmentId}
       />
+
+      <Toast ref={toast} />  {/* Toast Component */}
     </Modal>
   );
 }
