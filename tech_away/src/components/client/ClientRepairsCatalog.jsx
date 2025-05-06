@@ -258,7 +258,6 @@ export default function ClientRepairsCatalog({activeRepairs}) {
 							box-shadow: 0 0 0 0.2rem var(--variant-green-highlight);
 							border-color:rgba(55, 65, 81, 0.35);
 						}
-
 						.p-datepicker-trigger {
 							border: var(--variant-one);
 							border-top-right-radius: 6px !important;
@@ -266,6 +265,19 @@ export default function ClientRepairsCatalog({activeRepairs}) {
 							padding-right: 0.05rem;
 							background-color: var(--variant-one);
 						}
+                            .p-menu {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                        .p-menu ul {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            list-style: none;
+                        }
+                        .p-menu .p-menuitem-link {
+                            text-decoration: none !important;
+                            color: #374151 !important; /* Ajuste conforme seu tema */
+                        }
 						`}
 				</style>
             </div>
