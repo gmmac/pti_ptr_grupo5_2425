@@ -3,6 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import CharityProjectInfoEditor from './CharityProjectEditor/CharityProjectInfoEditor';
 import CharityProjectEquipmentTypeEditor from './CharityProjectEditor/CharityProjectEquipmentTypeEditor';
 import CharityProjectEquipmentSheetEditor from './CharityProjectEditor/CharityProjectEquipmentSheetEditor';
+import CharityProjectDonationDetails from './CharityProjectDonationDetails';
 
 export default function CharityProjectDetails({ project, onRefresh }) {
   const [infoAlert, setInfoAlert] = useState({ message: '', variant: '', show: false });
@@ -58,6 +59,11 @@ export default function CharityProjectDetails({ project, onRefresh }) {
             alert={equipmentSheetAlert}
             onChangeAlert={handleEquipmentSheetAlert}
           />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <CharityProjectDonationDetails />
         </Col>
       </Row>
     </div>

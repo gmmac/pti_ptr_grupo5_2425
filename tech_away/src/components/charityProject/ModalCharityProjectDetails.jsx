@@ -5,6 +5,7 @@ import CharityProjectInfoEditor from './CharityProjectEditor/CharityProjectInfoE
 import CharityProjectEquipmentTypeEditor from './CharityProjectEditor/CharityProjectEquipmentTypeEditor';
 import CharityProjectEquipmentSheetEditor from './CharityProjectEditor/CharityProjectEquipmentSheetEditor';
 import api from '../../utils/axios';
+import CharityProjectDonationDetails from './CharityProjectDonationDetails';
 
 export default function ModalCharityProjectDetails({ show, handleClose, project, onRefresh, setSelectedProject }) {
   const [projectData, setProjectData] = useState(null);
@@ -72,6 +73,13 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
               />
             </Col>
           </Row>
+
+          <Row>
+            <Col>
+              <CharityProjectDonationDetails />
+            </Col>
+          </Row>
+
         </Modal.Body>
       </Modal>
       }

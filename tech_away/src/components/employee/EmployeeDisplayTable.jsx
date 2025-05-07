@@ -119,7 +119,7 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
     return (
         <>
             <ConfirmDialog />
-            <div className="">
+            <div className="d-none d-lg-table">
                 <DataTable
                     value={data}
                     lazy

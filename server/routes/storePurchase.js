@@ -39,7 +39,13 @@ router.get("/", async (req, res) => {
 
       if (storeName) whereStore.name = { [Op.iLike]: `%${storeName}%` };
 
-      if (purchasePrice) {where.purchasePrice = purchasePrice;}      
+      if (purchasePrice && parseFloat(purchasePrice) > 0) {
+        where.purchasePrice = { [Op.eq]: parseFloat(purchasePrice) };
+      } else {
+        // Força exibir apenas vendas (maiores que 0)
+        where.purchasePrice = { [Op.gt]: 0 };
+      }
+        
 
       if (employeeName) {
         where[Op.and] = Sequelize.where(
@@ -164,5 +170,31 @@ router.post("/", async (req, res) => {
     }
 });
 
+
+router.post("/donate", async (req, res) => {
+
+  try {
+      const {statusID, price, clientNic, equipmentBarcode, charityProjectId} = req.body;
+
+      console.log(req.body)
+
+      const storeID = req.cookies["employeeInfo"].storeNIPC
+      const employeeID = req.cookies["employeeInfo"].nic
+
+
+      const usedEquipment = await models.UsedEquipment.create({ statusID: statusID, price: price, purchaseDate: new Date(), equipmentId: equipmentBarcode, storeId: storeID, createdAt: new Date(), updatedAt: new Date() });
+      
+      // só cria a compra da loja, caso o equipamento usado exista (tenha sido criado)
+      if(usedEquipment){
+          const storePurchases = await models.StorePurchase.create({ storeID: storeID, clientNIC: clientNic, employeeID: employeeID, purchasePrice: price, usedEquipmentID: usedEquipment.id, createdAt: new Date(), updatedAt: new Date() });
+          res.status(201).json(storePurchases);
+      } else{
+          res.status(400).json({ error: "Error." });
+      }
+
+  } catch (error) {
+      res.status(400).json({ error: "Error." });
+  }
+});
 
 module.exports = router;

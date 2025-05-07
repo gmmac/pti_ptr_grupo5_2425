@@ -35,6 +35,12 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: 'equipmentSheetId'
       });
       
+      CharityProject.belongsToMany(models.UsedEquipment, {
+        through: models.CharityProjectDonations,
+        foreignKey: 'charityProjectId',
+        otherKey: 'usedEquipmentId'
+      });
+      
       
       }
   }
