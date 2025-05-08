@@ -4,6 +4,7 @@ import "../../styles/variables.css";
 import ClientProfile from '../../components/client/ClientProfile';
 import "../../styles/ClientProfilePage.css"
 import ClientRepairs from "../../components/client/ClientRepairs";
+import ClientSales from "../../components/client/ClientSales"
 
 export default function ProfilePageClient() {
     const [activeTab, setActiveTab] = useState(sessionStorage.getItem("clientSelctedTab") || "profile");
@@ -23,7 +24,7 @@ export default function ProfilePageClient() {
                         <Nav.Link eventKey="repairs">Repairs</Nav.Link>
                     </Nav.Item>
                     <Nav.Item className='custom-tabs'>
-                        <Nav.Link eventKey="sales">Sales</Nav.Link>
+                    <Nav.Link eventKey="sales">Sales</Nav.Link>
                     </Nav.Item>
                     <Nav.Item className='custom-tabs'>
                         <Nav.Link eventKey="purchases">Purchases</Nav.Link>
@@ -32,10 +33,7 @@ export default function ProfilePageClient() {
 
                 <Tab.Content className='custom-tab-content'>
                     <Tab.Pane eventKey="sales">
-                        <p>Tab content for Sales</p>
-                    </Tab.Pane>
-                    <Tab.Pane eventKey="purchases">
-                        <p>Tab content for Purchases</p>
+                        <ClientSales/>
                     </Tab.Pane>
                     <Tab.Pane eventKey="repairs">
                         <ClientRepairs isSelected={activeTab === "repairs"}/>
