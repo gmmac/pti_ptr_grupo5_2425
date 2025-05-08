@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -11,7 +11,7 @@ import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
 import RepairInfo from "../client/RepairInfo";
 
-export default function DisplayTablePurchases() {
+export default function DisplayTablePurchases(refreshAllTables=null) {
 	const [loading, setLoading] = useState(false);
 	const [totalRecords, setTotalRecords] = useState(0);
 	const [showRepairInfo, setShowRepairInfo] = useState(false);
@@ -96,7 +96,6 @@ export default function DisplayTablePurchases() {
     };
 
     const onFilter = (event) => {
-        console.log("estou a filtrar no bom")
         event['first'] = 0; // Resetar a página quando o filtro mudar
         setLazyState(event);
     };

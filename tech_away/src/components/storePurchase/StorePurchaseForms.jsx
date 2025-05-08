@@ -39,6 +39,16 @@ export default function StorePurchaseForms({show, handleClose}) {
     const [showModal, setShowModal] = useState(false);
     const [showModalEq, setShowModalEq] = useState(false);
 
+    const refreshData = () => {
+        api.get(`/api/equipmentSheet/teste`)
+            .then(res => setEquipmentList(res.data.data.map(e => e.barcode)))
+            .catch(error => console.error('Erro ao buscar equipamentos:', error.message));
+    
+        api.get(`/api/client/`)
+            .then(res => setClientList(res.data.data.map(e => e.nic)))
+            .catch(error => console.error('Erro ao buscar NICs:', error.message));
+    };
+
     useEffect(() => {
         api.get(`/api/equipmentStatus/`)
             .then(res => setStatusList(res.data))
@@ -207,6 +217,8 @@ export default function StorePurchaseForms({show, handleClose}) {
                 console.error("Erro ao registrar venda: ", error.response.data);
                 setError("Ocorreu um erro ao registar a venda.");
             });
+
+            handleClose();
     };
 
     return (
