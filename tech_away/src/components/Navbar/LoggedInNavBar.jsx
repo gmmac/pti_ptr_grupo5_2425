@@ -15,9 +15,9 @@ import { Badge } from "primereact/badge";
 import "../../styles/variables.css";
 
 const navItems = [
+	{ name: "Shop", path: "/store" },
 	{ name: "About Us", path: "/about" },
-	{ name: "Our Services", path: "/services" },
-	{ name: "Store", path: "/store" },
+	{ name: "Our Stores", path: "/services" },
 ];
 
 export default function LoggedInNavBar() {

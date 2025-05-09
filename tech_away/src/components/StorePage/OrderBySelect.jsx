@@ -48,7 +48,7 @@ export default function OrderBySelect({
 
 			{isOpen && (
 				<div
-					className="border rounded shadow bg-white position-absolute mt-2 p-3"
+					className="border rounded shadow bg-white position-absolute mt-2 p-3 w-100"
 					style={{
 						zIndex: 1000,
 						width: "150%",

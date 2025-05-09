@@ -29,7 +29,7 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 				boxShadow: "var(--shadow-default)",
 				borderRadius: "var(--rounded-sm)",
 				padding: "16px",
-				minHeight: "250px",
+				minHeight: "280px",
 			}}
 			gap={2}
 			className="rounded-sm p-4 justify-content-center align-items-center"

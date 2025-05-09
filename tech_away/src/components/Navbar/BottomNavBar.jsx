@@ -11,12 +11,12 @@ const baseNavItems = [
 		icon: "pi pi-home",
 	},
 	{
-		name: "Store",
+		name: "Shop",
 		path: "/store",
 		icon: "pi pi-shopping-bag",
 	},
 	{
-		name: "Stores",
+		name: "Our Stores",
 		path: "/our-stores",
 		icon: "pi pi-map-marker",
 	},

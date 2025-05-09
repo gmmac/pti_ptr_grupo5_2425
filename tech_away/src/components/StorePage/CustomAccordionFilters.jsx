@@ -53,7 +53,7 @@ export default function CustomAccordionFilters({
 					backgroundColor: "var(--white)",
 					borderRadius: " 0 0 var(--rounded-sm) var(--rounded-sm)",
 					boxShadow: "var(--shadow-default)",
-					overflow: "hidden", // Ajuda com glitches visuais
+					
 					transition: "height 0.15s ease-in-out", // Suaviza
 				}}
 				className="px-4 pt-1 pb-4"
