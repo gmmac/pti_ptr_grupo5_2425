@@ -162,6 +162,7 @@ router.post("/login", async (req, res) => {
     console.error(error);
   
     if (error.response?.status === 403) {
+      console.log(error.response)
       return res.status(401).json({ message: "Invalid Credentials" });
     }
   
