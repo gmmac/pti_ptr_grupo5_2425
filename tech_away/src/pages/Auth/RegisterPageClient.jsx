@@ -20,18 +20,18 @@ export default function RegisterPageClient() {
     </Container>
   ) : (
     <Container className="d-flex align-items-center justify-content-center mb-4 ">
-      <Row className="w-100 mt-2 g-5">
+      <Row className="w-100 mt-0 g-5">
         <Col
           sm={12}
           md={6}
-          className="d-flex justify-content-center align-items-center"
+          className="d-flex justify-content-center align-items-center ps-0"
         >
           <WelcomeLG />
         </Col>
         <Col
           sm={12}
           md={6}
-          className="d-flex justify-content-center align-items-center"
+          className="d-flex justify-content-center align-items-center pe-0"
         >
           <RegisterForms />
         </Col>
