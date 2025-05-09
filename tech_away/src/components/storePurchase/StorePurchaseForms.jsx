@@ -4,7 +4,7 @@ import api from '../../utils/axios';
 import ClientCatalogModal from './ClientCatalogModal';
 import EquipmentCatalogModal from './EquipmentCatalogModal';
 
-export default function StorePurchaseForms({show, handleClose}) {
+export default function StorePurchaseForms({show, handleClose, setRefreshPurchases}) {
     const [form, setForm] = useState({
         statusID: '',
         price: '',
@@ -39,15 +39,6 @@ export default function StorePurchaseForms({show, handleClose}) {
     const [showModal, setShowModal] = useState(false);
     const [showModalEq, setShowModalEq] = useState(false);
 
-    const refreshData = () => {
-        api.get(`/api/equipmentSheet/teste`)
-            .then(res => setEquipmentList(res.data.data.map(e => e.barcode)))
-            .catch(error => console.error('Erro ao buscar equipamentos:', error.message));
-    
-        api.get(`/api/client/`)
-            .then(res => setClientList(res.data.data.map(e => e.nic)))
-            .catch(error => console.error('Erro ao buscar NICs:', error.message));
-    };
 
     useEffect(() => {
         api.get(`/api/equipmentStatus/`)
@@ -72,14 +63,6 @@ export default function StorePurchaseForms({show, handleClose}) {
             .then(res => setClientList(res.data.data.map(e => e.nic)))
             .catch(error => console.error('Erro ao buscar NICs:', error.message));
     }, []);
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
-
-    const handleCloseModalEq = () => {
-        setShowModalEq(false);
-    };
 
     const handleSelectClient = (client) => {
         if (client) {
@@ -203,6 +186,36 @@ export default function StorePurchaseForms({show, handleClose}) {
                 setSuccessMessage("Venda registada com sucesso!");
                 setError("");
 
+                setRefreshPurchases(prev => {
+                    console.log("Valor anterior de refreshPurchases:", prev);
+                    return !prev;
+                });
+
+                setClientData({
+                    nic: '',
+                    nif: '',
+                    birthDate: '',
+                    gender: '',
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    phone: ''
+                });
+
+                setEquipmentData({
+                    barcode: '',
+                    model: '',
+                    releaseYear: '',
+                    type: ''
+                });
+
+                setForm({
+                    statusID: '',
+                    price: '',
+                    clientNic: '',
+                    equipmentBarcode: '',
+                });
+
                 setTimeout(() => {
                     setSuccessMessage("");
                     setForm({
@@ -211,7 +224,7 @@ export default function StorePurchaseForms({show, handleClose}) {
                         clientNic: '',
                         equipmentBarcode: '',
                     });
-                }, 3000);
+                }, 1000);
             })
             .catch(error => {
                 console.error("Erro ao registrar venda: ", error.response.data);

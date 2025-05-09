@@ -9,13 +9,11 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
-import RepairInfo from "../client/RepairInfo";
 
-export default function DisplayTablePurchases(refreshAllTables=null) {
+export default function DisplayTablePurchases({refreshTable}) {
 	const [loading, setLoading] = useState(false);
 	const [totalRecords, setTotalRecords] = useState(0);
-	const [showRepairInfo, setShowRepairInfo] = useState(false);
-	const [repairID, setRepairID] = useState(null);
+
 
     const [lazyState, setLazyState] = useState({
         first: 0,
@@ -41,7 +39,7 @@ export default function DisplayTablePurchases(refreshAllTables=null) {
 
     useEffect(() => {
         loadLazyData();
-    }, [lazyState]);
+    }, [refreshTable, lazyState]);
 
     const loadLazyData = () => {
         setLoading(true);
@@ -100,10 +98,6 @@ export default function DisplayTablePurchases(refreshAllTables=null) {
         setLazyState(event);
     };
 
-    const openRepairInfo = (repairID) => {
-        setShowRepairInfo(true);
-        setRepairID(repairID);
-    };
 
     return (
         <>
@@ -186,36 +180,7 @@ export default function DisplayTablePurchases(refreshAllTables=null) {
 							}}
                         />
                     ))}
-                    <Column
-                        header=""
-                        body={(rowData, options) => {
-                            const menuItems = [
-                                {
-                                    label: "See Details",
-                                    icon: "pi pi-info-circle",
-                                    command: () => openRepairInfo(rowData.id),
-                                },
-                            ];
-                            return (
-                                <>
-                                    <Menu
-                                        model={menuItems}
-                                        popup
-                                        ref={(el) => (menuRefs.current[options.rowIndex] = el)}
-                                    />
-                                    <Button
-                                        icon="pi pi-ellipsis-v"
-                                        text
-                                        severity="secondary"
-                                        onClick={(e) =>
-                                            menuRefs.current[options.rowIndex].toggle(e)
-                                        }
-                                        className="rounded-5"
-                                    />
-                                </>
-                            );
-                        }}
-                    />
+                    
                 </DataTable>
 				<style>
 					{`
@@ -270,7 +235,7 @@ export default function DisplayTablePurchases(refreshAllTables=null) {
 						`}
 				</style>
             </div>
-            <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
+            
         </>
     );
 }

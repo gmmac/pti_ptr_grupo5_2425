@@ -5,6 +5,7 @@ import StorePurchaseForms from '../storePurchase/StorePurchaseForms'
 
 export default function EmployeeStorePurchase() {
     const [show, setShow] = useState(false);
+    const [refreshPurchases, setRefreshPurchases] = useState(false);
     const handleShow = () => setShow(true);
     
     return (
@@ -15,10 +16,11 @@ export default function EmployeeStorePurchase() {
                 </Col>
             </Row>
 
-        <DisplayTablePurchases/>
+        <DisplayTablePurchases refreshTable={refreshPurchases} />
         <StorePurchaseForms
             show={show}
             handleClose={() => setShow(false)}
+            setRefreshPurchases={setRefreshPurchases}
         />
         </Container>
     )
