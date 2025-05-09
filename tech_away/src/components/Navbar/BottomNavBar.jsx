@@ -16,7 +16,7 @@ const baseNavItems = [
 		icon: "pi pi-shopping-bag",
 	},
 	{
-		name: "Our Stores",
+		name: "Stores",
 		path: "/our-stores",
 		icon: "pi pi-map-marker",
 	},

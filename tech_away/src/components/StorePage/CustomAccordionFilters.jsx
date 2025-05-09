@@ -62,8 +62,8 @@ export default function CustomAccordionFilters({
 					<Stack gap={3} className="mt-3">
 						<Stack
 							gap={3}
-							direction="horizontal"
-							className="flex-wrap justify-content-center "
+							direction="vertical"
+							className="justify-content-center align-items-center"
 						>
 							<OrderBySelect
 								label="Order By"

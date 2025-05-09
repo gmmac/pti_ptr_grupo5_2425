@@ -24,7 +24,7 @@ export default function OrderBySelect({
 	}, []);
 
 	return (
-		<div className="position-relative" ref={ref}>
+		<div className="position-relative w-100" ref={ref}>
 			<Button
 				type="button"
 				style={{
@@ -33,7 +33,7 @@ export default function OrderBySelect({
 					border: "none",
 					boxShadow: "var(--shadow-default)",
 				}}
-				className="rounded-pill px-4"
+				className="rounded-pill px-4 w-100"
 				onClick={toggleDropdown}
 			>
 				<Stack

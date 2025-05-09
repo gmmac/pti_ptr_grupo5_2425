@@ -41,7 +41,7 @@ export default function SearchableCheckboxList({
 
 	return (
 		<div
-			className="position-relative "
+			className="position-relative w-100"
 			ref={ref}
 			style={{ fontFamily: "var(--body-font)" }}
 		>
@@ -54,7 +54,7 @@ export default function SearchableCheckboxList({
 					border: "none",
 					boxShadow: "var(--shadow-default)",
 				}}
-				className="rounded-pill px-4"
+				className="rounded-pill px-4 w-100"
 				onClick={toggleDropdown}
 			>
 				<Stack
