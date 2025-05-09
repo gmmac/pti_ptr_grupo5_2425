@@ -39,21 +39,12 @@ function LayoutPage() {
 			className="vh-100 m-0 p-0"
 			style={{ backgroundColor: "var(--light-grey)" }}
 		>
-			{isUserLoggedIn() ? (
-				<CartProvider>
-					{renderNavBar()}
-					<div className="flex-grow-1 overflow-auto">
-						<Outlet />
-					</div>
-				</CartProvider>
-			) : (
-				<>
-					{renderNavBar()}
-					<div className="flex-grow-1 overflow-auto">
-						<Outlet />
-					</div>
-				</>
-			)}
+			<CartProvider>
+				{renderNavBar()}
+				<div className="flex-grow-1 overflow-auto">
+					<Outlet />
+				</div>
+			</CartProvider>
 		</Stack>
 	);
 }

@@ -33,7 +33,6 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 			gap={2}
 			className="rounded-sm p-4 justify-content-center align-items-center"
 		>
-			{/* Informações do tipo e marca */}
 			<Stack direction="horizontal" gap={2} className="justify-content-between">
 				<Stack
 					direction="horizontal"
