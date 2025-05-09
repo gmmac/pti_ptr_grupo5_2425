@@ -98,6 +98,7 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password, userType } = req.body;
     // Login User
+    console.log(req.body)
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
       client_id: process.env.AUTH0_CLIENT_ID,
       client_secret: process.env.AUTH0_CLIENT_SECRET,
