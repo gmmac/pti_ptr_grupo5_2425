@@ -1,5 +1,10 @@
-// ...imports mantidos
-import CharityProjectCatalogModal from '../charity/CharityProjectCatalogModal';
+import React, { useState, useEffect } from 'react';
+import { Form, Button, Modal, Alert, Row, Col } from 'react-bootstrap';
+import api from '../../utils/axios';
+import ClientCatalogModal from '../storePurchase/ClientCatalogModal';
+// import CharityProjectCatalogModal from '../charity/CharityProjectCatalogModal';
+import UsedEquipmentCatalogModal from './../equipment/UsedEquipmentCatalogModal';
+import CharityProjectCatalogModal from '../charityProject/CharityProjectCatalogModal';
 
 export default function DonationForms({ show, handleClose }) {
   const [form, setForm] = useState({
@@ -81,6 +86,105 @@ export default function DonationForms({ show, handleClose }) {
       setError("Ocorreu um erro ao registar a doação.");
     }
   };
+
+  const handleSelectClient = (client) => {
+    if (client) {
+        setClientData({
+            nic: client.nic,
+            nif: client.nif,
+            birthDate: client.birthDate,
+            gender: client.gender,
+            firstName: client.firstName,
+            lastName: client.lastName,
+            email: client.email,
+            phone: client.phone
+        });
+
+        setForm((prevForm) => ({
+            ...prevForm,
+            clientNic: client.nic
+        }));
+    } else {
+        setClientData({
+            nic: '',
+            nif: '',
+            birthDate: '',
+            gender: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: ''
+        });
+
+        setForm((prevForm) => ({
+            ...prevForm,
+            clientNic: ''
+        }));
+    }
+
+    setShowModal(false);
+};
+
+const handleChange = (event) => {
+  const { name, value } = event.target;
+
+  setClientData({ ...clientData, [name]: value });
+
+  if (name === "equipmentBarcode") {
+      if (!/^\d*$/.test(value)) {
+          setError("O Código de barras do equipamento deve conter apenas números.");
+      } else if (value.length > 20) {
+          setError("O Código de barras do equipamento deve ter 20 algarismos.");
+      } else {
+          setError("");
+      }
+  }
+
+  if (name === "clientNic") {
+      if (!/^\d*$/.test(value)) {
+          setError("O NIC do cliente deve conter apenas números.");
+      } else if (value.length > 9) {
+          setError("O NIC do cliente deve ter 9 algarismos.");
+      } else {
+          setError("");
+      }
+  }
+
+  setForm(prevState => ({
+      ...prevState,
+      [name]: value
+  }));
+};
+
+const handleSelectEquipment = (equipment) => {
+  if (equipment) {
+      setEquipmentData({
+          barcode: equipment.barcode,
+          model: equipment.model,
+          releaseYear: equipment.releaseYear,
+          type: equipment.type
+      });
+
+      setForm((prevForm) => ({
+          ...prevForm,
+          equipmentBarcode: equipment.barcode
+      }));
+  } else {
+      setEquipmentData({
+          barcode: '',
+          model: '',
+          releaseYear: '',
+          type: ''
+      });
+
+      setForm((prevForm) => ({
+          ...prevForm,
+          equipmentBarcode: ''
+      }));
+  }
+
+  setShowModalEq(false);
+};
 
   return (
     <>
