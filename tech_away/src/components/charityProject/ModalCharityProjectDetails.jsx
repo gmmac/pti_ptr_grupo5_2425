@@ -76,7 +76,9 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
 
           <Row>
             <Col>
-              <CharityProjectDonationDetails />
+              <CharityProjectDonationDetails
+                projectId={projectData.id}
+              />
             </Col>
           </Row>
 

@@ -24,6 +24,11 @@ module.exports = (sequelize, DataTypes) => {
 				onUpdate: "CASCADE",
 				onDelete: "SET NULL",
 			});
+
+			UsedEquipment.hasMany(models.StorePurchase, {
+				foreignKey: 'usedEquipmentID',
+				sourceKey:  'id',
+			});
 			
 			UsedEquipment.belongsToMany(models.CharityProject, {
 				through: models.CharityProjectDonations,

@@ -54,7 +54,7 @@ export default function CharityProjectCatalog({
       <CharityProjectDisplayTable
         onOpenDetails={onOpenDetails}
       />
-      {/* <CharityProjectCardView
+      <CharityProjectCardView
         projects={charityProjects}
         onOpenDetails={onOpenDetails}
         onDelete={handleDelete}
@@ -64,7 +64,7 @@ export default function CharityProjectCatalog({
         handlePageChange={handlePageChange}
         currentPage={currentPage}
         totalPages={totalPages}
-      /> */}
+      />
 
       {/* Modal de confirmação */}
       <ConfirmationModal

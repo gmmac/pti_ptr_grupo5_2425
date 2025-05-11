@@ -68,7 +68,6 @@ export default function OrganizerCharityProjects() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
 
     const handleOpenDetailsModal = (project) => {
-    console.log("ASAJSHAKH ", project)
     setSelectedProject(project);
     setShowDetailsModal(true);
     };
@@ -100,7 +99,9 @@ export default function OrganizerCharityProjects() {
             <Spinner animation="border" />
             </div>
         ) : ( 
-            <>
+            <>  
+              <div>
+
                 <CharityProjectCatalog 
                   charityProjects={charityProjects} 
                   handlePageChange={handlePageChange} 
@@ -108,7 +109,10 @@ export default function OrganizerCharityProjects() {
                   totalPages={totalPages}
                   onOpenDetails={handleOpenDetailsModal}
                   onRefresh={toggleRefresh}
-                />
+                  />
+              
+
+              </div>
 
               <ModalCharityProjectDetails
                 show={showDetailsModal}

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Modal, Alert, Row, Col } from 'react-bootstrap';
 import api from '../../utils/axios';
 import ClientCatalogModal from '../storePurchase/ClientCatalogModal';
-// import CharityProjectCatalogModal from '../charity/CharityProjectCatalogModal';
 import UsedEquipmentCatalogModal from './../equipment/UsedEquipmentCatalogModal';
 import CharityProjectCatalogModal from '../charityProject/CharityProjectCatalogModal';
 
@@ -10,19 +9,19 @@ export default function DonationForms({ show, handleClose }) {
   const [form, setForm] = useState({
     statusID: '',
     clientNic: '',
-    equipmentBarcode: '',
+    usedEquipmentID: '',
     charityProjectId: '',
   });
 
   const [statusList, setStatusList] = useState([]);
+  const [modelsList, setModelsList] = useState([]);
   const [equipmentList, setEquipmentList] = useState([]);
   const [clientList, setClientList] = useState([]);
-  const [charityList, setCharityList] = useState([]);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const [clientData, setClientData] = useState({ /* ... */ });
-  const [equipmentData, setEquipmentData] = useState({ /* ... */ });
+  const [clientData, setClientData] = useState({});
+  const [equipmentData, setEquipmentData] = useState({});
   const [charityProject, setCharityProject] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
@@ -30,11 +29,18 @@ export default function DonationForms({ show, handleClose }) {
   const [showModalCharity, setShowModalCharity] = useState(false);
 
   useEffect(() => {
-    api.get(`/api/equipmentStatus/`).then(res => setStatusList(res.data)).catch(console.error);
-    api.get(`/api/model/`).then(res => setModelsList(res.data)).catch(console.error);
-    api.get(`/api/equipmentSheet/teste`).then(res => setEquipmentList(res.data.data.map(e => e.barcode))).catch(console.error);
-    api.get(`/api/client/`).then(res => setClientList(res.data.data.map(e => e.nic))).catch(console.error);
-    api.get(`/api/charityProject`).then(res => setCharityList(res.data.data)).catch(console.error);
+    api.get('/api/equipmentStatus/')
+      .then(res => setStatusList(res.data))
+      .catch(console.error);
+    api.get('/api/model/')
+      .then(res => setModelsList(res.data))
+      .catch(console.error);
+    api.get('/api/usedEquipment')
+      .then(res => setEquipmentList(res.data.data.map(e => e.id)))
+      .catch(console.error);
+    api.get('/api/client/')
+      .then(res => setClientList(res.data.data.map(e => e.nic)))
+      .catch(console.error);
   }, []);
 
   const handleSelectCharity = (project) => {
@@ -50,216 +56,146 @@ export default function DonationForms({ show, handleClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
-    if (form.equipmentBarcode.length !== 20) {
-      setError("O Código de barras do equipamento deve ter exatamente 20 algarismos.");
-      return;
-    }
-
-    if (!equipmentList.includes(form.equipmentBarcode)) {
-      setError("Não existe nenhum equipamento com o Código de barras fornecido.");
+    if (!equipmentList.includes(form.usedEquipmentID)) {
+      setError('No equipment found with the provided barcode.');
       return;
     }
 
     if (!clientList.includes(form.clientNic)) {
-      setError("Não existe nenhum cliente com o NIC fornecido.");
+      setError('No client found with the provided NIC.');
       return;
     }
 
     if (!form.charityProjectId) {
-      setError("Selecione um projeto de beneficência.");
+      setError('Please select a charity project.');
       return;
     }
 
     try {
-      await api.post('/api/donation', form); // Altere para sua rota real
-      setSuccessMessage("Doação registrada com sucesso!");
-      setError("");
-
-      setTimeout(() => {
-        setSuccessMessage("");
-        setForm({ statusID: '', clientNic: '', equipmentBarcode: '', charityProjectId: '' });
-        setCharityProject(null);
-      }, 3000);
-    } catch (error) {
-      console.error("Erro ao registrar doação: ", error);
-      setError("Ocorreu um erro ao registar a doação.");
+      await api.post('/api/storePurchase/donate', form);
+      setSuccessMessage('Donation registered successfully!');
+      setForm({ statusID: '', clientNic: '', usedEquipmentID: '', charityProjectId: '' });
+      setCharityProject(null);
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      const backendMsg = err.response?.data?.error;
+      if (backendMsg) {
+        setError(backendMsg);
+      } else {
+        console.error('Error registering donation:', err);
+        setError('An error occurred while registering the donation.');
+      }
     }
   };
 
   const handleSelectClient = (client) => {
     if (client) {
-        setClientData({
-            nic: client.nic,
-            nif: client.nif,
-            birthDate: client.birthDate,
-            gender: client.gender,
-            firstName: client.firstName,
-            lastName: client.lastName,
-            email: client.email,
-            phone: client.phone
-        });
-
-        setForm((prevForm) => ({
-            ...prevForm,
-            clientNic: client.nic
-        }));
+      setClientData({
+        nic: client.nic,
+        nif: client.nif,
+        birthDate: client.birthDate,
+        gender: client.gender,
+        firstName: client.firstName,
+        lastName: client.lastName,
+        email: client.email,
+        phone: client.phone,
+      });
+      setForm(prev => ({ ...prev, clientNic: client.nic }));
     } else {
-        setClientData({
-            nic: '',
-            nif: '',
-            birthDate: '',
-            gender: '',
-            firstName: '',
-            lastName: '',
-            email: '',
-            phone: ''
-        });
-
-        setForm((prevForm) => ({
-            ...prevForm,
-            clientNic: ''
-        }));
+      setClientData({ nic: '', nif: '', birthDate: '', gender: '', firstName: '', lastName: '', email: '', phone: '' });
+      setForm(prev => ({ ...prev, clientNic: '' }));
     }
-
     setShowModal(false);
-};
+  };
 
-const handleChange = (event) => {
-  const { name, value } = event.target;
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setClientData(prev => ({ ...prev, [name]: value }));
+    setForm(prev => ({ ...prev, [name]: value }));
 
-  setClientData({ ...clientData, [name]: value });
+    if (name === 'usedEquipmentID' && !/^[0-9]*$/.test(value)) {
+      setError('The equipment barcode must contain only numbers.');
+    }
+    if (name === 'clientNic') {
+      if (!/^[0-9]*$/.test(value)) setError('The client NIC must contain only numbers.');
+      else if (value.length > 9) setError('The client NIC must be 9 digits long.');
+    }
+  };
 
-  if (name === "equipmentBarcode") {
-      if (!/^\d*$/.test(value)) {
-          setError("O Código de barras do equipamento deve conter apenas números.");
-      } else if (value.length > 20) {
-          setError("O Código de barras do equipamento deve ter 20 algarismos.");
-      } else {
-          setError("");
-      }
-  }
-
-  if (name === "clientNic") {
-      if (!/^\d*$/.test(value)) {
-          setError("O NIC do cliente deve conter apenas números.");
-      } else if (value.length > 9) {
-          setError("O NIC do cliente deve ter 9 algarismos.");
-      } else {
-          setError("");
-      }
-  }
-
-  setForm(prevState => ({
-      ...prevState,
-      [name]: value
-  }));
-};
-
-const handleSelectEquipment = (equipment) => {
-  if (equipment) {
+  const handleSelectEquipment = (equipment) => {
+    if (equipment) {
       setEquipmentData({
-          barcode: equipment.barcode,
-          model: equipment.model,
-          releaseYear: equipment.releaseYear,
-          type: equipment.type
+        barcode: equipment.id,
+        model: equipment.EquipmentSheet.EquipmentModel.name,
       });
-
-      setForm((prevForm) => ({
-          ...prevForm,
-          equipmentBarcode: equipment.barcode
-      }));
-  } else {
-      setEquipmentData({
-          barcode: '',
-          model: '',
-          releaseYear: '',
-          type: ''
-      });
-
-      setForm((prevForm) => ({
-          ...prevForm,
-          equipmentBarcode: ''
-      }));
-  }
-
-  setShowModalEq(false);
-};
+      setForm(prev => ({ ...prev, usedEquipmentID: equipment.id }));
+    } else {
+      setEquipmentData({ barcode: '', model: '' });
+      setForm(prev => ({ ...prev, usedEquipmentID: '' }));
+    }
+    setShowModalEq(false);
+  };
 
   return (
     <>
       <Modal show={show} onHide={handleClose} size="lg" centered>
         <Modal.Header closeButton>
-          <Modal.Title>Registrar Doação</Modal.Title>
+          <Modal.Title>Register Donation</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
-
           <Form onSubmit={handleSubmit}>
-            <Row className="mb-3">
-              <Form.Group controlId="formEstado">
-                <Form.Label>Estado do Equipamento</Form.Label>
-                <Form.Control as="select" name="statusID" value={form.statusID} onChange={handleChange} required>
-                  <option value="">Selecione...</option>
-                  {statusList.map((s, idx) => <option key={idx} value={s.id}>{s.state}</option>)}
-                </Form.Control>
-              </Form.Group>
-            </Row>
-
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="formClientNic">
-                  <Form.Label>NIC do cliente</Form.Label>
-                  <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Digite o NIC" required />
+                  <Form.Label>Client NIC</Form.Label>
+                  <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Enter NIC" required />
                 </Form.Group>
               </Col>
               <Col md={6} className="d-flex align-items-end">
-                <Button onClick={() => setShowModal(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
-                  Procurar cliente
+                <Button variant="outline-secondary" className="w-100 rounded-pill shadow-sm" onClick={() => setShowModal(true)}>
+                  Search Client
                 </Button>
               </Col>
             </Row>
-
             <Row className="mb-3">
               <Col md={6}>
-                <Form.Group controlId="formBarcodeEquipamento">
-                  <Form.Label>Código de barras do Equipamento</Form.Label>
-                  <Form.Control type="number" name="equipmentBarcode" value={form.equipmentBarcode} onChange={handleChange} placeholder="Digite o código de barras" required />
+                <Form.Group controlId="formusedEquipmentID">
+                  <Form.Label>Equipment Barcode</Form.Label>
+                  <Form.Control type="text" name="usedEquipmentID" value={form.usedEquipmentID} onChange={handleChange} placeholder="Enter barcode" required />
                 </Form.Group>
               </Col>
               <Col md={6} className="d-flex align-items-end">
-                <Button onClick={() => setShowModalEq(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
-                  Buscar equipamento
+                <Button variant="outline-secondary" className="w-100 rounded-pill shadow-sm" onClick={() => setShowModalEq(true)}>
+                  Search Equipment
                 </Button>
               </Col>
             </Row>
-
             <Row className="mb-3">
-              <Col md={12}>
+              <Col>
                 <Form.Group controlId="formCharityProject">
-                  <Form.Label>Projeto de Beneficência</Form.Label>
-                  <Form.Control type="text" readOnly value={charityProject ? charityProject.name : ''} placeholder="Selecione um projeto" />
+                  <Form.Label>Charity Project</Form.Label>
+                  <Form.Control type="text" readOnly value={charityProject?.name || ''} placeholder="Select a project" />
                 </Form.Group>
               </Col>
-              <Col md={12} className="d-flex align-items-end mt-2">
-                <Button onClick={() => setShowModalCharity(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
-                  Selecionar projeto
+              <Col className="d-flex align-items-end">
+                <Button variant="outline-secondary" className="w-100 rounded-pill shadow-sm" onClick={() => setShowModalCharity(true)}>
+                  Select Project
                 </Button>
               </Col>
             </Row>
-
             {error && <Alert variant="danger" className="text-center">{error}</Alert>}
-
             <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg">
-              Registrar Doação
+              Register Donation
             </Button>
           </Form>
         </Modal.Body>
       </Modal>
-
       <ClientCatalogModal show={showModal} handleClose={() => setShowModal(false)} handleSelectClient={handleSelectClient} selectedClient={clientData.nic} />
-      <UsedEquipmentCatalogModal show={showModalEq} handleClose={() => setShowModalEq(false)} handleSelectEquipment={handleSelectEquipment} selectedEquipment={equipmentData.barcode} />
-      <CharityProjectCatalogModal show={showModalCharity} handleClose={() => setShowModalCharity(false)} handleSelectProject={handleSelectCharity} selectedProject={charityProject?.id} />
+      <UsedEquipmentCatalogModal show={showModalEq} handleClose={() => setShowModalEq(false)} handleSelectEquipment={handleSelectEquipment} selectedEquipmentID={equipmentData.barcode} />
+      <CharityProjectCatalogModal show={showModalCharity} handleClose={() => setShowModalCharity(false)} handleSelectCharity={handleSelectCharity} selectedCharityID={charityProject?.id} />
     </>
   );
 }

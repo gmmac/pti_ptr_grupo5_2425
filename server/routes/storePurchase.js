@@ -171,30 +171,153 @@ router.post("/", async (req, res) => {
 });
 
 
+router.get("/getDonations", async (req, res) => {
+
+// try {
+    const {
+      // clientName,
+      // employeeName,
+      // modelName,
+      // storeName,
+      charityProjectId,
+      usedEquipmentId,
+      createdAt,
+      page = 1,
+      pageSize = 10,
+      sortField = "id",
+      sortOrder = "ASC",
+    } = req.query;
+
+    console.log(req.query)
+
+    const where = {};
+    if (charityProjectId) {
+      where.charityProjectId = Number(charityProjectId);
+    }
+    else if (usedEquipmentId){
+      where.usedEquipmentId = Number(usedEquipmentID);
+    }
+
+    const offset = (Number(page) - 1) * Number(pageSize);
+
+    const { count, rows } = await models.CharityProjectDonations.findAndCountAll({
+      where,
+      include: [
+        {
+          model: models.UsedEquipment,
+          attributes: [ "id"],
+          // where: statusFilter,
+          include:[
+            {
+              model: models.StorePurchase,
+              attributes: ["id", "storeID", "clientNIC", "employeeID"],
+              include: [
+                {
+                  model: models.Client,
+                  attributes: ["nic", "firstName", "lastName", "email"],
+
+                }
+              ]
+            },
+            {
+              model: models.EquipmentSheet,
+              attributes: [ "barcode"],
+              include: [{
+                model: models.EquipmentModel,
+                attributes: [ "id", "name"],
+
+                include: [{
+                  model: models.Brand,
+                  attributes: [ "id", "name"],
+                }]
+
+              }]
+
+            }
+            
+          ]
+        },
+        {
+          model: models.CharityProject,
+          attributes: [ "id", "name"],
+          include: [
+            {
+              model: models.Warehouse,
+              attributes: ["id", "name"],
+
+            }
+          ]
+
+        }
+
+      ],
+      limit: Number(pageSize),
+      offset,
+      order: [['charityProjectId', 'ASC']],  // or pull from req.query if you still want ordering
+    });
+
+    return res.json({
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: Number(page),
+      pageSize: Number(pageSize),
+      data: rows,
+    });
+
+  // } catch (error) {
+  //     res.status(400).json({ error: "Error." });
+  // }
+});
+
 router.post("/donate", async (req, res) => {
-
   try {
-      const {statusID, price, clientNic, equipmentBarcode, charityProjectId} = req.body;
+    const { clientNic, usedEquipmentID, charityProjectId } = req.body;
+    const storeID    = req.cookies["employeeInfo"].storeNIPC;
+    const employeeID = req.cookies["employeeInfo"].nic;
 
-      console.log(req.body)
+    // 1) Look up project and its warehouse
+    const project   = await models.CharityProject.findByPk(charityProjectId);
+    const warehouse = await models.Warehouse.findByPk(project.warehouseID);
+    if (!warehouse) {
+      return res.status(404).json({ error: "Warehouse not found." });
+    }
+    if (warehouse.availableSlots <= 0) {
+      return res.status(400).json({ error: "This warehouse has no available slots." });
+    }
 
-      const storeID = req.cookies["employeeInfo"].storeNIPC
-      const employeeID = req.cookies["employeeInfo"].nic
+    // 2) Create the “store purchase” with price = 0
+    const storePurchase = await models.StorePurchase.create({
+      storeID,
+      clientNIC:     clientNic,
+      employeeID,
+      purchasePrice: 0,
+      usedEquipmentID,
+      createdAt:     new Date(),
+      updatedAt:     new Date()
+    });
+    if (!storePurchase) {
+      return res.status(400).json({ error: "Could not record donation." });
+    }
 
+    // 3) Link it into the donation join‐table
+    const donation = await models.CharityProjectDonations.create({
+      charityProjectId,
+      usedEquipmentId: usedEquipmentID,
+      createdAt:       new Date(),
+      updatedAt:       new Date()
+    });
 
-      const usedEquipment = await models.UsedEquipment.create({ statusID: statusID, price: price, purchaseDate: new Date(), equipmentId: equipmentBarcode, storeId: storeID, createdAt: new Date(), updatedAt: new Date() });
-      
-      // só cria a compra da loja, caso o equipamento usado exista (tenha sido criado)
-      if(usedEquipment){
-          const storePurchases = await models.StorePurchase.create({ storeID: storeID, clientNIC: clientNic, employeeID: employeeID, purchasePrice: price, usedEquipmentID: usedEquipment.id, createdAt: new Date(), updatedAt: new Date() });
-          res.status(201).json(storePurchases);
-      } else{
-          res.status(400).json({ error: "Error." });
-      }
+    // 4) Decrement availableSlots by 1
+    await warehouse.decrement("availableSlots", { by: 1 });
+
+    return res.status(201).json(donation);
 
   } catch (error) {
-      res.status(400).json({ error: "Error." });
+    console.error("Error in /donate:", error);
+    return res.status(500).json({ error: "Unexpected error." });
   }
 });
+
+
 
 module.exports = router;

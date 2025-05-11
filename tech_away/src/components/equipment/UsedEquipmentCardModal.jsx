@@ -1,30 +1,28 @@
-import React from 'react'
-import { Button, Card } from 'react-bootstrap'
+import React from 'react';
+import { Button, Card } from 'react-bootstrap';
 
-export default function UsedEquipmentCardModal({equipment, selectedEquipment, handleEquipmentSelection}) {
-    
+export default function UsedEquipmentCardModal({ equipment, selectedEquipmentID, handleEquipmentSelection }) {
   return (
     <Card className="mb-3 d-lg-none">
-        <Card.Body>
-        <Card.Title>{equipment.EquipmentSheet.EquipmentModel.name}</Card.Title>
+      <Card.Body>
+        <Card.Title>ID: {equipment.id}</Card.Title>
         <Card.Text>
-            <strong>Barcode:</strong> {equipment.EquipmentSheet.barcode}<br />
-            <strong>Model:</strong> {equipment.EquipmentSheet.EquipmentModel.name}<br />
-            <strong>Release Year:</strong> {equipment.EquipmentSheet.EquipmentModel.releaseYear}<br />
-            <strong>Type:</strong> {equipment.EquipmentSheet.EquipmentType.name}
+          <strong>Barcode:</strong> {equipment.EquipmentSheet.barcode}<br />
+          <strong>Model:</strong> {equipment.EquipmentSheet.EquipmentModel.name}<br />
+          <strong>Type:</strong> {equipment.EquipmentSheet.EquipmentType.name}
         </Card.Text>
-        <Button 
-            style={{
-              backgroundColor: selectedEquipment === equipment.EquipmentSheet.barcode ? '#708c7e' : '#b5a8c9',
-              color: 'white',
-              border: 'none'
-            }} 
-            variant={selectedEquipment === equipment.EquipmentSheetbarcode ? "secondary" : "primary"} 
-            onClick={() => handleEquipmentSelection(equipment)}
+        <Button
+          style={{
+            backgroundColor: selectedEquipmentID === equipment.id ? '#708c7e' : '#b5a8c9',
+            color: 'white',
+            border: 'none'
+          }}
+          variant={selectedEquipmentID === equipment.id ? 'secondary' : 'primary'}
+          onClick={() => handleEquipmentSelection(equipment)}
         >
-            {selectedEquipment === equipment.EquipmentSheet.barcode ? "Deselect" : "Select"}
+          {selectedEquipmentID === equipment.id ? 'Deselect' : 'Select'}
         </Button>
-        </Card.Body>
+      </Card.Body>
     </Card>
-  )
+  );
 }

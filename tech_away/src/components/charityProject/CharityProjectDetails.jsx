@@ -63,7 +63,9 @@ export default function CharityProjectDetails({ project, onRefresh }) {
       </Row>
       <Row>
         <Col>
-          <CharityProjectDonationDetails />
+          <CharityProjectDonationDetails
+            projectId={project.id}
+          />
         </Col>
       </Row>
     </div>

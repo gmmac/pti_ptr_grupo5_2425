@@ -7,61 +7,93 @@ const { sequelize } = require("../models/index");
 router.get("/", async (req, res) => {
   try {
     const {
+      id,
+      projectName,
+      status,
+      warehouse,
+      organizerName,
       startDate,
       completionDate,
-      status,
-      id,
-      warehouseID,
-      organizerNic,
       page = 1,
       pageSize = 5,
-      orderBy = "id",
-      orderDirection = "ASC",
     } = req.query;
 
+    // build “where” for CharityProject fields
     const where = {};
+    if (id) {
+      where.id = { [Op.eq]: parseInt(id, 10) };
+    }
+    if (projectName) {
+      where.name = { [Op.iLike]: `%${projectName}%` };
+    }
+    if (startDate) {
+      where.startDate = { [Op.gte]: startDate };
+    }
+    if (completionDate) {
+      where.completionDate = { [Op.lte]: completionDate };
+    }
 
-    if (startDate) where.startDate = { [Op.gte]: startDate };
-    if (completionDate) where.completionDate = { [Op.lte]: completionDate };
-    if (status) where.status = { [Op.eq]: parseInt(status) };
-    if (warehouseID) where.warehouseID = { [Op.eq]: parseInt(warehouseID) };
-    if (organizerNic) where.organizerNic = { [Op.like]: `%${organizerNic}%` };
-    if (id) where.id = { [Op.eq]: id };
+    // build include‐level filters
+    const statusFilter = {};
+    if (status) {
+      statusFilter.state = { [Op.iLike]: `%${status}%` };
+    }
 
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    const order = [[orderBy, orderDirection.toUpperCase()]];
+    const warehouseFilter = {};
+    if (warehouse) {
+      warehouseFilter.name = { [Op.iLike]: `%${warehouse}%` };
+    }
+
+    // for organizer name, concatenate firstName + lastName
+    const organizerWhere = organizerName
+      ? Sequelize.where(
+          Sequelize.fn(
+            'concat',
+            Sequelize.col('Organizer.firstName'),
+            ' ',
+            Sequelize.col('Organizer.lastName')
+          ),
+          { [Op.iLike]: `%${organizerName}%` }
+        )
+      : null;
+
+    const offset = (Number(page) - 1) * Number(pageSize);
 
     const { count, rows } = await models.CharityProject.findAndCountAll({
       where,
       include: [
         {
           model: models.ProjectStatus,
-          attributes: ["id", "state"],
+          attributes: ['id', 'state'],
+          where: statusFilter,
         },
         {
           model: models.Warehouse,
-          attributes: ["id", "name"],
+          attributes: ['id', 'name'],
+          where: warehouseFilter,
         },
         {
           model: models.Organizer,
-          attributes: ["nic", "firstName", "lastName", "email"],
+          attributes: ['nic', 'firstName', 'lastName', 'email'],
+          // apply organizerName filter if present
+          ...(organizerWhere ? { where: organizerWhere } : {}),
         },
       ],
-      limit: parseInt(pageSize),
+      limit: Number(pageSize),
       offset,
-      order,
+      order: [['id', 'ASC']],  // or pull from req.query if you still want ordering
     });
 
-    res.json({
+    return res.json({
       totalItems: count,
       totalPages: Math.ceil(count / pageSize),
-      currentPage: parseInt(page),
-      pageSize: parseInt(pageSize),
+      currentPage: Number(page),
+      pageSize: Number(pageSize),
       data: rows,
     });
   } catch (error) {
-    console.error("Error fetching charity projects:", error);
-    res.status(500).json({ error: "Error fetching charity projects." });
+    console.error('Error fetching charity projects:', error);
+    return res.status(500).json({ error: 'Error fetching charity projects.' });
   }
 });
 

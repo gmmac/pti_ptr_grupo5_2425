@@ -118,7 +118,7 @@ export default function CharityProjectDisplayTable({onEdit, onOpenDetails, onDel
     return (
         <>
             <ConfirmDialog />
-            <div className="">
+            <div className="d-none d-lg-block">
                 <DataTable
                     value={data}
                     lazy
@@ -190,7 +190,7 @@ export default function CharityProjectDisplayTable({onEdit, onOpenDetails, onDel
                         {
                             label: "Detalhes",
                             icon: "pi pi-eye",
-                            command: () => {console.log(rowData.id); onOpenDetails(rowData.id)}
+                            command: () => {onOpenDetails(rowData.id)}
                         },
                         {
                             label: "Editar",

@@ -1,41 +1,42 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Table } from 'react-bootstrap'
+import React, { useEffect } from 'react';
+import { Button, Table } from 'react-bootstrap';
 
-export default function UsedEquipmentTableModal({equipments, selectedEquipment, handleEquipmentSelection}) {
-
+export default function UsedEquipmentTableModal({ equipments, selectedEquipmentID, handleEquipmentSelection }) {
   return (
     <Table responsive="sm" striped bordered hover className="d-none d-lg-table">
-        <thead>
+      <thead>
         <tr>
-            <th>Barcode</th>
-            <th>Model</th>
-            <th>Release Year</th>
-            <th>Type</th>
+          <th>ID</th>
+          <th>Barcode</th>
+          <th>Model</th>
+          <th>Type</th>
+          <th>Select Equipment</th>
         </tr>
-        </thead>
-        <tbody>
-        {equipments.map((equipment) => (
-            <tr key={equipment.EquipmentSheet.barcode}>
-            <td>{equipment.EquipmentSheet.barcode}</td>
-            <td>{equipment.EquipmentSheet.EquipmentModel.name}</td>
-            <td>{equipment.EquipmentSheet.EquipmentModel.releaseYear}</td>
-            <td>{equipment.EquipmentSheet.EquipmentType.name}</td>
+      </thead>
+      <tbody>
+        {equipments.map((e) => (
+          <tr key={e.id}>
+            <td>{e.id}</td>
+            <td>{e.EquipmentSheet.barcode}</td>
+            <td>{e.EquipmentSheet.EquipmentModel.name}</td>
+            <td>{e.EquipmentSheet.EquipmentType.name}</td>
             <td>
-                <Button 
+              <Button
+                size="sm"
                 style={{
-                    backgroundColor: selectedEquipment === equipment.EquipmentSheet.barcode ? '#708c7e' : '#b5a8c9',
-                    color: 'white',
-                    border: 'none'
-                }} 
-                variant={selectedEquipment === equipment.EquipmentSheet.barcode ? "secondary" : "primary"} 
-                onClick={() => handleEquipmentSelection(equipment)}
-                >
-                    {selectedEquipment === equipment.EquipmentSheet.barcode ? "Deselect" : "Select"}
-                </Button>
+                  backgroundColor: selectedEquipmentID === e.id ? '#708c7e' : '#b5a8c9',
+                  color: 'white',
+                  border: 'none'
+                }}
+                variant={selectedEquipmentID === e.id ? 'secondary' : 'primary'}
+                onClick={() => handleEquipmentSelection(e)}
+              >
+                {selectedEquipmentID === e.id ? 'Deselect' : 'Select'}
+              </Button>
             </td>
-            </tr>
+          </tr>
         ))}
-        </tbody>
+      </tbody>
     </Table>
-  )
+  );
 }

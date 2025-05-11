@@ -1,76 +1,52 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Button, Table, Container } from "react-bootstrap";
-import api from "../../utils/axios";
-import PaginationControl from "../pagination/PaginationControl";
-import UsedEquipmentTableModal from "./UsedEquipmentTableModal";
-import UsedEquipmentCardModal from "./UsedEquipmentCardModal";
-// import EquipmentFilter from "./EquipmentFilter";
-// import EquipmentTableModal from "./EquipmentTableModal";
-// import EquipmentCardModal from "./EquipmentCardModal";
+import React, { useEffect, useState } from 'react';
+import { Modal, Button, Container } from 'react-bootstrap';
+import api from '../../utils/axios';
+import PaginationControl from '../pagination/PaginationControl';
+import UsedEquipmentTableModal from './UsedEquipmentTableModal';
+import UsedEquipmentCardModal from './UsedEquipmentCardModal';
 
-export default function UsedEquipmentCatalogModal({ show, handleClose, handleSelectEquipment, selectedEquipment }) {
+export default function UsedEquipmentCatalogModal({ show, handleClose, handleSelectEquipment, selectedEquipmentID }) {
+  const [equipments, setEquipments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 4;
+  const [filters, setFilters] = useState({ usedEquipmentId: '', model: '', type: '' });
 
-    const [equipments, setEquipments] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-  
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const itemsPerPage = 4;
-    
-    const [filters, setFilters] = useState({
-      usedEquipmentId: "",
-      model: "",
-    //   releaseYear: "",
-      type: "",
-      orderDirection: "ASC"
-    });
-
-    const handleClosePopUp = () => {
-      handleClose()
-      setFilters({
-        barcode: "",
-        model: "",
-        releaseYear: "",
-        type: "",
-        orderDirection: "ASC"
-      })
-    }
-  
-    useEffect(() => {
-      const fetchEquipments= async () => {
-          setLoading(true);
-          setError(null);
-          try {
-            const response = await api.get(`/api/usedEquipment`, {
-              params: {
-                ...filters,
-                page: currentPage,
-                pageSize: itemsPerPage
-              }
-            });
-            setEquipments(response.data.data || []);
-            setTotalPages(response.data.totalPages);
-            console.log(response.data.data)
-          } catch (err) {
-            setError("Erro ao carregar os equipamentos");
-          }
-          setLoading(false);
-      };
-  
-      if (show) {
-        fetchEquipments();
-      }
-    }, [show, currentPage, filters]);
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+  const handleClosePopUp = () => {
+    handleClose();
+    setFilters({ usedEquipmentId: '', model: '', type: '' });
+    setCurrentPage(1);
   };
 
-  const handleEquipmentSelection = (equipment) => {
-    if (selectedEquipment === equipment.EquipmentSheet.barcode) {
+  useEffect(() => {
+    const fetchEquipments = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await api.get('/api/usedEquipment', {
+          params: { ...filters, page: currentPage, pageSize: itemsPerPage }
+        });
+        setEquipments(response.data.data || []);
+        setTotalPages(response.data.totalPages);
+      } catch (err) {
+        setError('Error loading used equipment');
+      }
+      setLoading(false);
+    };
+
+    if (show) fetchEquipments();
+  }, [show, currentPage, filters]);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
+
+  // Pass full equipment object back to parent so barcode stays defined
+  const onSelect = (equipment) => {
+    if (selectedEquipmentID === equipment.id) {
       handleSelectEquipment(null);
     } else {
       handleSelectEquipment(equipment);
@@ -78,30 +54,32 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
   };
 
   return (
-    <Modal show={show} onHide={handleClose} size="xl" centered>
+    <Modal show={show} onHide={handleClosePopUp} size="xl" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Catálogo de Equipamentos</Modal.Title>
+        <Modal.Title>Catalog of Used Equipment</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* <EquipmentFilter setFilters={setFilters} /> */}
         {loading ? (
           <p>Loading Data...</p>
         ) : error ? (
           <p className="text-danger">{error}</p>
         ) : equipments.length === 0 ? (
-          <p>Data not found.</p>
+          <p>No equipment found.</p>
         ) : (
           <Container>
-              <UsedEquipmentTableModal equipments={equipments} selectedEquipment={selectedEquipment} handleEquipmentSelection={handleEquipmentSelection} /> 
-              {equipments.map((e) => {
-                return <UsedEquipmentCardModal 
-                  key={e.barcode} 
-                  equipment={e} 
-                  selectedEquipment={selectedEquipment} 
-                  handleEquipmentSelection={handleEquipmentSelection} 
-                  />
-              })}
-
+            <UsedEquipmentTableModal
+              equipments={equipments}
+              selectedEquipmentID={selectedEquipmentID}
+              handleEquipmentSelection={onSelect}
+            />
+            {equipments.map((e) => (
+              <UsedEquipmentCardModal
+                key={e.id}
+                equipment={e}
+                selectedEquipmentID={selectedEquipmentID}
+                handleEquipmentSelection={onSelect}
+              />
+            ))}
             <PaginationControl
               handlePageChange={handlePageChange}
               currentPage={currentPage}
@@ -111,7 +89,7 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClosePopUp}>Fechar</Button>
+        <Button variant="secondary" onClick={handleClosePopUp}>Close</Button>
       </Modal.Footer>
     </Modal>
   );
