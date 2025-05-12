@@ -130,6 +130,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
     };
 
     const capitalizeFirstLetter = (value) => {
+        if(String(value) == "id") return "ID";
         return String(value).charAt(0).toUpperCase() + String(value).slice(1);
     }
 
