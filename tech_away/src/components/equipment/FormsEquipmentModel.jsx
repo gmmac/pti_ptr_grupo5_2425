@@ -17,7 +17,6 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
     const [showNewBrandModal, setShowNewBrandModal] = useState(false);
 
     const [equipmentModel, setEquipmentModel] = useState(() => {
-        console.log(existingModel)
         if (existingModel) {
             return {
                 name: existingModel.name || "",
@@ -38,7 +37,6 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 
     useEffect(() => {
         if (existingModel) {
-            console.log("Exist",  existingModel)
           setEquipmentModel({
             name: existingModel.name || "",
             brandId: existingModel.Brand?.id || "",
@@ -46,7 +44,6 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
             price: existingModel.price || "",
             releaseYear: existingModel.releaseYear || "",
           });
-          console.log("Equipm",existingModel)
         }
       }, [existingModel]);
 
@@ -132,6 +129,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
     //   };
 
 	const handleRefresh = () => {
+        if (existingModel) return;
 		setEquipmentModel({
 			name: "",
             brandId: "",
@@ -168,7 +166,8 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
                                         <Button
                                             className="rounded-pill"
                                             style={{ backgroundColor: "var(--variant-two", border: "none" , width: "100px"}}
-                                            onClick={() => setShowBrandModal(true)}
+                                            onClick={() => {setShowBrandModal(true)}
+                                            }
                                         >Select
                                         </Button>
                                     </div>
@@ -318,6 +317,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
                 showModal={showBrandModal}
                 closeModal={() => setShowBrandModal(false)}
                 title="brand"
+                selectedItem = {{ id: equipmentModel.brandId, name: equipmentModel.brand }}
                 onSelect={handleBrandModel}
             />
 

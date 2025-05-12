@@ -6,12 +6,19 @@ export default function ModalToSelect({
 	showModal,
 	closeModal,
 	title,
+	selectedItem = null,
 	onSelect,
 }) {
 	const [list, setList] = useState([]);
 	const [columns, setColumns] = useState([]);
 	const [selectedRow, setSelectedRow] = useState(null);
 	const [search, setSearch] = useState("");
+
+	useEffect(() => {
+		if (showModal) {
+			setSelectedRow(selectedItem);
+		}
+	}, [showModal, selectedItem]);
 
 	useEffect(() => {
 		if (!showModal) return; // Evita chamadas desnecessárias
