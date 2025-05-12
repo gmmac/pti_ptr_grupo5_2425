@@ -72,7 +72,7 @@
     .custom-manage-tabs .nav-item .nav-link.active,
     .custom-manage-tabs .nav-link[aria-selected="true"] {
         background-color: var(--variant-one);
-        color: var(--dark-grey);
+        color: var(--light-grey);
         font-weight: bold;
     }
 
