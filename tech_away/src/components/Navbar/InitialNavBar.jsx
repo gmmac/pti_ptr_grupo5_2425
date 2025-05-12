@@ -6,8 +6,8 @@ import "../../styles/variables.css";
 
 const navItems = [
 	{ name: "Shop", path: "/store" },
-	{ name: "About Us", path: "/about" },
-	{ name: "Our Stores", path: "/services" },
+	{ name: "About Us", path: "/about-us" },
+	{ name: "Our Stores", path: "/our-stores" },
 ];
 
 export default function InitialNavBar() {

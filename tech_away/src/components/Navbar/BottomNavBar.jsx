@@ -16,11 +16,6 @@ const baseNavItems = [
 		path: "/store",
 		icon: "pi pi-shopping-bag",
 	},
-	{
-		name: "Our Stores",
-		path: "/our-stores",
-		icon: "pi pi-map-marker",
-	},
 ];
 
 export default function BottomNavBar() {
@@ -92,6 +87,64 @@ export default function BottomNavBar() {
 						</Nav.Item>
 					);
 				})}
+				<Nav.Item className="mx-2">
+					<Dropdown drop="up-centered">
+						<Dropdown.Toggle
+							id="dropdown-user"
+							className="rounded-pill px-3 border-0"
+							style={{ backgroundColor: "transparent" }}
+						>
+							<Stack
+								direction="vertical"
+								className="text-center align-items-center justify-content-center"
+							>
+								<i
+									className="pi pi-info-circle"
+									style={{ fontSize: "1.3rem", color: "var(--dark-grey)" }}
+								></i>
+								<p
+									className="m-0"
+									style={{ fontSize: "9px", color: "var(--dark-grey)" }}
+								>
+									Information
+								</p>
+							</Stack>
+						</Dropdown.Toggle>
+
+						<Dropdown.Menu>
+							<Dropdown.Item as={Link} to={"/our-stores"}>
+								<Stack
+									gap={2}
+									direction="horizontal"
+									className="text-center align-items-center justify-content-start"
+								>
+									<i
+										className="pi pi-map-marker"
+										style={{ fontSize: "1.3rem", color: "var(--dark-grey)" }}
+									></i>
+									<p className="m-0" style={{ color: "var(--dark-grey)" }}>
+										Our Stores
+									</p>
+								</Stack>
+							</Dropdown.Item>
+							<Dropdown.Item as={Link} to={"/about-us"}>
+								<Stack
+									gap={2}
+									direction="horizontal"
+									className="text-center align-items-center justify-content-start"
+								>
+									<i
+										className="pi pi-users"
+										style={{ fontSize: "1.3rem", color: "var(--dark-grey)" }}
+									></i>
+									<p className="m-0" style={{ color: "var(--dark-grey)" }}>
+										About Us
+									</p>
+								</Stack>
+							</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
+				</Nav.Item>
 
 				{user ? (
 					<>

@@ -39,6 +39,7 @@ import { UserTypeProvider } from "./contexts/AuthenticationProviders/UserTypePro
 import CharityProjectPage from "./pages/Organizer/CharityProjectPage";
 import TestPage from "./pages/TestPage";
 import CartMobilePage from "./pages/CartMobilePage";
+import  AboutPage  from "./pages/AboutPage";
 
 export default function Router() {
 	return (
@@ -48,6 +49,7 @@ export default function Router() {
 					<Routes>
 						<Route path="*" element={<NotFoundPage />} />
 						<Route path="teste" element={<TestPage />} />
+
 						{/* Rotas do Client */}
 						<Route
 							path="/"
@@ -57,6 +59,8 @@ export default function Router() {
 								</AuthProvider>
 							}
 						>
+							<Route path="about-us" element={<AboutPage />} />
+
 							<Route index element={<HomePage />} />
 							<Route path="store" element={<StorePage />} />
 							<Route
