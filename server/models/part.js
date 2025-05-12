@@ -13,23 +13,29 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Part.init({
-    name: {
-      type: DataTypes.STRING(50),
-      allowNull: true
+  Part.init(
+    {
+      name: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
+      price: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+      },
+      arriveTime: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      isActive: {
+        type: DataTypes.STRING(1),
+      },
     },
-    price: {
-      type: DataTypes.FLOAT,
-      allowNull: true
-    },
-    arriveTime: {
-      type: DataTypes.INTEGER,
-      allowNull: true
+    {
+      sequelize,
+      modelName: "Part",
+      timestamps: true,
     }
-  }, {
-    sequelize,
-    modelName: 'Part',
-    timestamps: true,
-  });
+  );
   return Part;
 };

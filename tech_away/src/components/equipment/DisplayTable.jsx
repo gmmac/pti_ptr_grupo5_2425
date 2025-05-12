@@ -33,6 +33,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
             'Barcode': { value: '', matchMode: 'contains' },
             'EquipmentModel': { value: '', matchMode: 'contains' },
             'EquipmentType': { value: '', matchMode: 'contains' },
+            'arriveTime': { value: '', matchMode: 'contains' },
 			'createdAt': { value: '', matchMode: 'equals' },
 			'updatedAt': { value: '', matchMode: 'equals' }
 		}
@@ -199,6 +200,9 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 								}
                                 if (value && column == "price"){
                                     return `${value} €`;
+                                }
+                                if (value && column == "arriveTime"){
+                                    return `${value} days`;
                                 }
 								if (dateFields.includes(column) && value) {
 									const date = new Date(value);

@@ -76,7 +76,7 @@ export default function FormsNewBrand({ showModal, closeModal, refreshTable}) {
 	};
 
 	return (
-		<Modal show={showModal} onHide={closeModal}>
+		<Modal show={showModal} onHide={() => { closeModal(); handleRefresh()}}>
 			<Modal.Header closeButton>
 				<Modal.Title>Add New Brand</Modal.Title>
 			</Modal.Header>

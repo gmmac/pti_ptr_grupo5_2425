@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Container, Row, Col, Tabs, Tab } from "react-bootstrap";
 import DisplayTable from "../../equipment/DisplayTable";
 import FormsEquipmentModel from "../../equipment/FormsEquipmentModel";

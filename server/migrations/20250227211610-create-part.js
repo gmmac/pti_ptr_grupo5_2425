@@ -2,30 +2,33 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Parts', {
+    await queryInterface.createTable("Parts", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       name: {
-        type: Sequelize.STRING(50)
+        type: Sequelize.STRING(50),
       },
       price: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       arriveTime: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+      },
+      isActive: {
+        type: Sequelize.STRING(1),
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
