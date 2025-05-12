@@ -95,6 +95,96 @@ router.get("/", async (req, res) => {
 	}
 });
 
+router.get("/displayTable", async (req, res) => {
+  try {
+    const {
+      nic,
+      nif,
+      birthDate,
+      gender,
+      name,
+      email,
+      phone,
+      active = "1",
+      page = 1,
+      pageSize = 10,
+      sortField = "nic",
+      sortOrder = "ASC",
+    } = req.query;
+
+    const where = {};
+
+    if (nic) where.nic = { [Op.like]: `${nic}%` };
+    if (nif) where.nif = { [Op.like]: `${nif}%` };
+    if (gender) where.gender = { [Op.like]: `${gender}%` };
+    if (email) where.email = { [Op.like]: `%${email}%` };
+    if (phone) where.phone = { [Op.like]: `%${phone}%` };
+    if (name) {
+      where[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          "concat",
+          Sequelize.col("firstName"),
+          " ",
+          Sequelize.col("lastName")
+        ),
+        {
+          [Op.iLike]: `%${name}%`,
+        }
+      );
+    }
+	if (active) where.isActive = { [Op.eq]: active };
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+    const orderClause = [];
+
+    if (sortField === "name") {
+      orderClause.push([
+        Sequelize.fn(
+          "concat",
+          Sequelize.col("firstName"),
+          " ",
+          Sequelize.col("lastName")
+        ),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField) {
+      // Para outros campos, use o nome da tabela corretamente
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
+
+    const { count, rows } = await models.Client.findAndCountAll({
+      where,
+      limit: parseInt(pageSize),
+      offset,
+      order: orderClause,
+    });
+
+    const formattedData = rows.map((item) => ({
+      nic: item.nic,
+      nif: item.nif,
+      name: item.firstName + " " + item.lastName,
+      email: item.email,
+      birthDate: item.birthDate,
+      phone: item.phone,
+    }));
+
+    res.json({
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+      data: formattedData,
+    });
+  } catch (error) {
+    console.error("Error fetching clients:", error);
+    res.status(500).json({ error: "Error fetching clients." });
+  }
+});
+
 router.get("/:NIC", async (req, res) => {
 	try {
 		const client = await models.Client.findByPk(req.params.NIC);

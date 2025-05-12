@@ -25,8 +25,6 @@ export default function ModelsManage() {
 			<Tabs
                 id="types-tabs"
                 defaultActiveKey="active"
-                // activeKey={activeTab}
-                // onSelect={handleTabChange}
                 className="custom-manage-tabs mb-3"
             >
                 <Tab eventKey="active" title="Active Equipment Models">
