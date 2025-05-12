@@ -98,7 +98,7 @@ export default function BottomNavBar() {
 						<Nav.Item className="mx-2">
 							<Nav.Link
 								as={Link}
-								to={"/"}
+								to={"/cart"}
 								style={{
 									backgroundColor: isCartActive
 										? "var(--variant-one)"
@@ -117,14 +117,16 @@ export default function BottomNavBar() {
 											color: "var(--dark-grey)",
 										}}
 									>
-										<Badge
-											value={numCartItems}
-											style={{
-												fontSize: "8px",
-												backgroundColor: "var(--white)",
-												color: "var(--dark-grey)",
-											}}
-										/>
+										{numCartItems ? (
+											<Badge
+												value={numCartItems}
+												style={{
+													fontSize: "8px",
+													backgroundColor: "var(--white)",
+													color: "var(--dark-grey)",
+												}}
+											/>
+										) : null}
 									</i>
 									<p
 										className="m-0"

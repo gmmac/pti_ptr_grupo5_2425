@@ -122,7 +122,7 @@ export default function LoggedInNavBar() {
 											value={numCartItems}
 											style={{
 												fontSize: "10px",
-												backgroundColor: "var(--variant-one)",
+												backgroundColor: "var(--white)",
 												color: "var(--dark-grey)",
 											}}
 										/>
