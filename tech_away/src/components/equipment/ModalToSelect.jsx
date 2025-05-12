@@ -94,7 +94,9 @@ export default function ModalToSelect({
 												color: selectedRow?.id === item.id ? "#fff" : "inherit", // Cor do texto na linha selecionada
 											}}
 										>
-											{item[col]}
+											{typeof item[col] === "object" && item[col] !== null
+												? item[col].name || JSON.stringify(item[col])
+												: item[col]}
 										</td>
 									))}
 								</tr>

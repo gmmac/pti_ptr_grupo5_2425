@@ -330,20 +330,34 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 						`}
 				</style>
             </div>
-				{model == "model" ? 
-					<FormsEquipmentModel showModal={showModal} closeModal={() => setShowModal(false)} refreshTable={() => loadLazyData()} existingModel = {selectedObj || {}} /> : 
-					<ModalEdit
-						show={showModal}
-						handleClose={() => setShowModal(false)}
-						modelToEdit={model}
-						objectToChange={selectedObj || {}}
-						attributesToEdit={columns}
-						onSave={() => {
-							setShowModal(false);
-							loadLazyData();
-						}}
-					/>
-				}
+            {model === "model" ? (
+                <FormsEquipmentModel
+                    showModal={showModal}
+                    closeModal={() => setShowModal(false)}
+                    refreshTable={() => loadLazyData()}
+                    existingModel={selectedObj || {}}
+                />
+            ) : model === "equipmentSheet" ? (
+                <FormsEquipmentSheet
+                    showModal={showModal}
+                    closeModal={() => setShowModal(false)}
+                    refreshTable={() => loadLazyData()}
+                    existingSheet={selectedObj || {}}
+                />
+            ) : (
+                <ModalEdit
+                    show={showModal}
+                    handleClose={() => setShowModal(false)}
+                    modelToEdit={model}
+                    objectToChange={selectedObj || {}}
+                    attributesToEdit={columns}
+                    onSave={() => {
+                        setShowModal(false);
+                        loadLazyData();
+                    }}
+                />
+            )}
+
             
         </>
     );

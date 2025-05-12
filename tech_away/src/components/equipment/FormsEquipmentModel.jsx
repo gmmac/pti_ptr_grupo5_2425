@@ -129,21 +129,6 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
         }
 	};
 
-    // const handleNext = () => {
-    //     let hasError = false;
-    //     let newErrors = { ...errors };
-    //     if (!equipmentModel.brandId) {
-    //       newErrors.brand = "Brand is required";
-    //       hasError = true;
-    //     }
-    //     setErrors(newErrors);
-      
-    //     if (hasError) {
-    //       return;
-    //     }
-    //     stepperRef.current.nextCallback();
-    //   };
-
     const handleNext = () => {
         let hasError = false;
         const newErrors = { ...errors };
@@ -196,7 +181,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 			<Modal.Body>
 				
             {/* <div className="card flex justify-content-center"> */}
-                <Stepper ref={stepperRef} style={{ flexBasis: '50rem' }} className="custom-stepper">
+                <Stepper ref={stepperRef} style={{ flexBasis: '50rem' }} className="custom-stepper" linear="true">
                     <StepperPanel header="Choose brand" style={{ paddingLeft: '0px' }}>
                         <div className="flex flex-column h-12rem">
                             <div className="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
@@ -240,16 +225,18 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
                                     </Col>
                                 </Row>          
                         </div>
-                        <div className="flex pt-4 justify-content-end ">
+                        <div className="flex pt-4 justify-content-start"></div>
+                        <Stack gap={2} direction="horizontal">
+                        <Button className="rounded-pill" label="Cancel" severity="secondary" icon="pi pi-times" onClick={() => {closeModal(); handleRefresh()}} />
                             <Button
-                                className="rounded-pill"
+                                className="rounded-pill ms-auto"
                                 label="Next"
                                 icon="pi pi-arrow-right"
                                 iconPos="right"
                                 style={{ backgroundColor: "var(--variant-one)", border: "none" }}
                                 onClick={handleNext}
                             />
-                        </div>
+                        </Stack>    
                     </StepperPanel>
                     <StepperPanel header="Equipment Model">
                         <div className="flex flex-column h-12rem">
