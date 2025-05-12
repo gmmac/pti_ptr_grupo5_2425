@@ -106,7 +106,7 @@ export default function ClientManageDisplayTable({ model, active = "1", refreshA
 
     const confirmDelete = (id) => {
         confirmDialog({
-            message: (<> Are you sure you want to {active == "1" ? "delete" : "restore"} this {model}?<br />This action can erase other items associated with this {model}.</>),
+            message: (<> Are you sure you want to {active == "1" ? "deactivate" : "restore"} this {model}?</>),
             header: "Confirmation",
             icon: "pi pi-exclamation-triangle",
             accept: () => handleDelete(id),
@@ -243,18 +243,29 @@ export default function ClientManageDisplayTable({ model, active = "1", refreshA
                                                 label="Delete"
                                                 style={{color: "var(--danger)"}}
                                                 className="custom-icon-button-withtext"
-                                                onClick={() => confirmDelete(model==="equipmentSheet" ? rowData.Barcode: rowData.id)}
+                                                onClick={() => confirmDelete(rowData.nic)}
                                             /> 
                                         </> : 
-                                    <Button
-                                        icon="pi pi-history"
-                                        text
-                                        severity="success"
-                                        label="Restore"
-                                        style={{color: "var(--valid)"}}
-                                        className="custom-icon-button-withtext"
-                                        onClick={() => confirmDelete(model==="equipmentSheet" ? rowData.Barcode: rowData.id)}
-                                    />
+                                        <>
+                                        <Button
+                                                icon="pi pi-info-circle"
+                                                rounded
+                                                text
+                                                severity="secondary"
+                                                aria-label="Edit"
+                                                className="custom-icon-button"
+                                                onClick={() => handleEdit(rowData)}
+                                            />
+                                        <Button
+                                            icon="pi pi-history"
+                                            text
+                                            severity="success"
+                                            label="Restore"
+                                            style={{color: "var(--valid)"}}
+                                            className="custom-icon-button-withtext"
+                                            onClick={() => confirmDelete(rowData.nic)}
+                                        />
+                                        </>
                                     }
                                 </div>
                             );

@@ -319,4 +319,19 @@ router.post("/", async (req, res) => {
 	}
 });
 
+router.patch("/activation/:nic", async (req, res) => {
+  try {
+	const client = await models.Client.findByPk(req.params.nic);
+	if (!client) {
+	  return res.status(404).json({ error: "Client not found" });
+	}
+	client.updatedAt = new Date();
+	client.isActive = client.isActive === "1" ? "0" : "1";
+	await client.save();
+	res.status(200).json(client);
+  } catch (error) {
+	res.status(500).json({ error: "Error updating client." });
+  }
+});
+
 module.exports = router;

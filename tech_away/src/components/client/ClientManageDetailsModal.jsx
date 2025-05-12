@@ -41,6 +41,17 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
 
   const formatDate = (date) => date ? new Date(date).toLocaleDateString('pt-PT') : '-';
 
+  const formatDateTime = (value) => {
+        const date = new Date(value);
+        const formattedDate = date.toLocaleDateString("pt-PT");
+        const formattedTime = date.toLocaleTimeString("pt-PT", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        });
+        return `${formattedDate} ${formattedTime}`;
+  };
+
   const handleChange = (field, value) => {
     setEditedClient(prev => ({ ...prev, [field]: value }));
 
@@ -204,11 +215,7 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
                 </>
               )}
             </div>
-          </Col>
-
-          {/* Right Column */}
-          <Col md={6}>
-          <div className="mb-3">
+            <div className="mb-3">
               <strong><i className="pi pi-user-plus" /> Gender:</strong><br />
               {!editMode ? (
                 client.gender === 'M' ? 'Male' : client.gender === 'F' ? 'Female' : client.gender === 'O' ? 'Other' : '-'
@@ -221,6 +228,10 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
                 />
               )}
             </div>
+          </Col>
+
+          {/* Right Column */}
+          <Col md={6}>
             <div className="mb-3">
               <strong><i className="pi pi-map-marker" /> Address:</strong><br />
               {!editMode ? (
@@ -266,10 +277,18 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
                 </>
               )}
             </div>
+            <div className="mb-3">
+              <strong><i className="pi pi-calendar-plus" /> Created at:</strong><br />
+              {formatDateTime(client.createdAt) || '-'}
+            </div>
+            <div className="mb-3">
+              <strong><i className="pi pi-calendar-clock" /> Last updated at:</strong><br />
+              {formatDateTime(client.updatedAt) || '-'}
+            </div>
           </Col>
         </Row>
         <div className="mt-2 mt-md-0">
-            {!editMode ? (
+            {!editMode ? ( client.isActive == "1" &&
                     <Button
                         className="rounded-pill ms-auto"
                         label="Edit"
