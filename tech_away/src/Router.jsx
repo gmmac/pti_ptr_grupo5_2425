@@ -39,7 +39,8 @@ import { UserTypeProvider } from "./contexts/AuthenticationProviders/UserTypePro
 import CharityProjectPage from "./pages/Organizer/CharityProjectPage";
 import TestPage from "./pages/TestPage";
 import CartMobilePage from "./pages/CartMobilePage";
-import  AboutPage  from "./pages/AboutPage";
+import AboutPage from "./pages/AboutPage";
+import OurStores from "./pages/OurStores";
 
 export default function Router() {
 	return (
@@ -60,6 +61,7 @@ export default function Router() {
 							}
 						>
 							<Route path="about-us" element={<AboutPage />} />
+							<Route path="our-stores" element={<OurStores />} />
 
 							<Route index element={<HomePage />} />
 							<Route path="store" element={<StorePage />} />
