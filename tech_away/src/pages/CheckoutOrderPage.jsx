@@ -14,7 +14,7 @@ export default function CheckoutOrderPage() {
 	};
 
 	return (
-		<Container style={{ fontFamily: "var(--body-font)" }}>
+		<Container style={{ fontFamily: "var(--body-font)" }} className="mb-5">
 			<Row className="g-4 pb-3 mx-0">
 				<div
 					style={{
@@ -73,7 +73,7 @@ export default function CheckoutOrderPage() {
 					</Stack>
 				</div>
 			</Row>
-			<Row className="g-4">
+			<Row className="g-4 mb-5">
 				<Col xs={12} md={5} lg={5} className="d-flex flex-column">
 					<Stack
 						className="p-4 flex-grow-1"
