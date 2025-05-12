@@ -105,7 +105,7 @@ export default function FormsNewBrand({ showModal, closeModal, refreshTable}) {
                      )}
 					<Button
 						className="w-100 rounded-pill"
-						style={{ backgroundColor: "var(--variant-two", border: "none" }}
+						style={{ backgroundColor: "var(--variant-one", border: "none" }}
 						onClick={handleSubmit}
 					>
 						Add Brand
