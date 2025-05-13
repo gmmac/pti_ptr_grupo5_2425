@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
 	async up(queryInterface, Sequelize) {
-		await queryInterface.bulkInsert("OrderStatus", [
+		await queryInterface.bulkInsert("OrderStatuses", [
 			{
 				state: "Pending Approval",
 				createdAt: new Date(),
@@ -17,6 +17,6 @@ module.exports = {
 	},
 
 	async down(queryInterface, Sequelize) {
-		await queryInterface.bulkDelete("OrderStatus", null, {});
+		await queryInterface.bulkDelete("OrderStatuses", null, {});
 	},
 };

@@ -36,12 +36,13 @@ module.exports = {
 				type: Sequelize.INTEGER,
 				allowNull: false,
 				references: {
-					model: "OrderStatuses", // Certifique-se de que a tabela está com esse nome
+					model: "OrderStatuses", // <- TEM que estar assim (com S no fim)
 					key: "id",
 				},
 				onUpdate: "CASCADE",
 				onDelete: "SET NULL",
 			},
+
 			pickupInStore: {
 				type: Sequelize.BOOLEAN,
 				allowNull: false,
