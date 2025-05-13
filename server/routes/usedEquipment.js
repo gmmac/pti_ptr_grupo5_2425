@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
       active = "1",
       page = 1,
       pageSize = 6,
-      sortField = "putOnSaleDate",
+      sortField = "id",
       sortOrder = "ASC",
     } = req.query;
 
@@ -66,6 +66,16 @@ router.get("/", async (req, res) => {
       where.statusID = { [Op.eq]: Status };
     if (active)
       sheetWhere.isActive = { [Op.eq]: active };
+
+    where.action = {
+      [Op.or]: [
+        { [Op.ne]: 'D' },
+        { [Op.is]: null },
+        { [Op.eq]: 'S' }
+
+      ]
+    };
+
 
     const { count, rows } = await models.UsedEquipment.findAndCountAll({
       where,
@@ -151,7 +161,7 @@ router.get("/displayTable", async (req, res) => {
       active = "1",
       page = 1,
       pageSize = 6,
-      sortField = "putOnSaleDate",
+      sortField = "id",
       sortOrder = "ASC",
     } = req.query;
 
@@ -210,6 +220,16 @@ router.get("/displayTable", async (req, res) => {
     if (active) {
       sheetWhere.isActive = { [Op.eq]: active };
     }
+
+    where.action = {
+      [Op.or]: [
+        { [Op.ne]: 'D' },
+        { [Op.is]: null },
+        { [Op.eq]: 'S' }
+
+      ]
+    };
+
 
     const { count, rows } = await models.UsedEquipment.findAndCountAll({
       where,

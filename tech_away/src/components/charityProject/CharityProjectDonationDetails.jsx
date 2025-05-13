@@ -1,40 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Spinner, Alert, Card, ListGroup } from 'react-bootstrap';
+import { Container, Spinner, Alert, Card } from 'react-bootstrap';
 import api from '../../utils/axios';
 import PaginationControl from '../pagination/PaginationControl';
 
 export default function CharityProjectDonationDetails({ projectId }) {
-  const [groups, setGroups]   = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+  const [donations, setDonations]   = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages]   = useState(1);
 
   const PAGE_SIZE = 4;
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchDonations = async () => {
       setLoading(true);
       setError(null);
       try {
         const res = await api.get('/api/storePurchase/getDonations', {
           params: {
             charityProjectId: projectId,
-            page:             currentPage,
-            pageSize:         PAGE_SIZE
+            page: currentPage,
+            pageSize: PAGE_SIZE
           }
         });
-        setGroups(res.data.data || []);
+        setDonations(res.data.data || []);
         setTotalPages(res.data.totalPages);
       } catch {
         setError('Error loading donation details');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    if (projectId) fetch();
-    else {
-      setGroups([]);
+    if (projectId) {
+      fetchDonations();
+    } else {
+      setDonations([]);
       setLoading(false);
     }
   }, [projectId, currentPage]);
@@ -53,61 +55,48 @@ export default function CharityProjectDonationDetails({ projectId }) {
 
           {error && <Alert variant="danger">{error}</Alert>}
 
-          {!loading && !error && groups.length === 0 && (
+          {!loading && !error && donations.length === 0 && (
             <Alert variant="info">No donations found for this project.</Alert>
           )}
 
           {!loading && !error && (
             <div className="overflow-auto mb-3" style={{ maxHeight: '500px' }}>
-              {groups.map(grp => (
+              {donations.map(item => (
                 <Card
-                  key={grp.Equipment.usedEquipmentId}
+                  key={item.Purchase.id}
                   className="mb-3 border-0 shadow-sm"
                   style={{ backgroundColor: '#f8f9fa', borderRadius: '0.75rem' }}
                 >
                   <Card.Body>
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                      <h6 className="mb-1">
-                        {grp.Equipment.brandModel}
-                      </h6>
-
-                      <div className='d-flex  flex-column'>
-                        <small className="text-muted">
-                          <b>Barcode:</b> {grp.Equipment.barcode}
-                        </small>
-                        <small className="text-muted">
-                          <b>Total Donations:</b> {grp.Purchases.length} {grp.Purchases.length === 1 ? 'donation' : 'donations'}
-                        </small>
+                    <div className="d-flex flex-column flex-lg-row justify-content-lg-between">
+                      <div className="d-flex flex-column">
+                        <h6 className="mb-1">{item.Equipment.brandModel}</h6>
+                        <small className="text-muted"> Barcode: {item.Equipment.barcode} </small>
                       </div>
 
+                      <div className='d-flex justify-content-start justify-lg-content-center align-items-end'>
+                          <small className="d-block"><b>Date:</b> {new Date(item.Purchase.purchase_date).toLocaleDateString()}</small>
+                      </div>
                     </div>
 
-                    <ListGroup variant="flush" className="p-2">
-                      {grp.Purchases.map(p => (
-                        <ListGroup.Item key={p.id} className="p-2">
-                          <div className="d-flex justify-content-between">
-                            <div>
-                              <strong>#{p.id}</strong> — {p.Client.firstName} {p.Client.lastName}
-                            </div>
-                            <small className="text-muted">
-                              {new Date(p.createdAt).toLocaleDateString()}
-                            </small>
-                          </div>
-                          <div className="ms-3">
-                            <small>
-                              Employee: {p.Employee.firstName} {p.Employee.lastName} | Store: {p.Store.name}
-                            </small>
-                          </div>
-                        </ListGroup.Item>
-                      ))}
-                    </ListGroup>
+                    <hr />
+
+                    <div className="d-flex flex-column flex-lg-row justify-content-lg-between">
+                      <div className="mb-0 mb-lg-2 mb-lg-0">
+                        <small className="d-block"><b>Employee:</b> {item.Purchase.Employee.name}</small>
+                        <small className="d-block"><b>Store:</b> {item.Purchase.Store.name}</small>
+                      </div>
+                      <div>
+                        <small className="d-block"><b>Client:</b> {item.Purchase.Client.name}</small>
+                      </div>
+                    </div>
                   </Card.Body>
                 </Card>
               ))}
             </div>
           )}
 
-          {!loading && !error && (
+          {!loading && !error && totalPages > 1 && (
             <PaginationControl
               currentPage={currentPage}
               totalPages={totalPages}

@@ -482,7 +482,6 @@ router.get("/:id/equipmentSheet", async (req, res) => {
 });
 
 
-
 router.get("/:ID", async (req, res) => {
   const { ID } = req.params;
 
@@ -510,26 +509,65 @@ router.put('/:ID', async (req, res) => {
   const { name, startDate, completionDate, warehouseID, statusID } = req.body;
 
   try {
+    // 1) Load the project
     const project = await models.CharityProject.findByPk(projectId);
-
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
     }
 
-    project.name = name || project.name;
-    project.startDate = startDate || project.startDate;
-    project.completionDate = completionDate || project.completionDate;
-    project.warehouseID = warehouseID || project.warehouseID;
-    project.status = statusID || project.status;
+    // 2) If warehouseID is changing, enforce slot logic
+    if (warehouseID && Number(warehouseID) !== project.warehouseID) {
+      // how many donations this project already has
+      const donationCount = await models.CharityProjectDonations.count({
+        where: { charityProjectId: projectId }
+      });
+
+      console.log(donationCount)
+
+      // load both old & new warehouses
+      const oldWh = await models.Warehouse.findByPk(project.warehouseID);
+      const newWh = await models.Warehouse.findByPk(warehouseID);
+
+
+      if (!newWh) {
+        return res.status(404).json({ error: 'New warehouse not found.' });
+      }
+      // check capacity
+      if (newWh.availableSlots < donationCount) {
+        return res
+          .status(400)
+          .json({ error: 'Not enough available slots in the selected warehouse.' });
+      }
+
+      // return slots to old warehouse
+      if (oldWh) {
+        await oldWh.increment('availableSlots', { by: donationCount });
+      }
+
+      // take slots from new warehouse
+      await newWh.decrement('availableSlots', { by: donationCount });
+
+      // apply the change
+      project.warehouseID = Number(warehouseID);
+    }
+
+    // 3) Update other fields
+    project.name           = name           ?? project.name;
+    project.startDate      = startDate      ?? project.startDate;
+    project.completionDate = completionDate ?? project.completionDate;
+    project.status         = statusID       ?? project.status;
 
     await project.save();
 
-    return res.status(200).json({ message: 'Project updated successfully', data: project });
+    return res
+      .status(200)
+      .json({ message: 'Project updated successfully', data: project });
   } catch (error) {
     console.error('Error updating project:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 router.delete('/:ID', async (req, res) => {
   const projectId = req.params.ID;

@@ -175,133 +175,117 @@ router.get("/getDonations", async (req, res) => {
   try {
     const {
       charityProjectId,
-      page      = 1,
-      pageSize  = 4,
-      sortField = 'usedEquipmentId',
-      sortOrder = 'ASC'
+      page           = 1,
+      pageSize       = 4,
+      orderBy        = "usedEquipmentId",
+      orderDirection = "ASC"
     } = req.query;
 
-    // Build base filter
+    const offset = (parseInt(page, 10) - 1) * parseInt(pageSize, 10);
+    const limit  = parseInt(pageSize, 10);
+
+    // filtro opcional por projeto
     const where = {};
     if (charityProjectId) {
-      where.charityProjectId = Number(charityProjectId);
+      where.charityProjectId = { [Op.eq]: Number(charityProjectId) };
     }
 
-    // 1) Count how many distinct equipments match
-    const totalItems = await models.CharityProjectDonations.count({
+    const { count, rows } = await models.CharityProjectDonations.findAndCountAll({
       where,
-      distinct: true,
-      col: 'usedEquipmentId'
-    });
-    const totalPages = Math.ceil(totalItems / pageSize);
-    const offset     = (Number(page) - 1) * Number(pageSize);
-
-    // 2) Fetch one page of distinct equipment IDs
-    const equipmentRows = await models.CharityProjectDonations.findAll({
-      where,
-      attributes: ['usedEquipmentId'],
-      group:      ['usedEquipmentId'],
-      order:      [[sortField, sortOrder]],
-      limit:      Number(pageSize),
-      offset
-    });
-    const equipIds = equipmentRows.map(r => r.usedEquipmentId);
-
-    // 3) Now fetch *all* donations for those equipments, with nested ordering
-    const donations = await models.CharityProjectDonations.findAll({
-      where: { usedEquipmentId: equipIds },
       include: [
         {
           model: models.UsedEquipment,
-          as: 'UsedEquipment',
           attributes: ['id'],
           include: [
             {
               model: models.EquipmentSheet,
-              as: 'EquipmentSheet',
               attributes: ['barcode'],
-              include: [{
-                model: models.EquipmentModel,
-                as: 'EquipmentModel',
-                attributes: ['id','name'],
-                include: [{
-                  model: models.Brand,
-                  as: 'Brand',
-                  attributes: ['id','name']
-                }]
-              }]
+              include: [
+                {
+                  model: models.EquipmentModel,
+                  attributes: ['id','name'],
+
+                  include: [{
+                    model: models.Brand,
+                    attributes: ['id','name']
+                  }]
+                },
+                {
+                  model: models.EquipmentType,
+                  attributes: ['id','name'],
+                }
+              ]
             },
             {
               model: models.StorePurchase,
-              as: 'StorePurchases',
-              attributes: ['id','storeID','clientNIC','employeeID','createdAt'],
+              attributes: ['id','createdAt'],
               include: [
-                { model: models.Client,   as: 'Client',   attributes: ['nic','firstName','lastName','email'] },
-                { model: models.Employee, as: 'Employee', attributes: ['nic','firstName','lastName','email'] },
-                { model: models.Store,    as: 'Store',    attributes: ['nipc','name'] }
+                { model: models.Client,   attributes: ['nic','firstName','lastName','email'] },
+                { model: models.Employee, attributes: ['nic','firstName','lastName','email'] },
+                { model: models.Store,    attributes: ['nipc','name'] }
+              ]
+            },
+            {
+              model: models.CharityProject,
+                include: [
+                { model: models.Warehouse },
               ]
             }
           ]
-        },
-        {
-          model: models.CharityProject,
-          as: 'CharityProject',
-          attributes: ['id','name'],
-          include: [{
-            model: models.Warehouse,
-            as: 'Warehouse',
-            attributes: ['id','name']
-          }]
         }
       ],
-      order: [
-        ['usedEquipmentId', 'ASC'],
-        [ 
-          { model: models.UsedEquipment,  as: 'UsedEquipment'  },
-          { model: models.StorePurchase, as: 'StorePurchases' },
-          'createdAt',
-          'ASC'
-        ]
-      ]
+      order: [[orderBy, orderDirection.toUpperCase()]],
+      offset,
+      limit
     });
 
-    // 4) Group and reshape into the API format
-    const grouped = equipIds.map(eid => {
-      const slice = donations.filter(d => d.usedEquipmentId === eid);
-      const first = slice[0];
-      return {
-        Project: {
-          charityProjectId:   first.CharityProject.id,
-          charityProjectName: first.CharityProject.name
-        },
-        Warehouse: {
-          id:   first.CharityProject.Warehouse.id,
-          name: first.CharityProject.Warehouse.name
-        },
+    const formattedAll = rows.flatMap(item => {
+      const ue = item.UsedEquipment;
+      const project = ue.CharityProjects[0];
+      const warehouse = project.Warehouse;
+
+      return ue.StorePurchases.map(purchase => ({
+        Project: { id: project.id, name: project.name },
+        Warehouse: { id: warehouse.id, name: warehouse.name },
         Equipment: {
-          usedEquipmentId: eid,
-          barcode:         first.UsedEquipment.EquipmentSheet.barcode,
-          brandModel:
-            first.UsedEquipment.EquipmentSheet.EquipmentModel.Brand.name + ' ' +
-            first.UsedEquipment.EquipmentSheet.EquipmentModel.name
+          usedEquipmentId: ue.id,
+          barcode: ue.EquipmentSheet.barcode,
+          brandModel: `${ue.EquipmentSheet.EquipmentModel.Brand.name} ${ue.EquipmentSheet.EquipmentModel.name}`,
+          type: ue.EquipmentSheet.EquipmentType.name
         },
-        Purchases: first.UsedEquipment.StorePurchases
-      };
+        Purchase: {
+          id: purchase.id,
+          purchase_date: purchase.createdAt,
+          Client: {
+            nic: purchase.Client.nic,
+            name: `${purchase.Client.firstName} ${purchase.Client.lastName}`,
+          },
+          Employee: {
+            nic: purchase.Employee.nic,
+            name: `${purchase.Employee.firstName} ${purchase.Employee.lastName}`,
+          },
+          Store: {
+            nipc: purchase.Store.nipc,
+            name: purchase.Store.name,
+          },
+        },
+      }));
     });
 
-    return res.json({
-      totalItems,
-      totalPages,
-      currentPage: Number(page),
-      pageSize:     Number(pageSize),
-      data:         grouped
+
+    res.json({
+      totalItems:  count,
+      totalPages:  Math.ceil(count / pageSize),
+      currentPage: parseInt(page, 10),
+      pageSize:    parseInt(pageSize, 10),
+      data:        formattedAll
     });
-  }
-  catch(err) {
-    console.error("Error in /getDonations:", err);
-    return res.status(500).json({ error: 'Error fetching donations.' });
+  } catch (err) {
+    console.error("Error: ", err);
+    return res.status(500).json({ error: 'Erro ao buscar equipamentos doados.' });
   }
 });
+
 
 
 router.post("/donate", async (req, res) => {
@@ -332,15 +316,24 @@ router.post("/donate", async (req, res) => {
     });
 
     // 3) Cria linha de doação
-    const donation = await models.CharityProjectDonations.create({
-      charityProjectId,
-      usedEquipmentId: usedEquipmentID,
-      createdAt:       new Date(),
-      updatedAt:       new Date()
-    });
+    let donation = null;
+    if (storePurchase) {
+      donation = await models.CharityProjectDonations.create({
+        charityProjectId,
+        usedEquipmentId: usedEquipmentID,
+        createdAt:       new Date(),
+        updatedAt:       new Date()
+      });
+    }
 
     // 4) Decrementa slots
     await warehouse.decrement("availableSlots", { by: 1 });
+
+    // 5) Marca o equipamento como doado (action = 'D')
+    await models.UsedEquipment.update(
+      { action: 'D', updatedAt: new Date() },
+      { where: { id: usedEquipmentID } }
+    );
 
     return res.status(201).json(donation);
 
@@ -356,6 +349,7 @@ router.post("/donate", async (req, res) => {
     return res.status(500).json({ error: "Unexpected error." });
   }
 });
+
 
 
 
