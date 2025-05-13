@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, use } from "react";
 import { Container, Row, Col, Stack, Button } from "react-bootstrap";
 import EquipmentSheetCard from "../components/StorePage/EquipmentSheetCard";
 import PaginationControl from "../components/pagination/PaginationControl";
@@ -47,10 +47,13 @@ export default function StorePage() {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+  useEffect(() => {
+    console.log(filters);
+  }, [filters]);
 
   return (
     <Container className="mb-5">
-      <Stack gap={4} direction="vertical">
+      <Stack gap={4} direction="vertical" className="mb-5">
         {isMobile ? (
           <Stack
             direction="horizontal"
@@ -62,7 +65,7 @@ export default function StorePage() {
               WebkitMaskImage: "inset(0 round var(--rounded-lg))",
               maskImage: "inset(0 round var(--rounded-lg))",
             }}
-            className="justify-content-between overflow-hidden mb-4"
+            className="justify-content-between overflow-hidden"
           >
             <h1
               className="ps-4 fs-1"
@@ -127,7 +130,7 @@ export default function StorePage() {
                 boxShadow: "var(--shadow-default)",
               }}
             >
-              <MapProvider />
+              <MapProvider filters={filters} setFilters={setFilters} />
             </div>
           )}
 
