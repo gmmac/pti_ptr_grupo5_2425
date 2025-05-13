@@ -32,6 +32,28 @@ module.exports = {
 			total: {
 				type: Sequelize.FLOAT,
 			},
+			orderStatusID: {
+				type: Sequelize.INTEGER,
+				allowNull: false,
+				references: {
+					model: "OrderStatuses", // Certifique-se de que a tabela está com esse nome
+					key: "id",
+				},
+				onUpdate: "CASCADE",
+				onDelete: "SET NULL",
+			},
+			pickupInStore: {
+				type: Sequelize.BOOLEAN,
+				allowNull: false,
+			},
+			address: {
+				type: Sequelize.STRING(100),
+				allowNull: true,
+			},
+			storeId: {
+				type: Sequelize.STRING(9),
+				allowNull: true,
+			},
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
