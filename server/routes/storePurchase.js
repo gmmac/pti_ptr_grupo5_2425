@@ -172,102 +172,137 @@ router.post("/", async (req, res) => {
 
 
 router.get("/getDonations", async (req, res) => {
-
-// try {
+  try {
     const {
-      // clientName,
-      // employeeName,
-      // modelName,
-      // storeName,
       charityProjectId,
-      usedEquipmentId,
-      createdAt,
-      page = 1,
-      pageSize = 10,
-      sortField = "id",
-      sortOrder = "ASC",
+      page      = 1,
+      pageSize  = 4,
+      sortField = 'usedEquipmentId',
+      sortOrder = 'ASC'
     } = req.query;
 
-    console.log(req.query)
-
+    // Build base filter
     const where = {};
     if (charityProjectId) {
       where.charityProjectId = Number(charityProjectId);
     }
-    else if (usedEquipmentId){
-      where.usedEquipmentId = Number(usedEquipmentID);
-    }
 
-    const offset = (Number(page) - 1) * Number(pageSize);
-
-    const { count, rows } = await models.CharityProjectDonations.findAndCountAll({
+    // 1) Count how many distinct equipments match
+    const totalItems = await models.CharityProjectDonations.count({
       where,
+      distinct: true,
+      col: 'usedEquipmentId'
+    });
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const offset     = (Number(page) - 1) * Number(pageSize);
+
+    // 2) Fetch one page of distinct equipment IDs
+    const equipmentRows = await models.CharityProjectDonations.findAll({
+      where,
+      attributes: ['usedEquipmentId'],
+      group:      ['usedEquipmentId'],
+      order:      [[sortField, sortOrder]],
+      limit:      Number(pageSize),
+      offset
+    });
+    const equipIds = equipmentRows.map(r => r.usedEquipmentId);
+
+    // 3) Now fetch *all* donations for those equipments, with nested ordering
+    const donations = await models.CharityProjectDonations.findAll({
+      where: { usedEquipmentId: equipIds },
       include: [
         {
           model: models.UsedEquipment,
-          attributes: [ "id"],
-          // where: statusFilter,
-          include:[
-            {
-              model: models.StorePurchase,
-              attributes: ["id", "storeID", "clientNIC", "employeeID"],
-              include: [
-                {
-                  model: models.Client,
-                  attributes: ["nic", "firstName", "lastName", "email"],
-
-                }
-              ]
-            },
+          as: 'UsedEquipment',
+          attributes: ['id'],
+          include: [
             {
               model: models.EquipmentSheet,
-              attributes: [ "barcode"],
+              as: 'EquipmentSheet',
+              attributes: ['barcode'],
               include: [{
                 model: models.EquipmentModel,
-                attributes: [ "id", "name"],
-
+                as: 'EquipmentModel',
+                attributes: ['id','name'],
                 include: [{
                   model: models.Brand,
-                  attributes: [ "id", "name"],
+                  as: 'Brand',
+                  attributes: ['id','name']
                 }]
-
               }]
-
+            },
+            {
+              model: models.StorePurchase,
+              as: 'StorePurchases',
+              attributes: ['id','storeID','clientNIC','employeeID','createdAt'],
+              include: [
+                { model: models.Client,   as: 'Client',   attributes: ['nic','firstName','lastName','email'] },
+                { model: models.Employee, as: 'Employee', attributes: ['nic','firstName','lastName','email'] },
+                { model: models.Store,    as: 'Store',    attributes: ['nipc','name'] }
+              ]
             }
-            
           ]
         },
         {
           model: models.CharityProject,
-          attributes: [ "id", "name"],
-          include: [
-            {
-              model: models.Warehouse,
-              attributes: ["id", "name"],
-
-            }
-          ]
-
+          as: 'CharityProject',
+          attributes: ['id','name'],
+          include: [{
+            model: models.Warehouse,
+            as: 'Warehouse',
+            attributes: ['id','name']
+          }]
         }
-
       ],
-      limit: Number(pageSize),
-      offset,
-      order: [['charityProjectId', 'ASC']],  // or pull from req.query if you still want ordering
+      order: [
+        ['usedEquipmentId', 'ASC'],
+        [ 
+          { model: models.UsedEquipment,  as: 'UsedEquipment'  },
+          { model: models.StorePurchase, as: 'StorePurchases' },
+          'createdAt',
+          'ASC'
+        ]
+      ]
+    });
+
+    // 4) Group and reshape into the API format
+    const grouped = equipIds.map(eid => {
+      const slice = donations.filter(d => d.usedEquipmentId === eid);
+      const first = slice[0];
+      return {
+        Project: {
+          charityProjectId:   first.CharityProject.id,
+          charityProjectName: first.CharityProject.name
+        },
+        Warehouse: {
+          id:   first.CharityProject.Warehouse.id,
+          name: first.CharityProject.Warehouse.name
+        },
+        Equipment: {
+          usedEquipmentId: eid,
+          barcode:         first.UsedEquipment.EquipmentSheet.barcode,
+          brandModel:
+            first.UsedEquipment.EquipmentSheet.EquipmentModel.Brand.name + ' ' +
+            first.UsedEquipment.EquipmentSheet.EquipmentModel.name
+        },
+        Purchases: first.UsedEquipment.StorePurchases
+      };
     });
 
     return res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / pageSize),
+      totalItems,
+      totalPages,
       currentPage: Number(page),
-      pageSize: Number(pageSize),
-      data: rows,
+      pageSize:     Number(pageSize),
+      data:         grouped
     });
-
-  // } catch (error) {
-  //     res.status(400).json({ error: "Error." });
-  // }
+  }
+  catch(err) {
+    console.error("Error in /getDonations:", err);
+    return res.status(500).json({ error: 'Error fetching donations.' });
+  }
 });
+
 
 router.post("/donate", async (req, res) => {
   try {
@@ -275,7 +310,7 @@ router.post("/donate", async (req, res) => {
     const storeID    = req.cookies["employeeInfo"].storeNIPC;
     const employeeID = req.cookies["employeeInfo"].nic;
 
-    // 1) Look up project and its warehouse
+    // 1) Projeto e warehouse
     const project   = await models.CharityProject.findByPk(charityProjectId);
     const warehouse = await models.Warehouse.findByPk(project.warehouseID);
     if (!warehouse) {
@@ -285,7 +320,7 @@ router.post("/donate", async (req, res) => {
       return res.status(400).json({ error: "This warehouse has no available slots." });
     }
 
-    // 2) Create the “store purchase” with price = 0
+    // 2) Cria StorePurchase
     const storePurchase = await models.StorePurchase.create({
       storeID,
       clientNIC:     clientNic,
@@ -295,11 +330,8 @@ router.post("/donate", async (req, res) => {
       createdAt:     new Date(),
       updatedAt:     new Date()
     });
-    if (!storePurchase) {
-      return res.status(400).json({ error: "Could not record donation." });
-    }
 
-    // 3) Link it into the donation join‐table
+    // 3) Cria linha de doação
     const donation = await models.CharityProjectDonations.create({
       charityProjectId,
       usedEquipmentId: usedEquipmentID,
@@ -307,12 +339,19 @@ router.post("/donate", async (req, res) => {
       updatedAt:       new Date()
     });
 
-    // 4) Decrement availableSlots by 1
+    // 4) Decrementa slots
     await warehouse.decrement("availableSlots", { by: 1 });
 
     return res.status(201).json(donation);
 
   } catch (error) {
+    // Se for violação de única combinação charityProjectId+usedEquipmentId
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res
+        .status(400)
+        .json({ error: "This equipment has already been donated to this project." });
+    }
+
     console.error("Error in /donate:", error);
     return res.status(500).json({ error: "Unexpected error." });
   }

@@ -143,8 +143,10 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
 
   return (
     <>
+
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h5 className="fw-semibold mb-0">Selected Equipment Types</h5>
+
         {isOrganizer && (
           !isEditing ? (
             <Button variant="primary" size="sm" onClick={() => setIsEditing(true)}>
@@ -165,7 +167,13 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
         </Alert>
       )}
 
+        {selectedTypes.length === 0 && (
+          <Alert variant="info">No Equipment Types defined for this project.</Alert>
+        )}
+
       <SelectedCardList
+        colNumMD={4}
+        colNumXS={6}
         selectedElements={selectedTypes}
         isEditing={isEditing}
         onRemove={toggleSelectType}

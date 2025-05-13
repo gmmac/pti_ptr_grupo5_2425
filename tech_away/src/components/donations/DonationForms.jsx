@@ -47,6 +47,7 @@ export default function DonationForms({ show, handleClose }) {
     if (project) {
       setCharityProject(project);
       setForm(prev => ({ ...prev, charityProjectId: project.id }));
+      setError('');
     } else {
       setCharityProject(null);
       setForm(prev => ({ ...prev, charityProjectId: '' }));
@@ -77,7 +78,11 @@ export default function DonationForms({ show, handleClose }) {
       await api.post('/api/storePurchase/donate', form);
       setSuccessMessage('Donation registered successfully!');
       setForm({ statusID: '', clientNic: '', usedEquipmentID: '', charityProjectId: '' });
+     
       setCharityProject(null);
+      setEquipmentData(null);
+      setClientData(null);
+
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       const backendMsg = err.response?.data?.error;
@@ -103,6 +108,7 @@ export default function DonationForms({ show, handleClose }) {
         phone: client.phone,
       });
       setForm(prev => ({ ...prev, clientNic: client.nic }));
+      setError('');
     } else {
       setClientData({ nic: '', nif: '', birthDate: '', gender: '', firstName: '', lastName: '', email: '', phone: '' });
       setForm(prev => ({ ...prev, clientNic: '' }));
@@ -131,6 +137,7 @@ export default function DonationForms({ show, handleClose }) {
         model: equipment.EquipmentSheet.EquipmentModel.name,
       });
       setForm(prev => ({ ...prev, usedEquipmentID: equipment.id }));
+      setError('');
     } else {
       setEquipmentData({ barcode: '', model: '' });
       setForm(prev => ({ ...prev, usedEquipmentID: '' }));
@@ -140,7 +147,7 @@ export default function DonationForms({ show, handleClose }) {
 
   return (
     <>
-      <Modal show={show} onHide={handleClose} size="lg" centered>
+      <Modal show={show} onHide={handleClose} size="xl" centered>
         <Modal.Header closeButton>
           <Modal.Title>Register Donation</Modal.Title>
         </Modal.Header>
@@ -193,8 +200,8 @@ export default function DonationForms({ show, handleClose }) {
           </Form>
         </Modal.Body>
       </Modal>
-      <ClientCatalogModal show={showModal} handleClose={() => setShowModal(false)} handleSelectClient={handleSelectClient} selectedClient={clientData.nic} />
-      <UsedEquipmentCatalogModal show={showModalEq} handleClose={() => setShowModalEq(false)} handleSelectEquipment={handleSelectEquipment} selectedEquipmentID={equipmentData.barcode} />
+      <ClientCatalogModal show={showModal} handleClose={() => setShowModal(false)} handleSelectClient={handleSelectClient} selectedClient={clientData?.nic} />
+      <UsedEquipmentCatalogModal show={showModalEq} handleClose={() => setShowModalEq(false)} handleSelectEquipment={handleSelectEquipment} selectedEquipmentID={equipmentData?.barcode} />
       <CharityProjectCatalogModal show={showModalCharity} handleClose={() => setShowModalCharity(false)} handleSelectCharity={handleSelectCharity} selectedCharityID={charityProject?.id} />
     </>
   );

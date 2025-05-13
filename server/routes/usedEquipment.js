@@ -139,6 +139,153 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+router.get("/displayTable", async (req, res) => {
+  try {
+    const {
+      Barcode,
+      EquipmentType,
+      BrandModel,          // agora usamos este único campo
+      Store,
+      Status,
+      active = "1",
+      page = 1,
+      pageSize = 6,
+      sortField = "putOnSaleDate",
+      sortOrder = "ASC",
+    } = req.query;
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+    // Função que concatena Brand.name + ' ' + EquipmentModel.name
+    const brandModelConcat = Sequelize.fn(
+      'concat',
+      Sequelize.col("EquipmentSheet.EquipmentModel.Brand.name"),
+      ' ',
+      Sequelize.col("EquipmentSheet.EquipmentModel.name")
+    );
+
+    // Montagem do ORDER BY
+    const orderClause = [];
+    if (sortField === "BrandModel") {
+      orderClause.push([
+        Sequelize.fn("LOWER", brandModelConcat),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField === "EquipmentType") {
+      orderClause.push([
+        Sequelize.fn("LOWER", Sequelize.col("EquipmentSheet.EquipmentType.name")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField) {
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
+
+    // Montagem do WHERE
+    const where = {};
+    const sheetWhere = {};
+
+    if (Barcode) {
+      sheetWhere.barcode = { [Op.iLike]: `%${Barcode}%` };
+    }
+    if (EquipmentType) {
+      sheetWhere["$EquipmentType.name$"] = { [Op.iLike]: `%${EquipmentType}%` };
+    }
+    // Novo filtro unificado BrandModel
+    if (BrandModel) {
+      sheetWhere[Op.and] = Sequelize.where(
+        Sequelize.fn('LOWER', brandModelConcat),
+        { [Op.iLike]: `%${BrandModel.toLowerCase()}%` }
+      );
+    }
+    if (Store) {
+      where["$Store.name$"] = { [Op.iLike]: `%${Store}%` };
+    }
+    if (Status) {
+      where.statusID = { [Op.eq]: Status };
+    }
+    if (active) {
+      sheetWhere.isActive = { [Op.eq]: active };
+    }
+
+    const { count, rows } = await models.UsedEquipment.findAndCountAll({
+      where,
+      include: [
+        {
+          model: models.EquipmentSheet,
+          where: sheetWhere,
+          attributes: ["barcode", "createdAt", "updatedAt"],
+          include: [
+            {
+              model: models.EquipmentModel,
+              as: "EquipmentModel",
+              attributes: ["id", "name"],
+              include: [
+                {
+                  model: models.Brand,
+                  as: "Brand",
+                  attributes: ["id", "name"],
+                },
+              ],
+            },
+            {
+              model: models.EquipmentType,
+              as: "EquipmentType",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+        {
+          model: models.EquipmentStatus,
+          as: "EquipmentStatus",
+          attributes: ["id", "state"],
+        },
+        {
+          model: models.Store,
+          attributes: ["nipc", "name"],
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset,
+      order: orderClause,
+    });
+
+    const formattedData = rows.map((item) => ({
+      id: item.id,
+      price: item.price,
+      putOnSaleDate: item.putOnSaleDate,
+      purchaseDate: item.purchaseDate,
+      action: item.action,
+      EquipmentStatus: item.EquipmentStatus,
+      Store: item.Store,
+      EquipmentSheet: {
+        barcode: item.EquipmentSheet.barcode,
+        brandModel: item.EquipmentSheet.EquipmentModel.Brand.name + " " + item.EquipmentSheet.EquipmentModel.name,
+        EquipmentModel: item.EquipmentSheet.EquipmentModel,
+        EquipmentType: item.EquipmentSheet.EquipmentType,
+        createdAt: item.EquipmentSheet.createdAt,
+        updatedAt: item.EquipmentSheet.updatedAt,
+      },
+    }));
+
+    res.json({
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+      data: formattedData,
+    });
+
+  } catch (error) {
+    console.error("Error fetching used equipment:", error);
+    res.status(500).json({ error: "Error fetching used equipment." });
+  }
+});
+
+
 router.get("/:ID", async (req, res) => {
 	try {
 		const { ID } = req.params;

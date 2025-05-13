@@ -18,7 +18,7 @@ export default function UsedEquipmentTableModal({ equipments, selectedEquipmentI
           <tr key={e.id}>
             <td>{e.id}</td>
             <td>{e.EquipmentSheet.barcode}</td>
-            <td>{e.EquipmentSheet.EquipmentModel.name}</td>
+            <td>{e.EquipmentSheet.brandModel}</td>
             <td>{e.EquipmentSheet.EquipmentType.name}</td>
             <td>
               <Button

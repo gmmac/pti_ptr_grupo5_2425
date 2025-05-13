@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Modal, Row } from 'react-bootstrap';
+import { Card, Col, Modal, Row } from 'react-bootstrap';
 import './../../styles/pageElements.css';
 import CharityProjectInfoEditor from './CharityProjectEditor/CharityProjectInfoEditor';
 import CharityProjectEquipmentTypeEditor from './CharityProjectEditor/CharityProjectEquipmentTypeEditor';
@@ -56,30 +56,39 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
             setSelectedProject={setSelectedProject}
           />
           <hr className="my-4" />
-          <Row>
-            <Col md={12} lg={6} className="mb-4">
-              <CharityProjectEquipmentTypeEditor
-                projectId={projectData.id}
-                isEditing={true}
-                alert={equipmentAlert}
-                onChangeAlert={handleEquipmentAlert}
-              />
+          <Row className="g-4">
+            <Col md={12} lg={6} className="d-flex">
+              <Card className="flex-fill mb-3 border shadow-sm">
+                <Card.Body>
+                  <CharityProjectEquipmentTypeEditor
+                    projectId={projectData.id}
+                    isEditing={true}
+                    alert={equipmentAlert}
+                    onChangeAlert={handleEquipmentAlert}
+                  />
+                </Card.Body>
+              </Card>
             </Col>
-            <Col md={12} lg={6} className="mb-4">
-              <CharityProjectEquipmentSheetEditor
-                projectId={projectData.id}
-                alert={equipmentSheetAlert}
-                onChangeAlert={handleEquipmentSheetAlert}
-              />
+
+            <Col md={12} lg={6} className="d-flex">
+              <Card className="flex-fill mb-3 border shadow-sm">
+                <Card.Body>
+                  <CharityProjectEquipmentSheetEditor
+                    projectId={projectData.id}
+                    alert={equipmentSheetAlert}
+                    onChangeAlert={handleEquipmentSheetAlert}
+                  />
+                </Card.Body>
+              </Card>
             </Col>
           </Row>
 
+          <hr className="my-4" />
+
           <Row>
-            <Col>
               <CharityProjectDonationDetails
                 projectId={projectData.id}
               />
-            </Col>
           </Row>
 
         </Modal.Body>

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Row, Col, Card, Button, FormControl, InputGroup } from 'react-bootstrap';
 
-export default function SelectedCardList({ selectedElements = [], isEditing = false, onRemove, renderCard, onQuantityChange }) {
+export default function SelectedCardList({ selectedElements = [], isEditing = false, onRemove, renderCard, onQuantityChange, colNumMD, colNumXS }) {
   return (
     <Row>
       {selectedElements.map((element, index) => (
-        <Col key={element.id || element.Barcode || index} md={4} sm={6} xs={12} className="mb-3">
+        <Col key={element.id || element.Barcode || index} md={colNumMD} sm={6} xs={colNumXS} className="mb-3">
           <Card
             bg={isEditing ? 'success' : 'light'}
             text={isEditing ? 'white' : 'dark'}

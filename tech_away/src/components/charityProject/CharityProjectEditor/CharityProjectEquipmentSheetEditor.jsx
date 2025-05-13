@@ -162,6 +162,10 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
           )}
       </div>
 
+        {selectedSheets.length === 0 && (
+          <Alert variant="info">No Equipment Sheet defined for this project.</Alert>
+        )}
+        
       {alert.show && (
         <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>
           {alert.message}
@@ -169,6 +173,8 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
       )}
 
     <SelectedCardList
+      colNumMD={6}
+      colNumXS={12}
       selectedElements={selectedSheets}
       isEditing={isEditing}
       onRemove={toggleSelectSheet}

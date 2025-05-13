@@ -25,7 +25,7 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
       setLoading(true);
       setError(null);
       try {
-        const response = await api.get('/api/usedEquipment', {
+        const response = await api.get('/api/usedEquipment/displayTable', {
           params: { ...filters, page: currentPage, pageSize: itemsPerPage }
         });
         setEquipments(response.data.data || []);
