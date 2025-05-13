@@ -12,7 +12,11 @@ app.use(cookieParser());
 
 app.use(
 	cors({
-		origin: ["http://localhost:5173", "https://techaway.dev", "https://techaway.dev"],
+		origin: [
+			"http://localhost:5173",
+			"https://techaway.dev",
+			"https://techaway.dev",
+		],
 		credentials: true,
 	})
 );
@@ -54,6 +58,7 @@ const payment = require("./routes/payment");
 const projectStatus = require("./routes/projectStatus");
 const equipmentType = require("./routes/equipmentType");
 const purchaseCartEquipment = require("./routes/purchaseCartEquipment");
+const orderStatus = require("./routes/orderStatus");
 
 // Definição de endpoints --> rotas
 app.use("/api/address", address);
@@ -87,6 +92,7 @@ app.use("/api/payment", payment);
 app.use("/api/projectStatus", projectStatus);
 app.use("/api/equipmentType", equipmentType);
 app.use("/api/purchaseCartEquipment", purchaseCartEquipment);
+app.use("/api/oderStatus", orderStatus);
 
 app.get("/status", (req, res) => {
 	res.json({
