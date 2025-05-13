@@ -136,7 +136,11 @@ export default function ClientInfo({ userType = "client" }) {
 					Personal <br /> Information
 				</h4>
 				{isEditing ? (
-					<Stack direction="horizontal" gap={2}>
+					<Stack
+						direction="horizontal"
+						gap={2}
+						style={{ color: "var(--white)" }}
+					>
 						<Button
 							onClick={handleSaveChanges}
 							disabled={changedFields.length == 0}
@@ -150,8 +154,10 @@ export default function ClientInfo({ userType = "client" }) {
 						</Button>
 						<Button
 							onClick={() => {
+								setFormData(originalData); // Volta a colocar os valores originais nos inputs
+								setChangedFields([]);
+								setErrors({});
 								setIsEditing(false);
-								refreshFormData();
 							}}
 							className="rounded-pill"
 							variant="secondary"
@@ -164,7 +170,7 @@ export default function ClientInfo({ userType = "client" }) {
 					</Stack>
 				) : (
 					<Button
-						className="rounded-pill px-5"
+						className="rounded-pill px-3"
 						style={{
 							color: "var(--white)",
 							border: "none",
@@ -218,7 +224,7 @@ export default function ClientInfo({ userType = "client" }) {
 							</Form.Control.Feedback>
 						</Form.Group>
 					</Col>
-					<Col md={6}>
+					<Col md={12}>
 						<Form.Group className="mb-3">
 							<Form.Label>Birth Date</Form.Label>
 							<Form.Control

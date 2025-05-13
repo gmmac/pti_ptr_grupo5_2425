@@ -2,7 +2,15 @@ const express = require("express");
 const router = express.Router();
 const models = require("../models");
 
-router.get("/", async (req, res) => {});
+router.get("/", async (req, res) => {
+	try {
+		const purchaseCartEquipments = await models.PurchaseCartEquipment.findAll();
+		res.status(200).json(purchaseCartEquipments);
+	} catch (error) {
+		console.error("Erro ao buscar PurchaseCartEquipments:", error);
+		res.status(500).json({ error: "Erro ao buscar PurchaseCartEquipments." });
+	}
+});
 
 router.post("/", async (req, res) => {});
 

@@ -8,6 +8,7 @@ import LgDecoration from "../../components/profile/LgDecoration";
 import { IsMobileContext } from "../../contexts/IsMobileContext";
 import SmDecoration from "../../components/profile/SmDecoration";
 import ClientInfo from "../../components/profile/ClientInfo";
+import ProfileTabs from "../../components/profile/ProfileTabs";
 
 export default function ProfilePageClient() {
 	const isMobile = useContext(IsMobileContext);
@@ -26,8 +27,11 @@ export default function ProfilePageClient() {
 				{/* decoração */}
 				{isMobile ? <SmDecoration /> : <LgDecoration />}
 				<Row>
-					<Col xs={12} md={5} className="d-flex justify-content-center">
+					<Col xs={12} sm={12} md={12} lg={5} className="mb-3">
 						<ClientInfo />
+					</Col>
+					<Col xs={12} sm={12} md={12} lg={7} className="mb-3">
+						<ProfileTabs />
 					</Col>
 				</Row>
 

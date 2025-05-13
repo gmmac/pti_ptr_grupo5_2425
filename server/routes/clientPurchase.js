@@ -33,6 +33,25 @@ router.post("/", async (req, res) => {
 	}
 });
 
+router.get("/client-orders/:ID", async (req, res) => {
+	try {
+		const clientId = req.params.ID;
+
+		const cartsIds = await models.ClientPurchase.findAll({
+			where: { clientNIC: clientId },
+		});
+
+		if (!cartsIds) {
+			return res.status(404).json({ error: "Carrinhos não encontrados" });
+		}
+
+		res.status(200).json(cartsIds);
+	} catch (error) {
+		console.error("Erro ao buscar PurchaseCartEquipment:", error);
+		res.status(500).json({ error: "Erro ao buscar PurchaseCartEquipment." });
+	}
+});
+
 router.get("/:ID", async (req, res) => {
 	try {
 		const purchase = await models.ClientPurchase.findByPk(req.params.ID);
