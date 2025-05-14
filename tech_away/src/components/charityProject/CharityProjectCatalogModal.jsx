@@ -25,7 +25,7 @@ export default function CharityProjectCatalogModal({
   const [filters, setFilters] = useState({
     id: "",
     projectName: "",
-    status: "",
+    status: "Opened",
     warehouse: "",
     organizerName: "",
     startDate: "",
@@ -41,7 +41,7 @@ export default function CharityProjectCatalogModal({
     setFilters({
       id: "",
       projectName: "",
-      status: "",
+      status: "Opened",
       warehouse: "",
       organizerName: "",
       startDate: "",
@@ -132,11 +132,6 @@ export default function CharityProjectCatalogModal({
           </Container>
         )}
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClosePopUp}>
-          Close
-        </Button>
-      </Modal.Footer>
     </Modal>
   );
 }

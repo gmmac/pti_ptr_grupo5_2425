@@ -440,54 +440,84 @@ router.get("/:id/equipmentTypes", async (req, res) => {
       orderDirection = "ASC"
     } = req.query;
 
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    const limit = parseInt(pageSize);
+    const offset = (parseInt(page, 10) - 1) * parseInt(pageSize, 10);
+    const limit  = parseInt(pageSize, 10);
 
+    // 1) valida projeto
     const project = await models.CharityProject.findByPk(id);
     if (!project) {
       return res.status(404).json({ error: "Charity Project not found." });
     }
 
+    // 2) metas por tipo
     const linkedRecords = await models.CharityProjectEquipmentType.findAll({
       where: { charityProjectId: id },
       attributes: ['equipmentTypeId', 'quantity']
     });
-
     const idToQtyMap = linkedRecords.reduce((acc, rec) => {
       acc[rec.equipmentTypeId] = rec.quantity || 1;
       return acc;
     }, {});
-
     const equipmentTypeIds = Object.keys(idToQtyMap);
 
+    // 3) conta doações por tipo, só barcode + COUNT(*)
+    const donationCountsRaw = await models.CharityProjectDonations.findAll({
+      where: { charityProjectId: id },
+      include: [{
+        model: models.UsedEquipment,
+        attributes: [],
+        include: [{
+          model: models.EquipmentSheet,
+          attributes: [],
+          include: [{
+            model: models.EquipmentType,
+            where: { id: equipmentTypeIds },
+            attributes: []
+          }]
+        }]
+      }],
+      attributes: [
+        [Sequelize.col('UsedEquipment.EquipmentSheet.EquipmentType.id'), 'equipmentTypeId'],
+        [Sequelize.fn('COUNT', Sequelize.literal('*')),              'count']
+      ],
+      group: ['UsedEquipment.EquipmentSheet.EquipmentType.id'],
+      raw: true
+    });
+    const donationCountsMap = donationCountsRaw.reduce((acc, row) => {
+      acc[row.equipmentTypeId] = parseInt(row.count, 10);
+      return acc;
+    }, {});
+
+    // 4) busca dados de EquipmentType
     const { count, rows } = await models.EquipmentType.findAndCountAll({
       where: {
-        id: equipmentTypeIds,
-        name: {
-          [Op.iLike]: `%${name}%`
-        }
+        id:   equipmentTypeIds,
+        name: { [Op.iLike]: `%${name}%` }
       },
       order: [[orderBy, orderDirection.toUpperCase()]],
       offset,
       limit
     });
 
-    const dataWithQty = rows.map((type) => ({
-      ...type.toJSON(),
-      quantity: idToQtyMap[type.id] || 1
+    // 5) formata saída incluindo currentDonations e quantidade meta
+    const formatted = rows.map(type => ({
+      id:               type.id,
+      name:             type.name,
+      quantity:         idToQtyMap[type.id] || 1,
+      currentDonations: donationCountsMap[type.id] || 0
     }));
 
-    res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / limit),
-      currentPage: parseInt(page),
-      pageSize: limit,
-      data: dataWithQty
+    return res.json({
+      totalItems:  count,
+      totalPages:  Math.ceil(count / limit),
+      currentPage: parseInt(page, 10),
+      pageSize:    limit,
+      data:        formatted
     });
 
   } catch (error) {
     console.error("Erro ao buscar tipos vinculados ao projeto:", error);
-    res.status(500).json({ error: "Erro ao buscar tipos vinculados ao projeto." });
+    return res.status(500).json({ error: "Erro ao buscar tipos vinculados ao projeto." });
   }
 });
 
@@ -503,26 +533,51 @@ router.get("/:id/equipmentSheet", async (req, res) => {
       orderDirection = "ASC"
     } = req.query;
 
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    const limit = parseInt(pageSize);
+    const offset = (parseInt(page, 10) - 1) * parseInt(pageSize, 10);
+    const limit  = parseInt(pageSize, 10);
 
+    // 1) valida projeto
     const project = await models.CharityProject.findByPk(id);
     if (!project) {
       return res.status(404).json({ error: "Charity Project not found." });
     }
 
+    // 2) metas por sheet
     const linkedRecords = await models.EquipmentSheetCharityProject.findAll({
       where: { charityProjectId: id },
       attributes: ['equipmentSheetId', 'quantity']
     });
-
     const idToQtyMap = linkedRecords.reduce((acc, rec) => {
       acc[rec.equipmentSheetId] = rec.quantity || 1;
       return acc;
     }, {});
-
     const equipmentSheetIds = Object.keys(idToQtyMap);
 
+    // 3) conta doações por barcode usando COUNT(*)
+    const donationCountsRaw = await models.CharityProjectDonations.findAll({
+      where: { charityProjectId: id },
+      include: [{
+        model: models.UsedEquipment,
+        attributes: [],
+        include: [{
+          model: models.EquipmentSheet,
+          where: { barcode: equipmentSheetIds },
+          attributes: [] 
+        }]
+      }],
+      attributes: [
+        [Sequelize.col('UsedEquipment.EquipmentSheet.barcode'), 'barcode'],
+        [Sequelize.fn('COUNT', Sequelize.literal('*')),    'count']
+      ],
+      group: ['UsedEquipment.EquipmentSheet.barcode'],
+      raw: true
+    });
+    const donationCountsMap = donationCountsRaw.reduce((acc, row) => {
+      acc[row.barcode] = parseInt(row.count, 10);
+      return acc;
+    }, {});
+
+    // 4) busca dados dos sheets
     const { count, rows } = await models.EquipmentSheet.findAndCountAll({
       where: {
         barcode: {
@@ -534,48 +589,33 @@ router.get("/:id/equipmentSheet", async (req, res) => {
         {
           model: models.EquipmentModel,
           attributes: ['id', 'name'],
-          include: [
-            {
-              model: models.Brand,
-              attributes: ['id', 'name']
-            }
-          ]
+          include: [{ model: models.Brand, attributes: ['id', 'name'] }]
         },
-        {
-          model: models.EquipmentType,
-          attributes: ['id', 'name']
-        }
+        { model: models.EquipmentType, attributes: ['id', 'name'] }
       ],
       order: [[orderBy, orderDirection.toUpperCase()]],
       offset,
       limit
     });
 
-    const formattedRows = rows.map((item) => ({
-      Barcode: item.barcode,
-      CreatedAt: item.createdAt,
-      UpdatedAt: item.updatedAt,
-      EquipmentModel: {
-        id: item.EquipmentModel?.id,
-        name: item.EquipmentModel?.name
-      },
-      Brand: {
-        id: item.EquipmentModel?.Brand?.id,
-        name: item.EquipmentModel?.Brand?.name
-      },
-      EquipmentType: {
-        id: item.EquipmentType?.id,
-        name: item.EquipmentType?.name
-      },
-      quantity: idToQtyMap[item.barcode] || 1
+    // 5) formata resposta incluindo currentDonations
+    const formattedRows = rows.map(item => ({
+      Barcode:         item.barcode,
+      CreatedAt:       item.createdAt,
+      UpdatedAt:       item.updatedAt,
+      EquipmentModel:  { id: item.EquipmentModel.id, name: item.EquipmentModel.name },
+      Brand:           { id: item.EquipmentModel.Brand.id, name: item.EquipmentModel.Brand.name },
+      EquipmentType:   { id: item.EquipmentType.id, name: item.EquipmentType.name },
+      quantity:        idToQtyMap[item.barcode] || 1,
+      currentDonations: donationCountsMap[item.barcode] || 0
     }));
 
     res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / limit),
-      currentPage: parseInt(page),
-      pageSize: limit,
-      data: formattedRows
+      totalItems:  count,
+      totalPages:  Math.ceil(count / limit),
+      currentPage: parseInt(page, 10),
+      pageSize:    limit,
+      data:        formattedRows
     });
 
   } catch (error) {

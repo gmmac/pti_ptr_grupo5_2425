@@ -25,7 +25,7 @@ module.exports = {
         {
           barcode: "34567890123456789012",
           model: 3, // "PlayStation 5"
-          type: 3,
+          type: 2,
           isActive: "1",
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -33,7 +33,7 @@ module.exports = {
         {
           barcode: "45678901234567890123",
           model: 4, // "XPS 13"
-          type: 2,
+          type: 4,
           isActive: "1",
           createdAt: new Date(),
           updatedAt: new Date(),

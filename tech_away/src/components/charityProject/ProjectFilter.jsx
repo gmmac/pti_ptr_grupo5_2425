@@ -5,7 +5,7 @@ export default function ProjectFilter({ setFilters }) {
   const [localFilters, setLocalFilters] = useState({
     id: "",
     projectName: "",
-    status: "",
+    status: "Opened",
     warehouse: "",
     organizerName: "",
     startDate: "",
@@ -26,7 +26,7 @@ export default function ProjectFilter({ setFilters }) {
     const cleared = {
       id: "",
       projectName: "",
-      status: "",
+      status: "Opened",
       warehouse: "",
       organizerName: "",
       startDate: "",
@@ -68,7 +68,7 @@ export default function ProjectFilter({ setFilters }) {
                     />
                   </Form.Group>
                 </Col>
-                <Col xs={12} md={4}>
+                {/* <Col xs={12} md={4}>
                   <Form.Group controlId="filterStatus">
                     <Form.Label>Status</Form.Label>
                     <Form.Control
@@ -79,7 +79,7 @@ export default function ProjectFilter({ setFilters }) {
                       onChange={handleChange}
                     />
                   </Form.Group>
-                </Col>
+                </Col> */}
                 <Col xs={12} md={4}>
                   <Form.Group controlId="filterWarehouse">
                     <Form.Label>Warehouse</Form.Label>
@@ -104,7 +104,7 @@ export default function ProjectFilter({ setFilters }) {
                     />
                   </Form.Group>
                 </Col>
-                <Col xs={12} md={4}>
+                {/* <Col xs={12} md={4}>
                   <Form.Group controlId="filterStartDate">
                     <Form.Label>Start Date</Form.Label>
                     <Form.Control
@@ -125,7 +125,7 @@ export default function ProjectFilter({ setFilters }) {
                       onChange={handleChange}
                     />
                   </Form.Group>
-                </Col>
+                </Col> */}
               </Row>
               <Row className="mt-4 justify-content-center">
                 <Col xs={12} md={3} className="mb-2">

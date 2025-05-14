@@ -59,16 +59,6 @@ export default function DonationForms({ show, handleClose }) {
     e.preventDefault();
     setError('');
 
-    if (!equipmentList.includes(form.usedEquipmentID)) {
-      setError('No equipment found with the provided barcode.');
-      return;
-    }
-
-    if (!clientList.includes(form.clientNic)) {
-      setError('No client found with the provided NIC.');
-      return;
-    }
-
     if (!form.charityProjectId) {
       setError('Please select a charity project.');
       return;
