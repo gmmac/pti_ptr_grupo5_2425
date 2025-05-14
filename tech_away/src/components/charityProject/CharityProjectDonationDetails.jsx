@@ -87,8 +87,9 @@ export default function CharityProjectDonationDetails({ projectId }) {
                                 Barcode: {item.Equipment.barcode}
                               </small>
                             </div>
-                            <div className="d-flex justify-content-start justify-lg-content-center align-items-end">
-                              <small className="d-block">
+                            <div className="d-flex flex-column">
+                              <h6 className="mb-1">{item.Equipment.type}</h6>
+                              <small className="text-muted">
                                 <b>Date:</b>{' '}
                                 {new Date(item.Purchase.purchase_date)
                                   .toLocaleDateString()}

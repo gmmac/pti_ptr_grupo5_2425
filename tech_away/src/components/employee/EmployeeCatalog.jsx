@@ -103,8 +103,9 @@ export default function EmployeeCatalog() {
             <EmployeeCardView 
               employees={employees}
               />
-
-            <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
+              <div className='d-lg-none'>
+                <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
+            </div>
         </>
         }
 
@@ -119,15 +120,16 @@ export default function EmployeeCatalog() {
             refreshKey={refreshKey}
           />
 
-{employees &&
-        <>
-            <EmployeeCardView 
-              employees={employees}
-              />
+        {employees &&
+          <>
+              <EmployeeCardView 
+                employees={employees}
+                />
+              
+              <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
+          </>
+        }
 
-            <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
-        </>
-}
         </Tab>
       </Tabs>
 

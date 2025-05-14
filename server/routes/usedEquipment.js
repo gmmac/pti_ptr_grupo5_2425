@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
       Status,
       active = "1",
       page = 1,
-      pageSize = 10,
+      pageSize = 6,
       sortField = "id",
       sortOrder = "ASC",
     } = req.query;
@@ -159,7 +159,7 @@ router.get("/displayTable", async (req, res) => {
       Status,
       active = "1",
       page = 1,
-      pageSize = 10,
+      pageSize = 2,
       sortField = "id",
       sortOrder = "ASC",
     } = req.query;
