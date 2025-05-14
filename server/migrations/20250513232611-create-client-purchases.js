@@ -42,11 +42,6 @@ module.exports = {
 				onUpdate: "CASCADE",
 				onDelete: "SET NULL",
 			},
-
-			pickupInStore: {
-				type: Sequelize.BOOLEAN,
-				allowNull: false,
-			},
 			address: {
 				type: Sequelize.STRING(100),
 				allowNull: true,

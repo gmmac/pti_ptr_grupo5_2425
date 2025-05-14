@@ -33,11 +33,7 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: true,
 			},
 			orderStatusID: {
-				typer: DataTypes.INTEGER,
-				allowNull: false,
-			},
-			pickupInStore: {
-				type: DataTypes.BOOLEAN,
+				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
 			address: {

@@ -12,9 +12,16 @@ router.get("/", async (req, res) => {
 });
 router.post("/", async (req, res) => {
 	try {
-		const { clientNIC, totalPrice, employeeID } = req.body;
+		const {
+			clientNIC,
+			totalPrice,
+			employeeID,
+			pickupInStore,
+			address,
+			storeId,
+		} = req.body;
 
-		if (!clientNIC || !totalPrice) {
+		if (!clientNIC || totalPrice === undefined || totalPrice === null) {
 			return res
 				.status(400)
 				.json({ error: "clientNIC e totalPrice são obrigatórios." });
@@ -24,6 +31,10 @@ router.post("/", async (req, res) => {
 			clientNIC,
 			total: totalPrice,
 			employeeID: employeeID ?? "123456789", // padrão
+			orderStatusID: 1, // padrão - pendding approval
+			pickupInStore,
+			address: address ?? "",
+			storeId: storeId ?? null,
 		});
 
 		res.status(201).json({ id: purchase.id });

@@ -92,7 +92,7 @@ app.use("/api/payment", payment);
 app.use("/api/projectStatus", projectStatus);
 app.use("/api/equipmentType", equipmentType);
 app.use("/api/purchaseCartEquipment", purchaseCartEquipment);
-app.use("/api/oderStatus", orderStatus);
+app.use("/api/orderStatus", orderStatus);
 
 app.get("/status", (req, res) => {
 	res.json({
