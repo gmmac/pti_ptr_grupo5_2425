@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
 				onUpdate: "CASCADE",
 				onDelete: "SET NULL",
 			});
+			ClientPurchase.belongsTo(models.OrderStatus, {
+				foreignKey: "orderStatusID",
+				targetKey: "id",
+			});
 		}
 	}
 	ClientPurchase.init(

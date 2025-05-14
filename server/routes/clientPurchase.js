@@ -50,6 +50,10 @@ router.get("/client-orders/:ID", async (req, res) => {
 
 		const cartsIds = await models.ClientPurchase.findAll({
 			where: { clientNIC: clientId },
+			include: {
+				model: models.OrderStatus,
+				attributes: ["state"],
+			},
 		});
 
 		if (!cartsIds) {

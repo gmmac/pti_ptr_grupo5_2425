@@ -2,6 +2,7 @@ import React, { useState, useEffect, use } from "react";
 import { Stack, Row, Col } from "react-bootstrap";
 import api from "../../utils/axios";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
+import OrderCard from "./OrderCard";
 
 export default function PurchaseTab() {
 	const [purchases, setPurchases] = useState([]);
@@ -10,6 +11,10 @@ export default function PurchaseTab() {
 	useEffect(() => {
 		fetchPurchases();
 	}, [user]);
+
+	useEffect(() => {
+		console.log(purchases);
+	}, [purchases]);
 	const fetchPurchases = async () => {
 		try {
 			const res = await api.get(
@@ -27,24 +32,9 @@ export default function PurchaseTab() {
 				My Orders
 			</h5>
 			<Stack direction="vertical" gap={2}>
-				<Stack direction="vertical" gap={2} style={{ height: "450px" }}>
+				<Stack direction="vertical" gap={2} >
 					{purchases.map((purchase) => (
-						<Row key={purchase.id} className="mb-3">
-							<Col
-								className=""
-								style={{
-									backgroundColor: "var(--white)",
-									fontFamily: "var(--body-font)",
-								}}
-							>
-								<h6>Order ID: {purchase.id}</h6>
-								<p>Total Price: {purchase.total}</p>
-								<p>Date: {new Date(purchase.createdAt).toLocaleDateString()}</p>
-							</Col>
-							<Col>
-								<Stack direction="vertical" gap={2} className=""></Stack>
-							</Col>
-						</Row>
+						<OrderCard key={purchase.id} order={purchase} />
 					))}
 				</Stack>
 			</Stack>
