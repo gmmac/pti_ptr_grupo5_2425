@@ -17,7 +17,6 @@ export default function WarehouseCatalogModal({
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 4;
 
   const [filters, setFilters] = useState({
     name: "",
@@ -33,7 +32,6 @@ export default function WarehouseCatalogModal({
           params: {
             ...filters,
             page: currentPage,
-            pageSize: itemsPerPage,
           },
         });
         setWarehouses(response.data.data);

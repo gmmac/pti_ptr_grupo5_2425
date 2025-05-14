@@ -10,7 +10,7 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
 
-export default function CharityProjectDisplayTable({onEdit, onOpenDetails, onDelete, refreshKey}) {
+export default function CharityProjectDisplayTable({onEdit, onOpenDetails, onDelete, refreshKey, canDelete=false}) {
 	const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
 
@@ -186,23 +186,32 @@ export default function CharityProjectDisplayTable({onEdit, onOpenDetails, onDel
                     <Column
                     header=""
                     body={(rowData, options) => {
+                        // podes afinar aqui: rowData.canDelete, status do projeto, etc.
+                        const allowDelete = canDelete;
+
                         const menuItems = [
                         {
-                            label: "Detalhes",
-                            icon: "pi pi-eye",
-                            command: () => {onOpenDetails(rowData.id)}
+                            label: 'See Details',
+                            icon: 'pi pi-eye',
+                            command: () => onOpenDetails(rowData.id)
                         },
-                        {
-                            label: "Editar",
-                            icon: "pi pi-pencil",
-                            command: () => handleEdit(rowData)
-                        },
-                        {
-                            label: "Excluir",
-                            icon: "pi pi-trash",
-                            command: () => confirmDelete(rowData.id)
-                        },
+                        ...(allowDelete
+                            ? [
+                                {
+                                label: 'Delete',
+                                icon: 'pi pi-trash',
+                                command: () =>
+                                    confirmDialog({
+                                    message: 'Are you sure you want to delete this project? This action cannot be undone.',
+                                    header: 'Confirmation',
+                                    icon: 'pi pi-exclamation-triangle',
+                                    accept: () => onDelete(rowData.id),
+                                    })
+                                }
+                            ]
+                            : [])
                         ];
+
                         return (
                         <>
                             <Menu
@@ -221,6 +230,8 @@ export default function CharityProjectDisplayTable({onEdit, onOpenDetails, onDel
                         );
                     }}
                     />
+
+
 
                 </DataTable>
 

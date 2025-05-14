@@ -194,6 +194,8 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
             <Accordion.Body className="bg-white">
               <SearchBar value={search} onChange={setSearch} onSearch={handleSearch} />
               <FlowPane
+                colNumMD={4}
+                colNumXS={6}
                 elements={equipmentTypes}
                 selectedElements={selectedTypes}
                 isEditing={isEditing}

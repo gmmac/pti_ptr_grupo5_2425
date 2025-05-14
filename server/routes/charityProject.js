@@ -201,7 +201,7 @@ router.get("/displayTable", async (req, res) => {
     organizerName: item.Organizer.firstName + " " + item.Organizer.lastName,
     status: item.ProjectStatus.state,
     statusID: item.ProjectStatus.id,
-    totalSpace: item.totalSpace,
+    // totalSpace: item.totalSpace,
     warehouse: item.Warehouse.name,
     warehouseID: item.Warehouse.id,
     startDate: item.startDate,

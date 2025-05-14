@@ -5,7 +5,7 @@ export default function EquipmentTypeCard({ element, isSelected, isEditing, onTo
   return (
 <Card
   onClick={() => isEditing && onToggle(element)}
-  className={`border-0 shadow-sm ${isSelected ? 'ring ring-success' : ''} rounded-3`}
+  className={`border-0 shadow-sm ${isSelected ? 'ring ring-success' : ''} rounded-3 m-1`}
   style={{
     cursor: isEditing ? 'pointer' : 'default',
     transition: '0.3s',
@@ -15,7 +15,7 @@ export default function EquipmentTypeCard({ element, isSelected, isEditing, onTo
   <Card.Body className="d-flex justify-content-between align-items-start p-3">
     <div>
       <Card.Title className="mb-1 fs-6 fw-semibold text-capitalize">
-        {element.name} - {element.quantity}
+        {element.name}
       </Card.Title>
       <small className="text-muted">ID: {element.id}</small>
     </div>

@@ -5,7 +5,7 @@ export default function SelectedCardList({ selectedElements = [], isEditing = fa
   return (
     <Row>
       {selectedElements.map((element, index) => (
-        <Col key={element.id || element.Barcode || index} md={colNumMD} sm={6} xs={colNumXS} className="mb-3">
+        <Col key={element.id || element.Barcode || index} md={colNumMD} xs={colNumXS} className="mb-3">
           <Card
             bg={isEditing ? 'success' : 'light'}
             text={isEditing ? 'white' : 'dark'}

@@ -11,7 +11,6 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 4;
   const [filters, setFilters] = useState({ usedEquipmentId: '', model: '', type: '' });
 
   const handleClosePopUp = () => {
@@ -26,7 +25,7 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
       setError(null);
       try {
         const response = await api.get('/api/usedEquipment/displayTable', {
-          params: { ...filters, page: currentPage, pageSize: itemsPerPage }
+          params: { ...filters, page: currentPage }
         });
         setEquipments(response.data.data || []);
         setTotalPages(response.data.totalPages);

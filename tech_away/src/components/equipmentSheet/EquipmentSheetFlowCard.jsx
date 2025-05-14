@@ -5,7 +5,7 @@ export default function EquipmentSheetFlowCard({ element, isSelected, isEditing,
   return (
     <Card
       onClick={() => isEditing && onToggle(element)}
-      className={`shadow-sm border ${isSelected ? 'border-success' : 'border-light'} rounded-sm`}
+      className={`shadow-sm border ${isSelected ? 'border-success' : 'border-light'} rounded-sm m-1`}
       style={{ cursor: isEditing ? 'pointer' : 'default', transition: '0.2s' }}
     >
     <Card.Body onClick={console.log(element)} className="d-flex justify-content-between align-items-start p-3">

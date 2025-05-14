@@ -86,6 +86,16 @@ export default function OrganizerCharityProjects() {
     setShowDetailsModal(false);
     };
 
+    const handleDelete = async (projectId) => {
+      try {
+        await api.delete(`/api/charityProject/${projectId}`);
+        toggleRefresh();
+      } catch (err) {
+        console.error("Error deleting project:", err);
+        setError("Could not delete project.");
+      }
+  };
+
   return (
     <div>
 
@@ -123,6 +133,8 @@ export default function OrganizerCharityProjects() {
                     totalPages={totalPages}
                     onOpenDetails={handleOpenDetailsModal}
                     onRefresh={toggleRefresh}
+                    onDelete={handleDelete}
+                    canDelete={true}
                   />
                 )
               )}

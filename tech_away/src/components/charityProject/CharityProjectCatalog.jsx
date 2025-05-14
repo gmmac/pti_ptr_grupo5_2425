@@ -13,7 +13,9 @@ export default function CharityProjectCatalog({
   currentPage,
   totalPages,
   onOpenDetails,
-  onRefresh
+  onRefresh,
+  onDelete,
+  canDelete
 }) {
   const [deleting, setDeleting] = useState(false);
   const [confirmationData, setConfirmationData] = useState({
@@ -53,6 +55,8 @@ export default function CharityProjectCatalog({
 
       <CharityProjectDisplayTable
         onOpenDetails={onOpenDetails}
+        onDelete={onDelete}
+        canDelete={canDelete}
       />
       <CharityProjectCardView
         projects={charityProjects}
@@ -60,11 +64,14 @@ export default function CharityProjectCatalog({
         onDelete={handleDelete}
         deleting={deleting}
       />
-      <PaginationControl
-        handlePageChange={handlePageChange}
-        currentPage={currentPage}
-        totalPages={totalPages}
-      />
+      
+      <div className='d-block d-lg-none'>
+        <PaginationControl
+          handlePageChange={handlePageChange}
+          currentPage={currentPage}
+          totalPages={totalPages}
+        />
+      </div>
 
       {/* Modal de confirmação */}
       <ConfirmationModal

@@ -170,8 +170,8 @@ export default function DonationForms({ show, handleClose }) {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="formusedEquipmentID">
-                  <Form.Label>Equipment Barcode</Form.Label>
-                  <Form.Control type="text" name="usedEquipmentID" value={form.usedEquipmentID} onChange={handleChange} placeholder="Enter barcode" required />
+                  <Form.Label>Equipment ID</Form.Label>
+                  <Form.Control type="text" name="usedEquipmentID" value={form.usedEquipmentID} onChange={handleChange} placeholder="Enter equipment ID" required />
                 </Form.Group>
               </Col>
               <Col md={6} className="d-flex align-items-end">

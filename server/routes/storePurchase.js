@@ -176,7 +176,7 @@ router.get("/getDonations", async (req, res) => {
     const {
       charityProjectId,
       page           = 1,
-      pageSize       = 4,
+      pageSize       = 8,
       orderBy        = "usedEquipmentId",
       orderDirection = "ASC"
     } = req.query;
@@ -287,7 +287,6 @@ router.get("/getDonations", async (req, res) => {
 });
 
 
-
 router.post("/donate", async (req, res) => {
   try {
     const { clientNic, usedEquipmentID, charityProjectId } = req.body;
@@ -296,6 +295,16 @@ router.post("/donate", async (req, res) => {
 
     // 1) Projeto e warehouse
     const project   = await models.CharityProject.findByPk(charityProjectId);
+    if (!project) {
+      return res.status(404).json({ error: "Charity project not found." });
+    }
+    // Só permite doação se o status for 'Opened' (seed: id = 2)
+    if (project.status !== 2) {
+      return res
+        .status(400)
+        .json({ error: "Donations are only allowed for projects in 'Opened' status." });
+    }
+
     const warehouse = await models.Warehouse.findByPk(project.warehouseID);
     if (!warehouse) {
       return res.status(404).json({ error: "Warehouse not found." });
@@ -338,17 +347,16 @@ router.post("/donate", async (req, res) => {
     return res.status(201).json(donation);
 
   } catch (error) {
-    // Se for violação de única combinação charityProjectId+usedEquipmentId
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res
         .status(400)
         .json({ error: "This equipment has already been donated to this project." });
     }
-
     console.error("Error in /donate:", error);
     return res.status(500).json({ error: "Unexpected error." });
   }
 });
+
 
 
 
