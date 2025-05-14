@@ -35,7 +35,7 @@ export default function ProfilePageClient() {
 					</Col>
 				</Row>
 
-				<Tab.Container
+				{/* <Tab.Container
 					defaultActiveKey="profile"
 					activeKey={activeTab}
 					onSelect={(selectedKey) => selectTab(selectedKey)}
@@ -69,7 +69,7 @@ export default function ProfilePageClient() {
 							<ClientProfile />
 						</Tab.Pane>
 					</Tab.Content>
-				</Tab.Container>
+				</Tab.Container> */}
 			</Stack>
 		</Container>
 	);

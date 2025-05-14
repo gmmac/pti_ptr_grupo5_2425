@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Row, Stack, Col } from "react-bootstrap";
+import { Button, Modal, Row, Stack, Col, Image } from "react-bootstrap";
 import api from "../../utils/axios";
 
 export default function OrderDetailsModal({
@@ -15,9 +15,20 @@ export default function OrderDetailsModal({
 			const response = await api.get(
 				`/api/purchaseCartEquipment/order/${order.id}`
 			);
-			console.log(response.data);
 
-			setOrderedEquipments(response.data);
+			const equipment = response.data;
+
+			const equimentInfo = [];
+
+			for (const e in equipment) {
+				const res = await api.get(
+					`/api/usedEquipment/by-used-equiment-id/${equipment[e].equipmentId}`
+				);
+
+				equimentInfo.push(res.data);
+			}
+
+			setOrderedEquipments(equimentInfo);
 		} catch (error) {
 			console.error(error);
 		}
@@ -37,8 +48,6 @@ export default function OrderDetailsModal({
 	}, [showDetails]);
 
 	useEffect(() => {
-		console.log("storeData", storeData);
-
 		if (order.storeId) {
 			fetchStoreData(order.storeId);
 		}
@@ -89,6 +98,19 @@ export default function OrderDetailsModal({
 				</Stack>
 				<Row>
 					<Col sm={12} md={8}>
+						<Stack
+							direction="horizontal"
+							gap={2}
+							className="justify-content-between mb-2"
+						>
+							<h6 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
+								{orderedEquipments.length} items ordered
+							</h6>
+
+							<h6 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
+								Total Price: {order.total} €
+							</h6>
+						</Stack>
 						{orderedEquipments.map((equipment, key) => (
 							<Stack
 								key={key}
@@ -96,13 +118,35 @@ export default function OrderDetailsModal({
 								className="justify-content-between align-items-center"
 								style={{
 									backgroundColor: "#eae6f0",
-									borderRadius: "10px",
 									padding: "20px",
 									borderRadius: "16px",
 									marginBottom: "10px",
 								}}
+								gap={2}
 							>
-								olaaaaa
+								<Image
+									src="../../public/assets/ip.png"
+									className="w-25 rounded-3"
+									style={{
+										objectFit: "cover",
+										// mixBlendMode: "darken",
+									}}
+								/>
+								<Stack direction="vertical">
+									<h6
+										className="m-0"
+										style={{ fontFamily: "var(--title-font)" }}
+									>
+										{
+											equipment.usedEquipments.EquipmentSheet.EquipmentModel
+												.name
+										}
+									</h6>
+									<p className="m-0 ">
+										{equipment.usedEquipments.EquipmentStatus.state}
+									</p>
+									<p className="m-0">{equipment.usedEquipments.price} €</p>
+								</Stack>
 							</Stack>
 						))}
 					</Col>
@@ -124,9 +168,16 @@ export default function OrderDetailsModal({
 											className="m-0"
 											style={{ fontFamily: "var(--title-font)" }}
 										>
-											To Pickup in Store
+											To Pickup in Store:
 										</h6>
-										<p></p>
+										<span className="d-flex flex-row align-items-center justify-content-start gap-2">
+											<i className="pi pi-map-marker"></i>
+											<p className="m-0">{storeData.name}</p>
+										</span>
+										<span className="d-flex flex-row align-items-center justify-content-start gap-2">
+											<i className="pi pi-phone"></i>
+											<p className="m-0">{storeData.phone}</p>
+										</span>
 									</span>
 								) : (
 									<h6
