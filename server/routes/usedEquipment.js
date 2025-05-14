@@ -149,13 +149,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 router.get("/displayTable", async (req, res) => {
   try {
     const {
       Barcode,
       EquipmentType,
-      BrandModel,          // agora usamos este único campo
+      BrandModel,
       Store,
       Status,
       active = "1",
@@ -174,6 +173,7 @@ router.get("/displayTable", async (req, res) => {
       ' ',
       Sequelize.col("EquipmentSheet.EquipmentModel.name")
     );
+    
 
     // Montagem do ORDER BY
     const orderClause = [];
@@ -197,12 +197,14 @@ router.get("/displayTable", async (req, res) => {
     // Montagem do WHERE
     const where = {};
     const sheetWhere = {};
+    const typeWhere = {}
+    const storeWhere = {}
 
     if (Barcode) {
-      sheetWhere.barcode = { [Op.iLike]: `%${Barcode}%` };
+      sheetWhere.barcode = { [Op.iLike]: `${Barcode}%` };
     }
     if (EquipmentType) {
-      sheetWhere["$EquipmentType.name$"] = { [Op.iLike]: `%${EquipmentType}%` };
+      typeWhere.name = { [Op.iLike]: `%${EquipmentType}%` };
     }
     // Novo filtro unificado BrandModel
     if (BrandModel) {
@@ -212,7 +214,7 @@ router.get("/displayTable", async (req, res) => {
       );
     }
     if (Store) {
-      where["$Store.name$"] = { [Op.iLike]: `%${Store}%` };
+      storeWhere.name = { [Op.iLike]: `%${Store}%` };
     }
     if (Status) {
       where.statusID = { [Op.eq]: Status };
@@ -255,6 +257,7 @@ router.get("/displayTable", async (req, res) => {
               model: models.EquipmentType,
               as: "EquipmentType",
               attributes: ["id", "name"],
+              where: typeWhere
             },
           ],
         },
@@ -266,6 +269,7 @@ router.get("/displayTable", async (req, res) => {
         {
           model: models.Store,
           attributes: ["nipc", "name"],
+          where: storeWhere
         },
       ],
       limit: parseInt(pageSize),

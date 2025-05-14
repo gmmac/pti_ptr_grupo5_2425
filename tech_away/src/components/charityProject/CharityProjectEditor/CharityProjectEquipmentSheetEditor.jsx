@@ -120,9 +120,15 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
       setIsEditing(false);
     } catch (error) {
       console.error('Error saving equipment sheets:', error);
-      showAlert('Error updating equipment sheets.', 'danger');
-      onChangeAlert?.({ message: 'Error updating equipment sheets.', variant: 'danger' });
+    
+      const message =
+        error.response?.data?.error ||
+        'Error updating equipment sheets.';
+    
+      showAlert(message, 'danger');
+      onChangeAlert?.({ message, variant: 'danger' });
     }
+    
   };
 
   const handleCancel = () => {
@@ -133,7 +139,7 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
 
   const showAlert = (message, variant) => {
     setAlert({ show: true, message, variant });
-    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 2500);
+    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 3000);
   };
 
   const handleSearch = (value = search) => {

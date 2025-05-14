@@ -121,9 +121,15 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
       setIsEditing(false);
     } catch (error) {
       console.error('Error saving equipment types:', error);
-      showAlert('Error updating equipment types.', 'danger');
-      onChangeAlert?.({ message: 'Error updating equipment types.', variant: 'danger' });
+    
+      const message =
+        error.response?.data?.error ||
+        'Error updating equipment types.';
+    
+      showAlert(message, 'danger');
+      onChangeAlert?.({ message, variant: 'danger' });
     }
+    
   };
 
   const handleCancel = () => {
@@ -134,7 +140,7 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
 
   const showAlert = (message, variant) => {
     setAlert({ show: true, message, variant });
-    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 2500);
+    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 3000);
   };
 
   const handleSearch = (value = search) => {

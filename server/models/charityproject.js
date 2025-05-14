@@ -71,10 +71,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    totalSpace: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    }
+    // totalSpace: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: true
+    // }
   }, {
     sequelize,
     modelName: 'CharityProject',

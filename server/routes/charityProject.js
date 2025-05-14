@@ -217,7 +217,7 @@ router.get("/displayTable", async (req, res) => {
   });
 
   } catch (error) {
-  console.log(error);
+  console.error(error);
   res.status(500).json({ error: "Error fetching brands." });
   }
 });
@@ -266,6 +266,61 @@ router.post("/linkEquipmentType", async (req, res) => {
       return res.status(400).json({ error: "charityProjectId and items[] are required." });
     }
 
+    // Busca projeto + warehouse
+    const charityProject = await models.CharityProject.findByPk(charityProjectId, {
+      include: {
+        model: models.Warehouse,
+        attributes: ['availableSlots']
+      }
+    });
+
+    if (!charityProject) {
+      return res.status(404).json({ error: "Charity project not found." });
+    }
+
+    const availableSlots = charityProject.Warehouse?.availableSlots;
+    if (availableSlots == null) {
+      return res.status(400).json({ error: "Warehouse available slots not defined." });
+    }
+
+    // Busca os registros atuais
+    const existingRecords = await models.CharityProjectEquipmentType.findAll({
+      where: { charityProjectId }
+    });
+
+    // Mapas para facilitar comparações
+    const existingMap = new Map();
+    let totalAtual = 0;
+    
+    for (const record of existingRecords) {
+      existingMap.set(record.equipmentTypeId, record.quantity);
+      totalAtual += record.quantity;
+    }
+
+
+    // Calcular a soma final após update
+    let totalFinal = totalAtual;
+
+
+    for (const item of items) {
+      const quantity = item.quantity || 1;
+      const existingQty = existingMap.get(item.id) || 0;
+
+      // Subtrai o antigo (se houver) e adiciona o novo
+      totalFinal = totalFinal - existingQty + quantity;
+    }
+
+
+    
+    // Verifica se cabe no espaço disponível
+    if (totalFinal > availableSlots) {
+      console.error(`Not enough available slots in warehouse. Requested total: ${totalFinal}, Available: ${availableSlots}`)
+      return res.status(400).json({
+        error: `Not enough available slots in warehouse. Requested total: ${totalFinal}, Available: ${availableSlots}`
+      });
+    }
+
+    // Atualiza os dados: remove todos os registros antigos e insere os novos
     await models.CharityProjectEquipmentType.destroy({
       where: { charityProjectId }
     });
@@ -281,15 +336,17 @@ router.post("/linkEquipmentType", async (req, res) => {
     const created = await models.CharityProjectEquipmentType.bulkCreate(records);
 
     res.status(201).json({
-      message: "Equipment types linked successfully.",
+      message: "Equipment types updated successfully.",
       insertedCount: created.length,
       data: created
     });
+
   } catch (error) {
-    console.error("Error linking equipment types:", error);
+    console.error("Error updating equipment types:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
+
 
 router.post("/linkEquipmentSheet", async (req, res) => {
   try {
@@ -299,6 +356,53 @@ router.post("/linkEquipmentSheet", async (req, res) => {
       return res.status(400).json({ error: "charityProjectId and items[] are required." });
     }
 
+    // Busca projeto + warehouse
+    const charityProject = await models.CharityProject.findByPk(charityProjectId, {
+      include: {
+        model: models.Warehouse,
+        attributes: ['availableSlots']
+      }
+    });
+
+    if (!charityProject) {
+      return res.status(404).json({ error: "Charity project not found." });
+    }
+
+    const availableSlots = charityProject.Warehouse?.availableSlots;
+    if (availableSlots == null) {
+      return res.status(400).json({ error: "Warehouse available slots not defined." });
+    }
+
+    // Busca os registros atuais
+    const existingRecords = await models.EquipmentSheetCharityProject.findAll({
+      where: { charityProjectId }
+    });
+
+    const existingMap = new Map();
+    let totalAtual = 0;
+
+    for (const record of existingRecords) {
+      existingMap.set(record.equipmentSheetId, record.quantity);
+      totalAtual += record.quantity;
+    }
+
+    // Calcular novo total após atualização
+    let totalFinal = totalAtual;
+
+    for (const item of items) {
+      const quantity = item.quantity || 1;
+      const existingQty = existingMap.get(item.barcode) || 0;
+      totalFinal = totalFinal - existingQty + quantity;
+    }
+
+    // Verifica se há espaço suficiente
+    if (totalFinal > availableSlots) {
+      return res.status(400).json({
+        error: `Not enough available slots in warehouse. Requested total: ${totalFinal}, Available: ${availableSlots}`
+      });
+    }
+
+    // Atualiza: remove todos os registros e insere os novos
     await models.EquipmentSheetCharityProject.destroy({
       where: { charityProjectId }
     });
@@ -318,13 +422,12 @@ router.post("/linkEquipmentSheet", async (req, res) => {
       insertedCount: created.length,
       data: created
     });
+
   } catch (error) {
     console.error("Error linking equipment sheets:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
-
-
 
 router.get("/:id/equipmentTypes", async (req, res) => {
   try {
@@ -522,7 +625,6 @@ router.put('/:ID', async (req, res) => {
         where: { charityProjectId: projectId }
       });
 
-      console.log(donationCount)
 
       // load both old & new warehouses
       const oldWh = await models.Warehouse.findByPk(project.warehouseID);

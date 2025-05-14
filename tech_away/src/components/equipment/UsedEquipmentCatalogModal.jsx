@@ -4,6 +4,7 @@ import api from '../../utils/axios';
 import PaginationControl from '../pagination/PaginationControl';
 import UsedEquipmentTableModal from './UsedEquipmentTableModal';
 import UsedEquipmentCardModal from './UsedEquipmentCardModal';
+import UsedEquipmentFilter from './UsedEquipmentFilter';
 
 export default function UsedEquipmentCatalogModal({ show, handleClose, handleSelectEquipment, selectedEquipmentID }) {
   const [equipments, setEquipments] = useState([]);
@@ -11,11 +12,23 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filters, setFilters] = useState({ usedEquipmentId: '', model: '', type: '' });
+  const [filters, setFilters] = useState({    
+    usedEquipmentId: '',
+    Barcode: '',
+    BrandModel: '',
+    EquipmentType: '',
+    sortField: 'id',
+    sortOrder: 'ASC'});
 
   const handleClosePopUp = () => {
     handleClose();
-    setFilters({ usedEquipmentId: '', model: '', type: '' });
+    setFilters({    
+    usedEquipmentId: '',
+    Barcode: '',
+    BrandModel: '',
+    EquipmentType: '',
+    sortField: 'id',
+    sortOrder: 'ASC'});
     setCurrentPage(1);
   };
 
@@ -57,6 +70,7 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
       <Modal.Header closeButton>
         <Modal.Title>Catalog of Used Equipment</Modal.Title>
       </Modal.Header>
+      <UsedEquipmentFilter setFilters={setFilters} />
       <Modal.Body>
         {loading ? (
           <p>Loading Data...</p>
@@ -87,9 +101,6 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
           </Container>
         )}
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClosePopUp}>Close</Button>
-      </Modal.Footer>
     </Modal>
   );
 }
