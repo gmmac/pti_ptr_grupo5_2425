@@ -185,11 +185,11 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
         onRemove={toggleSelectType}
         onQuantityChange={handleQuantityChange}
         renderCard={(type) => (
-          <div className="fw-semibold text-capitalize">
-            {type.name}
-            <div> Quantity: {type.quantity} </div>
+          <>
+            <div className="fw-semibold text-capitalize">{type.name}</div>
+            <div> Quantity: {type.currentDonations ?? 0} / {type.quantity} </div>
             <div className="small text-muted">ID: {type.id}</div>
-          </div>
+          </>
         )}
       />
 

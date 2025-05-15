@@ -188,7 +188,8 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
       renderCard={(sheet) => (
         <>
           <div className="fw-semibold">{sheet.EquipmentModel?.name} - {sheet?.Brand?.name}</div>
-          <div> Quantity: {sheet.quantity} </div>
+          {/* <div> Quantity: {sheet.quantity} </div> */}
+          <div> Quantity: {sheet.currentDonations ?? 0} / {sheet.quantity} </div>
           <div className="small text-muted">{sheet.EquipmentType?.name}</div>
           <div className="small text-muted">{sheet.Barcode}</div>
         </>
