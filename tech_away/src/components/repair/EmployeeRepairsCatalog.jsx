@@ -9,12 +9,16 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
-import RepairInfo from "../client/RepairInfo";
+import RepairInfo from "./RepairInfo";
+import NewRepairStatusLog from "./NewRepairStatusLog";
+import EditRepairForms from "./EditRepairForms";
 
-export default function EmployeeRepairsCatalog() {
+export default function EmployeeRepairsCatalog({refreshRepairs}) {
 	const [loading, setLoading] = useState(false);
 	const [totalRecords, setTotalRecords] = useState(0);
 	const [showRepairInfo, setShowRepairInfo] = useState(false);
+    const [showChangeRepairStatus, setShowChangeRepairStatus] = useState(false);
+    const [showEditRepair, setShowEditRepair] = useState(false);
 	const [repairID, setRepairID] = useState(null);
 
     const [lazyState, setLazyState] = useState({
@@ -41,7 +45,7 @@ export default function EmployeeRepairsCatalog() {
 
     useEffect(() => {
         loadLazyData();
-    }, [lazyState]);
+    }, [refreshRepairs, lazyState]);
 
     const loadLazyData = () => {
         setLoading(true);
@@ -94,7 +98,6 @@ export default function EmployeeRepairsCatalog() {
     };
 
     const onFilter = (event) => {
-        console.log("estou a filtrar no bom")
         event['first'] = 0; // Resetar a página quando o filtro mudar
         setLazyState(event);
     };
@@ -102,6 +105,20 @@ export default function EmployeeRepairsCatalog() {
     const openRepairInfo = (repairID) => {
         setShowRepairInfo(true);
         setRepairID(repairID);
+    };
+
+    const changeRepairStatus = (repairID) => {
+        setShowChangeRepairStatus(true);
+        setRepairID(repairID);
+    };
+
+    const openEditRepairModal = (repairID) => {
+        setShowEditRepair(true);
+        setRepairID(repairID);
+    };
+
+    const refreshTable = () => {
+        loadLazyData();
     };
 
     return (
@@ -194,6 +211,16 @@ export default function EmployeeRepairsCatalog() {
                                     icon: "pi pi-info-circle",
                                     command: () => openRepairInfo(rowData.id),
                                 },
+                                {
+                                    label: "Change Status",
+                                    icon: "pi pi-sync",
+                                    command: () => changeRepairStatus(rowData.id),
+                                },
+                                {
+                                    label: "Edit Repair",
+                                    icon: "pi pi-pencil",
+                                    command: () => openEditRepairModal(rowData.id),
+                                }
                             ];
                             return (
                                 <>
@@ -266,10 +293,25 @@ export default function EmployeeRepairsCatalog() {
 							padding-right: 0.05rem;
 							background-color: var(--variant-one);
 						}
+                        .p-menu {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                        .p-menu ul {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            list-style: none;
+                        }
+                        .p-menu .p-menuitem-link {
+                            text-decoration: none !important;
+                            color: #374151 !important; /* Ajuste conforme seu tema */
+                        }
 						`}
 				</style>
             </div>
             <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
+            <NewRepairStatusLog repairId={repairID} showModal={showChangeRepairStatus} closeModal={() => setShowChangeRepairStatus(false)} setRefreshRepairs={refreshTable}/>
+            <EditRepairForms repairID={repairID} showModal={showEditRepair} closeModal={() => setShowEditRepair(false)} setRefreshRepairs={refreshTable}/>
         </>
     );
 }

@@ -256,31 +256,44 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
 
 
 router.post("/", async (req, res) => {
-  try {
-    const {
-      statusID,
-      description,
-      budget,
-      estimatedDeliverDate,
-      employeeId,
-      usedEquipmentId,
-    } = req.body;
-    const repair = await models.Repair.create({
-      statusID,
-      description,
-      budget,
-      estimatedDeliverDate,
-      employeeId,
-      usedEquipmentId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-    res.status(200).json({
-      data: repair,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Error creating repair." });
-  }
+	try {
+		const {
+			description,
+			clientId,
+			statusID,
+			usedEquipmentId,
+			budget,
+			estimatedDeliverDate,
+		} = req.body;
+		
+		const employeeId = req.cookies.employeeInfo.nic;
+
+		const repair = await models.Repair.create({
+			statusID,
+			description,
+			budget,
+			estimatedDeliverDate,
+			employeeId,
+			clientId,
+			usedEquipmentId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
+
+		await models.RepairStatusLog.create({
+			statusId: 1,
+			description: 'Pedido de reparação criado',
+			repairId: repair.id,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
+
+		res.status(200).json({
+			data: repair,
+		});
+	} catch (error) {
+	res.status(500).json({ error: "Error creating repair." });
+	}
 });
 
 router.get("/:id", async (req, res) => {
@@ -315,7 +328,45 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {});
+router.put("/:id", async (req, res) => {
+	try {
+		const { id } = req.params;
+		const {
+			description,
+			clientId,
+			statusID,
+			usedEquipmentId,
+			budget,
+			estimatedDeliverDate,
+		} = req.body;
+
+		// Verifica se a repair existe
+		const repair = await models.Repair.findByPk(id);
+		if (!repair) {
+			return res.status(404).json({ error: "Repair not found." });
+		}
+
+		// Atualiza os campos
+		await repair.update({
+			description,
+			clientId,
+			statusID: statusID ?? repair.statusID, // caso venha undefined
+			usedEquipmentId,
+			budget,
+			estimatedDeliverDate,
+			updatedAt: new Date(),
+		});
+
+		res.status(200).json({
+			message: "Repair updated successfully.",
+			data: repair,
+		});
+	} catch (error) {
+		console.error("PUT /repair/:id error:", error);
+		res.status(500).json({ error: "Error updating repair." });
+	}
+});
+
 
 router.delete("/:id", async (req, res) => {});
 

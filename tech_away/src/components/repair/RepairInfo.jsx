@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Table, Card, Row, Col } from 'react-bootstrap';
 import { FileText, Calendar, Wallet, People, Shop, CheckCircle } from 'react-bootstrap-icons';
-import PaginationControl from '../pagination/PaginationControl';
 import api from '../../utils/axios';
 
 export default function RepairInfo({ repairID, show, onClose }) {
@@ -47,7 +46,7 @@ export default function RepairInfo({ repairID, show, onClose }) {
       fetchRepair();
       fetchRepairsLogs();
     }
-  }, [currentPage, repairID]);
+  }, [show, currentPage, repairID]);
 
   return (
     <Modal show={show} onHide={onClose} centered size="xl" >

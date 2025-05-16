@@ -306,6 +306,60 @@ router.get("/displayTable", async (req, res) => {
     console.error("Error fetching used equipment:", error);
     res.status(500).json({ error: "Error fetching used equipment." });
   }
+router.get("/usedEquipmentRepairs", async (req, res) => {
+	try {
+		const {
+			id,
+			price,
+			equipmentId,
+			storeId,
+			page = 1,
+			pageSize = 10,
+			orderBy,
+			orderDirection,
+		} = req.query;
+
+		const where = {};
+
+		if (id && !isNaN(parseInt(id))) where.id = parseInt(id);
+		if (price && !isNaN(parseFloat(price))) where.price = parseFloat(price);
+		if (equipmentId) where.equipmentId = equipmentId;
+		if (storeId) where.storeId = storeId;
+
+		const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
+		let order = [];
+		if (orderBy && orderDirection) {
+			order = [[orderBy, orderDirection.toUpperCase()]];
+		} else {
+			order = [["id", "ASC"]];
+		}
+
+		const { count, rows } = await models.UsedEquipment.findAndCountAll({
+			where,
+			limit: parseInt(pageSize),
+			offset,
+			order,
+		});
+		
+		const formattedData = rows.map((item) => ({
+			id: item.id,
+			price: item.price,
+			equipmentId: item.equipmentId,
+			storeId: item.storeId,
+		}));
+
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: formattedData,
+		});
+	} catch (error) {
+		console.error("Error fetching clients:", error);
+		res.status(500).json({ error: "Error fetching clients." });
+	}
 });
 
 router.get("/:ID", async (req, res) => {

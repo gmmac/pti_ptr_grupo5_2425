@@ -1,23 +1,14 @@
 import React, { useState } from 'react'
 import EmployeeRepairsCatalog from '../repair/EmployeeRepairsCatalog'
 import { Button, Col, Container, Row } from 'react-bootstrap'
-import NewRepairForms from '../repair/NewRepairForms';
-import SelectClientModal from '../client/SelectClientModal';
+import EditRepairForms from '../repair/EditRepairForms';
 
 export default function EmployeeRepairs() {
 	const [show, setShow] = useState(false);
-	const [showClientModal, setShowClientModal] = useState(false);
+	const [refreshRepairs, setRefreshRepairs] = useState(false)
 
 	const handleShow = () => setShow(true);
 	const handleClose = () => setShow(false);
-
-	const handleClientModal = ({ id, name }) => {
-		setRepair((prev) => ({
-		  ...prev,
-		  clientId: id,
-		  clientName: name
-		}));
-	};
 
 	return (
 		<Container className="mt-4">
@@ -27,16 +18,9 @@ export default function EmployeeRepairs() {
 				</Col>
 			</Row>
 
-			<EmployeeRepairsCatalog />
+			<EmployeeRepairsCatalog refreshRepairs={refreshRepairs}/>
 
-			<NewRepairForms showModal={show} closeModal={handleClose} setShowClientModal={setShowClientModal}/>
-
-			{/* Modal de seleção do cliente */}
-			<SelectClientModal
-				showModal={showClientModal}
-				closeModal={() => setShowClientModal(false)}
-				onSelect={handleClientModal}
-			/>
+			<EditRepairForms repairID={null} showModal={show} closeModal={handleClose} setRefreshRepairs={setRefreshRepairs}/>
 		</Container>
 	)
 }

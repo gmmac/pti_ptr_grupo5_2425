@@ -235,7 +235,7 @@ export default function DisplayTablePurchases({refreshTable}) {
 						`}
 				</style>
             </div>
-            
+            {/* <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/> */}
         </>
     );
 }

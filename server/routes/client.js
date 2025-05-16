@@ -23,8 +23,6 @@ router.get("/", async (req, res) => {
 			orderDirection,
 		} = req.query;
 
-
-		console.log(req.query)
 		const where = {};
 
 		if (nic) where.nic = { [Op.like]: `${nic}%` };
@@ -163,8 +161,6 @@ router.delete("/:NIC", async (req, res) => {
 
 router.post("/", async (req, res) => {
 	try {
-		console.log(req.body);
-
 		const {
 			nic,
 			nif,
