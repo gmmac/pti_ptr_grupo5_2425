@@ -9,7 +9,6 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
-import RepairInfo from "../client/RepairInfo";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 
 export default function ClientSales(refreshAllTables=null) {

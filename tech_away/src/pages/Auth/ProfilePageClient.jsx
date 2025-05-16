@@ -9,7 +9,6 @@ import { IsMobileContext } from "../../contexts/IsMobileContext";
 import SmDecoration from "../../components/profile/SmDecoration";
 import ClientInfo from "../../components/profile/ClientInfo";
 import ProfileTabs from "../../components/profile/ProfileTabs";
-import ClientSales from "../../components/client/ClientSales"
 
 export default function ProfilePageClient() {
 	const isMobile = useContext(IsMobileContext);

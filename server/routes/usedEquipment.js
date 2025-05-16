@@ -305,7 +305,8 @@ router.get("/displayTable", async (req, res) => {
   } catch (error) {
     console.error("Error fetching used equipment:", error);
     res.status(500).json({ error: "Error fetching used equipment." });
-  }
+  }})
+  
 router.get("/usedEquipmentRepairs", async (req, res) => {
 	try {
 		const {
