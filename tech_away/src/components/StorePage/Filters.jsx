@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Form, Stack, Button, Accordion } from "react-bootstrap";
+import { Stack, Button } from "react-bootstrap";
 import api from "../../utils/axios";
 import { IsMobileContext } from "../../contexts/IsMobileContext";
 import SearchableSelect from "./SearchableSelect";
@@ -62,7 +62,7 @@ export default function Filters({ filters, setFilters }) {
 	}, []);
 
 	const clearFilters = () => {
-		setFilters({ orderBy: "", type: "", model: "", brand: "" });
+		setFilters({ orderBy: "", type: "", model: "", brand: "", store: "" });
 	};
 
 	return isMobile ? (
