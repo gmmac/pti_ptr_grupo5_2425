@@ -50,7 +50,7 @@ export default function SearchableCheckboxList({
 				style={{
 					backgroundColor:
 						selected.length > 0 ? "var(--variant-one)" : "var(--light-grey)",
-					color: "var(--dark-grey)",
+					color: selected.length > 0 ? "var(--white)" : "var(--dark-grey)",
 					border: "none",
 					boxShadow: "var(--shadow-default)",
 				}}
@@ -69,7 +69,10 @@ export default function SearchableCheckboxList({
 
 					<i
 						className="pi pi-chevron-down"
-						style={{ color: "var(--dark-grey)", fontSize: "0.8rem" }}
+						style={{
+							color: selected.length > 0 ? "var(--white)" : "var(--dark-grey)",
+							fontSize: "0.8rem",
+						}}
 					></i>
 				</Stack>
 			</Button>
