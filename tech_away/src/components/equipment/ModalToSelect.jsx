@@ -6,6 +6,7 @@ export default function ModalToSelect({
 	showModal,
 	closeModal,
 	title,
+	selectedItem = null,
 	onSelect,
 }) {
 	const [list, setList] = useState([]);
@@ -14,7 +15,12 @@ export default function ModalToSelect({
 	const [search, setSearch] = useState("");
 
 	useEffect(() => {
-		console.log("MOSTRO: " + showModal)
+		if (showModal) {
+			setSelectedRow(selectedItem);
+		}
+	}, [showModal, selectedItem]);
+
+	useEffect(() => {
 		if (!showModal) return; // Evita chamadas desnecessárias
 
 		api
@@ -88,7 +94,9 @@ export default function ModalToSelect({
 												color: selectedRow?.id === item.id ? "#fff" : "inherit", // Cor do texto na linha selecionada
 											}}
 										>
-											{item[col]}
+											{typeof item[col] === "object" && item[col] !== null
+												? item[col].name || JSON.stringify(item[col])
+												: item[col]}
 										</td>
 									))}
 								</tr>

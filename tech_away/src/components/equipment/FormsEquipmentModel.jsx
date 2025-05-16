@@ -16,8 +16,9 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 
     const [showNewBrandModal, setShowNewBrandModal] = useState(false);
 
+    const [pendingBrand, setPendingBrand] = useState({ id: "", name: "" });
+
     const [equipmentModel, setEquipmentModel] = useState(() => {
-        console.log(existingModel)
         if (existingModel) {
             return {
                 name: existingModel.name || "",
@@ -38,17 +39,22 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 
     useEffect(() => {
         if (existingModel) {
-            console.log("Exist",  existingModel)
-          setEquipmentModel({
-            name: existingModel.name || "",
-            brandId: existingModel.Brand?.id || "",
-            brand: existingModel.Brand?.name || "",
-            price: existingModel.price || "",
-            releaseYear: existingModel.releaseYear || "",
-          });
-          console.log("Equipm",existingModel)
+            setEquipmentModel({
+                name: existingModel.name || "",
+                brandId: existingModel.Brand?.id || "",
+                brand: existingModel.Brand?.name || "",
+                price: existingModel.price || "",
+                releaseYear: existingModel.releaseYear || "",
+            });
+    
+            setPendingBrand({
+                id: existingModel.Brand?.id || "",
+                name: existingModel.Brand?.name || "",
+            });
+        } else {
+            setPendingBrand({ id: "", name: "" });
         }
-      }, [existingModel]);
+    }, [existingModel]);
 
 	const [errors, setErrors] = useState({});
 
@@ -68,7 +74,8 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 	};
 
     const handleBrandModel = ({ id, name }) => {
-		setEquipmentModel((prev) => ({ ...prev, brand: name, brandId: id }));
+		setPendingBrand({ id, name });
+        setErrors(prev => ({ ...prev, brand: null }))
 	};
 
 	const handleSubmit = async (e) => {
@@ -78,8 +85,14 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 		let hasError = false;
 		let newErrors = {};
 
-		Object.keys(equipmentModel).forEach((field) => {
-			if (!equipmentModel[field]) {
+        const fieldsToValidate = {
+            ...equipmentModel,
+            brand: pendingBrand.name,
+            brandId: pendingBrand.id,
+        };
+
+		Object.keys(fieldsToValidate).forEach((field) => {
+			if (!fieldsToValidate[field]) {
 				newErrors[field] = "This field is required";
 				hasError = true;
 			}
@@ -90,7 +103,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 
 		const dataToSubmit = {
 			name: equipmentModel.name,
-            brand: equipmentModel.brandId,
+            brand: pendingBrand.id,
             price: equipmentModel.price,
             releaseYear: equipmentModel.releaseYear,
 
@@ -116,29 +129,47 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
         }
 	};
 
-    // const handleNext = () => {
-    //     let hasError = false;
-    //     let newErrors = { ...errors };
-    //     if (!equipmentModel.brandId) {
-    //       newErrors.brand = "Brand is required";
-    //       hasError = true;
-    //     }
-    //     setErrors(newErrors);
-      
-    //     if (hasError) {
-    //       return;
-    //     }
-    //     stepperRef.current.nextCallback();
-    //   };
+    const handleNext = () => {
+        let hasError = false;
+        const newErrors = { ...errors };
+    
+        if (!pendingBrand.id) {
+            newErrors.brand = "Brand is required";
+            hasError = true;
+        } else {
+            newErrors.brand = null;
+        }
+    
+        setErrors(newErrors);
+    
+        if (!hasError) {
+            stepperRef.current.nextCallback();
+        }
+    };
 
 	const handleRefresh = () => {
-		setEquipmentModel({
-			name: "",
-            brandId: "",
-            brand: "",
-            price: "",
-            releaseYear: "",
-		});
+        if (existingModel) {
+            setEquipmentModel({
+                name: existingModel.name || "",
+                brandId: existingModel.Brand?.id || "",
+                brand: existingModel.Brand?.name || "",
+                price: existingModel.price || "",
+                releaseYear: existingModel.releaseYear || "",
+            });
+            setPendingBrand({
+                id: existingModel.Brand?.id || "",
+                name: existingModel.Brand?.name || "",
+            });
+        } else {
+            setEquipmentModel({
+                name: "",
+                brandId: "",
+                brand: "",
+                price: "",
+                releaseYear: "",
+            });
+            setPendingBrand({ id: "", name: "" });
+        }
 		setErrors({});
 	};
 
@@ -150,7 +181,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
 			<Modal.Body>
 				
             {/* <div className="card flex justify-content-center"> */}
-                <Stepper ref={stepperRef} style={{ flexBasis: '50rem' }} className="custom-stepper">
+                <Stepper ref={stepperRef} style={{ flexBasis: '50rem' }} className="custom-stepper" linear="true">
                     <StepperPanel header="Choose brand" style={{ paddingLeft: '0px' }}>
                         <div className="flex flex-column h-12rem">
                             <div className="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
@@ -159,24 +190,27 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
                                     <div className="d-flex">
                                         <Form.Control
                                             type="text"
-                                            name="model"
-                                            value={equipmentModel.brand}
+                                            name="brand"
+                                            value={pendingBrand.name}
                                             isInvalid={!!errors.brand}
                                             readOnly
                                             className="rounded-pill me-2"
                                         />
                                         <Button
                                             className="rounded-pill"
-                                            style={{ backgroundColor: "var(--variant-two", border: "none" , width: "100px"}}
-                                            onClick={() => setShowBrandModal(true)}
+                                            style={{ backgroundColor: "var(--variant-one", border: "none" , width: "100px"}}
+                                            onClick={() => {setShowBrandModal(true)}
+                                            }
                                         >Select
                                         </Button>
                                     </div>
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.brand}
-                                    </Form.Control.Feedback>
+                                    {errors.brand && (
+                                        <div className="invalid-feedback d-block">
+                                            {errors.brand}
+                                        </div>
+                                    )}
                                 </Form.Group>
-                                </div>
+                            </div>
                                 <Row className="d-flex justify-content-between align-items-center ">
                                     <Col xs={7} className="text-start">
                                     If the brand you're looking for does not exist, add a new one:
@@ -184,21 +218,25 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
                                     <Col xs="auto" className="d-flex justify-content-end align-self-center">
                                     <Button
                                         className="rounded-pill"
-                                        style={{ backgroundColor: "var(--variant-two", border: "none" }}
+                                        style={{ backgroundColor: "var(--variant-one", border: "none" }}
                                         onClick={() => setShowNewBrandModal(true)}
                                         >Add new Brand
                                     </Button>
                                     </Col>
-                                </Row>
-                                <Stack  >
-                                    
-                                    
-				                </Stack>
-                                
+                                </Row>          
                         </div>
-                        <div className="flex pt-4 justify-content-end ">
-                            <Button className="rounded-pill" label="Next" icon="pi pi-arrow-right" iconPos="right" onClick={() => stepperRef.current.nextCallback()} />
-                        </div>
+                        <div className="flex pt-4 justify-content-start"></div>
+                        <Stack gap={2} direction="horizontal">
+                        <Button className="rounded-pill" label="Cancel" severity="secondary" icon="pi pi-times" onClick={() => {closeModal(); handleRefresh()}} />
+                            <Button
+                                className="rounded-pill ms-auto"
+                                label="Next"
+                                icon="pi pi-arrow-right"
+                                iconPos="right"
+                                style={{ backgroundColor: "var(--variant-one)", border: "none" }}
+                                onClick={handleNext}
+                            />
+                        </Stack>    
                     </StepperPanel>
                     <StepperPanel header="Equipment Model">
                         <div className="flex flex-column h-12rem">
@@ -308,7 +346,19 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
                         </Stack>
                         
                     </StepperPanel>
+                    
                 </Stepper>
+                <style>
+                    {`
+                        .p-stepper .p-stepper-header.p-highlight .p-stepper-number {
+                            background-color: var(--variant-one);
+                        }
+
+                        .p-stepper .p-stepper-header:has(~ .p-highlight) .p-stepper-separator {
+                            background-color: var(--variant-one);
+                        }
+                    `}
+                </style>
             {/* </div> */}
         
 			</Modal.Body>
@@ -318,6 +368,7 @@ export default function FormsEquipmentModel({ showModal, closeModal, refreshTabl
                 showModal={showBrandModal}
                 closeModal={() => setShowBrandModal(false)}
                 title="brand"
+                selectedItem = {{ id: equipmentModel.brandId, name: equipmentModel.brand }}
                 onSelect={handleBrandModel}
             />
 

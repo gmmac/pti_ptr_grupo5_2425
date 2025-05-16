@@ -2,19 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from 'primereact/button';
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Menu } from "primereact/menu";
 import { confirmDialog } from "primereact/confirmdialog";
-import { FilterMatchMode } from "primereact/api";
 import api from "../../utils/axios";
-import ModalEdit from "./ModalEdit";
-import FormsEquipmentSheet from "./FormsEquipmentSheet";
+import ModalEdit from "../equipment/ModalEdit";
+import FormsEquipmentSheet from "../equipment/FormsEquipmentSheet";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
-import FormsEquipmentModel from "./FormsEquipmentModel";
+import FormsEquipmentModel from "../equipment/FormsEquipmentModel";
 import { Calendar } from 'primereact/calendar';
+import ClientManageDetailsModal from "./ClientManageDetailsModal";
 
-export default function DisplayTable({ model, active = "1", refreshAllTables=null}) {
+export default function ClientManageDisplayTable({ model, active = "1", refreshAllTables=null}) {
 	const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
 
@@ -25,15 +24,12 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
         sortField: null,
         sortOrder: null,
         filters: {
-			'id': { value: '', matchMode: 'contains' },
+			'nic': { value: '', matchMode: 'contains' },
+			'nif': { value: '', matchMode: 'contains' },
+            'birthDate': { value: '', matchMode: 'contains' },
 			'name': { value: '', matchMode: 'contains' },
-			'price': { value: '', matchMode: 'contains' },
-			'releaseYear': { value: '', matchMode: 'contains' },
-			'Brand': { value: '', matchMode: 'contains' },
-            'Barcode': { value: '', matchMode: 'contains' },
-            'EquipmentModel': { value: '', matchMode: 'contains' },
-            'EquipmentType': { value: '', matchMode: 'contains' },
-            'arriveTime': { value: '', matchMode: 'contains' },
+			'email': { value: '', matchMode: 'contains' },
+			'phone': { value: '', matchMode: 'contains' },
 			'createdAt': { value: '', matchMode: 'equals' },
 			'updatedAt': { value: '', matchMode: 'equals' }
 		}
@@ -44,7 +40,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
     const [selectedObj, setSelectedObj] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const menuRefs = useRef([]);
-	const dateFields = ['createdAt', 'updatedAt']; // adiciona os campos relevantes
+	const dateFields = ['createdAt', 'updatedAt', 'birthDate']; // adiciona os campos relevantes
 
     useEffect(() => {
         loadLazyData();
@@ -76,7 +72,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
         }
 
         // Faz a requisição ao backend
-        api.get(`api/${model}`, { params }).then((res) => {
+        api.get(`api/${model}/displayTable`, { params }).then((res) => {
             const responseData = res.data;
             if (responseData.data.length > 0) {
                 const allColumns = Object.keys(responseData.data[0]).filter(
@@ -110,7 +106,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 
     const confirmDelete = (id) => {
         confirmDialog({
-            message: (<> Are you sure you want to {active == "1" ? "delete" : "restore"} this {model}?<br />This action can erase other items associated with this {model}.</>),
+            message: (<> Are you sure you want to {active == "1" ? "deactivate" : "restore"} this {model}?</>),
             header: "Confirmation",
             icon: "pi pi-exclamation-triangle",
             accept: () => handleDelete(id),
@@ -118,7 +114,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
     };
 
     const handleEdit = (item) => {
-        setSelectedObj(item);
+        setSelectedObj(item.nic);
         setShowModal(true);
     };
 
@@ -130,7 +126,9 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
     };
 
     const capitalizeFirstLetter = (value) => {
-        if(String(value) == "id") return "ID";
+        if(String(value) == "nic") return "NIC";
+        if(String(value) == "nif") return "NIF";
+        if(String(value) == "birthDate") return "Birthdate";
         return String(value).charAt(0).toUpperCase() + String(value).slice(1);
     }
 
@@ -206,6 +204,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                                     return `${value} days`;
                                 }
 								if (dateFields.includes(column) && value) {
+                                    if(column == "birthDate") return new Date(value).toLocaleDateString("pt-PT");
 									const date = new Date(value);
 									const formattedDate = date.toLocaleDateString("pt-PT");
 									const formattedTime = date.toLocaleTimeString("pt-PT", {
@@ -229,7 +228,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                                     {active=="1" ? 
                                         <>
                                           <Button
-                                                icon="pi pi-pencil"
+                                                icon="pi pi-info-circle"
                                                 rounded
                                                 text
                                                 severity="secondary"
@@ -244,18 +243,29 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                                                 label="Delete"
                                                 style={{color: "var(--danger)"}}
                                                 className="custom-icon-button-withtext"
-                                                onClick={() => confirmDelete(model==="equipmentSheet" ? rowData.Barcode: rowData.id)}
+                                                onClick={() => confirmDelete(rowData.nic)}
                                             /> 
                                         </> : 
-                                    <Button
-                                        icon="pi pi-history"
-                                        text
-                                        severity="success"
-                                        label="Restore"
-                                        style={{color: "var(--valid)"}}
-                                        className="custom-icon-button-withtext"
-                                        onClick={() => confirmDelete(model==="equipmentSheet" ? rowData.Barcode: rowData.id)}
-                                    />
+                                        <>
+                                        <Button
+                                                icon="pi pi-info-circle"
+                                                rounded
+                                                text
+                                                severity="secondary"
+                                                aria-label="Edit"
+                                                className="custom-icon-button"
+                                                onClick={() => handleEdit(rowData)}
+                                            />
+                                        <Button
+                                            icon="pi pi-history"
+                                            text
+                                            severity="success"
+                                            label="Restore"
+                                            style={{color: "var(--valid)"}}
+                                            className="custom-icon-button-withtext"
+                                            onClick={() => confirmDelete(rowData.nic)}
+                                        />
+                                        </>
                                     }
                                 </div>
                             );
@@ -335,35 +345,13 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 						`}
 				</style>
             </div>
-            {model === "model" ? (
-                <FormsEquipmentModel
-                    showModal={showModal}
-                    closeModal={() => setShowModal(false)}
-                    refreshTable={() => loadLazyData()}
-                    existingModel={selectedObj || {}}
-                />
-            ) : model === "equipmentSheet" ? (
-                <FormsEquipmentSheet
-                    showModal={showModal}
-                    closeModal={() => setShowModal(false)}
-                    refreshTable={() => loadLazyData()}
-                    existingSheet={selectedObj || {}}
-                />
-            ) : (
-                <ModalEdit
-                    show={showModal}
-                    handleClose={() => setShowModal(false)}
-                    modelToEdit={model}
-                    objectToChange={selectedObj || {}}
-                    attributesToEdit={columns}
-                    onSave={() => {
-                        setShowModal(false);
-                        loadLazyData();
-                    }}
-                />
-            )}
-
             
+            <ClientManageDetailsModal 
+                clientNIC={selectedObj || {}}
+                showModal={showModal}
+                refreshTable={() => loadLazyData()}
+                closeModal= {() => setShowModal(false)}
+            />
         </>
     );
 }

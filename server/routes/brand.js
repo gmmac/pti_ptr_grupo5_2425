@@ -136,6 +136,9 @@ router.put("/:id", async (req, res) => {
     if (!brand) {
       return res.status(404).json({ error: "Brand not found" });
     }
+     if (!name) {
+       return res.status(400).json({ error: "Brand name is required." });
+     }
     const exists = await models.Brand.findOne({
       where: { name },
     });

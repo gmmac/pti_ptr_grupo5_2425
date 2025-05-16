@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Container, Row, Col, Tabs, Tab } from "react-bootstrap";
 import DisplayTable from "../../equipment/DisplayTable";
 import FormsEquipmentModel from "../../equipment/FormsEquipmentModel";
@@ -25,8 +25,6 @@ export default function ModelsManage() {
 			<Tabs
                 id="types-tabs"
                 defaultActiveKey="active"
-                // activeKey={activeTab}
-                // onSelect={handleTabChange}
                 className="custom-manage-tabs mb-3"
             >
                 <Tab eventKey="active" title="Active Equipment Models">

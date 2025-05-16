@@ -76,7 +76,7 @@ export default function FormsNewBrand({ showModal, closeModal, refreshTable}) {
 	};
 
 	return (
-		<Modal show={showModal} onHide={closeModal}>
+		<Modal show={showModal} onHide={() => { closeModal(); handleRefresh()}}>
 			<Modal.Header closeButton>
 				<Modal.Title>Add New Brand</Modal.Title>
 			</Modal.Header>
@@ -105,7 +105,7 @@ export default function FormsNewBrand({ showModal, closeModal, refreshTable}) {
                      )}
 					<Button
 						className="w-100 rounded-pill"
-						style={{ backgroundColor: "var(--variant-two", border: "none" }}
+						style={{ backgroundColor: "var(--variant-one", border: "none" }}
 						onClick={handleSubmit}
 					>
 						Add Brand
