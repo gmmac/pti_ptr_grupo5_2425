@@ -9,11 +9,16 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
+import RepairInfo from "../client/RepairInfo";
+import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 
-export default function DisplayTablePurchases({refreshTable}) {
+export default function ClientSales(refreshAllTables=null) {
 	const [loading, setLoading] = useState(false);
 	const [totalRecords, setTotalRecords] = useState(0);
-
+	const [showRepairInfo, setShowRepairInfo] = useState(false);
+	const [repairID, setRepairID] = useState(null);
+    
+    const { user, logOut } = useAuth();
 
     const [lazyState, setLazyState] = useState({
         first: 0,
@@ -26,8 +31,9 @@ export default function DisplayTablePurchases({refreshTable}) {
             'storeName': { value: '', matchMode: 'contains' },
             'purchasePrice': { value: '', matchMode: 'contains' },
             'employeeName': { value: '', matchMode: 'contains' },
-			'clientName': { value: '', matchMode: 'contains' },
+			'BrandName': { value: '', matchMode: 'contains' },//**************************************************** */
             'modelName': { value: '', matchMode: 'contains' },
+            'Status': { value: '', matchMode: 'contains' }, //***************************************************** */
             'createdAt': { value: '', matchMode: 'equals' },
 		}
     });
@@ -39,7 +45,7 @@ export default function DisplayTablePurchases({refreshTable}) {
 
     useEffect(() => {
         loadLazyData();
-    }, [refreshTable, lazyState]);
+    }, [lazyState]);
 
     const loadLazyData = () => {
         setLoading(true);
@@ -53,9 +59,13 @@ export default function DisplayTablePurchases({refreshTable}) {
         const params = {
             page: currentPage,
             pageSize: pageSize,
+            nic: user?.nic,
             sortField,
-            sortOrder
+            sortOrder,
         };
+    
+
+        console.log(user?.nic);
 
         // Adiciona os filtros aos params
         for (const key in filters) {
@@ -64,6 +74,8 @@ export default function DisplayTablePurchases({refreshTable}) {
                 params[key] = filterMeta.value;
             }
         }
+
+        params.nic = user?.nic;
 
         // Faz a requisição ao backend
         api.get("/api/storePurchase", { params: params }).then((res) => {
@@ -98,6 +110,10 @@ export default function DisplayTablePurchases({refreshTable}) {
         setLazyState(event);
     };
 
+    const openRepairInfo = (repairID) => {
+        setShowRepairInfo(true);
+        setRepairID(repairID);
+    };
 
     return (
         <>
@@ -180,7 +196,36 @@ export default function DisplayTablePurchases({refreshTable}) {
 							}}
                         />
                     ))}
-                    
+                    <Column
+                        header=""
+                        body={(rowData, options) => {
+                            const menuItems = [
+                                {
+                                    label: "See Details",
+                                    icon: "pi pi-info-circle",
+                                    command: () => openRepairInfo(rowData.id),
+                                },
+                            ];
+                            return (
+                                <>
+                                    <Menu
+                                        model={menuItems}
+                                        popup
+                                        ref={(el) => (menuRefs.current[options.rowIndex] = el)}
+                                    />
+                                    <Button
+                                        icon="pi pi-ellipsis-v"
+                                        text
+                                        severity="secondary"
+                                        onClick={(e) =>
+                                            menuRefs.current[options.rowIndex].toggle(e)
+                                        }
+                                        className="rounded-5"
+                                    />
+                                </>
+                            );
+                        }}
+                    />
                 </DataTable>
 				<style>
 					{`
@@ -235,7 +280,6 @@ export default function DisplayTablePurchases({refreshTable}) {
 						`}
 				</style>
             </div>
-            
         </>
     );
 }

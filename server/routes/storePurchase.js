@@ -13,6 +13,7 @@ router.get("/", async (req, res) => {
         purchasePrice,
         modelName,
         storeName,
+        nic,
         createdAt,
         page = 1,
         pageSize = 10,
@@ -22,6 +23,7 @@ router.get("/", async (req, res) => {
       const where = {};
       const whereModel = {};
       const whereStore = {};
+      const whereClient = {}
 
       if (id)
         where.id = sequelize.where(
@@ -73,6 +75,9 @@ router.get("/", async (req, res) => {
           }
         );
       }
+      if (nic) {
+        whereClient.nic = nic;
+      }
       
       const offset = (parseInt(page) - 1) * parseInt(pageSize);
       const orderClause = [];
@@ -92,7 +97,8 @@ router.get("/", async (req, res) => {
           },
           {
             model: models.Client,
-            attributes: ["firstName", "lastName"],
+            attributes: ["firstName", "lastName","nic"],
+            where: whereClient,
           },
           {
             model: models.UsedEquipment,
