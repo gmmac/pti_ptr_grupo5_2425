@@ -16,7 +16,7 @@ export default function Filters({ filters, setFilters }) {
 		api
 			.get("api/type")
 			.then((res) => {
-				const typesObj = res.data;
+				const typesObj = res.data.data;
 				const typesArray = Object.keys(typesObj).map((key) => ({
 					id: typesObj[key].id,
 					name: typesObj[key].name,
