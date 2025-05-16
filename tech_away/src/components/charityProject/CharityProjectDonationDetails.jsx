@@ -46,7 +46,13 @@ export default function CharityProjectDonationDetails({ projectId }) {
 
   return (
     <Container className="my-4">
-      <Card className="shadow-sm">
+      <Card 
+        className="shadow-sm"
+        style={{
+          transform: 'none',
+          transition: 'none',
+        }}
+      >
         <Card.Body>
           <h5 className="fw-bold mb-3">Donations</h5>
 
@@ -76,7 +82,9 @@ export default function CharityProjectDonationDetails({ projectId }) {
                         className="h-100 border-0 shadow-sm"
                         style={{
                           backgroundColor: '#f8f9fa',
-                          borderRadius: '0.75rem'
+                          borderRadius: '0.75rem',
+                          transform: 'none',
+                          transition: 'none',
                         }}
                       >
                         <Card.Body className="d-flex flex-column justify-between">

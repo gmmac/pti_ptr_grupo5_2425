@@ -58,7 +58,7 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
           <hr className="my-4" />
           <Row className="g-4">
             <Col md={12} lg={6} className="d-flex">
-              <Card className="flex-fill mb-3 border shadow-sm">
+              <Card className="flex-fill mb-3 border shadow-sm" style={{ transform: 'none', transition: 'none',}}>
                 <Card.Body>
                   <CharityProjectEquipmentTypeEditor
                     projectId={projectData.id}
@@ -71,7 +71,7 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
             </Col>
 
             <Col md={12} lg={6} className="d-flex">
-              <Card className="flex-fill mb-3 border shadow-sm">
+              <Card className="flex-fill mb-3 border shadow-sm" style={{ transform: 'none', transition: 'none',}}>
                 <Card.Body>
                   <CharityProjectEquipmentSheetEditor
                     projectId={projectData.id}

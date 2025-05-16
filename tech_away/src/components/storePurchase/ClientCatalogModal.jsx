@@ -76,7 +76,18 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
   };
 
   return (
-    <Modal show={show} onHide={handleClosePopUp} size="xl" centered>
+    <Modal show={show} onHide={handleClosePopUp} 
+    onExited={() =>{    
+      setFilters({
+        nic: "",
+        name: "",
+        email: "",
+        phone: "",
+        orderBy: "nic",
+        orderDirection: "ASC"
+      });
+    }} 
+    size="xl" centered>
       <Modal.Header closeButton>
         <Modal.Title>Catálogo de Clientes</Modal.Title>
       </Modal.Header>

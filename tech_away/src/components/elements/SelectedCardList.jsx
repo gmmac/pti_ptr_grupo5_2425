@@ -19,11 +19,19 @@ export default function SelectedCardList({
           md={colNumMD}
           xs={colNumXS}
           className="mb-3"
+          style={{
+            transform: 'none',
+            transition: 'none',
+          }}
         >
           <Card
             bg={isEditing ? 'success' : 'light'}
             text={isEditing ? 'white' : 'dark'}
             className="shadow-sm rounded-sm border-0"
+            style={{
+              transform: 'none',
+              transition: 'none',
+            }}
           >
             <Card.Body className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-start">

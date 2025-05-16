@@ -66,7 +66,19 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
   };
 
   return (
-    <Modal show={show} onHide={handleClosePopUp} size="xl" centered>
+    <Modal show={show} onHide={handleClosePopUp} 
+      onExited={() => {
+        setFilters({    
+        usedEquipmentId: '',
+        Barcode: '',
+        BrandModel: '',
+        EquipmentType: '',
+        sortField: 'id',
+        sortOrder: 'ASC'});
+      }}
+      size="xl" 
+      centered>
+      
       <Modal.Header closeButton>
         <Modal.Title>Catalog of Used Equipment</Modal.Title>
       </Modal.Header>

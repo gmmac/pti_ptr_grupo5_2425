@@ -146,7 +146,7 @@ module.exports = {
         nic: "456789012",
         nif: "654321098",
         // internNum: "7",
-        storeNIPC: "123456789",
+        storeNIPC: "778800112",
         birthDate: new Date("1988-07-30"),
         gender: "F", // 'F' para feminino
         firstName: "Ana",

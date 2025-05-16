@@ -159,23 +159,46 @@ router.get("/displayTable", async (req, res) => {
       Status,
       active = "1",
       page = 1,
-      pageSize = 2,
+      pageSize = 6,
       sortField = "id",
       sortOrder = "ASC",
     } = req.query;
 
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-
-    // Função que concatena Brand.name + ' ' + EquipmentModel.name
+    // 1) Concat para Brand + Model
     const brandModelConcat = Sequelize.fn(
-      'concat',
+      "concat",
       Sequelize.col("EquipmentSheet.EquipmentModel.Brand.name"),
-      ' ',
+      " ",
       Sequelize.col("EquipmentSheet.EquipmentModel.name")
     );
-    
 
-    // Montagem do ORDER BY
+    // 2) Filtros raiz (action e status)
+    const rootWhere = {
+      action: {
+        [Op.or]: [
+          { [Op.ne]: "D" },
+          { [Op.is]: null },
+          { [Op.eq]: "S" },
+        ],
+      },
+      ...(Status && { statusID: Status }),
+    };
+
+    // 3) Filtros de EquipmentSheet
+    const sheetWhere = {};
+    if (Barcode) sheetWhere.barcode = { [Op.iLike]: `${Barcode}%` };
+    sheetWhere.isActive = { [Op.eq]: active };
+
+    // 4) Filtros de EquipmentType e Store
+    const typeIncludeWhere = EquipmentType
+      ? { name: { [Op.iLike]: `%${EquipmentType}%` } }
+      : {};
+    const storeIncludeWhere = Store
+      ? { name: { [Op.iLike]: `%${Store}%` } }
+      : {};
+
+    // 5) Ordenação e paginação
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
     const orderClause = [];
     if (sortField === "BrandModel") {
       orderClause.push([
@@ -184,57 +207,22 @@ router.get("/displayTable", async (req, res) => {
       ]);
     } else if (sortField === "EquipmentType") {
       orderClause.push([
-        Sequelize.fn("LOWER", Sequelize.col("EquipmentSheet.EquipmentType.name")),
+        Sequelize.fn(
+          "LOWER",
+          Sequelize.col("EquipmentSheet.EquipmentType.name")
+        ),
         sortOrder == -1 ? "DESC" : "ASC",
       ]);
-    } else if (sortField) {
+    } else {
       orderClause.push([
         Sequelize.col(sortField),
         sortOrder == -1 ? "DESC" : "ASC",
       ]);
     }
 
-    // Montagem do WHERE
-    const where = {};
-    const sheetWhere = {};
-    const typeWhere = {}
-    const storeWhere = {}
-
-    if (Barcode) {
-      sheetWhere.barcode = { [Op.iLike]: `${Barcode}%` };
-    }
-    if (EquipmentType) {
-      typeWhere.name = { [Op.iLike]: `%${EquipmentType}%` };
-    }
-    // Novo filtro unificado BrandModel
-    if (BrandModel) {
-      sheetWhere[Op.and] = Sequelize.where(
-        Sequelize.fn('LOWER', brandModelConcat),
-        { [Op.iLike]: `%${BrandModel.toLowerCase()}%` }
-      );
-    }
-    if (Store) {
-      storeWhere.name = { [Op.iLike]: `%${Store}%` };
-    }
-    if (Status) {
-      where.statusID = { [Op.eq]: Status };
-    }
-    if (active) {
-      sheetWhere.isActive = { [Op.eq]: active };
-    }
-
-    where.action = {
-      [Op.or]: [
-        { [Op.ne]: 'D' },
-        { [Op.is]: null },
-        { [Op.eq]: 'S' }
-
-      ]
-    };
-
-
+    // 6) Query com include e filtro de BrandModel no include
     const { count, rows } = await models.UsedEquipment.findAndCountAll({
-      where,
+      where: rootWhere,
       include: [
         {
           model: models.EquipmentSheet,
@@ -244,11 +232,19 @@ router.get("/displayTable", async (req, res) => {
             {
               model: models.EquipmentModel,
               as: "EquipmentModel",
+              required: !!BrandModel,
+              where: BrandModel
+                ? Sequelize.where(
+                    Sequelize.fn("LOWER", brandModelConcat),
+                    { [Op.iLike]: `%${BrandModel.toLowerCase()}%` }
+                  )
+                : undefined,
               attributes: ["id", "name"],
               include: [
                 {
                   model: models.Brand,
                   as: "Brand",
+                  required: !!BrandModel,
                   attributes: ["id", "name"],
                 },
               ],
@@ -257,7 +253,7 @@ router.get("/displayTable", async (req, res) => {
               model: models.EquipmentType,
               as: "EquipmentType",
               attributes: ["id", "name"],
-              where: typeWhere
+              where: typeIncludeWhere,
             },
           ],
         },
@@ -269,7 +265,7 @@ router.get("/displayTable", async (req, res) => {
         {
           model: models.Store,
           attributes: ["nipc", "name"],
-          where: storeWhere
+          where: storeIncludeWhere,
         },
       ],
       limit: parseInt(pageSize),
@@ -277,6 +273,7 @@ router.get("/displayTable", async (req, res) => {
       order: orderClause,
     });
 
+    // 7) Formatação da resposta
     const formattedData = rows.map((item) => ({
       id: item.id,
       price: item.price,
@@ -287,7 +284,10 @@ router.get("/displayTable", async (req, res) => {
       Store: item.Store,
       EquipmentSheet: {
         barcode: item.EquipmentSheet.barcode,
-        brandModel: item.EquipmentSheet.EquipmentModel.Brand.name + " " + item.EquipmentSheet.EquipmentModel.name,
+        brandModel:
+          item.EquipmentSheet.EquipmentModel.Brand.name +
+          " " +
+          item.EquipmentSheet.EquipmentModel.name,
         EquipmentModel: item.EquipmentSheet.EquipmentModel,
         EquipmentType: item.EquipmentSheet.EquipmentType,
         createdAt: item.EquipmentSheet.createdAt,
@@ -302,13 +302,11 @@ router.get("/displayTable", async (req, res) => {
       pageSize: parseInt(pageSize),
       data: formattedData,
     });
-
   } catch (error) {
     console.error("Error fetching used equipment:", error);
     res.status(500).json({ error: "Error fetching used equipment." });
   }
 });
-
 
 router.get("/:ID", async (req, res) => {
 	try {

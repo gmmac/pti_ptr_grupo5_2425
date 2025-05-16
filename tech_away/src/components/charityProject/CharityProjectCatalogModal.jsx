@@ -91,7 +91,22 @@ export default function CharityProjectCatalogModal({
   };
 
   return (
-    <Modal show={show} onHide={handleClosePopUp} size="xl" centered>
+    <Modal show={show} onHide={handleClosePopUp} 
+      onExited={() => {
+        setFilters({
+          id: "",
+          projectName: "",
+          status: "Opened",
+          warehouse: "",
+          organizerName: "",
+          startDate: "",
+          completionDate: "",
+          orderBy: "id",
+          orderDirection: "ASC",
+        });
+      }}
+      size="xl" 
+      centered>
       <Modal.Header closeButton>
         <Modal.Title>Charity Project Catalog</Modal.Title>
       </Modal.Header>

@@ -8,7 +8,8 @@ export default function EquipmentTypeCard({ element, isSelected, isEditing, onTo
   className={`border-0 shadow-sm ${isSelected ? 'ring ring-success' : ''} rounded-3 m-1`}
   style={{
     cursor: isEditing ? 'pointer' : 'default',
-    transition: '0.3s',
+    transform: 'none',
+    transition: 'none',
     backgroundColor: isSelected ? '#e6f4ea' : '#fff',
   }}
 >

@@ -51,7 +51,7 @@ export default function CharityProjectCatalog({
   };
 
   return (
-    <Container className="py-4">
+    <div>
 
       <CharityProjectDisplayTable
         onOpenDetails={onOpenDetails}
@@ -86,6 +86,6 @@ export default function CharityProjectCatalog({
         confirmText="Delete"
         confirmVariant="danger"
       />
-    </Container>
+    </div>
   );
 }
