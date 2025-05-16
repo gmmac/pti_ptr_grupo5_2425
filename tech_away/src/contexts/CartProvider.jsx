@@ -165,6 +165,9 @@ export const CartProvider = ({ children }) => {
 				clientNIC: user.nic,
 				totalPrice: totalPrice,
 				// employeeID: opcional
+				pickupInStore: true,
+				address: "",
+				storeId: 123456789,
 			});
 
 			const clientPurchaseId = clientPurchaseRes.data.id;
@@ -198,6 +201,8 @@ export const CartProvider = ({ children }) => {
 				cartItems,
 				clearCart,
 				putPurchaseInBd,
+				fetchCartItems,
+				fetchTotalPrice,
 			}}
 		>
 			{cartId && (

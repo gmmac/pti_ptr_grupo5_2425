@@ -331,6 +331,44 @@ router.get("/:ID", async (req, res) => {
 	}
 });
 
+router.get("/by-used-equiment-id/:ID", async (req, res) => {
+	try {
+		const { ID } = req.params;
+
+		const usedEquipments = await models.UsedEquipment.findOne({
+			where: { id: ID },
+			include: [
+				{
+					model: models.EquipmentSheet,
+					as: "EquipmentSheet",
+					include: [
+						{
+							model: models.EquipmentModel,
+							as: "EquipmentModel", // este 'as' tem de bater certo com o que definiste no `belongsTo`
+							attributes: ["name"],
+						},
+					],
+				},
+				{
+					model: models.Store,
+					as: "Store",
+					attributes: ["name"],
+				},
+				{
+					model: models.EquipmentStatus,
+					as: "EquipmentStatus",
+					attributes: ["state"],
+				},
+			],
+		});
+
+		res.json({ usedEquipments });
+	} catch (error) {
+		console.error("Error fetching used equipments:", error);
+		res.status(500).json({ error: "Error fetching used equipments." });
+	}
+});
+
 // ver os que estão disponiveis para compra
 router.get("/in-stock/:ID", async (req, res) => {
 	try {

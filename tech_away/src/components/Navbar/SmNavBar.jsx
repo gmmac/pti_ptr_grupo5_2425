@@ -15,7 +15,8 @@ const SmNavBar = () => {
 						color: "var(--dark-grey)",
 						fontFamily: "var(--title-font)",
 						fontWeight: "bold",
-					}} className="fs-3"
+					}}
+					className="fs-3"
 				>
 					TechAway
 				</Navbar.Brand>

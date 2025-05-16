@@ -3,9 +3,21 @@ import { Button, Stack, Image } from "react-bootstrap";
 import { Heart, Cart } from "react-bootstrap-icons";
 import { Tag } from "primereact/tag";
 import { useCart } from "../../contexts/CartProvider";
+import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 
 export default function UsedEquipmentCard({ usedEquipment }) {
+	const { isUserLoggedIn } = useAuth();
 	const { addItemToCart } = useCart();
+
+	const handleAddToCart = () => {
+		if (!isUserLoggedIn) {
+			console.log(
+				"Para adicionar ao carrinho, é necessário estar autenticado."
+			);
+			return;
+		}
+		addItemToCart(usedEquipment.id);
+	};
 
 	return (
 		<Stack
@@ -17,11 +29,11 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 				boxShadow: "var(--shadow-default)",
 				borderRadius: "var(--rounded-sm)",
 				padding: "16px",
+				minHeight: "240px",
 			}}
 			gap={2}
 			className="rounded-sm p-4 justify-content-center align-items-center"
 		>
-			{/* Informações do tipo e marca */}
 			<Stack direction="horizontal" gap={2} className="justify-content-between">
 				<Stack
 					direction="horizontal"
@@ -77,9 +89,7 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 					<Button
 						className="rounded-pill"
 						style={{ backgroundColor: "var(--variant-two)", border: "none" }}
-						onClick={() => {
-							addItemToCart(usedEquipment.id);
-						}}
+						onClick={handleAddToCart}
 					>
 						<Cart size={20} style={{ color: "var(--white)" }} />
 					</Button>

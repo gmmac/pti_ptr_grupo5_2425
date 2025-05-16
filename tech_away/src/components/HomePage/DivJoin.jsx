@@ -45,9 +45,9 @@ export default function DivJoin() {
 						<path
 							d="M1 6H16.5M16.5 6L10.5 1M16.5 6L10.5 11"
 							stroke="#E7E7E7"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
 						/>
 					</svg>
 				</Stack>
