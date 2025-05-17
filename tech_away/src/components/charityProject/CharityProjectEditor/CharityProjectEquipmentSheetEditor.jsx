@@ -41,13 +41,13 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
     }
   };
 
-  const fetchSheets = async (page = 1, barcode = '') => {
+  const fetchSheets = async (page = 1, BrandModel = '') => {
     try {
       const res = await api.get('/api/equipmentSheet', {
         params: {
           page,
           pageSize: pagination.pageSize,
-          barcode,
+          BrandModel,
           orderBy: 'barcode',
           orderDirection: 'ASC',
         },
@@ -187,7 +187,7 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
       onQuantityChange={handleQuantityChange}
       renderCard={(sheet) => (
         <>
-          <div className="fw-semibold">{sheet.EquipmentModel?.name} - {sheet?.Brand?.name}</div>
+          <div className="fw-semibold">{sheet?.Brand?.name} {sheet.EquipmentModel?.name}</div>
           {/* <div> Quantity: {sheet.quantity} </div> */}
           <div> Quantity: {sheet.currentDonations ?? 0} / {sheet.quantity} </div>
           {/* <div className="small text-muted">{sheet.EquipmentType?.name}</div>
@@ -219,11 +219,16 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
                 )}
               />
 
-              <PaginationControl
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                handlePageChange={(page) => fetchSheets(page, search)}
-              />
+              {equipmentSheets.length == 0 ?
+                "No data found" :
+
+                <PaginationControl
+                  currentPage={pagination.currentPage}
+                  totalPages={pagination.totalPages}
+                  handlePageChange={(page) => fetchSheets(page, search)}
+                />
+              }
+
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>

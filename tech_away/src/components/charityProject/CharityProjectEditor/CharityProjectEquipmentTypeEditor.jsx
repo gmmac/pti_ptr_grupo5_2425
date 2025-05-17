@@ -216,11 +216,15 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
                   />
                 )}
               />
-              <PaginationControl
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                handlePageChange={(page) => fetchEquipmentTypes(page, search)}
-              />
+              {equipmentTypes.length == 0 ?
+                "No data found" :
+
+                <PaginationControl
+                  currentPage={pagination.currentPage}
+                  totalPages={pagination.totalPages}
+                  handlePageChange={(page) => fetchEquipmentTypes(page, search)}
+                />
+              }
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
