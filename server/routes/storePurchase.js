@@ -182,7 +182,7 @@ router.get("/getDonations", async (req, res) => {
     const {
       charityProjectId,
       page           = 1,
-      pageSize       = 8,
+      pageSize       = 4,
       orderBy        = "usedEquipmentId",
       orderDirection = "ASC"
     } = req.query;

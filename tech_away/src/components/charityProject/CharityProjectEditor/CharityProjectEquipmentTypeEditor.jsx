@@ -8,6 +8,7 @@ import PaginationControl from '../../pagination/PaginationControl';
 import api from '../../../utils/axios';
 import EquipmentTypeCard from '../../equipmentType/EquipmentTypeCard';
 import useSafeOrganizerAuth from '../../../utils/auth';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeAlert }) {
   const [equipmentTypes, setEquipmentTypes] = useState([]);
@@ -147,10 +148,28 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
     fetchEquipmentTypes(1, value);
   };
 
+  const confirmSave = () => {
+    confirmDialog({
+      message: `Are you sure you want to save?`,
+      header: "Confirmation",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => handleSave(),
+    });
+  };
+
+  const confirmCancel = () => {
+    confirmDialog({
+      message: `Are you sure you want to cancel?`,
+      header: "Confirmation",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => handleCancel(),
+    });
+  };
+
   return (
     <>
-
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <ConfirmDialog />
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-column flex-lg-row">
         <h5 className="fw-semibold mb-2">Selected Equipment Types</h5>
 
         {isOrganizer && (
@@ -160,8 +179,8 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
             </Button>
           ) : (
             <div className="d-flex gap-2">
-              <Button variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}} onClick={handleSave}>Save</Button>
-              <Button variant="outline-danger" onClick={handleCancel}>Cancel</Button>
+              <Button variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}} onClick={confirmSave}>Save</Button>
+              <Button variant="outline-danger" onClick={confirmCancel}>Cancel</Button>
             </div>
           )
         )}

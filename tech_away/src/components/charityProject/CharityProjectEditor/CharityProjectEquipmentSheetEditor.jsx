@@ -7,6 +7,7 @@ import PaginationControl from '../../pagination/PaginationControl';
 import api from '../../../utils/axios';
 import EquipmentSheetFlowCard from './../../equipmentSheet/EquipmentSheetFlowCard';
 import useSafeOrganizerAuth from '../../../utils/auth';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 export default function CharityProjectEquipmentSheetEditor({ projectId, onChangeAlert }) {
   const [equipmentSheets, setEquipmentSheets] = useState([]);
@@ -146,9 +147,27 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
     fetchSheets(1, value);
   };
 
+    const confirmSave = () => {
+      confirmDialog({
+        message: `Are you sure you want to save?`,
+        header: "Confirmation",
+        icon: "pi pi-exclamation-triangle",
+        accept: () => handleSave(),
+      });
+    };
+  
+    const confirmCancel = () => {
+      confirmDialog({
+        message: `Are you sure you want to cancel?`,
+        header: "Confirmation",
+        icon: "pi pi-exclamation-triangle",
+        accept: () => handleCancel(),
+      });
+    };
+
   return (
     <>
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-column flex-lg-row">
         <h5 className="fw-semibold mb-2">Selected Equipment Sheets</h5>
           {isOrganizer && (
               !isEditing ? (
@@ -157,10 +176,10 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
               </Button>
               ) : (
               <div className="d-flex gap-2">
-                  <Button variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}} onClick={handleSave}>
+                  <Button variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}} onClick={confirmSave}>
                   Save
                   </Button>
-                  <Button variant="outline-danger" onClick={handleCancel}>
+                  <Button variant="outline-danger" onClick={confirmCancel}>
                   Cancel
                   </Button>
               </div>
