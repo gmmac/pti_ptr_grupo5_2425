@@ -175,19 +175,19 @@ export default function CharityProjectInfoEditor({ project, onChangeAlert, onRef
     return (
         <>
             <div className="d-flex justify-content-between align-items-center mb-2">
-                <h5 className="fw-semibold mb-0">Project Info</h5>
+                <h5 className="fw-semibold mb-2">Project Info</h5>
 
                 {isOrganizer && (
                     !editing ? (
-                    <Button variant="primary" size="sm" onClick={() => setEditing(true)}>
+                    <Button variant="primary" style={{backgroundColor: "var(--variant-two)", border: "none"}} onClick={() => setEditing(true)}>
                         Edit
                     </Button>
                     ) : (
                     <div className="d-flex gap-2">
-                        <Button variant="success" size="sm" onClick={handleSave} disabled={!hasChanged()}>
+                        <Button variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}} disabled={!hasChanged()}>
                         Save
                         </Button>
-                        <Button variant="outline-secondary" size="sm" onClick={handleCancel}>
+                        <Button variant="outline-danger" onClick={handleCancel}>
                         Cancel
                         </Button>
                     </div>
@@ -297,7 +297,7 @@ export default function CharityProjectInfoEditor({ project, onChangeAlert, onRef
                             />
                             {editing && (
                                 <Button
-                                    variant="outline-primary"
+                                    variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}}
                                     onClick={() => setShowWarehouseModal(true)}
                                     className="rounded-pill"
                                 >

@@ -148,19 +148,19 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
 
   return (
     <>
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <h5 className="fw-semibold mb-0">Selected Equipment Sheets</h5>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h5 className="fw-semibold mb-2">Selected Equipment Sheets</h5>
           {isOrganizer && (
               !isEditing ? (
-              <Button variant="primary" size="sm" onClick={() => setIsEditing(true)}>
+              <Button variant="primary" style={{backgroundColor: "var(--variant-two)", border: "none"}} onClick={() => setIsEditing(true)}>
                   Edit
               </Button>
               ) : (
               <div className="d-flex gap-2">
-                  <Button variant="success" size="sm" onClick={handleSave}>
+                  <Button variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}} onClick={handleSave}>
                   Save
                   </Button>
-                  <Button variant="outline-secondary" size="sm" onClick={handleCancel}>
+                  <Button variant="outline-danger" onClick={handleCancel}>
                   Cancel
                   </Button>
               </div>
@@ -190,8 +190,8 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
           <div className="fw-semibold">{sheet.EquipmentModel?.name} - {sheet?.Brand?.name}</div>
           {/* <div> Quantity: {sheet.quantity} </div> */}
           <div> Quantity: {sheet.currentDonations ?? 0} / {sheet.quantity} </div>
-          <div className="small text-muted">{sheet.EquipmentType?.name}</div>
-          <div className="small text-muted">{sheet.Barcode}</div>
+          {/* <div className="small text-muted">{sheet.EquipmentType?.name}</div>
+          <div className="small text-muted">{sheet.Barcode}</div> */}
         </>
       )}
     />

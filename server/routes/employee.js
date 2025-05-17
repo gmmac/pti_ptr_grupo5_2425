@@ -90,9 +90,7 @@ router.get("/displayTable", async (req, res) => {
 	const {
 	  internNum,
 	  employeeName,
-	//   firstName,
-	//   lastName,
-	  storeNIPC,
+	  store,
 	  email,
 	  phone,
 	  role,
@@ -106,6 +104,7 @@ router.get("/displayTable", async (req, res) => {
 
 	const where = {};
 	const roleCondition =  {};
+	const storeCondition = {}
 
 	if (internNum)
 	  where.internNum = sequelize.where(
@@ -113,9 +112,8 @@ router.get("/displayTable", async (req, res) => {
 		{ [Op.iLike]: `${internNum}%` }
 	  );
 
-	if (storeNIPC) where.storeNIPC = { [Op.iLike]: `${storeNIPC}%` };
-	// if (firstName) where.firstName = { [Op.iLike]: `${firstName}%` };
-	// if (lastName) where.lastName = { [Op.iLike]: `${lastName}%` };
+	if (store) storeCondition.name = { [Op.iLike]: `%${store}%` };
+
 	if (employeeName) {
 		where[Op.and] = Sequelize.where(
 		  Sequelize.fn(
@@ -169,7 +167,12 @@ router.get("/displayTable", async (req, res) => {
 		  model: models.EmployeeRole,
 		  attributes: ["id", "role"],
 		  where: roleCondition
-		},    
+		},
+		{
+			model: models.Store,
+			attributes: ["nipc", "name"],
+			where: storeCondition
+		}   
 	   ],  
 	  limit: parseInt(pageSize),
 	  offset,
@@ -183,8 +186,10 @@ router.get("/displayTable", async (req, res) => {
 		// lastName: item.lastName,
 		email: item.email,
 		phone: item.phone,
-		role: item.EmployeeRole.role,
-		storeNIPC: item.storeNipc,
+		storeNIPC: item.storeNIPC,
+		storeName: item.Store.name,
+		roleId: item.EmployeeRole.id,
+		roleName: item.EmployeeRole.role,
 		isActive: item.isActive
 	}));
 
@@ -303,7 +308,6 @@ router.put("/:internNum", async (req, res) => {
 
 		await employee.update(req.body);
 
-		// Verifica se existe um cookie de employeeInfo e se é o mesmo internNum
 		const currentEmployee = req.cookies.employeeInfo;
 		if (currentEmployee && currentEmployee.internNum == req.params.internNum) {
 			res.cookie("employeeInfo", employee.dataValues, {

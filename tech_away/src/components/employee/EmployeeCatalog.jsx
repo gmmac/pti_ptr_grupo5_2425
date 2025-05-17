@@ -1,144 +1,214 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Container, Stack, Tabs, Tab, Spinner, Alert } from 'react-bootstrap';
+// src/components/EmployeeCatalog.jsx
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  Button,
+  Container,
+  Tabs,
+  Tab,
+  Alert,
+  Row,
+  Col
+} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
 import EmployeeDisplayTable from './EmployeeDisplayTable';
 import EmployeeEditModal from './EmployeeEditModal';
-import EmployeeCardView from './EmployeeCardView'
-import api from "../../utils/axios"
+import EmployeeCardView from './EmployeeCardView';
+import EmployeeFilter from './EmployeeFilter';
+import api from "../../utils/axios";
 import PaginationControl from '../pagination/PaginationControl';
 
 export default function EmployeeCatalog() {
   const navigate = useNavigate();
   const { toggleActivateAccount } = useAuthEmployee();
 
+  // Estado geral
   const [activeTab, setActiveTab] = useState('active');
   const [error, setError] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [employees, setEmployees] = useState(0);
-  
+
+  // Dados e paginação
+  const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 6;
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  // Filtros
+  const [filters, setFilters] = useState({
+    internNum: '',
+    employeeName: '',
+    email: '',
+    phone: '',
+    store: '',
+    role: ''
+  });
+  const [resetFilter, setResetFilter] = useState(false);
 
+  // Função estável para aplicar filtros
+  const handleFilterChange = useCallback((newFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  }, []);
+
+  // Busca de dados combinando filtros + aba + paginação
   const fetchEmployees = async () => {
     try {
-      const isActive = activeTab === "active" ? "1" : "0";
-
-      const response = await api.get('/api/employee/', {
+      const isActive = activeTab === 'active' ? '1' : '0';
+      const resp = await api.get('/api/employee/displayTable', {
         params: {
-          // ...filters,
-          active: isActive,
+          isActive,
           page: currentPage,
-          // pageSize: itemsPerPage,
-        },
+          pageSize: itemsPerPage,
+          ...filters
+        }
       });
-
-      setEmployees(response.data.data);
-      setTotalPages(response.data.totalPages);
+      setEmployees(resp.data.data || []);
+      setTotalPages(resp.data.totalPages || 1);
     } catch (err) {
-      setError("Erro ao buscar funcionários.");
       console.error(err);
+      setError('Erro ao buscar funcionários.');
     }
   };
 
   useEffect(() => {
     fetchEmployees();
-  // }, [currentPage, filters, refresh, activeTab]);
-}, [currentPage, refreshKey, activeTab]);
+  }, [activeTab, currentPage, filters, refreshKey]);
 
+  // Ações CRUD e toggle
   const handleCreateEmployee = () => navigate('/employee/register');
-
-  const handleEditEmployee = (employee) => {
-    setSelectedEmployee(employee);
+  const handleEditEmployee = emp => {
+    setSelectedEmployee(emp);
     setShowEditModal(true);
   };
-
-  const handleSaveEditedEmployee = (id, updatedData) => {
+  const handleSaveEditedEmployee = async (internNum, payload) => {
+    await api.put(`/api/employee/${internNum}`, payload);
     setShowEditModal(false);
     setSelectedEmployee(null);
+    setRefreshKey(k => k + 1);
+  };
+  const handleToggleActivation = async internNum => {
+    await toggleActivateAccount(internNum);
+    setRefreshKey(k => k + 1);
   };
 
-  const handleToggleActivationAccount = async (internNum) => {
-    try {
-      await toggleActivateAccount(internNum);
-      setRefreshKey(prev => prev + 1); // Força refresh da tabela
-    } catch (err) {
-      console.error("Error toggling activation:", err.message);
-    }
+  const onTabSelect = key => {
+    setActiveTab(key);
+    setCurrentPage(1);
+    setResetFilter(r => !r);
   };
 
   return (
     <Container className="py-4">
-      <Stack direction="horizontal" gap={3} className="justify-content-center my-3">
-        <Button variant="primary" size="lg" onClick={handleCreateEmployee}>
-          + Create New Employee
-        </Button>
-      </Stack>
+      <Row className="mb-3">
+        <Col className="text-end">
+          <Button
+            style={{ backgroundColor: 'var(--variant-one)', border: 'none' }}
+            onClick={handleCreateEmployee}
+          >
+            + Create New Employee
+          </Button>
+        </Col>
+      </Row>
 
       {error && <Alert variant="danger">{error}</Alert>}
 
-      <Tabs
-        id="employees-tabs"
-        activeKey={activeTab}
-        onSelect={(key) => setActiveTab(key)}
-        className="mb-3"
-      >
+      <Tabs activeKey={activeTab} onSelect={onTabSelect} className="mb-3">
         <Tab eventKey="active" title="Active Employees">
-        <EmployeeDisplayTable
-          model="employee"
-          isActiveFilter="1"
-          onEdit={handleEditEmployee}
-          onDelete={handleToggleActivationAccount}
-          refreshKey={refreshKey}
-        />
-
-        {employees &&
-        <>
-            <EmployeeCardView 
-              employees={employees}
-              />
-              <div className='d-lg-none'>
-                <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
-            </div>
-        </>
-        }
-
-
-        </Tab>
-        <Tab eventKey="inactive" title="Inactive Employees">
-          <EmployeeDisplayTable
-            model="employee"
-            isActiveFilter= "0"
-            onEdit={handleEditEmployee}
-            onDelete={handleToggleActivationAccount}
-            refreshKey={refreshKey}
-          />
-
-        {employees &&
-          <>
-              <EmployeeCardView 
-                employees={employees}
+          {/* DESKTOP */}
+          <div className="d-none d-lg-block">
+            <EmployeeDisplayTable
+              rowKey="internNum" 
+              isActiveFilter="1"
+              filters={filters}
+              onEdit={handleEditEmployee}
+              onDelete={handleToggleActivation}
+              refreshKey={refreshKey}
+              page={currentPage}
+              pageSize={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+          {/* MOBILE */}
+          
+            <div className="d-lg-none">
+              <EmployeeFilter
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                resetFilter={resetFilter}
                 />
-              
-              <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
-          </>
-        }
 
+              {employees.length === 0 ? (
+                    "No data Found"
+              ):
+                <EmployeeCardView
+                  employees={employees}
+                  isActiveFilter="1"
+                  onEdit={handleEditEmployee}
+                  onDelete={handleToggleActivation}
+                />
+              }
+              <PaginationControl
+                currentPage={currentPage}
+                totalPages={totalPages}
+                handlePageChange={setCurrentPage}
+              />
+            </div>
+        </Tab>
+
+        <Tab eventKey="inactive" title="Inactive Employees">
+          {/* DESKTOP */}
+          <div className="d-none d-lg-block">
+            <EmployeeDisplayTable
+              rowKey="internNum"
+              isActiveFilter="0"
+              filters={filters}
+              onEdit={handleEditEmployee}
+              onDelete={handleToggleActivation}
+              refreshKey={refreshKey}
+              page={currentPage}
+              pageSize={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+          {/* MOBILE */}
+          
+            <div className="d-lg-none">
+              <EmployeeFilter
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                resetFilter={resetFilter}
+              />
+
+            {employees.length === 0 ? (
+              "No data Found"
+              ): 
+                <EmployeeCardView
+                  employees={employees}
+                  isActiveFilter="0"
+                  onEdit={handleEditEmployee}
+                  onDelete={handleToggleActivation}
+                />
+              }
+
+              <PaginationControl
+                currentPage={currentPage}
+                totalPages={totalPages}
+                handlePageChange={setCurrentPage}
+              />
+            </div>
         </Tab>
       </Tabs>
 
-      <EmployeeEditModal
-        show={showEditModal}
-        onHide={() => setShowEditModal(false)}
-        employee={selectedEmployee}
-        onSave={handleSaveEditedEmployee}
-      />
+      {showEditModal && (
+        <EmployeeEditModal
+          show={showEditModal}
+          onHide={() => setShowEditModal(false)}
+          employee={selectedEmployee}
+          onSave={handleSaveEditedEmployee}
+        />
+      )}
     </Container>
   );
 }

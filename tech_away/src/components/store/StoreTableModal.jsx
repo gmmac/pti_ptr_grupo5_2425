@@ -1,40 +1,41 @@
-import React from 'react'
-import { Button, Table } from 'react-bootstrap'
+import React from 'react';
+import { Table, Button } from 'react-bootstrap';
 
 export default function StoreTableModal({ stores, selectedStore, handleStoreSelection }) {
-    const rowsToFill = Math.max(0, 4 - stores.length);
-  
-    return (
-      <Table responsive="" striped bordered hover className="d-none d-lg-table mb-0">
-        <thead>
-          <tr>
-            <th>NIPC</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Address</th>
-            <th>Select Store</th>
+  return (
+    <Table striped bordered hover className="d-none d-lg-table mb-3">
+      <thead>
+        <tr>
+          <th>NIPC</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Address</th>
+          <th>Select</th>
+        </tr>
+      </thead>
+      <tbody>
+        {stores.map((s) => (
+          <tr key={s.nipc}>
+            <td>{s.nipc}</td>
+            <td>{s.name}</td>
+            <td>{s.email}</td>
+            <td>{s.address}</td>
+            <td className="text-center">
+              <Button
+                style={{
+                  backgroundColor: selectedStore === s.nipc ? '#708c7e' : '#b5a8c9',
+                  color: 'white',
+                  border: 'none'
+                }} 
+                variant={selectedStore === s.nipc ? 'secondary' : 'primary'}
+                onClick={() => handleStoreSelection(s)}
+              >
+                {selectedStore === s.nipc ? 'Deselect' : 'Select'}
+              </Button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {stores.map((store) => (
-            <tr key={store.nipc}>
-              <td>{store.nipc}</td>
-              <td>{store.name}</td>
-              <td>{store.email}</td>
-              <td>{store.address}</td>
-              <td className='d-flex justify-content-center'>
-                <Button
-                  variant={selectedStore === store.nipc ? "secondary" : "primary"}
-                  onClick={() => handleStoreSelection(store)}
-                >
-                  {selectedStore === store.nipc ? "Deselect" : "Select"}
-                </Button>
-              </td>
-            </tr>
-          ))}
-
-        </tbody>
-      </Table>
-    );
-  }
-  
+        ))}
+      </tbody>
+    </Table>
+  );
+}

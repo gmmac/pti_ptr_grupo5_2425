@@ -97,17 +97,18 @@ export default function OrganizerCharityProjects() {
   };
 
   return (
-    <Container>
+    <>
+      <h1> My Charity Projects </h1>
+      <Container>
 
-        <h1> My Charity Projects </h1>
 
         {error && <Alert variant="danger">{error}</Alert>}
         {loading ? (
-            <div className="text-center my-5">
+          <div className="text-center my-5">
             <Spinner animation="border" />
             </div>
         ) : ( 
-            <>
+          <>
               {isOrganizer() && 
                 <Row className="mb-3">
                   <Col className="text-end">
@@ -123,28 +124,29 @@ export default function OrganizerCharityProjects() {
                   </div>
                 ) : (
                   <CharityProjectCatalog 
-                    charityProjects={charityProjects} 
-                    handlePageChange={handlePageChange} 
-                    currentPage={currentPage} 
-                    totalPages={totalPages}
-                    onOpenDetails={handleOpenDetailsModal}
-                    onRefresh={toggleRefresh}
-                    onDelete={handleDelete}
-                    canDelete={true}
+                  charityProjects={charityProjects} 
+                  handlePageChange={handlePageChange} 
+                  currentPage={currentPage} 
+                  totalPages={totalPages}
+                  onOpenDetails={handleOpenDetailsModal}
+                  onRefresh={toggleRefresh}
+                  onDelete={handleDelete}
+                  canDelete={true}
                   />
                 )
               )}
 
             </>
 
-            )}
+)}
 
         {isOrganizer() && 
           <RegisterCharityProject 
-            showModal={showModal} 
-            closeModal={handleCloseModal} 
-            setRefresh={toggleRefresh} />
+          showModal={showModal} 
+          closeModal={handleCloseModal} 
+          setRefresh={toggleRefresh} />
         }
         </Container>
+      </>
   );
 }

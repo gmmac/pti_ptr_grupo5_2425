@@ -54,7 +54,7 @@ export default function CharityProjectDonationDetails({ projectId }) {
         }}
       >
         <Card.Body>
-          <h5 className="fw-bold mb-3">Donations</h5>
+          <h5 className="fw-bold mb-2">Donations</h5>
 
           {loading && (
             <div className="text-center">

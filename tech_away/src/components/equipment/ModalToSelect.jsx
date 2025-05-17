@@ -21,7 +21,7 @@ export default function ModalToSelect({
 	}, [showModal, selectedItem]);
 
 	useEffect(() => {
-		if (!showModal) return; // Evita chamadas desnecessárias
+		if (!showModal) return;
 
 		api
 			.get(`api/${title}`, {
