@@ -172,7 +172,6 @@ export default function EmployeeCatalog() {
               onPageChange={setCurrentPage}
             />
           </div>
-          {/* MOBILE */}
           
             <div className="d-lg-none">
               <EmployeeFilter

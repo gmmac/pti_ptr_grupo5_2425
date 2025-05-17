@@ -17,7 +17,10 @@ module.exports = (sequelize, DataTypes) => {
     protected: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    }
+    },
+        isActive: {
+      type: DataTypes.STRING(1),
+    },
   }, {
     sequelize,
     modelName: 'EmployeeRole',
