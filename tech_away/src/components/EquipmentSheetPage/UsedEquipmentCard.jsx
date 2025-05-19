@@ -29,10 +29,10 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 				boxShadow: "var(--shadow-default)",
 				borderRadius: "var(--rounded-sm)",
 				padding: "16px",
-				minHeight: "240px",
+				minHeight: "270px",
 			}}
 			gap={2}
-			className="rounded-sm p-4 justify-content-center align-items-center"
+			className="rounded-sm p-4 justify-content-between align-items-center"
 		>
 			<Stack direction="horizontal" gap={2} className="justify-content-between">
 				<Stack
@@ -79,19 +79,30 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 				>
 					{usedEquipment?.Store?.name}
 				</h5>
-				<Stack direction="horizontal" gap={2}>
+				<Stack direction="horizontal" gap={2} >
 					<Button
-						className="rounded-pill"
-						style={{ backgroundColor: "var(--variant-two)", border: "none" }}
+						className="px-3 rounded-pill d-flex justify-content-center align-items-center"
+						style={{
+							backgroundColor: "var(--variant-two)",
+							border: "none",
+							color: "var(--white)",
+						}}
 					>
-						<Heart size={20} style={{ color: "var(--white)" }} />
+						<i className="pi pi-heart" style={{ fontSize: "1.2rem" }}></i>
 					</Button>
 					<Button
-						className="rounded-pill"
-						style={{ backgroundColor: "var(--variant-two)", border: "none" }}
+						className="px-3 rounded-pill d-flex justify-content-center align-items-center"
+						style={{
+							backgroundColor: "var(--variant-two)",
+							border: "none",
+							color: "var(--white)",
+						}}
 						onClick={handleAddToCart}
 					>
-						<Cart size={20} style={{ color: "var(--white)" }} />
+						<i
+							className="pi pi-shopping-cart"
+							style={{ fontSize: "1.2rem" }}
+						></i>
 					</Button>
 				</Stack>
 			</Stack>

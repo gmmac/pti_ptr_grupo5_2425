@@ -62,7 +62,7 @@ export default function StorePage() {
 	}, [filters]);
 
 	return (
-		<Container className="mb-5" style={{ fontFamily: "var(--body-font)" }}>
+		<Container className="mb-navbar" style={{ fontFamily: "var(--body-font)" }}>
 			<Stack gap={4} direction="vertical" className="mb-5">
 				{isMobile ? <SecondLifeSm /> : <SecondLife />}
 

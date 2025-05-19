@@ -8,13 +8,13 @@ import SecondLifeSm from "../decoration/SecondLifeSm";
 
 export default function SMcontent(isMobile) {
 	return (
-		<Container>
+		<Container className="mb-navbar">
 			<Stack gap={4}>
 				<SecondLifeSm />
 				<DivTelem />
 				<DivJoin />
 				<DivOurServices />
-				<div style={{ height: "75px" }}></div>
+				
 			</Stack>
 		</Container>
 	);

@@ -24,6 +24,10 @@
 	--rounded-sm: 40px;
 }
 
+.mb-navbar {
+	margin-bottom: 100px;
+}
+
 .rounded-lg {
 	border-radius: var(--rounded-lg);
 }
