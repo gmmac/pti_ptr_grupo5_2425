@@ -76,18 +76,32 @@ export default function MapProvider({ children, filters, setFilters }) {
 		setMap(null);
 	}, []);
 
-	const setSelectedStore = (nipc) => {
-		setFilters({
-			...filters,
-			store: nipc,
+	const setSelectedStore = (nipc, name) => {
+		setFilters((prev) => {
+			const current = Array.isArray(prev.store) ? prev.store : [];
+
+			// Evita duplicados
+			const alreadyExists = current.some((store) => store.id === nipc);
+			if (alreadyExists) return prev;
+
+			return {
+				...prev,
+				store: [...current, { id: nipc, name }],
+			};
 		});
 	};
 
 	const clearStoreFromFilters = (nipc) => {
-		setFilters((prev) => ({
-			...prev,
-			store: prev.store === nipc ? "" : prev.store,
-		}));
+		setFilters((prev) => {
+			const current = Array.isArray(prev.store) ? prev.store : [];
+
+			const newStores = current.filter((store) => store.id !== nipc);
+
+			return {
+				...prev,
+				store: newStores.length > 0 ? newStores : "",
+			};
+		});
 	};
 
 	if (loadError) return <div>Erro ao carregar o mapa</div>;
@@ -113,9 +127,7 @@ export default function MapProvider({ children, filters, setFilters }) {
 									position={{ lat, lng }}
 									onClick={() => {
 										setHoveredMarkerId(index);
-										console.log(store.nipc);
-
-										setSelectedStore(store.nipc);
+										setSelectedStore(store.nipc, store.name); // nome incluído
 									}}
 								/>
 								{isHovered && (
