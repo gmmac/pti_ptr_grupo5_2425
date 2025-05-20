@@ -72,30 +72,31 @@ export default function EmployeeRolesDisplayTable({ onDelete, onEdit, refreshKey
     });
   };
 
-  const renderActions = (rowData) => {
-    if (rowData.protected) {
-      return (
-        <div className="d-flex justify-content-center align-items-center">
-          <Button
-            icon="pi pi-pencil"
-            className="p-button-text p-button-rounded me-3"
-            tooltip="Cannot modify protected roles"
-            severity="secondary"
-            disabled
-          />
-          <Button
-            icon={isActiveFilter === "1" ? "pi pi-trash" : "pi pi-history"}
-            className="p-button-text p-button-rounded"
-            tooltip="Cannot modify protected roles"
-            severity="danger"
-            disabled
-          />
-        </div>
-      );
-    }
-
+const renderActions = (rowData) => {
+  if (rowData.protected) {
     return (
       <div className="d-flex justify-content-center align-items-center">
+        <Button
+          icon="pi pi-pencil"
+          className="p-button-text p-button-rounded me-3"
+          tooltip="Cannot modify protected roles"
+          severity="secondary"
+          disabled
+        />
+        <Button
+          icon={isActiveFilter === "1" ? "pi pi-trash" : "pi pi-history"}
+          className="p-button-text p-button-rounded"
+          tooltip="Cannot modify protected roles"
+          severity="danger"
+          disabled
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="d-flex justify-content-center align-items-center">
+      {isActiveFilter === '1' && (
         <Button
           icon="pi pi-pencil"
           className="p-button-text p-button-rounded me-3"
@@ -103,26 +104,28 @@ export default function EmployeeRolesDisplayTable({ onDelete, onEdit, refreshKey
           severity="secondary"
           onClick={() => onEdit(rowData)}
         />
-        {isActiveFilter === "1" ? (
-          <Button
-            icon="pi pi-trash"
-            className="p-button-text p-button-rounded"
-            aria-label="Delete"
-            severity="danger"
-            onClick={() => confirmToggle(rowData)}
-          />
-        ) : (
-          <Button
-            icon="pi pi-history"
-            className="p-button-text p-button-rounded"
-            aria-label="Restore"
-            severity="success"
-            onClick={() => confirmToggle(rowData)}
-          />
-        )}
-      </div>
-    );
-  };
+      )}
+      {isActiveFilter === '1' ? (
+        <Button
+          icon="pi pi-trash"
+          className="p-button-text p-button-rounded"
+          aria-label="Delete"
+          severity="danger"
+          onClick={() => confirmToggle(rowData)}
+        />
+      ) : (
+        <Button
+          icon="pi pi-history"
+          className="p-button-text p-button-rounded"
+          aria-label="Restore"
+          severity="success"
+          onClick={() => confirmToggle(rowData)}
+        />
+      )}
+    </div>
+  );
+};
+
 
   return (
     <>

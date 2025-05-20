@@ -22,20 +22,17 @@ export default function EmployeeCatalog() {
   const navigate = useNavigate();
   const { toggleActivateAccount } = useAuthEmployee();
 
-  // Estado geral
   const [activeTab, setActiveTab] = useState('active');
   const [error, setError] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Dados e paginação
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 6;
 
-  // Filtros
   const [filters, setFilters] = useState({
     internNum: '',
     employeeName: '',
@@ -107,14 +104,14 @@ export default function EmployeeCatalog() {
             style={{ backgroundColor: 'var(--variant-one)', border: 'none' }}
             onClick={handleCreateEmployee}
           >
-            + Create New Employee
+            Create New Employee
           </Button>
         </Col>
       </Row>
 
       {error && <Alert variant="danger">{error}</Alert>}
 
-      <Tabs activeKey={activeTab} onSelect={onTabSelect} className="mb-3">
+      <Tabs activeKey={activeTab} onSelect={onTabSelect} className="custom-manage-tabs mb-3">
         <Tab eventKey="active" title="Active Employees">
           {/* DESKTOP */}
           <div className="d-none d-lg-block">

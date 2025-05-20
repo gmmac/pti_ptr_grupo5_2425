@@ -4,12 +4,12 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert("RepairStatuses", [
-      { state: "Repair created", createdAt: new Date(), updatedAt: new Date() },
-      { state: "Equipment on hold", createdAt: new Date(), updatedAt: new Date() },
-      { state: "Diagnosing equipment", createdAt: new Date(), updatedAt: new Date() },
-      { state: "Cost Estimate done", createdAt: new Date(), updatedAt: new Date() },
-      { state: "Repair finished", createdAt: new Date(), updatedAt: new Date() },
-      { state: "Equipment delivered", createdAt: new Date(), updatedAt: new Date() },
+      { state: "Repair created", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { state: "Equipment on hold", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { state: "Diagnosing equipment", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { state: "Cost Estimate done", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { state: "Repair finished", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { state: "Equipment delivered", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
     ]);
   },
 

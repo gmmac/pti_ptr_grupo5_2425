@@ -1,38 +1,34 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Warehouse extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      Warehouse.hasMany(models.CharityProject, {
-        foreignKey: 'warehouseID',
-      });
-      
+      Warehouse.hasMany(models.CharityProject, { foreignKey: 'warehouseID' });
     }
   }
   Warehouse.init({
     name: {
       type: DataTypes.STRING(50),
-      allowNull: true
+      allowNull: false,
+      unique: true
     },
     totalSlots: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false
     },
     availableSlots: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false
+    },
+    isActive: {
+      type: DataTypes.STRING(1),
+      allowNull: false,
+      defaultValue: '1'
     }
   }, {
     sequelize,
     modelName: 'Warehouse',
-    timestamps: true,
+    timestamps: true
   });
   return Warehouse;
 };

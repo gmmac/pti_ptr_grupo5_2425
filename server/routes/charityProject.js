@@ -97,165 +97,76 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/displayTable", async (req, res) => {
+router.get('/displayTable', async (req, res) => {
   try {
-  const {
-    id,
-    startDate,
-    completionDate,
-    status,
-    projectName,
-    warehouse,
-    organizerName,
-	  createdAt,
-    totalSpace,
-    page = 1,
-    pageSize = 5,
-    sortField = "id",
-    sortOrder = "ASC",
-  } = req.query;
+    const {
+      id, projectName, status, warehouse, organizerName,
+      startDate, completionDate,
+      isActive = '1', page = 1, pageSize = 10,
+      sortField = 'id', sortOrder = 'ASC'
+    } = req.query;
 
+    const where = { isActive: { [Op.like]: isActive } };
+    if (id)            where.id = Sequelize.where(Sequelize.cast(Sequelize.col('CharityProject.id'), 'varchar'), { [Op.iLike]: `${id}%` });
+    if (projectName)   where.name = { [Op.iLike]: `%${projectName}%` };
+    if (startDate)     where.startDate = { [Op.gte]: new Date(startDate) };
+    if (completionDate)where.completionDate = { [Op.lte]: new Date(completionDate) };
 
-  const where = {};
-  const warehouseCondition = {};
-  const statusCondition = {};
+    const statusFilter    = status    ? { state: { [Op.iLike]: `%${status}%` } } : {};
+    const warehouseFilter = warehouse ? { name:  { [Op.iLike]: `%${warehouse}%` } } : {};
+    const organizerWhere = organizerName
+      ? Sequelize.where(
+          Sequelize.fn('concat', Sequelize.col('Organizer.firstName'), ' ', Sequelize.col('Organizer.lastName')),
+          { [Op.iLike]: `%${organizerName}%` }
+        )
+      : null;
 
-  if (id)
-    where.id = sequelize.where(
-    sequelize.cast(sequelize.col("CharityProject.id"), "varchar"),
-    { [Op.iLike]: `${id}%` }
-    );
+    const offset = (Number(page) - 1) * Number(pageSize);
+    const order  = [[Sequelize.col(sortField), sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC']];
 
-  if (totalSpace) where.totalSpace = { [Op.eq]: totalSpace };
-  if (startDate) where.startDate = { [Op.lte]: startDate };
-  if (completionDate) where.completionDate = { [Op.gte]: completionDate };
-  if (status) statusCondition.state = { [Op.like]: `%${status}%` };
-  if (warehouse) warehouseCondition.name = { [Op.like]: `%${warehouse}%` };
-  if (projectName) where.name = { [Op.like]: `%${projectName}%` };
+    const { count, rows } = await models.CharityProject.findAndCountAll({
+      where,
+      include: [
+        { model: models.ProjectStatus, attributes: ['id','state'], where: statusFilter },
+        { model: models.Warehouse,     attributes: ['id','name'],  where: warehouseFilter },
+        { model: models.Organizer,     attributes: ['nic','firstName','lastName','email'], ...(organizerWhere?{ where:organizerWhere }:{}) }
+      ],
+      limit: Number(pageSize), offset, order
+    });
 
-  if (organizerName) {
-    where[Op.and] = Sequelize.where(
-      Sequelize.fn(
-      'concat',
-      Sequelize.col('firstName'),
-      ' ',
-      Sequelize.col('lastName')
-      ),
-      {
-      [Op.iLike]: `%${organizerName}%`
-      }
-    );
-    }
-    
-  if (createdAt) {
-    where.createdAt = {
-    [Op.gte]: new Date(createdAt),
-    [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
-    };
-  }
+    const data = rows.map(p => ({
+      id: p.id, name: p.name,
+      organizer: `${p.Organizer.firstName} ${p.Organizer.lastName}`,
+      status: p.ProjectStatus.state, statusID: p.ProjectStatus.id,
+      warehouse: p.Warehouse.name, warehouseID: p.Warehouse.id,
+      startDate: p.startDate, completionDate: p.completionDate
+    }));
 
-  const offset = (parseInt(page) - 1) * parseInt(pageSize);
-
-  const orderClause = [];
-
-  if (sortField === "name") {
-    orderClause.push([
-    Sequelize.fn("LOWER", Sequelize.col("CharityProject.id")),
-    sortOrder == -1 ? "DESC" : "ASC",
-    ]);
-  } else if (sortField) {
-    orderClause.push([
-    Sequelize.col(sortField),
-    sortOrder == -1 ? "DESC" : "ASC",
-    ]);
-  }
-
-
-  const { count, rows } = await models.CharityProject.findAndCountAll({
-    where,
-    include: [
-      {
-        model: models.ProjectStatus,
-        attributes: ["id", "state"],
-        where: statusCondition
-      },
-      {
-        model: models.Warehouse,
-        attributes: ["id", "name"],
-        where: warehouseCondition
-      },
-      {
-        model: models.Organizer,
-        attributes: ["nic", "firstName", "lastName", "email"],
-      },
-    ],
-    limit: parseInt(pageSize),
-    offset,
-    order: orderClause,
-  });
-
-
-  const formattedData = rows.map((item) => ({
-    id: item.id,
-    name: item.name,
-    organizerName: item.Organizer.firstName + " " + item.Organizer.lastName,
-    status: item.ProjectStatus.state,
-    statusID: item.ProjectStatus.id,
-    // totalSpace: item.totalSpace,
-    warehouse: item.Warehouse.name,
-    warehouseID: item.Warehouse.id,
-    startDate: item.startDate,
-    completionDate: item.completionDate
-  }));
-
-  res.status(200).json({
-    totalItems: count,
-    totalPages: Math.ceil(count / pageSize),
-    currentPage: parseInt(page),
-    pageSize: parseInt(pageSize),
-    data: formattedData,
-  });
-
-  } catch (error) {
-  console.error(error);
-  res.status(500).json({ error: "Error fetching brands." });
+    res.json({ totalItems: count, totalPages: Math.ceil(count/ pageSize), currentPage: Number(page), pageSize: Number(pageSize), data });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching charity projects.' });
   }
 });
 
 
-router.post("/", async (req, res) => {
-    const {
-        startDate,
-        completionDate,
-        projectName,
-        warehouseID,
-        // totalSpace,
-    } = req.body;
-
-    const currentOrganizer = req.cookies.organizerInfo;
-
-    if (!currentOrganizer || !currentOrganizer.nic) {
-        return res.status(400).json({ error: "Organizer not found." });
+router.post('/', async (req, res) => {
+  try {
+    const { name, startDate, completionDate, warehouseID } = req.body;
+    const organizerNic = req.cookies?.organizerInfo?.nic;
+    if (!organizerNic) {
+      return res.status(400).json({ error: 'Organizer not authenticated.' });
     }
-
-    try {
-        const newProject = await models.CharityProject.create({
-            startDate: startDate,
-            completionDate: completionDate,
-            name: projectName,
-            status: 1, // "created"
-            warehouseID: warehouseID,
-            // totalSpace: totalSpace,
-            organizerNic: currentOrganizer.nic,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        });
-
-        return res.status(201).json(newProject);
-    } catch (error) {
-        console.error("Error creating Charity Project:", error);
-        return res.status(500).json({ error: "Error creating Charity Project" });
-    }
+    const project = await models.CharityProject.create({
+      name, startDate, completionDate,
+      status: 1, warehouseID, organizerNic,
+      isActive: '1', createdAt: new Date(), updatedAt: new Date()
+    });
+    res.status(201).json(project);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error creating charity project.' });
+  }
 });
 
 router.post("/linkEquipmentType", async (req, res) => {
@@ -710,6 +621,18 @@ router.put('/:ID', async (req, res) => {
   }
 });
 
+router.patch('/activation/:id', async (req, res) => {
+  try {
+    const project = await models.CharityProject.findByPk(req.params.id);
+    if (!project) return res.status(404).json({ error:'Not found.' });
+    project.isActive = project.isActive==='1'?'0':'1';
+    await project.save();
+    res.json(project);
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({ error:'Error toggling activation.' });
+  }
+});
 
 router.delete('/:ID', async (req, res) => {
   const projectId = req.params.ID;

@@ -6,11 +6,11 @@ module.exports = {
 		await queryInterface.bulkInsert(
 			"EquipmentStatuses",
 			[
-				{ state: "New", createdAt: new Date(), updatedAt: new Date() },
-				{ state: "Barely Used", createdAt: new Date(), updatedAt: new Date() },
-				{ state: "Used", createdAt: new Date(), updatedAt: new Date() },
-				{ state: "Damaged", createdAt: new Date(), updatedAt: new Date() },
-				{ state: "Broken", createdAt: new Date(), updatedAt: new Date() },
+				{ state: "New", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+				{ state: "Barely Used", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+				{ state: "Used", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+				{ state: "Damaged", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+				{ state: "Broken", isActive: "1", createdAt: new Date(), updatedAt: new Date() },
 			],
 			{}
 		);

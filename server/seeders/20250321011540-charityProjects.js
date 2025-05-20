@@ -10,6 +10,7 @@ module.exports = {
         organizerNic: '122454888',
         status: 2,
         warehouseID: 1,
+        isActive: "1",
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -20,6 +21,7 @@ module.exports = {
         organizerNic: '122454888',
         status: 3,
         warehouseID: 1,
+        isActive: "1",
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -30,6 +32,7 @@ module.exports = {
         organizerNic: '123456789',
         status: 1,
         warehouseID: 3,
+        isActive: "1",
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -40,6 +43,7 @@ module.exports = {
         organizerNic: '987654321',
         status: 2,
         warehouseID: 1,
+        isActive: "1",
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -50,6 +54,7 @@ module.exports = {
         organizerNic: '111222333',
         status: 1,
         warehouseID: 2,
+        isActive: "1",
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -60,6 +65,7 @@ module.exports = {
         organizerNic: '511124359',
         status: 3,
         warehouseID: 3,
+        isActive: "1",
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -70,6 +76,7 @@ module.exports = {
         organizerNic: '111479985',
         status: 3,
         warehouseID: 2,
+        isActive: "1",
         createdAt: new Date(),
         updatedAt: new Date()
       }

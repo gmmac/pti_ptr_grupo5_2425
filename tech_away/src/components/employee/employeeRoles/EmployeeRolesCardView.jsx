@@ -21,11 +21,11 @@ export default function EmployeeRolesCardView({ roles, onEdit, onDelete, isActiv
         {roles.map((role, idx) => (
           <Col key={idx} xs={12}>
             <Card className="shadow-sm rounded p-3">
-              <Card.Body>
-                <Card.Title className="fw-bold text-center">
-                  {role.role}
-                </Card.Title>
-                <div className="d-flex gap-2 justify-content-center mt-3">
+            <Card.Body className='d-flex flex-column align-items-center justify-content-center'>
+              <Card.Title className="fw-bold text-center">
+                {role.role}
+              </Card.Title>
+              <div className="d-flex gap-2 flex-column justify-content-center mt-3 w-75">
                   {role.protected ? (
                     <Button
                       icon="pi pi-lock"
