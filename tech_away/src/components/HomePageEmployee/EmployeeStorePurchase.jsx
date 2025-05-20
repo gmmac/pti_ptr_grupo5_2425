@@ -23,5 +23,6 @@ export default function EmployeeStorePurchase() {
             setRefreshPurchases={setRefreshPurchases}
         />
         </Container>
+        
     )
 }

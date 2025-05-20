@@ -4,7 +4,7 @@ import api from '../../utils/axios';
 import ClientCatalogModal from './ClientCatalogModal';
 import EquipmentCatalogModal from './EquipmentCatalogModal';
 
-export default function StorePurchaseForms({show, handleClose, setRefreshPurchases}) {
+export default function StorePurchaseForms({ show, handleClose, setRefreshPurchases, purchaseData }) {
     const [form, setForm] = useState({
         statusID: '',
         price: '',
@@ -35,10 +35,8 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
     });
 
     const [modelsList, setModelsList] = useState([]);
-
     const [showModal, setShowModal] = useState(false);
     const [showModalEq, setShowModalEq] = useState(false);
-
 
     useEffect(() => {
         api.get(`/api/equipmentStatus/`)
@@ -64,71 +62,40 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
             .catch(error => console.error('Erro ao buscar NICs:', error.message));
     }, []);
 
+    // Preencher formulário em modo edição
+    useEffect(() => {
+        if (purchaseData) {
+            setForm({
+                statusID: '', // você pode adicionar isso se o estado estiver disponível em purchaseData
+                price: purchaseData.purchasePrice || '',
+                clientNic: '', // preencher se disponível
+                equipmentBarcode: '', // preencher se disponível
+            });
+        }
+    }, [purchaseData]);
+
     const handleSelectClient = (client) => {
         if (client) {
-            setClientData({
-                nic: client.nic,
-                nif: client.nif,
-                birthDate: client.birthDate,
-                gender: client.gender,
-                firstName: client.firstName,
-                lastName: client.lastName,
-                email: client.email,
-                phone: client.phone
-            });
-
-            setForm((prevForm) => ({
-                ...prevForm,
-                clientNic: client.nic
-            }));
+            setClientData({ ...client });
+            setForm((prevForm) => ({ ...prevForm, clientNic: client.nic }));
         } else {
             setClientData({
-                nic: '',
-                nif: '',
-                birthDate: '',
-                gender: '',
-                firstName: '',
-                lastName: '',
-                email: '',
-                phone: ''
+                nic: '', nif: '', birthDate: '', gender: '',
+                firstName: '', lastName: '', email: '', phone: ''
             });
-
-            setForm((prevForm) => ({
-                ...prevForm,
-                clientNic: ''
-            }));
+            setForm((prevForm) => ({ ...prevForm, clientNic: '' }));
         }
-
         setShowModal(false);
     };
 
     const handleSelectEquipment = (equipment) => {
         if (equipment) {
-            setEquipmentData({
-                barcode: equipment.barcode,
-                model: equipment.model,
-                releaseYear: equipment.releaseYear,
-                type: equipment.type
-            });
-
-            setForm((prevForm) => ({
-                ...prevForm,
-                equipmentBarcode: equipment.barcode
-            }));
+            setEquipmentData({ ...equipment });
+            setForm((prevForm) => ({ ...prevForm, equipmentBarcode: equipment.barcode }));
         } else {
-            setEquipmentData({
-                barcode: '',
-                model: '',
-                releaseYear: '',
-                type: ''
-            });
-
-            setForm((prevForm) => ({
-                ...prevForm,
-                equipmentBarcode: ''
-            }));
+            setEquipmentData({ barcode: '', releaseYear: '', type: '' });
+            setForm((prevForm) => ({ ...prevForm, equipmentBarcode: '' }));
         }
-
         setShowModalEq(false);
     };
 
@@ -181,64 +148,44 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
             return;
         }
 
-        await api.post('/api/storePurchase', form)
-            .then(response => {
+        try {
+            if (purchaseData) {
+                await api.put(`/api/storePurchase/${purchaseData.id}`, form);
+                setSuccessMessage("Venda atualizada com sucesso!");
+            } else {
+                await api.post('/api/storePurchase', form);
                 setSuccessMessage("Venda registada com sucesso!");
-                setError("");
+            }
 
-                setRefreshPurchases(prev => {
-                    console.log("Valor anterior de refreshPurchases:", prev);
-                    return !prev;
-                });
+            setError("");
+            setRefreshPurchases(prev => !prev);
 
-                setClientData({
-                    nic: '',
-                    nif: '',
-                    birthDate: '',
-                    gender: '',
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    phone: ''
-                });
-
-                setEquipmentData({
-                    barcode: '',
-                    model: '',
-                    releaseYear: '',
-                    type: ''
-                });
-
-                setForm({
-                    statusID: '',
-                    price: '',
-                    clientNic: '',
-                    equipmentBarcode: '',
-                });
-
-                setTimeout(() => {
-                    setSuccessMessage("");
-                    setForm({
-                        statusID: '',
-                        price: '',
-                        clientNic: '',
-                        equipmentBarcode: '',
-                    });
-                }, 1000);
-            })
-            .catch(error => {
-                console.error("Erro ao registrar venda: ", error.response.data);
-                setError("Ocorreu um erro ao registar a venda.");
+            setClientData({
+                nic: '', nif: '', birthDate: '', gender: '',
+                firstName: '', lastName: '', email: '', phone: ''
             });
 
+            setEquipmentData({
+                barcode: '', releaseYear: '', type: ''
+            });
+
+            setForm({
+                statusID: '', price: '', clientNic: '', equipmentBarcode: ''
+            });
+
+            setTimeout(() => setSuccessMessage(""), 1000);
             handleClose();
+        } catch (error) {
+            console.error("Erro ao salvar venda: ", error.response?.data || error.message);
+            setError("Ocorreu um erro ao salvar a venda.");
+        }
     };
 
     return (
         <>
             <Modal show={show} onHide={handleClose} size="lg" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Registar Venda de Produto</Modal.Title>
+                    <Modal.Title>{purchaseData ? "Editar Venda" : "Criar Nova Venda"}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
@@ -292,7 +239,7 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
                         {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
                         <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg">
-                            Registar Venda
+                            {purchaseData ? "Salvar Alterações" : "Registar Venda"}
                         </Button>
                     </Form>
                 </Modal.Body>

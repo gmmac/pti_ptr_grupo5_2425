@@ -92,11 +92,11 @@ export default function EquipmentCatalogModal({
     }
   };
 
-  const handleAddEquipment = (newEquipment) => {
-    // Aqui pode fazer POST para API se quiser persistir
-    setEquipments((prev) => [newEquipment, ...prev]);
-    setShowAddModal(false);
-  };
+  // const handleAddEquipment = (newEquipment) => {
+  //   // Aqui pode fazer POST para API se quiser persistir
+  //   setEquipments((prev) => [newEquipment, ...prev]);
+  //   setShowAddModal(false);
+  // };
 
   return (
     <>
