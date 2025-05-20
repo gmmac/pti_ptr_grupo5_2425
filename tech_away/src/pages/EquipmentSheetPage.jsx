@@ -6,24 +6,33 @@ import EquipmentSheetInfo from "../components/EquipmentSheetPage/EquipmentSheetI
 import UsedEquipmentCard from "../components/EquipmentSheetPage/UsedEquipmentCard";
 import MapProvider from "../contexts/MapProvider";
 import { IsMobileContext } from "../contexts/IsMobileContext";
+import PaginationControl from "../components/pagination/PaginationControl";
 
 export default function EquipmentSheetPage() {
 	const location = useLocation();
 	const barcode = location.state?.barcode;
+
 	const [currentPage, setCurrentPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
 	const itemsPerPage = 8;
+
 	const [equipmentSheet, setEquipmentSheet] = useState({});
+	const [usedEquipmentList, setUsedEquipmentList] = useState([]);
+	const [totalPages, setTotalPages] = useState(1);
+
 	const [filters, setFilters] = useState({
-		price: "",
-		dates: "",
+		orderBy: "",
 		state: "",
 	});
+
 	const isMobile = useContext(IsMobileContext);
 
-	const [usedEquipmentList, setUsedEquipmentList] = useState({});
-
+	const handlePageChange = (pageNumber) => {
+		setCurrentPage(pageNumber);
+	};
+	// Fetch equipment sheet info
 	useEffect(() => {
+		if (!barcode) return;
+
 		api
 			.get(`api/equipmentSheet/${barcode}`)
 			.then((res) => {
@@ -32,18 +41,32 @@ export default function EquipmentSheetPage() {
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
-	}, []);
+	}, [barcode]);
 
+	// Fetch used equipment list
 	useEffect(() => {
-		api
-			.get(`api/usedEquipment/in-stock/${barcode}`)
-			.then((res) => {
-				setUsedEquipmentList(res.data.usedEquipments);
-			})
-			.catch((error) => {
+		const fetchUsedEquipment = async () => {
+			try {
+				const params = {
+					equipmentId: barcode,
+					stateId: filters.state || "",
+					orderBy: filters.orderBy || "recent-date",
+					page: currentPage,
+					pageSize: itemsPerPage,
+				};
+
+				const response = await api.get("/api/usedEquipment/in-stock", {
+					params,
+				});
+				setUsedEquipmentList(response.data.data);
+				setTotalPages(response.data.totalPages);
+			} catch (error) {
 				console.error("API error:", error.message);
-			});
-	}, []);
+			}
+		};
+
+		if (barcode) fetchUsedEquipment();
+	}, [barcode, filters, currentPage]);
 
 	return (
 		<Container className="mb-navbar">
@@ -55,7 +78,7 @@ export default function EquipmentSheetPage() {
 					)}
 				</Stack>
 				<Row className="g-4">
-					{usedEquipmentList.length > 0 ? (
+					{usedEquipmentList && usedEquipmentList.length > 0 ? (
 						usedEquipmentList.map((usedEquipment, index) => (
 							<Col key={index} xs={12} sm={6} md={6} lg={4}>
 								<UsedEquipmentCard usedEquipment={usedEquipment} />
@@ -69,6 +92,13 @@ export default function EquipmentSheetPage() {
 					)}
 				</Row>
 			</Stack>
+			{totalPages > 1 && (
+				<PaginationControl
+					handlePageChange={handlePageChange}
+					currentPage={currentPage}
+					totalPages={totalPages}
+				/>
+			)}
 		</Container>
 	);
 }

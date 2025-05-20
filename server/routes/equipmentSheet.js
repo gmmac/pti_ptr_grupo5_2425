@@ -318,12 +318,7 @@ router.get("/in-stock", async (req, res) => {
 		const typeCondition = typeId ? { id: typeId } : {};
 		const brandCondition = brandId ? { id: brandId } : {};
 		const storeCondition = storeId ? { storeId } : {};
-		console.log("=======================");
-		console.log("modelId: ", modelId);
-		console.log("typeId: ", typeId);
-		console.log("brandId: ", brandId);
-		console.log("storeId: ", storeId);
-		console.log("=======================");
+
 
 		const offset = (parseInt(page) - 1) * parseInt(pageSize);
 

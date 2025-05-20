@@ -17,7 +17,6 @@ import InterestsPage from "./pages/InterestsPage";
 import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import StorePage from "./pages/StorePage";
 import EquipmentSheetPage from "./pages/EquipmentSheetPage";
-import UsedEquipmentPage from "./pages/UsedEquipmentPage";
 
 import { IsMobileProvider } from "./contexts/IsMobileContext";
 
@@ -69,10 +68,7 @@ export default function Router() {
 								path="store/:equipmentSheetName"
 								element={<EquipmentSheetPage />}
 							/>
-							<Route
-								path="store/:equipmentSheetName/:usedEquipmentID"
-								element={<UsedEquipmentPage />}
-							/>
+							
 							<Route path="changePassword" element={<ChangePasswordClient />} />
 							<Route path="register" element={<RegisterPageClient />} />
 							<Route path="login" element={<LoginPageClient />} />

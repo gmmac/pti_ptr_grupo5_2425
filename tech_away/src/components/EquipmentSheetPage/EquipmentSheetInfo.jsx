@@ -1,21 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { Stack } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { IsMobileContext } from "../../contexts/IsMobileContext";
 
 export default function EquipmentSheetInfo({ equipmentInfo }) {
 	const navigate = useNavigate();
+	const isMobile = useContext(IsMobileContext);
 
 	const handleGoBack = () => {
-		navigate(-1); // Volta para a página anterior
+		navigate(-1);
 	};
 
 	return (
 		<Stack
 			direction="horizontal"
-			className="rounded-sm p-4 w-100"
+			className="p-4 w-100"
 			style={{
 				backgroundColor: "var(--white)",
 				boxShadow: "var(--shadow-default)",
+				borderRadius: isMobile
+					? "0 0 var(--rounded-sm) var(--rounded-sm)"
+					: "var(--rounded-sm)",
 			}}
 			gap={4}
 		>
