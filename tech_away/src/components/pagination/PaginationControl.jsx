@@ -2,9 +2,34 @@ import React from 'react';
 import { Pagination } from 'react-bootstrap';
 
 export default function PaginationControl({ handlePageChange, currentPage, totalPages }) {
-  if (totalPages === 0) return null;
+  if (totalPages <= 1) return null;
 
-  const visiblePages = [...Array(totalPages).keys()].map((i) => i + 1);
+  const createPageItems = () => {
+    const pages = [];
+    const first = 1;
+    const last = totalPages;
+    const minPage = Math.max(2, currentPage - 1);
+    const maxPage = Math.min(totalPages - 1, currentPage + 1);
+
+    pages.push(first);
+
+    if (minPage > 2) {
+      pages.push('start-ellipsis');
+    }
+
+    for (let p = minPage; p <= maxPage; p++) {
+      pages.push(p);
+    }
+
+    if (maxPage < totalPages - 1) {
+      pages.push('end-ellipsis');
+    }
+
+    pages.push(last);
+    return pages;
+  };
+
+  const pages = createPageItems();
 
   return (
     <Pagination className="d-flex justify-content-center mt-3">
@@ -12,16 +37,21 @@ export default function PaginationControl({ handlePageChange, currentPage, total
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
       />
-      {visiblePages.map((page) => (
-        <Pagination.Item
-          key={page}
-          active={page === currentPage}
-          onClick={() => handlePageChange(page)}
-          className="rounded-sm"
-        >
-          {page}
-        </Pagination.Item>
-      ))}
+      {pages.map((page, idx) => {
+        if (page === 'start-ellipsis' || page === 'end-ellipsis') {
+          return <Pagination.Ellipsis key={`${page}-${idx}`} disabled />;
+        }
+        return (
+          <Pagination.Item
+            key={page}
+            active={page === currentPage}
+            onClick={() => handlePageChange(page)}
+            className="rounded-sm"
+          >
+            {page}
+          </Pagination.Item>
+        );
+      })}
       <Pagination.Next
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
@@ -29,69 +59,3 @@ export default function PaginationControl({ handlePageChange, currentPage, total
     </Pagination>
   );
 }
-
-
-// import React from 'react';
-// import { Pagination } from 'react-bootstrap';
-
-// export default function PaginationControl({ handlePageChange, currentPage, totalPages }) {
-//     if (totalPages === 0) return null;
-
-//     const visiblePages = [...Array(totalPages).keys()].map((i) => i + 1);
-
-//     return (
-//         <Pagination className="d-flex justify-content-center mt-4 custom-pagination">
-//             <Pagination.Prev
-//                 onClick={() => handlePageChange(currentPage - 1)}
-//                 disabled={currentPage === 1}
-//                 className="rounded-start"
-//             />
-//             {visiblePages.map((page) => (
-//                 <Pagination.Item
-//                     key={page}
-//                     active={page === currentPage}
-//                     onClick={() => handlePageChange(page)}
-//                     className={`custom-page-item ${page === currentPage ? 'active-page' : ''}`}
-//                 >
-//                     {page}
-//                 </Pagination.Item>
-//             ))}
-//             <Pagination.Next
-//                 onClick={() => handlePageChange(currentPage + 1)}
-//                 disabled={currentPage === totalPages}
-//                 className="rounded-end"
-//             />
-//             <style>
-//                 {`
-//                     .custom-pagination .page-link {
-//                         border: none;
-//                         margin: 0 4px;
-//                         padding: 6px 12px;
-//                         border-radius: 12px;
-//                         background-color: #f0f2f5;
-//                         color: #333;
-//                         transition: all 0.2s ease-in-out;
-//                     }
-
-//                     .custom-pagination .page-link:hover {
-//                         background-color: var(--variant-one);
-//                         color: white;
-//                     }
-
-//                     .custom-pagination .page-item.active .page-link,
-//                     .custom-pagination .active-page .page-link {
-//                         background-color: var(--variant-two);
-//                         color: white;
-//                         font-weight: bold;
-//                         border: none;
-//                     }
-
-//                     .custom-pagination .page-item.disabled .page-link {
-//                         background-color: #e0e0e0;
-//                         color: #888;
-//                     }
-//                 `}
-//             </style>
-//         </Pagination>
-//     );
-// }

@@ -1,11 +1,22 @@
 import React from 'react';
 import { Button, Table } from 'react-bootstrap';
 
-export default function WarehouseTableModal({ warehouses, selectedWarehouse, handleWarehouseSelection }) {
+export default function WarehouseTableModal({
+  warehouses,
+  selectedWarehouse,
+  handleWarehouseSelection
+}) {
+  // Mantém pelo menos 4 linhas para consistência visual
   const rowsToFill = Math.max(0, 4 - warehouses.length);
 
   return (
-    <Table responsive striped bordered hover className="d-none d-lg-table mb-0">
+    <Table
+      responsive="sm"
+      striped
+      bordered
+      hover
+      className="d-none d-lg-table"
+    >
       <thead>
         <tr>
           <th>ID</th>
@@ -19,22 +30,33 @@ export default function WarehouseTableModal({ warehouses, selectedWarehouse, han
           <tr key={warehouse.id}>
             <td>{warehouse.id}</td>
             <td>{warehouse.name}</td>
-            <td>{warehouse.availableSlots} / {warehouse.totalSlots}</td>
-            <td className="d-flex justify-content-center">
+            <td>
+              {warehouse.availableSlots} / {warehouse.totalSlots}
+            </td>
+            <td className="text-center">
               <Button
-                variant={selectedWarehouse?.id === warehouse.id ? "secondary" : "primary"}
+                style={{
+                  backgroundColor:
+                    selectedWarehouse?.id === warehouse.id
+                      ? '#708c7e'
+                      : '#b5a8c9',
+                  color: 'white',
+                  border: 'none'
+                }}
                 onClick={() => handleWarehouseSelection(warehouse)}
               >
-                {selectedWarehouse?.id === warehouse.id ? "Deselect" : "Select"}
+                {selectedWarehouse?.id === warehouse.id
+                  ? 'Deselect'
+                  : 'Select'}
               </Button>
             </td>
           </tr>
         ))}
 
-        {/* Empty rows for layout consistency */}
+        {/* Linhas vazias para manter altura mínima de 4 linhas */}
         {Array.from({ length: rowsToFill }).map((_, i) => (
           <tr key={`empty-${i}`}>
-            <td colSpan={4} style={{ height: '60px' }}></td>
+            <td colSpan={4} style={{ height: '60px' }} />
           </tr>
         ))}
       </tbody>

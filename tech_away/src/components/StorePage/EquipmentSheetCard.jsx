@@ -37,6 +37,7 @@ export default function EquipmentSheetCard(eSheet) {
 				color: "var(--dark-grey)",
 				backgroundColor: "var(--white)",
 				boxShadow: "var(--shadow-default)",
+				minHeight: "270px",
 			}}
 			gap={2}
 			className="rounded-sm p-4 justify-content-center align-items-center"

@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
       totalSlots,
       availableSlots,
       page = 1,
-      pageSize = 10,
+      pageSize = 6,
       orderBy = "id",
       orderDirection = "ASC"
     } = req.query;

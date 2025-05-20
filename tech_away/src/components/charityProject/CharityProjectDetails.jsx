@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Card } from 'react-bootstrap';
 import CharityProjectInfoEditor from './CharityProjectEditor/CharityProjectInfoEditor';
 import CharityProjectEquipmentTypeEditor from './CharityProjectEditor/CharityProjectEquipmentTypeEditor';
 import CharityProjectEquipmentSheetEditor from './CharityProjectEditor/CharityProjectEquipmentSheetEditor';
+import CharityProjectDonationDetails from './CharityProjectDonationDetails';
 
 export default function CharityProjectDetails({ project, onRefresh }) {
   const [infoAlert, setInfoAlert] = useState({ message: '', variant: '', show: false });
@@ -42,24 +43,42 @@ export default function CharityProjectDetails({ project, onRefresh }) {
 
       <hr className="my-4" />
 
-      <Row>
-        <Col md={12} lg={6} className="mb-4">
-          <CharityProjectEquipmentTypeEditor
-            projectId={project.id}
-            isEditing={true}
-            alert={equipmentAlert}
-            onChangeAlert={handleEquipmentAlert}
-          />
+      <Row className="g-4">
+        <Col md={12} lg={6} className="d-flex">
+          <Card className="flex-fill mb-3 border shadow-sm" style={{ transform: 'none', transition: 'none',}}>
+            <Card.Body>
+              <CharityProjectEquipmentTypeEditor
+                projectId={project.id}
+                isEditing={true}
+                alert={equipmentAlert}
+                onChangeAlert={handleEquipmentAlert}
+              />
+            </Card.Body>
+          </Card>
         </Col>
 
-        <Col md={12} lg={6} className="mb-4">
-          <CharityProjectEquipmentSheetEditor
-            projectId={project.id}
-            alert={equipmentSheetAlert}
-            onChangeAlert={handleEquipmentSheetAlert}
-          />
+        <Col md={12} lg={6} className="d-flex">
+          <Card className="flex-fill mb-3 border shadow-sm" style={{ transform: 'none', transition: 'none',}}>
+            <Card.Body>
+              <CharityProjectEquipmentSheetEditor
+                projectId={project.id}
+                alert={equipmentSheetAlert}
+                onChangeAlert={handleEquipmentSheetAlert}
+              />
+            </Card.Body>
+          </Card>
         </Col>
+      </Row>
+
+      <hr className="my-4" />
+
+      <Row>
+          <CharityProjectDonationDetails
+            projectId={project.id}
+          />
       </Row>
     </div>
   );
 }
+
+

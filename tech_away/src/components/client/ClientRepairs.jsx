@@ -3,7 +3,7 @@ import { Tab, Tabs } from 'react-bootstrap';
 import api from '../../utils/axios';
 import ClientRepairsCatalog from './ClientRepairsCatalog';
 import PaginationControl from '../pagination/PaginationControl';
-import RepairInfo from './RepairInfo';
+import RepairInfo from '../repair/RepairInfo';
 
 export default function ClientRepairs({isSelected}) {
   const [activeTab, setActiveTab] = useState("active");

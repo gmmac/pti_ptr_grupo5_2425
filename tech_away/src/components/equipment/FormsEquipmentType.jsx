@@ -75,7 +75,7 @@ export default function FormsEquipmentType({ showModal, closeModal, refreshTable
 	};
 
 	return (
-		<Modal show={showModal} onHide={closeModal}>
+		<Modal show={showModal} onHide={() => { closeModal(); handleRefresh()}}>
 			<Modal.Header closeButton>
 				<Modal.Title>Add New Equipment Type</Modal.Title>
 			</Modal.Header>

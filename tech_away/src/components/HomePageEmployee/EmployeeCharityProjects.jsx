@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import RegisterCharityProject from '../charityProject/ModalRegisterCharityProject';
-import { Alert, Button, Spinner } from 'react-bootstrap';
+import { Alert, Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import CharityProjectCatalog from '../charityProject/CharityProjectCatalog';
 import api from '../../utils/axios';
 import ModalCharityProjectDetails from '../charityProject/ModalCharityProjectDetails';
+import DonationForms from '../donations/DonationForms';
 
 export default function OrganizerCharityProjects() {
   const [showModal, setShowModal] = useState(false);
@@ -67,7 +68,6 @@ export default function OrganizerCharityProjects() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
 
     const handleOpenDetailsModal = (project) => {
-    console.log("ASAJSHAKH ", project)
     setSelectedProject(project);
     setShowDetailsModal(true);
     };
@@ -78,9 +78,17 @@ export default function OrganizerCharityProjects() {
     };
 
   return (
-    <div>
-        Associate to project
+    // <div>
+    <Container className="mt-4">
+      <Row className="mb-3">
+        <Col className="text-end">
+          <Button style={{ backgroundColor: "var(--variant-one)", border: "none" }} onClick={handleOpenModal}>Register Donation</Button>
+        </Col>
+      </Row>
 
+        {showModal && 
+          <DonationForms show={showModal} handleClose={handleCloseModal} />  
+        }
 
         {error && <Alert variant="danger">{error}</Alert>}
         {loading ? (
@@ -88,7 +96,9 @@ export default function OrganizerCharityProjects() {
             <Spinner animation="border" />
             </div>
         ) : ( 
-            <>
+            <>  
+              <div>
+
                 <CharityProjectCatalog 
                   charityProjects={charityProjects} 
                   handlePageChange={handlePageChange} 
@@ -96,7 +106,11 @@ export default function OrganizerCharityProjects() {
                   totalPages={totalPages}
                   onOpenDetails={handleOpenDetailsModal}
                   onRefresh={toggleRefresh}
-                />
+                  canDelete={false}
+                  />
+              
+
+              </div>
 
               <ModalCharityProjectDetails
                 show={showDetailsModal}
@@ -110,6 +124,6 @@ export default function OrganizerCharityProjects() {
 
             )}
 
-    </div>
+    </Container>
   );
 }

@@ -18,11 +18,11 @@ export default function CharityProjectCardView({ projects, onOpenDetails, onDele
                 {project.startDate ? new Date(project.startDate).toLocaleDateString() : "—"} <br />
                 <strong>Completion:</strong>{" "}
                 {project.completionDate ? new Date(project.completionDate).toLocaleDateString() : "—"} <br />
-                <strong>Status:</strong> {project.ProjectStatus?.state || "—"} <br />
-                <strong>Warehouse:</strong> {project.Warehouse?.name || "—"} <br />
+                <strong>Status:</strong> {project.status || "—"} <br />
+                <strong>Warehouse:</strong> {project.warehouse || "—"} <br />
               </Card.Text>
               <div className="d-flex justify-content-end gap-2">
-                <Button size="sm" onClick={() => onOpenDetails(project)}>
+                <Button size="sm" onClick={() => onOpenDetails(project.id)}>
                   See Details
                 </Button>
                 {isOrganizer && (

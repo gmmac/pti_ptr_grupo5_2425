@@ -1,13 +1,40 @@
-// LoginPageClient.js
-import React from 'react';
-import LoginForms from '../../components/authentication/LoginForms';
-
+import React, { useContext } from "react";
+import { Container, Row, Col, Stack } from "react-bootstrap";
+import LoginForms from "../../components/authentication/LoginForms";
+import WelcomeBackLg from "../../components/decoration/welcomeBackLg";
+import { IsMobileContext } from "../../contexts/IsMobileContext";
+import WelcomeBackSm from "../../components/decoration/WelcomeBackSm";
 export default function LoginPageClient() {
-    return (
-        <div className="d-flex align-items-center justify-content-center" style={{ minHeight: "calc(100vh - 56px)" }}>
-            <div style={{ width: "700px", maxWidth: "100%", padding: "20px" }}>
-                <LoginForms />
-            </div>
-        </div>
-    );
+  const isMobile = useContext(IsMobileContext);
+
+  return isMobile ? (
+		<Container>
+			<Stack
+				gap={5}
+				className="d-flex align-items-center justify-content-center mb-5"
+			>
+				<WelcomeBackSm />
+				<LoginForms />
+			</Stack>
+		</Container>
+	) : (
+		<Container className="d-flex align-items-center justify-content-center my-4">
+			<Row className="w-100 my-5 g-5 ">
+				<Col
+					sm={12}
+					md={6}
+					className="d-flex justify-content-center align-items-center ps-0"
+				>
+					<WelcomeBackLg />
+				</Col>
+				<Col
+					sm={12}
+					md={6}
+					className="d-flex justify-content-center align-items-center pe-0"
+				>
+					<LoginForms />
+				</Col>
+			</Row>
+		</Container>
+	);
 }

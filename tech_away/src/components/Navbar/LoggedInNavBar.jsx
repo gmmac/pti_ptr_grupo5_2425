@@ -15,9 +15,9 @@ import { Badge } from "primereact/badge";
 import "../../styles/variables.css";
 
 const navItems = [
-	{ name: "About Us", path: "/about" },
-	{ name: "Our Services", path: "/services" },
-	{ name: "Store", path: "/store" },
+	{ name: "Shop", path: "/store" },
+	{ name: "About Us", path: "/about-us" },
+	{ name: "Our Stores", path: "/our-stores" },
 ];
 
 export default function LoggedInNavBar() {
@@ -49,6 +49,8 @@ export default function LoggedInNavBar() {
 			>
 				<Container>
 					<Navbar.Brand
+						as={Link}
+						to={"/"}
 						style={{
 							color: "var(--dark-grey)",
 							fontFamily: "var(--title-font)",

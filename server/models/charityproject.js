@@ -35,6 +35,12 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: 'equipmentSheetId'
       });
       
+      CharityProject.belongsToMany(models.UsedEquipment, {
+        through: models.CharityProjectDonations,
+        foreignKey: 'charityProjectId',
+        otherKey: 'usedEquipmentId'
+      });
+      
       
       }
   }
@@ -65,10 +71,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    totalSpace: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    }
+    // totalSpace: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: true
+    // }
   }, {
     sequelize,
     modelName: 'CharityProject',

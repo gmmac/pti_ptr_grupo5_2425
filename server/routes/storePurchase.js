@@ -13,6 +13,7 @@ router.get("/", async (req, res) => {
         purchasePrice,
         modelName,
         storeName,
+        nic,
         createdAt,
         page = 1,
         pageSize = 10,
@@ -22,6 +23,7 @@ router.get("/", async (req, res) => {
       const where = {};
       const whereModel = {};
       const whereStore = {};
+      const whereClient = {}
 
       if (id)
         where.id = sequelize.where(
@@ -39,7 +41,13 @@ router.get("/", async (req, res) => {
 
       if (storeName) whereStore.name = { [Op.iLike]: `%${storeName}%` };
 
-      if (purchasePrice) {where.purchasePrice = purchasePrice;}      
+      if (purchasePrice && parseFloat(purchasePrice) > 0) {
+        where.purchasePrice = { [Op.eq]: parseFloat(purchasePrice) };
+      } else {
+        // Força exibir apenas vendas (maiores que 0)
+        where.purchasePrice = { [Op.gt]: 0 };
+      }
+        
 
       if (employeeName) {
         where[Op.and] = Sequelize.where(
@@ -67,6 +75,9 @@ router.get("/", async (req, res) => {
           }
         );
       }
+      if (nic) {
+        whereClient.nic = nic;
+      }
       
       const offset = (parseInt(page) - 1) * parseInt(pageSize);
       const orderClause = [];
@@ -86,7 +97,8 @@ router.get("/", async (req, res) => {
           },
           {
             model: models.Client,
-            attributes: ["firstName", "lastName"],
+            attributes: ["firstName", "lastName","nic"],
+            where: whereClient,
           },
           {
             model: models.UsedEquipment,
@@ -163,6 +175,196 @@ router.post("/", async (req, res) => {
         res.status(400).json({ error: "Error." });
     }
 });
+
+
+router.get("/getDonations", async (req, res) => {
+  try {
+    const {
+      charityProjectId,
+      page           = 1,
+      pageSize       = 8,
+      orderBy        = "usedEquipmentId",
+      orderDirection = "ASC"
+    } = req.query;
+
+    const offset = (parseInt(page, 10) - 1) * parseInt(pageSize, 10);
+    const limit  = parseInt(pageSize, 10);
+
+    // filtro opcional por projeto
+    const where = {};
+    if (charityProjectId) {
+      where.charityProjectId = { [Op.eq]: Number(charityProjectId) };
+    }
+
+    const { count, rows } = await models.CharityProjectDonations.findAndCountAll({
+      where,
+      include: [
+        {
+          model: models.UsedEquipment,
+          attributes: ['id'],
+          include: [
+            {
+              model: models.EquipmentSheet,
+              attributes: ['barcode'],
+              include: [
+                {
+                  model: models.EquipmentModel,
+                  attributes: ['id','name'],
+
+                  include: [{
+                    model: models.Brand,
+                    attributes: ['id','name']
+                  }]
+                },
+                {
+                  model: models.EquipmentType,
+                  attributes: ['id','name'],
+                }
+              ]
+            },
+            {
+              model: models.StorePurchase,
+              attributes: ['id','createdAt'],
+              include: [
+                { model: models.Client,   attributes: ['nic','firstName','lastName','email'] },
+                { model: models.Employee, attributes: ['nic','firstName','lastName','email'] },
+                { model: models.Store,    attributes: ['nipc','name'] }
+              ]
+            },
+            {
+              model: models.CharityProject,
+                include: [
+                { model: models.Warehouse },
+              ]
+            }
+          ]
+        }
+      ],
+      order: [[orderBy, orderDirection.toUpperCase()]],
+      offset,
+      limit
+    });
+
+    const formattedAll = rows.flatMap(item => {
+      const ue = item.UsedEquipment;
+      const project = ue.CharityProjects[0];
+      const warehouse = project.Warehouse;
+
+      return ue.StorePurchases.map(purchase => ({
+        Project: { id: project.id, name: project.name },
+        Warehouse: { id: warehouse.id, name: warehouse.name },
+        Equipment: {
+          usedEquipmentId: ue.id,
+          barcode: ue.EquipmentSheet.barcode,
+          brandModel: `${ue.EquipmentSheet.EquipmentModel.Brand.name} ${ue.EquipmentSheet.EquipmentModel.name}`,
+          type: ue.EquipmentSheet.EquipmentType.name
+        },
+        Purchase: {
+          id: purchase.id,
+          purchase_date: purchase.createdAt,
+          Client: {
+            nic: purchase.Client.nic,
+            name: `${purchase.Client.firstName} ${purchase.Client.lastName}`,
+          },
+          Employee: {
+            nic: purchase.Employee.nic,
+            name: `${purchase.Employee.firstName} ${purchase.Employee.lastName}`,
+          },
+          Store: {
+            nipc: purchase.Store.nipc,
+            name: purchase.Store.name,
+          },
+        },
+      }));
+    });
+
+
+    res.json({
+      totalItems:  count,
+      totalPages:  Math.ceil(count / pageSize),
+      currentPage: parseInt(page, 10),
+      pageSize:    parseInt(pageSize, 10),
+      data:        formattedAll
+    });
+  } catch (err) {
+    console.error("Error: ", err);
+    return res.status(500).json({ error: 'Erro ao buscar equipamentos doados.' });
+  }
+});
+
+
+router.post("/donate", async (req, res) => {
+  try {
+    const { clientNic, usedEquipmentID, charityProjectId } = req.body;
+    const storeID    = req.cookies["employeeInfo"].storeNIPC;
+    const employeeID = req.cookies["employeeInfo"].nic;
+
+    // 1) Projeto e warehouse
+    const project   = await models.CharityProject.findByPk(charityProjectId);
+    if (!project) {
+      return res.status(404).json({ error: "Charity project not found." });
+    }
+    // Só permite doação se o status for 'Opened' (seed: id = 2)
+    if (project.status !== 2) {
+      return res
+        .status(400)
+        .json({ error: "Donations are only allowed for projects in 'Opened' status." });
+    }
+
+    const warehouse = await models.Warehouse.findByPk(project.warehouseID);
+    if (!warehouse) {
+      return res.status(404).json({ error: "Warehouse not found." });
+    }
+    if (warehouse.availableSlots <= 0) {
+      return res.status(400).json({ error: "This warehouse has no available slots." });
+    }
+
+    // 2) Cria StorePurchase
+    const storePurchase = await models.StorePurchase.create({
+      storeID,
+      clientNIC:     clientNic,
+      employeeID,
+      purchasePrice: 0,
+      usedEquipmentID,
+      createdAt:     new Date(),
+      updatedAt:     new Date()
+    });
+
+    // 3) Cria linha de doação
+    let donation = null;
+    if (storePurchase) {
+      donation = await models.CharityProjectDonations.create({
+        charityProjectId,
+        usedEquipmentId: usedEquipmentID,
+        createdAt:       new Date(),
+        updatedAt:       new Date()
+      });
+    }
+
+    // 4) Decrementa slots
+    await warehouse.decrement("availableSlots", { by: 1 });
+
+    // 5) Marca o equipamento como doado (action = 'D')
+    await models.UsedEquipment.update(
+      { action: 'D', updatedAt: new Date() },
+      { where: { id: usedEquipmentID } }
+    );
+
+    return res.status(201).json(donation);
+
+  } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res
+        .status(400)
+        .json({ error: "This equipment has already been donated to this project." });
+    }
+    console.error("Error in /donate:", error);
+    return res.status(500).json({ error: "Unexpected error." });
+  }
+});
+
+
+
 
 
 module.exports = router;

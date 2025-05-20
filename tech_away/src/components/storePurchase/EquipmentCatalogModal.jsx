@@ -92,6 +92,12 @@ export default function EquipmentCatalogModal({
     }
   };
 
+  const handleAddEquipment = (newEquipment) => {
+    // Aqui pode fazer POST para API se quiser persistir
+    setEquipments((prev) => [newEquipment, ...prev]);
+    setShowAddModal(false);
+  };
+
   return (
     <>
       <Modal show={show} onHide={handleClose} size="xl" centered>

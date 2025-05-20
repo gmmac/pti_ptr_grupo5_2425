@@ -177,7 +177,7 @@ router.post("/", async (req, res) => {
       data: model,
     });
   } catch (error) {
-    res.status(500).json({ error: "Error creating brand." });
+    res.status(500).json({ error: "Error creating equipment model." });
   }
 });
 

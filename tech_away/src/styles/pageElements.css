@@ -72,7 +72,7 @@
     .custom-manage-tabs .nav-item .nav-link.active,
     .custom-manage-tabs .nav-link[aria-selected="true"] {
         background-color: var(--variant-one);
-        color: var(--dark-grey);
+        color: var(--white);
         font-weight: bold;
     }
 
@@ -125,8 +125,8 @@
     border-radius: var(--rounded-lg)
 }
 
-.card:hover {
+/* .card:hover {
     transform: scale(1.02);
     transition: transform 0.2s ease;
     box-shadow: var(--shadow-default);
-}
+} */

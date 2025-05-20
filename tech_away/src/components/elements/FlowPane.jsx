@@ -1,16 +1,20 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
-export default function FlowPane({ elements, isEditing, selectedElements, onToggle, renderCard, isSelected}) {
+export default function FlowPane({
+  elements,
+  isEditing,
+  selectedElements,
+  onToggle,
+  renderCard,
+  isSelected,
+  colNumMD,
+  colNumXS
+}) {
   return (
     <Row>
       {elements.map((e) => (
-        <Col 
-        key={e.id || e.barcode} 
-        className="mb-3"
-        xs={6}
-        md={e.id ? 4 : 6}
-        >
+        <Col key={e.id} xs={colNumXS} md={colNumMD} >
           {renderCard({
             element: e,
             isSelected: isSelected(e),

@@ -1,15 +1,37 @@
 import React from 'react';
 import { Row, Col, Card, Button, FormControl, InputGroup } from 'react-bootstrap';
+import CustomProgressBar from './CustomProgressBar';
 
-export default function SelectedCardList({ selectedElements = [], isEditing = false, onRemove, renderCard, onQuantityChange }) {
+export default function SelectedCardList({
+  selectedElements = [],
+  isEditing = false,
+  onRemove,
+  renderCard,
+  onQuantityChange,
+  colNumMD,
+  colNumXS
+}) {
   return (
     <Row>
       {selectedElements.map((element, index) => (
-        <Col key={element.id || element.Barcode || index} md={4} sm={6} xs={12} className="mb-3">
+        <Col
+          key={element.id || element.Barcode || index}
+          md={colNumMD}
+          xs={colNumXS}
+          className="mb-3"
+          style={{
+            transform: 'none',
+            transition: 'none',
+          }}
+        >
           <Card
             bg={isEditing ? 'success' : 'light'}
             text={isEditing ? 'white' : 'dark'}
             className="shadow-sm rounded-sm border-0"
+            style={{
+              transform: 'none',
+              transition: 'none',
+            }}
           >
             <Card.Body className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-start">
@@ -17,25 +39,27 @@ export default function SelectedCardList({ selectedElements = [], isEditing = fa
                   {renderCard(element)}
                   {isEditing && (
                     <InputGroup className="mt-2">
-                      <InputGroup.Text className="bg-light text-dark">Qty</InputGroup.Text>
-                        <FormControl
-                          type="number"
-                          value={element.quantity ?? ''}
-                          onChange={(e) => {
-                            const raw = e.target.value;
-                            const value = parseInt(raw);
-                            if (raw === '') {
-                              onQuantityChange?.(element, '');
-                            } else if (!isNaN(value) && value > 0) {
-                              onQuantityChange?.(element, value);
-                            }
-                          }}
-                          onBlur={(e) => {
-                            if (!e.target.value || parseInt(e.target.value) <= 0) {
-                              onQuantityChange?.(element, 1);
-                            }
-                          }}
-                        />
+                      <InputGroup.Text className="bg-light text-dark">
+                        Qty
+                      </InputGroup.Text>
+                      <FormControl
+                        type="number"
+                        value={element.quantity ?? ''}
+                        onChange={(e) => {
+                          const raw = e.target.value;
+                          const value = parseInt(raw, 10);
+                          if (raw === '') {
+                            onQuantityChange?.(element, '');
+                          } else if (!isNaN(value) && value > 0) {
+                            onQuantityChange?.(element, value);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (!e.target.value || parseInt(e.target.value, 10) <= 0) {
+                            onQuantityChange?.(element, 1);
+                          }
+                        }}
+                      />
                     </InputGroup>
                   )}
                 </div>
@@ -51,6 +75,11 @@ export default function SelectedCardList({ selectedElements = [], isEditing = fa
                 )}
               </div>
             </Card.Body>
+
+            <CustomProgressBar
+              current={element.currentDonations}
+              total={element.quantity}
+            />
           </Card>
         </Col>
       ))}

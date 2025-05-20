@@ -7,61 +7,93 @@ const { sequelize } = require("../models/index");
 router.get("/", async (req, res) => {
   try {
     const {
+      id,
+      projectName,
+      status,
+      warehouse,
+      organizerName,
       startDate,
       completionDate,
-      status,
-      id,
-      warehouseID,
-      organizerNic,
       page = 1,
       pageSize = 5,
-      orderBy = "id",
-      orderDirection = "ASC",
     } = req.query;
 
+    // build “where” for CharityProject fields
     const where = {};
+    if (id) {
+      where.id = { [Op.eq]: parseInt(id, 10) };
+    }
+    if (projectName) {
+      where.name = { [Op.iLike]: `%${projectName}%` };
+    }
+    if (startDate) {
+      where.startDate = { [Op.gte]: startDate };
+    }
+    if (completionDate) {
+      where.completionDate = { [Op.lte]: completionDate };
+    }
 
-    if (startDate) where.startDate = { [Op.gte]: startDate };
-    if (completionDate) where.completionDate = { [Op.lte]: completionDate };
-    if (status) where.status = { [Op.eq]: parseInt(status) };
-    if (warehouseID) where.warehouseID = { [Op.eq]: parseInt(warehouseID) };
-    if (organizerNic) where.organizerNic = { [Op.like]: `%${organizerNic}%` };
-    if (id) where.id = { [Op.eq]: id };
+    // build include‐level filters
+    const statusFilter = {};
+    if (status) {
+      statusFilter.state = { [Op.iLike]: `%${status}%` };
+    }
 
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    const order = [[orderBy, orderDirection.toUpperCase()]];
+    const warehouseFilter = {};
+    if (warehouse) {
+      warehouseFilter.name = { [Op.iLike]: `%${warehouse}%` };
+    }
+
+    // for organizer name, concatenate firstName + lastName
+    const organizerWhere = organizerName
+      ? Sequelize.where(
+          Sequelize.fn(
+            'concat',
+            Sequelize.col('Organizer.firstName'),
+            ' ',
+            Sequelize.col('Organizer.lastName')
+          ),
+          { [Op.iLike]: `%${organizerName}%` }
+        )
+      : null;
+
+    const offset = (Number(page) - 1) * Number(pageSize);
 
     const { count, rows } = await models.CharityProject.findAndCountAll({
       where,
       include: [
         {
           model: models.ProjectStatus,
-          attributes: ["id", "state"],
+          attributes: ['id', 'state'],
+          where: statusFilter,
         },
         {
           model: models.Warehouse,
-          attributes: ["id", "name"],
+          attributes: ['id', 'name'],
+          where: warehouseFilter,
         },
         {
           model: models.Organizer,
-          attributes: ["nic", "firstName", "lastName", "email"],
+          attributes: ['nic', 'firstName', 'lastName', 'email'],
+          // apply organizerName filter if present
+          ...(organizerWhere ? { where: organizerWhere } : {}),
         },
       ],
-      limit: parseInt(pageSize),
+      limit: Number(pageSize),
       offset,
-      order,
+      order: [['id', 'ASC']],  // or pull from req.query if you still want ordering
     });
 
-    res.json({
+    return res.json({
       totalItems: count,
       totalPages: Math.ceil(count / pageSize),
-      currentPage: parseInt(page),
-      pageSize: parseInt(pageSize),
+      currentPage: Number(page),
+      pageSize: Number(pageSize),
       data: rows,
     });
   } catch (error) {
-    console.error("Error fetching charity projects:", error);
-    res.status(500).json({ error: "Error fetching charity projects." });
+    console.error('Error fetching charity projects:', error);
+    return res.status(500).json({ error: 'Error fetching charity projects.' });
   }
 });
 
@@ -78,7 +110,7 @@ router.get("/displayTable", async (req, res) => {
 	  createdAt,
     totalSpace,
     page = 1,
-    pageSize = 10,
+    pageSize = 5,
     sortField = "id",
     sortOrder = "ASC",
   } = req.query;
@@ -169,7 +201,7 @@ router.get("/displayTable", async (req, res) => {
     organizerName: item.Organizer.firstName + " " + item.Organizer.lastName,
     status: item.ProjectStatus.state,
     statusID: item.ProjectStatus.id,
-    totalSpace: item.totalSpace,
+    // totalSpace: item.totalSpace,
     warehouse: item.Warehouse.name,
     warehouseID: item.Warehouse.id,
     startDate: item.startDate,
@@ -185,7 +217,7 @@ router.get("/displayTable", async (req, res) => {
   });
 
   } catch (error) {
-  console.log(error);
+  console.error(error);
   res.status(500).json({ error: "Error fetching brands." });
   }
 });
@@ -234,6 +266,61 @@ router.post("/linkEquipmentType", async (req, res) => {
       return res.status(400).json({ error: "charityProjectId and items[] are required." });
     }
 
+    // Busca projeto + warehouse
+    const charityProject = await models.CharityProject.findByPk(charityProjectId, {
+      include: {
+        model: models.Warehouse,
+        attributes: ['availableSlots']
+      }
+    });
+
+    if (!charityProject) {
+      return res.status(404).json({ error: "Charity project not found." });
+    }
+
+    const availableSlots = charityProject.Warehouse?.availableSlots;
+    if (availableSlots == null) {
+      return res.status(400).json({ error: "Warehouse available slots not defined." });
+    }
+
+    // Busca os registros atuais
+    const existingRecords = await models.CharityProjectEquipmentType.findAll({
+      where: { charityProjectId }
+    });
+
+    // Mapas para facilitar comparações
+    const existingMap = new Map();
+    let totalAtual = 0;
+    
+    for (const record of existingRecords) {
+      existingMap.set(record.equipmentTypeId, record.quantity);
+      totalAtual += record.quantity;
+    }
+
+
+    // Calcular a soma final após update
+    let totalFinal = totalAtual;
+
+
+    for (const item of items) {
+      const quantity = item.quantity || 1;
+      const existingQty = existingMap.get(item.id) || 0;
+
+      // Subtrai o antigo (se houver) e adiciona o novo
+      totalFinal = totalFinal - existingQty + quantity;
+    }
+
+
+    
+    // Verifica se cabe no espaço disponível
+    if (totalFinal > availableSlots) {
+      console.error(`Not enough available slots in warehouse. Requested total: ${totalFinal}, Available: ${availableSlots}`)
+      return res.status(400).json({
+        error: `Not enough available slots in warehouse. Requested total: ${totalFinal}, Available: ${availableSlots}`
+      });
+    }
+
+    // Atualiza os dados: remove todos os registros antigos e insere os novos
     await models.CharityProjectEquipmentType.destroy({
       where: { charityProjectId }
     });
@@ -249,15 +336,17 @@ router.post("/linkEquipmentType", async (req, res) => {
     const created = await models.CharityProjectEquipmentType.bulkCreate(records);
 
     res.status(201).json({
-      message: "Equipment types linked successfully.",
+      message: "Equipment types updated successfully.",
       insertedCount: created.length,
       data: created
     });
+
   } catch (error) {
-    console.error("Error linking equipment types:", error);
+    console.error("Error updating equipment types:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
+
 
 router.post("/linkEquipmentSheet", async (req, res) => {
   try {
@@ -267,6 +356,53 @@ router.post("/linkEquipmentSheet", async (req, res) => {
       return res.status(400).json({ error: "charityProjectId and items[] are required." });
     }
 
+    // Busca projeto + warehouse
+    const charityProject = await models.CharityProject.findByPk(charityProjectId, {
+      include: {
+        model: models.Warehouse,
+        attributes: ['availableSlots']
+      }
+    });
+
+    if (!charityProject) {
+      return res.status(404).json({ error: "Charity project not found." });
+    }
+
+    const availableSlots = charityProject.Warehouse?.availableSlots;
+    if (availableSlots == null) {
+      return res.status(400).json({ error: "Warehouse available slots not defined." });
+    }
+
+    // Busca os registros atuais
+    const existingRecords = await models.EquipmentSheetCharityProject.findAll({
+      where: { charityProjectId }
+    });
+
+    const existingMap = new Map();
+    let totalAtual = 0;
+
+    for (const record of existingRecords) {
+      existingMap.set(record.equipmentSheetId, record.quantity);
+      totalAtual += record.quantity;
+    }
+
+    // Calcular novo total após atualização
+    let totalFinal = totalAtual;
+
+    for (const item of items) {
+      const quantity = item.quantity || 1;
+      const existingQty = existingMap.get(item.barcode) || 0;
+      totalFinal = totalFinal - existingQty + quantity;
+    }
+
+    // Verifica se há espaço suficiente
+    if (totalFinal > availableSlots) {
+      return res.status(400).json({
+        error: `Not enough available slots in warehouse. Requested total: ${totalFinal}, Available: ${availableSlots}`
+      });
+    }
+
+    // Atualiza: remove todos os registros e insere os novos
     await models.EquipmentSheetCharityProject.destroy({
       where: { charityProjectId }
     });
@@ -286,13 +422,12 @@ router.post("/linkEquipmentSheet", async (req, res) => {
       insertedCount: created.length,
       data: created
     });
+
   } catch (error) {
     console.error("Error linking equipment sheets:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
-
-
 
 router.get("/:id/equipmentTypes", async (req, res) => {
   try {
@@ -305,54 +440,84 @@ router.get("/:id/equipmentTypes", async (req, res) => {
       orderDirection = "ASC"
     } = req.query;
 
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    const limit = parseInt(pageSize);
+    const offset = (parseInt(page, 10) - 1) * parseInt(pageSize, 10);
+    const limit  = parseInt(pageSize, 10);
 
+    // 1) valida projeto
     const project = await models.CharityProject.findByPk(id);
     if (!project) {
       return res.status(404).json({ error: "Charity Project not found." });
     }
 
+    // 2) metas por tipo
     const linkedRecords = await models.CharityProjectEquipmentType.findAll({
       where: { charityProjectId: id },
       attributes: ['equipmentTypeId', 'quantity']
     });
-
     const idToQtyMap = linkedRecords.reduce((acc, rec) => {
       acc[rec.equipmentTypeId] = rec.quantity || 1;
       return acc;
     }, {});
-
     const equipmentTypeIds = Object.keys(idToQtyMap);
 
+    // 3) conta doações por tipo, só barcode + COUNT(*)
+    const donationCountsRaw = await models.CharityProjectDonations.findAll({
+      where: { charityProjectId: id },
+      include: [{
+        model: models.UsedEquipment,
+        attributes: [],
+        include: [{
+          model: models.EquipmentSheet,
+          attributes: [],
+          include: [{
+            model: models.EquipmentType,
+            where: { id: equipmentTypeIds },
+            attributes: []
+          }]
+        }]
+      }],
+      attributes: [
+        [Sequelize.col('UsedEquipment.EquipmentSheet.EquipmentType.id'), 'equipmentTypeId'],
+        [Sequelize.fn('COUNT', Sequelize.literal('*')),              'count']
+      ],
+      group: ['UsedEquipment.EquipmentSheet.EquipmentType.id'],
+      raw: true
+    });
+    const donationCountsMap = donationCountsRaw.reduce((acc, row) => {
+      acc[row.equipmentTypeId] = parseInt(row.count, 10);
+      return acc;
+    }, {});
+
+    // 4) busca dados de EquipmentType
     const { count, rows } = await models.EquipmentType.findAndCountAll({
       where: {
-        id: equipmentTypeIds,
-        name: {
-          [Op.iLike]: `%${name}%`
-        }
+        id:   equipmentTypeIds,
+        name: { [Op.iLike]: `%${name}%` }
       },
       order: [[orderBy, orderDirection.toUpperCase()]],
       offset,
       limit
     });
 
-    const dataWithQty = rows.map((type) => ({
-      ...type.toJSON(),
-      quantity: idToQtyMap[type.id] || 1
+    // 5) formata saída incluindo currentDonations e quantidade meta
+    const formatted = rows.map(type => ({
+      id:               type.id,
+      name:             type.name,
+      quantity:         idToQtyMap[type.id] || 1,
+      currentDonations: donationCountsMap[type.id] || 0
     }));
 
-    res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / limit),
-      currentPage: parseInt(page),
-      pageSize: limit,
-      data: dataWithQty
+    return res.json({
+      totalItems:  count,
+      totalPages:  Math.ceil(count / limit),
+      currentPage: parseInt(page, 10),
+      pageSize:    limit,
+      data:        formatted
     });
 
   } catch (error) {
     console.error("Erro ao buscar tipos vinculados ao projeto:", error);
-    res.status(500).json({ error: "Erro ao buscar tipos vinculados ao projeto." });
+    return res.status(500).json({ error: "Erro ao buscar tipos vinculados ao projeto." });
   }
 });
 
@@ -368,26 +533,51 @@ router.get("/:id/equipmentSheet", async (req, res) => {
       orderDirection = "ASC"
     } = req.query;
 
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    const limit = parseInt(pageSize);
+    const offset = (parseInt(page, 10) - 1) * parseInt(pageSize, 10);
+    const limit  = parseInt(pageSize, 10);
 
+    // 1) valida projeto
     const project = await models.CharityProject.findByPk(id);
     if (!project) {
       return res.status(404).json({ error: "Charity Project not found." });
     }
 
+    // 2) metas por sheet
     const linkedRecords = await models.EquipmentSheetCharityProject.findAll({
       where: { charityProjectId: id },
       attributes: ['equipmentSheetId', 'quantity']
     });
-
     const idToQtyMap = linkedRecords.reduce((acc, rec) => {
       acc[rec.equipmentSheetId] = rec.quantity || 1;
       return acc;
     }, {});
-
     const equipmentSheetIds = Object.keys(idToQtyMap);
 
+    // 3) conta doações por barcode usando COUNT(*)
+    const donationCountsRaw = await models.CharityProjectDonations.findAll({
+      where: { charityProjectId: id },
+      include: [{
+        model: models.UsedEquipment,
+        attributes: [],
+        include: [{
+          model: models.EquipmentSheet,
+          where: { barcode: equipmentSheetIds },
+          attributes: [] 
+        }]
+      }],
+      attributes: [
+        [Sequelize.col('UsedEquipment.EquipmentSheet.barcode'), 'barcode'],
+        [Sequelize.fn('COUNT', Sequelize.literal('*')),    'count']
+      ],
+      group: ['UsedEquipment.EquipmentSheet.barcode'],
+      raw: true
+    });
+    const donationCountsMap = donationCountsRaw.reduce((acc, row) => {
+      acc[row.barcode] = parseInt(row.count, 10);
+      return acc;
+    }, {});
+
+    // 4) busca dados dos sheets
     const { count, rows } = await models.EquipmentSheet.findAndCountAll({
       where: {
         barcode: {
@@ -399,48 +589,33 @@ router.get("/:id/equipmentSheet", async (req, res) => {
         {
           model: models.EquipmentModel,
           attributes: ['id', 'name'],
-          include: [
-            {
-              model: models.Brand,
-              attributes: ['id', 'name']
-            }
-          ]
+          include: [{ model: models.Brand, attributes: ['id', 'name'] }]
         },
-        {
-          model: models.EquipmentType,
-          attributes: ['id', 'name']
-        }
+        { model: models.EquipmentType, attributes: ['id', 'name'] }
       ],
       order: [[orderBy, orderDirection.toUpperCase()]],
       offset,
       limit
     });
 
-    const formattedRows = rows.map((item) => ({
-      Barcode: item.barcode,
-      CreatedAt: item.createdAt,
-      UpdatedAt: item.updatedAt,
-      EquipmentModel: {
-        id: item.EquipmentModel?.id,
-        name: item.EquipmentModel?.name
-      },
-      Brand: {
-        id: item.EquipmentModel?.Brand?.id,
-        name: item.EquipmentModel?.Brand?.name
-      },
-      EquipmentType: {
-        id: item.EquipmentType?.id,
-        name: item.EquipmentType?.name
-      },
-      quantity: idToQtyMap[item.barcode] || 1
+    // 5) formata resposta incluindo currentDonations
+    const formattedRows = rows.map(item => ({
+      Barcode:         item.barcode,
+      CreatedAt:       item.createdAt,
+      UpdatedAt:       item.updatedAt,
+      EquipmentModel:  { id: item.EquipmentModel.id, name: item.EquipmentModel.name },
+      Brand:           { id: item.EquipmentModel.Brand.id, name: item.EquipmentModel.Brand.name },
+      EquipmentType:   { id: item.EquipmentType.id, name: item.EquipmentType.name },
+      quantity:        idToQtyMap[item.barcode] || 1,
+      currentDonations: donationCountsMap[item.barcode] || 0
     }));
 
     res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / limit),
-      currentPage: parseInt(page),
-      pageSize: limit,
-      data: formattedRows
+      totalItems:  count,
+      totalPages:  Math.ceil(count / limit),
+      currentPage: parseInt(page, 10),
+      pageSize:    limit,
+      data:        formattedRows
     });
 
   } catch (error) {
@@ -448,7 +623,6 @@ router.get("/:id/equipmentSheet", async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar EquipmentSheets vinculados ao projeto." });
   }
 });
-
 
 
 router.get("/:ID", async (req, res) => {
@@ -478,26 +652,64 @@ router.put('/:ID', async (req, res) => {
   const { name, startDate, completionDate, warehouseID, statusID } = req.body;
 
   try {
+    // 1) Load the project
     const project = await models.CharityProject.findByPk(projectId);
-
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
     }
 
-    project.name = name || project.name;
-    project.startDate = startDate || project.startDate;
-    project.completionDate = completionDate || project.completionDate;
-    project.warehouseID = warehouseID || project.warehouseID;
-    project.status = statusID || project.status;
+    // 2) If warehouseID is changing, enforce slot logic
+    if (warehouseID && Number(warehouseID) !== project.warehouseID) {
+      // how many donations this project already has
+      const donationCount = await models.CharityProjectDonations.count({
+        where: { charityProjectId: projectId }
+      });
+
+
+      // load both old & new warehouses
+      const oldWh = await models.Warehouse.findByPk(project.warehouseID);
+      const newWh = await models.Warehouse.findByPk(warehouseID);
+
+
+      if (!newWh) {
+        return res.status(404).json({ error: 'New warehouse not found.' });
+      }
+      // check capacity
+      if (newWh.availableSlots < donationCount) {
+        return res
+          .status(400)
+          .json({ error: 'Not enough available slots in the selected warehouse.' });
+      }
+
+      // return slots to old warehouse
+      if (oldWh) {
+        await oldWh.increment('availableSlots', { by: donationCount });
+      }
+
+      // take slots from new warehouse
+      await newWh.decrement('availableSlots', { by: donationCount });
+
+      // apply the change
+      project.warehouseID = Number(warehouseID);
+    }
+
+    // 3) Update other fields
+    project.name           = name           ?? project.name;
+    project.startDate      = startDate      ?? project.startDate;
+    project.completionDate = completionDate ?? project.completionDate;
+    project.status         = statusID       ?? project.status;
 
     await project.save();
 
-    return res.status(200).json({ message: 'Project updated successfully', data: project });
+    return res
+      .status(200)
+      .json({ message: 'Project updated successfully', data: project });
   } catch (error) {
     console.error('Error updating project:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 router.delete('/:ID', async (req, res) => {
   const projectId = req.params.ID;

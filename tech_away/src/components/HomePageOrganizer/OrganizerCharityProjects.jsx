@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import RegisterCharityProject from '../charityProject/ModalRegisterCharityProject';
-import { Alert, Button, Spinner } from 'react-bootstrap';
+import { Alert, Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import CharityProjectCatalog from '../charityProject/CharityProjectCatalog';
 import api from '../../utils/axios';
 import ModalCharityProjectDetails from '../charityProject/ModalCharityProjectDetails';
@@ -86,8 +86,18 @@ export default function OrganizerCharityProjects() {
     setShowDetailsModal(false);
     };
 
+    const handleDelete = async (projectId) => {
+      try {
+        await api.delete(`/api/charityProject/${projectId}`);
+        toggleRefresh();
+      } catch (err) {
+        console.error("Error deleting project:", err);
+        setError("Could not delete project.");
+      }
+  };
+
   return (
-    <div>
+    <Container>
 
         <h1> My Charity Projects </h1>
 
@@ -99,16 +109,12 @@ export default function OrganizerCharityProjects() {
         ) : ( 
             <>
               {isOrganizer() && 
-                <div className="d-flex justify-content-end mb-3">
-                  <Button
-                    className="rounded-pill"
-                    style={{ backgroundColor: "var(--variant-two)", border: "none" }}
-                    onClick={handleOpenModal}
-                  >
-                    Add Charity Project
-                  </Button> 
-                </div>
-                }
+                <Row className="mb-3">
+                  <Col className="text-end">
+                    <Button style={{ backgroundColor: "var(--variant-one)", border: "none" }} onClick={handleOpenModal}>New Charity Project</Button>
+                  </Col>
+                </Row>
+              }
                 
               {!loading && (
                 charityProjects.length === 0 ? (
@@ -123,6 +129,8 @@ export default function OrganizerCharityProjects() {
                     totalPages={totalPages}
                     onOpenDetails={handleOpenDetailsModal}
                     onRefresh={toggleRefresh}
+                    onDelete={handleDelete}
+                    canDelete={true}
                   />
                 )
               )}
@@ -137,6 +145,6 @@ export default function OrganizerCharityProjects() {
             closeModal={handleCloseModal} 
             setRefresh={toggleRefresh} />
         }
-        </div>
+        </Container>
   );
 }

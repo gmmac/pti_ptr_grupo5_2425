@@ -119,7 +119,7 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
     return (
         <>
             <ConfirmDialog />
-            <div className="">
+            <div className="d-none d-lg-table">
                 <DataTable
                     value={data}
                     lazy
@@ -188,47 +188,50 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
                         />
                     ))}
 
-                    {columns.includes('isActive') && (
-                        <Column
-                            key="isActive"
-                            field="isActive"
-                            header="Status"
-                            body={(rowData) => (
-                                <Button
-                                    size="small"
-                                    severity={rowData.isActive === "1" ? 'warning' : 'success'}
-                                    label={rowData.isActive === "1" ? 'Deactivate' : 'Activate'}
-                                    onClick={() => onDelete(rowData.internNum)}
-                                />
-                            )}
-                        />
-                    )}
-
                     <Column
                         header=""
+                        headerStyle={{ width: '10%' }}
+                        bodyStyle={{padding: '0.7rem', paddingLeft: '0rem'}}
                         body={(rowData, options) => {
-                            const menuItems = [
-                                { label: "Edit", icon: "pi pi-pencil", command: () => handleEdit(rowData) },
-                                { label: "Delete", icon: "pi pi-trash", command: () => confirmDelete(rowData.id) },
-                            ];
                             return (
-                                <>
-                                    <Menu
-                                        model={menuItems}
-                                        popup
-                                        ref={(el) => (menuRefs.current[options.rowIndex] = el)}
-                                    />
+                                <div style={{ display: "flex", gap: "0.3rem", justifyContent: "center" }}>
+                                    {isActiveFilter=="1" ? 
+                                        <>
+                                          <Button
+                                                icon="pi pi-pencil"
+                                                rounded
+                                                text
+                                                severity="secondary"
+                                                aria-label="Edit"
+                                                className="custom-icon-button"
+                                                onClick={() => handleEdit(rowData)}
+                                            />
+                                            <Button
+                                                icon="pi pi-trash"
+                                                text
+                                                severity="danger"
+                                                label="Delete"
+                                                style={{color: "var(--danger)"}}
+                                                className="custom-icon-button-withtext"
+                                                onClick={() => onDelete(rowData.internNum)}
+
+                                            /> 
+                                        </> : 
                                     <Button
-                                        icon="pi pi-ellipsis-v"
+                                        icon="pi pi-history"
                                         text
-                                        severity="secondary"
-                                        onClick={(e) => menuRefs.current[options.rowIndex].toggle(e)}
-                                        className="rounded-5"
+                                        severity="success"
+                                        label="Restore"
+                                        style={{color: "var(--valid)"}}
+                                        className="custom-icon-button-withtext"
+                                        onClick={() => onDelete(rowData.internNum)}
                                     />
-                                </>
+                                    }
+                                </div>
                             );
                         }}
                     />
+
                 </DataTable>
 
                 <style>

@@ -7,8 +7,8 @@ import DivOurServices from "./DivOurServices";
 
 export default function SMcontent(isMobile) {
 	return (
-		<Container >
-			<Stack gap={4} 	>
+		<Container>
+			<Stack gap={4}>
 				<Stack
 					direction="horizontal"
 					style={{
@@ -21,7 +21,7 @@ export default function SMcontent(isMobile) {
 					}}
 					className="justify-content-between overflow-hidden"
 				>
-					<h1 className="ps-4 fs-1">
+					<h1 className="ps-4 fs-1" style={{ fontFamily: "var(--title-font)" }}>
 						Second{" "}
 						<span
 							style={{
@@ -51,8 +51,8 @@ export default function SMcontent(isMobile) {
 
 				<DivTelem />
 				<DivJoin />
-				<DivOurServices  />
-				<div style={{height:"75px"}} ></div>
+				<DivOurServices />
+				<div style={{ height: "75px" }}></div>
 			</Stack>
 		</Container>
 	);

@@ -54,6 +54,18 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          name: "Nitendo",
+          isActive: "1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "GoPro",
+          isActive: "1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );

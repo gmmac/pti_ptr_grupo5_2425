@@ -38,7 +38,7 @@ export default function ModalEdit({
 		}));
 
 		let newErrors = { ...errors };
-		newErrors[name] = value ? "" : "Este campo é obrigatório";
+		newErrors[name] = value ? "" : "This field is required";
 		setErrors(newErrors);
 	};
 
@@ -62,7 +62,7 @@ export default function ModalEdit({
 
 		attributesToEdit.forEach((attribute) => {
 			if (!formData[attribute] && !formData[`${attribute}Name`]) {
-				newErrors[attribute] = "Este campo é obrigatório";
+				newErrors[attribute] = "This field is required";
 				hasError = true;
 			}
 			payload[attribute] = formData[attribute] || null;
@@ -88,11 +88,15 @@ export default function ModalEdit({
 		}
 	};
 
+	const capitalizeFirstLetter = (value) => {
+        return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+    }
+
 	return (
 		<Modal show={show} onHide={handleClose}>
 			<Modal.Header closeButton>
 				<Modal.Title>
-					Edit {modelToEdit}
+					Edit {capitalizeFirstLetter(modelToEdit)}
 					<br />
 					ID: {id}
 				</Modal.Title>
@@ -105,7 +109,7 @@ export default function ModalEdit({
 					)
 					.map((attribute, index) => (
 						<Form.Group key={index} className="mb-3">
-							<Form.Label>{attribute}</Form.Label>
+							<Form.Label>{capitalizeFirstLetter(attribute)}</Form.Label>
 							{attribute === "barcode" ? (
 								<Form.Control
 									type="text"
@@ -137,7 +141,7 @@ export default function ModalEdit({
 											setModals((prev) => ({ ...prev, [attribute]: true }))
 										}
 									>
-										Selecionar
+										Select
 									</Button>
 								</div>
 							) : (
@@ -166,14 +170,14 @@ export default function ModalEdit({
 						variant="secondary"
 						onClick={handleClose}
 					>
-						Cancelar
+						Cancel
 					</Button>
 					<Button
 						className="rounded-pill"
 						style={{ backgroundColor: "var(--variant-one)", border: "none" }}
 						onClick={handleSubmit}
 					>
-						Salvar Alterações
+						Save Changes
 					</Button>
 				</Stack>
 			</Modal.Body>

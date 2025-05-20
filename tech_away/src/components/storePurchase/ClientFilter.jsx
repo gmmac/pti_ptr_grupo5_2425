@@ -5,8 +5,7 @@ import SearchBar from "../searchBar/SearchBar";
 export default function ClientFilter({ setFilters }) {
     const [localFilters, setLocalFilters] = useState({
         nic: "",
-        firstName: "",
-        lastName: "",
+        name: "",
         email: "",
         phone: "",
         orderBy: "nic",
@@ -38,8 +37,7 @@ export default function ClientFilter({ setFilters }) {
     const handleClear = () => {
         const clearedFilters = {
             nic: "",
-            firstName: "",
-            lastName: "",
+            name: "",
             email: "",
             phone: "",
             orderBy: "nic",
@@ -76,24 +74,11 @@ export default function ClientFilter({ setFilters }) {
                                 </Col>
                                 <Col xs={12} md={6}>
                                     <Form.Group controlId="filterName">
-                                        <Form.Label>First Name</Form.Label>
+                                        <Form.Label>Client Name</Form.Label>
                                         <Form.Control 
                                         type="text" 
-                                        name="firstName" 
-                                        value={localFilters.firstName} 
-                                        placeholder="Insert first name"
-                                        onChange={handleChange} 
-                                        />
-                                    
-                                    </Form.Group>
-                                </Col>
-                                <Col xs={12} md={6}>
-                                    <Form.Group controlId="filterName">
-                                        <Form.Label>Last Name</Form.Label>
-                                        <Form.Control 
-                                        type="text" 
-                                        name="lastName" 
-                                        value={localFilters.lastName} 
+                                        name="name" 
+                                        value={localFilters.name} 
                                         placeholder="Insert last name"
                                         onChange={handleChange} 
                                         />

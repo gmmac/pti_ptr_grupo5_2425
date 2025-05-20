@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Container, Stack, Tabs, Tab, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuthEmployee } from '../../contexts/AuthenticationProviders/EmployeeAuthProvider';
 import EmployeeDisplayTable from './EmployeeDisplayTable';
 import EmployeeEditModal from './EmployeeEditModal';
 import EmployeeCardView from './EmployeeCardView'
+import api from "../../utils/axios"
+import PaginationControl from '../pagination/PaginationControl';
 
 export default function EmployeeCatalog() {
   const navigate = useNavigate();
@@ -15,19 +17,40 @@ export default function EmployeeCatalog() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [employees, setEmployees] = useState(0);
   
-  // api.get('/api/employee/', { params })
-  // .then((res) => {
-  //   const items = res.data.data || [];
-  //   setData(items);
-  //   setTotalRecords(res.data.totalItems || 0);
-  //   if (items.length) {
-  //     const keys = Object.keys(items[0]).filter(k => k !== "CreatedAt");
-  //     setColumns(keys);
-  //   }
-  // })
-  // .catch((err) => console.error('Erro:', err))
-  // .finally(() => setLoading(false));
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      const isActive = activeTab === "active" ? "1" : "0";
+
+      const response = await api.get('/api/employee/', {
+        params: {
+          // ...filters,
+          active: isActive,
+          page: currentPage,
+          // pageSize: itemsPerPage,
+        },
+      });
+
+      setEmployees(response.data.data);
+      setTotalPages(response.data.totalPages);
+    } catch (err) {
+      setError("Erro ao buscar funcionários.");
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployees();
+  // }, [currentPage, filters, refresh, activeTab]);
+}, [currentPage, refreshKey, activeTab]);
 
   const handleCreateEmployee = () => navigate('/employee/register');
 
@@ -74,10 +97,18 @@ export default function EmployeeCatalog() {
           onDelete={handleToggleActivationAccount}
           refreshKey={refreshKey}
         />
-        {/* <EmployeeCardView 
-          employee={employee}
 
-        /> */}
+        {employees &&
+        <>
+            <EmployeeCardView 
+              employees={employees}
+              />
+              <div className='d-lg-none'>
+                <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
+            </div>
+        </>
+        }
+
 
         </Tab>
         <Tab eventKey="inactive" title="Inactive Employees">
@@ -87,8 +118,18 @@ export default function EmployeeCatalog() {
             onEdit={handleEditEmployee}
             onDelete={handleToggleActivationAccount}
             refreshKey={refreshKey}
-
           />
+
+        {employees &&
+          <>
+              <EmployeeCardView 
+                employees={employees}
+                />
+              
+              <PaginationControl handlePageChange={handlePageChange} currentPage={currentPage} totalPages={totalPages} />
+          </>
+        }
+
         </Tab>
       </Tabs>
 

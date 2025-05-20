@@ -16,7 +16,7 @@ export default function EmployeeHomeDashboard() {
         { title: 'Equipment Sheet', key: 'equipmentSheetManage' },
         { title: 'Equipment Types', key: 'equipmentTypeManage' },
         { title: 'Parts', key: 'partsManage' },
-        { title: 'Clients', key: 'clients' },
+        { title: 'Clients', key: 'clientsManage' },
     ];
     
     const {checkIsAdmin } = useAuthEmployee();

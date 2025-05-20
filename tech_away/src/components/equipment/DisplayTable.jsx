@@ -33,6 +33,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
             'Barcode': { value: '', matchMode: 'contains' },
             'EquipmentModel': { value: '', matchMode: 'contains' },
             'EquipmentType': { value: '', matchMode: 'contains' },
+            'arriveTime': { value: '', matchMode: 'contains' },
 			'createdAt': { value: '', matchMode: 'equals' },
 			'updatedAt': { value: '', matchMode: 'equals' }
 		}
@@ -129,6 +130,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
     };
 
     const capitalizeFirstLetter = (value) => {
+        if(String(value) == "id") return "ID";
         return String(value).charAt(0).toUpperCase() + String(value).slice(1);
     }
 
@@ -199,6 +201,9 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 								}
                                 if (value && column == "price"){
                                     return `${value} €`;
+                                }
+                                if (value && column == "arriveTime"){
+                                    return `${value} days`;
                                 }
 								if (dateFields.includes(column) && value) {
 									const date = new Date(value);
@@ -330,20 +335,34 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 						`}
 				</style>
             </div>
-				{model == "model" ? 
-					<FormsEquipmentModel showModal={showModal} closeModal={() => setShowModal(false)} refreshTable={() => loadLazyData()} existingModel = {selectedObj || {}} /> : 
-					<ModalEdit
-						show={showModal}
-						handleClose={() => setShowModal(false)}
-						modelToEdit={model}
-						objectToChange={selectedObj || {}}
-						attributesToEdit={columns}
-						onSave={() => {
-							setShowModal(false);
-							loadLazyData();
-						}}
-					/>
-				}
+            {model === "model" ? (
+                <FormsEquipmentModel
+                    showModal={showModal}
+                    closeModal={() => setShowModal(false)}
+                    refreshTable={() => loadLazyData()}
+                    existingModel={selectedObj || {}}
+                />
+            ) : model === "equipmentSheet" ? (
+                <FormsEquipmentSheet
+                    showModal={showModal}
+                    closeModal={() => setShowModal(false)}
+                    refreshTable={() => loadLazyData()}
+                    existingSheet={selectedObj || {}}
+                />
+            ) : (
+                <ModalEdit
+                    show={showModal}
+                    handleClose={() => setShowModal(false)}
+                    modelToEdit={model}
+                    objectToChange={selectedObj || {}}
+                    attributesToEdit={columns}
+                    onSave={() => {
+                        setShowModal(false);
+                        loadLazyData();
+                    }}
+                />
+            )}
+
             
         </>
     );

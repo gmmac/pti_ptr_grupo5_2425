@@ -120,9 +120,15 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
       setIsEditing(false);
     } catch (error) {
       console.error('Error saving equipment sheets:', error);
-      showAlert('Error updating equipment sheets.', 'danger');
-      onChangeAlert?.({ message: 'Error updating equipment sheets.', variant: 'danger' });
+    
+      const message =
+        error.response?.data?.error ||
+        'Error updating equipment sheets.';
+    
+      showAlert(message, 'danger');
+      onChangeAlert?.({ message, variant: 'danger' });
     }
+    
   };
 
   const handleCancel = () => {
@@ -133,7 +139,7 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
 
   const showAlert = (message, variant) => {
     setAlert({ show: true, message, variant });
-    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 2500);
+    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 3000);
   };
 
   const handleSearch = (value = search) => {
@@ -162,6 +168,10 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
           )}
       </div>
 
+        {selectedSheets.length === 0 && (
+          <Alert variant="info">No Equipment Sheet defined for this project.</Alert>
+        )}
+        
       {alert.show && (
         <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>
           {alert.message}
@@ -169,6 +179,8 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
       )}
 
     <SelectedCardList
+      colNumMD={6}
+      colNumXS={12}
       selectedElements={selectedSheets}
       isEditing={isEditing}
       onRemove={toggleSelectSheet}
@@ -176,7 +188,8 @@ export default function CharityProjectEquipmentSheetEditor({ projectId, onChange
       renderCard={(sheet) => (
         <>
           <div className="fw-semibold">{sheet.EquipmentModel?.name} - {sheet?.Brand?.name}</div>
-          <div> Quantity: {sheet.quantity} </div>
+          {/* <div> Quantity: {sheet.quantity} </div> */}
+          <div> Quantity: {sheet.currentDonations ?? 0} / {sheet.quantity} </div>
           <div className="small text-muted">{sheet.EquipmentType?.name}</div>
           <div className="small text-muted">{sheet.Barcode}</div>
         </>

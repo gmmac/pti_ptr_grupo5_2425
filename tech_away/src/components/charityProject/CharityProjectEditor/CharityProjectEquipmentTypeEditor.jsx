@@ -121,9 +121,15 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
       setIsEditing(false);
     } catch (error) {
       console.error('Error saving equipment types:', error);
-      showAlert('Error updating equipment types.', 'danger');
-      onChangeAlert?.({ message: 'Error updating equipment types.', variant: 'danger' });
+    
+      const message =
+        error.response?.data?.error ||
+        'Error updating equipment types.';
+    
+      showAlert(message, 'danger');
+      onChangeAlert?.({ message, variant: 'danger' });
     }
+    
   };
 
   const handleCancel = () => {
@@ -134,7 +140,7 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
 
   const showAlert = (message, variant) => {
     setAlert({ show: true, message, variant });
-    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 2500);
+    setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 3000);
   };
 
   const handleSearch = (value = search) => {
@@ -143,8 +149,10 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
 
   return (
     <>
+
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h5 className="fw-semibold mb-0">Selected Equipment Types</h5>
+
         {isOrganizer && (
           !isEditing ? (
             <Button variant="primary" size="sm" onClick={() => setIsEditing(true)}>
@@ -165,17 +173,23 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
         </Alert>
       )}
 
+        {selectedTypes.length === 0 && (
+          <Alert variant="info">No Equipment Types defined for this project.</Alert>
+        )}
+
       <SelectedCardList
+        colNumMD={4}
+        colNumXS={6}
         selectedElements={selectedTypes}
         isEditing={isEditing}
         onRemove={toggleSelectType}
         onQuantityChange={handleQuantityChange}
         renderCard={(type) => (
-          <div className="fw-semibold text-capitalize">
-            {type.name}
-            <div> Quantity: {type.quantity} </div>
+          <>
+            <div className="fw-semibold text-capitalize">{type.name}</div>
+            <div> Quantity: {type.currentDonations ?? 0} / {type.quantity} </div>
             <div className="small text-muted">ID: {type.id}</div>
-          </div>
+          </>
         )}
       />
 
@@ -186,6 +200,8 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
             <Accordion.Body className="bg-white">
               <SearchBar value={search} onChange={setSearch} onSearch={handleSearch} />
               <FlowPane
+                colNumMD={4}
+                colNumXS={6}
                 elements={equipmentTypes}
                 selectedElements={selectedTypes}
                 isEditing={isEditing}
