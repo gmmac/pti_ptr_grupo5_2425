@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Container, Row, Col, Tabs, Tab } from "react-bootstrap";
 import DisplayTable from "../../equipment/DisplayTable";
 import NewPartForms from "../../repair/NewPartForms";
+import PartsDisplayTable from "../../part/PartsDisplayTable";
 
 
 export default function PartsManage() {
@@ -29,7 +30,7 @@ export default function PartsManage() {
 				className="custom-manage-tabs mb-3"
 			>
 				<Tab eventKey="active" title="Active Parts">
-					<DisplayTable model="part" params="" key={refreshKey} active="1" refreshAllTables={refreshTable}/>
+					<PartsDisplayTable activeParts="1" key={refreshKey} refreshAllTables={refreshTable}/>
 				</Tab>
 				<Tab eventKey="inactive" title="Deleted Parts">
 					<DisplayTable model="part" params="" key={refreshKey} active="0" refreshAllTables={refreshTable}/>
@@ -37,7 +38,7 @@ export default function PartsManage() {
 
 			</Tabs>
 
-			<NewPartForms showModal={show} closeModal={handleClose} refreshTable={refreshTable}/>
+			<NewPartForms partID={null} showModal={show} closeModal={handleClose} refreshTable={refreshTable}/>
 
 		</Container>
 	);
