@@ -10,7 +10,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Part.belongsTo(models.EquipmentSheet, {
+				foreignKey: "equipmentId",
+				targetKey: "barcode",
+				onUpdate: "CASCADE",
+				onDelete: "SET NULL",
+			});
     }
   }
   Part.init(

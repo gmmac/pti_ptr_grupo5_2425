@@ -12,6 +12,16 @@ module.exports = {
       name: {
         type: Sequelize.STRING(50),
       },
+      equipmentId: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
+        references: {
+          model: 'EquipmentSheets',
+          key: 'barcode',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
       price: {
         type: Sequelize.FLOAT,
       },

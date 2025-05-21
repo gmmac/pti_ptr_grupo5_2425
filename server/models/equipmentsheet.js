@@ -28,6 +28,12 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: "CASCADE",
       });
 
+      EquipmentSheet.hasMany(models.Part, {
+        foreignKey: "equipmentId",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+
       EquipmentSheet.belongsToMany(models.CharityProject, {
         through: models.EquipmentSheetCharityProject,
         foreignKey: "equipmentSheetId",
