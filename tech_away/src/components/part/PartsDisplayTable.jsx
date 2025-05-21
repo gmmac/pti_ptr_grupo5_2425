@@ -216,26 +216,37 @@ export default function PartsDisplayTable({activeParts = "1", refreshAllTables=n
                             ];
                             return (
                                 <div style={{ display: "flex", gap: "0.3rem", justifyContent: "center" }}>
-                                    <>
-                                        <Button
-                                            icon="pi pi-pencil"
-                                            rounded
-                                            text
-                                            severity="secondary"
-                                            aria-label="Edit"
-                                            className="custom-icon-button"
-                                            onClick={() => handleEdit(rowData)}
-                                        />
-                                        <Button
-                                            icon="pi pi-trash"
-                                            text
-                                            severity="danger"
-                                            label="Delete"
-                                            style={{color: "var(--danger)"}}
-                                            className="custom-icon-button-withtext"
-                                            onClick={() => confirmDelete(rowData.id)}
-                                        /> 
-                                    </>
+                                    {activeParts=="1" ? 
+                                        <>
+                                            <Button
+                                                icon="pi pi-pencil"
+                                                rounded
+                                                text
+                                                severity="secondary"
+                                                aria-label="Edit"
+                                                className="custom-icon-button"
+                                                onClick={() => handleEdit(rowData)}
+                                            />
+                                            <Button
+                                                icon="pi pi-trash"
+                                                text
+                                                severity="danger"
+                                                label="Delete"
+                                                style={{color: "var(--danger)"}}
+                                                className="custom-icon-button-withtext"
+                                                onClick={() => confirmDelete(rowData.id)}
+                                            /> 
+                                        </> : 
+                                    <Button
+                                        icon="pi pi-history"
+                                        text
+                                        severity="success"
+                                        label="Restore"
+                                        style={{color: "var(--valid)"}}
+                                        className="custom-icon-button-withtext"
+                                        onClick={() => confirmDelete(rowData.id)}
+                                    />
+                                    }
                                 </div>
                             );
                         }}

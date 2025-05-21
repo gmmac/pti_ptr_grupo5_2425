@@ -33,7 +33,7 @@ export default function PartsManage() {
 					<PartsDisplayTable activeParts="1" key={refreshKey} refreshAllTables={refreshTable}/>
 				</Tab>
 				<Tab eventKey="inactive" title="Deleted Parts">
-					<DisplayTable model="part" params="" key={refreshKey} active="0" refreshAllTables={refreshTable}/>
+					<PartsDisplayTable activeParts="0" key={refreshKey} refreshAllTables={refreshTable}/>
 				</Tab>
 
 			</Tabs>
