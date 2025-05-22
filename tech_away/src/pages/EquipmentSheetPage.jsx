@@ -7,6 +7,7 @@ import UsedEquipmentCard from "../components/EquipmentSheetPage/UsedEquipmentCar
 import MapProvider from "../contexts/MapProvider";
 import { IsMobileContext } from "../contexts/IsMobileContext";
 import PaginationControl from "../components/pagination/PaginationControl";
+import Filters from "../components/EquipmentSheetPage/Filters";
 
 export default function EquipmentSheetPage() {
 	const location = useLocation();
@@ -55,7 +56,7 @@ export default function EquipmentSheetPage() {
 					pageSize: itemsPerPage,
 				};
 
-				const response = await api.get("/api/usedEquipment/in-stock", {
+				const response = await api.get("/api/usedEquipment/in-stock/", {
 					params,
 				});
 				setUsedEquipmentList(response.data.data);
@@ -77,6 +78,7 @@ export default function EquipmentSheetPage() {
 						<MapProvider filters={filters} setFilters={setFilters} />
 					)}
 				</Stack>
+				<Filters filters={filters} setFilters={setFilters} />
 				<Row className="g-4">
 					{usedEquipmentList && usedEquipmentList.length > 0 ? (
 						usedEquipmentList.map((usedEquipment, index) => (
@@ -91,14 +93,15 @@ export default function EquipmentSheetPage() {
 						</Col>
 					)}
 				</Row>
+
+				{totalPages > 1 && (
+					<PaginationControl
+						handlePageChange={handlePageChange}
+						currentPage={currentPage}
+						totalPages={totalPages}
+					/>
+				)}
 			</Stack>
-			{totalPages > 1 && (
-				<PaginationControl
-					handlePageChange={handlePageChange}
-					currentPage={currentPage}
-					totalPages={totalPages}
-				/>
-			)}
 		</Container>
 	);
 }

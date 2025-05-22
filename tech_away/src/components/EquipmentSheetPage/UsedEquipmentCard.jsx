@@ -16,7 +16,7 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 			);
 			return;
 		}
-		addItemToCart(usedEquipment.id);
+		addItemToCart(usedEquipment.ID);
 	};
 
 	return (
@@ -41,10 +41,10 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 					gap={2}
 				>
 					<i className="pi pi-tag" style={{ color: "var(--dark-grey)" }}></i>
-					<p className="m-0">{usedEquipment.price}€</p>
+					<p className="m-0">{usedEquipment?.Price}€</p>
 				</Stack>
 				<Tag
-					value={usedEquipment?.EquipmentStatus?.state}
+					value={usedEquipment?.State}
 					rounded
 					style={{
 						backgroundColor: "var(--variant-one)",
@@ -77,9 +77,9 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 					}}
 					className="m-0 text-bold"
 				>
-					{usedEquipment?.Store?.name}
+					{usedEquipment?.Store}
 				</h5>
-				<Stack direction="horizontal" gap={2} >
+				<Stack direction="horizontal" gap={2}>
 					<Button
 						className="px-3 rounded-pill d-flex justify-content-center align-items-center"
 						style={{
