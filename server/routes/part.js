@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
       arriveTime,
       active = "1",
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       sortField = "id",
       sortOrder = "ASC",
     } = req.query;

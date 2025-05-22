@@ -102,7 +102,7 @@ router.get('/displayTable', async (req, res) => {
     const {
       id, projectName, status, warehouse, organizerName,
       startDate, completionDate,
-      isActive = '1', page = 1, pageSize = 10,
+      isActive = '1', page = 1, pageSize = 5,
       sortField = 'id', sortOrder = 'ASC'
     } = req.query;
 
@@ -122,7 +122,34 @@ router.get('/displayTable', async (req, res) => {
       : null;
 
     const offset = (Number(page) - 1) * Number(pageSize);
-    const order  = [[Sequelize.col(sortField), sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC']];
+    const order = [];
+
+    if (sortField === "projectName") {
+      order.push([
+        Sequelize.fn("LOWER", Sequelize.col("CharityProject.projectName")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField === "organizerName" || sortField === "organizer") {
+      order.push([
+        Sequelize.fn("LOWER", Sequelize.col("Organizer.firstName")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+      order.push([
+        Sequelize.fn("LOWER", Sequelize.col("Organizer.lastName")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField === "warehouse") {
+      order.push([
+        Sequelize.fn("LOWER", Sequelize.col("Warehouse.name")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField) {
+      order.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
+
 
     const { count, rows } = await models.CharityProject.findAndCountAll({
       where,
@@ -345,7 +372,7 @@ router.get("/:id/equipmentTypes", async (req, res) => {
     const { id } = req.params;
     const {
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       name = "",
       orderBy = "id",
       orderDirection = "ASC"
@@ -438,7 +465,7 @@ router.get("/:id/equipmentSheet", async (req, res) => {
     const { id } = req.params;
     const {
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       barcode = "",
       orderBy = "barcode",
       orderDirection = "ASC"

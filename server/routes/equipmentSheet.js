@@ -118,7 +118,7 @@ router.get('/', async (req, res) => {
       BrandModel,
       active = '1',
       page = 1,
-      pageSize = 6,
+      pageSize = 5,
       sortField = 'EquipmentModel',
       sortOrder = 'ASC',
     } = req.query;
@@ -229,7 +229,7 @@ router.get("/in-stock", async (req, res) => {
   try {
     const {
       page = 1,
-      pageSize = 6,
+      pageSize = 5,
       orderBy = "recent-date", // Valor padrão
       modelId,
       typeId,

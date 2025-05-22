@@ -167,7 +167,7 @@ export const CartProvider = ({ children }) => {
 				// employeeID: opcional
 				pickupInStore: true,
 				address: "",
-				storeId: 123456789,
+				storeId: "000000000",
 			});
 
 			const clientPurchaseId = clientPurchaseRes.data.id;

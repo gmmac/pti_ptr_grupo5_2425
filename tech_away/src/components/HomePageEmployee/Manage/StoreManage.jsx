@@ -1,7 +1,8 @@
 import React from 'react'
+import StoreCatalog from '../../store/StoreCatalog'
 
 export default function StoreManage() {
   return (
-    <div>StoreManage</div>
+    <StoreCatalog />
   )
 }

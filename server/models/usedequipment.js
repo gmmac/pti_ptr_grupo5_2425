@@ -40,6 +40,12 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: 'usedEquipmentId',
 			});
 			  
+			UsedEquipment.hasMany(models.PurchaseCartEquipment, {
+				foreignKey: 'equipmentId',
+				sourceKey: 'id',
+				onUpdate: 'CASCADE',
+				onDelete: 'SET NULL'
+			});
 			
 		}
 	}

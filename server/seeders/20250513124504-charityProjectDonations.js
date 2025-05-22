@@ -17,8 +17,8 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        usedEquipmentId: 4,
-        charityProjectId: 1,
+        usedEquipmentId: 6,
+        charityProjectId: 4,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -28,12 +28,7 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       },
-      // {
-      //   usedEquipmentId: 6,
-      //   charityProjectId: 2,
-      //   createdAt: new Date(),
-      //   updatedAt: new Date()
-      // },
+
 
     ], {});
   },

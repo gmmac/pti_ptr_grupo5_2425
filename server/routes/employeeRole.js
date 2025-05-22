@@ -27,7 +27,7 @@ router.get('/displayTable', async (req, res) => {
       createdAt,
       isActive = "1",
       page = 1,
-      pageSize = 6,
+      pageSize = 5,
       sortField = 'id',
       sortOrder = 'ASC',
     } = req.query;
@@ -65,9 +65,19 @@ router.get('/displayTable', async (req, res) => {
     const offset = (parseInt(page, 10) - 1) * limit;
 
     // Ordenação dinâmica
-    const orderClause = [
-      [Sequelize.col(sortField), sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC']
-    ];
+    const orderClause = [];
+
+    if (sortField === "state") {
+      orderClause.push([
+        Sequelize.fn("LOWER", Sequelize.col("EmployeeRole.role")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField) {
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
 
     // Consulta com contagem total
     const { count, rows } = await models.EmployeeRole.findAndCountAll({

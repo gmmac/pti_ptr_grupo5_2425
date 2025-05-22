@@ -5,25 +5,25 @@ module.exports = {
     await queryInterface.bulkInsert('CharityProjects', [
       {
         startDate: new Date('2025-01-10'),
-        completionDate: new Date('2025-07-15'),
+        completionDate: new Date('2025-07-17'),
         name: "Campanha de Inverno",
         organizerNic: '122454888',
         status: 2,
         warehouseID: 1,
         isActive: "1",
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date('2025-01-01'),
+        updatedAt: new Date('2025-01-11')
       },
       {
-        startDate: new Date('2024-02-01'),
-        completionDate: new Date('2024-05-20'),
+        startDate: new Date('2022-10-01'),
+        completionDate: new Date('2023-05-20'),
         name: "Recolha Escolar 2024",
         organizerNic: '122454888',
-        status: 3,
+        status: 5,
         warehouseID: 1,
         isActive: "1",
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date('2022-10-01'),
+        updatedAt: new Date('2023-05-20')
       },
       {
         startDate: new Date('2026-05-20'),
@@ -33,8 +33,8 @@ module.exports = {
         status: 1,
         warehouseID: 3,
         isActive: "1",
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date('2025-05-12'),
+        updatedAt: new Date('2025-06-12')
       },
       {
         startDate: new Date('2025-03-20'),

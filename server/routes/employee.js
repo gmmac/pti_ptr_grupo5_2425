@@ -96,7 +96,7 @@ router.get("/displayTable", async (req, res) => {
 	  role,
 	  createdAt,
 	  page = 1,
-	  pageSize = 10,
+	  pageSize = 5,
 	  sortField = "internNum",
 	  sortOrder = "ASC",
 	} = req.query;
@@ -147,33 +147,45 @@ router.get("/displayTable", async (req, res) => {
 
 	const orderClause = [];
 
-	if (sortField === "name") {
-	  orderClause.push([
-		Sequelize.fn("LOWER", Sequelize.col("Employee.internNum")),
-		sortOrder == -1 ? "DESC" : "ASC",
-	  ]);
-	} else if (sortField) {
-	  orderClause.push([
-		Sequelize.col(sortField),
-		sortOrder == -1 ? "DESC" : "ASC",
-	  ]);
+	if (sortField === "employeeName") {
+	orderClause.push(["firstName", sortOrder == -1 ? "DESC" : "ASC"]);
+	orderClause.push(["lastName", sortOrder == -1 ? "DESC" : "ASC"]);
+	} else if (sortField === "roleName") {
+	orderClause.push([
+		{ model: models.EmployeeRole },
+		"role",
+		sortOrder == -1 ? "DESC" : "ASC"
+	]);
+	} else if (sortField === "storeName") {
+	orderClause.push([
+		{ model: models.Store },
+		"name",
+		sortOrder == -1 ? "DESC" : "ASC"
+	]);
+	} else {
+	orderClause.push([
+		sortField,
+		sortOrder == -1 ? "DESC" : "ASC"
+	]);
 	}
+
+
 
 
 	const { count, rows } = await models.Employee.findAndCountAll({
 	  where,
-	  include: [
+		include: [
 		{
-		  model: models.EmployeeRole,
-		  attributes: ["id", "role"],
-		  where: roleCondition
+			model: models.EmployeeRole,
+			attributes: ["id", "role"],
+			where: roleCondition
 		},
 		{
 			model: models.Store,
 			attributes: ["nipc", "name"],
 			where: storeCondition
 		}   
-	   ],  
+		],
 	  limit: parseInt(pageSize),
 	  offset,
 	  order: orderClause,

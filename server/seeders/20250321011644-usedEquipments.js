@@ -45,7 +45,6 @@ module.exports = {
 					purchaseDate: new Date("2025-01-10"),
 					equipmentId: "23456789012345678901", // Referência ao barcode do equipamento "Galaxy S23" na tabela EquipmentSheets
 					storeId: "123456789",
-					action: "D",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
@@ -67,6 +66,7 @@ module.exports = {
 					purchaseDate: null,
 					equipmentId: "45678901234567890123", // Referência ao barcode do equipamento "XPS 13" na tabela EquipmentSheets
 					storeId: "123456789",
+					action: "D",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},

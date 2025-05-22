@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
     const {
       name,
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       orderBy = "id",
       orderDirection = "ASC"
     } = req.query;

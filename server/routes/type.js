@@ -34,7 +34,7 @@ router.get("/", async (req, res) => {
       createdAt,
       updatedAt,
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       sortField = "id",
       sortOrder = "ASC",
     } = req.query;

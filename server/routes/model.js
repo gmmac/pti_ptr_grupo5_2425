@@ -55,7 +55,7 @@ router.get("/", async (req, res) => {
       releaseYear,
       active = "1",
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       sortField = "name",
       sortOrder = "ASC",
     } = req.query;

@@ -6,7 +6,7 @@ const models = require('../models')
 http://localhost:4005/api/interest/?equipmentSheetID=&folderInterestID=&orderBy=createdAt&orderDirection=ASC&page=2&pageSize=3
 router.get("/", async (req, res) => {
   try {
-    const { equipmentSheetID, folderInterestID, page = 1, pageSize = 10, orderBy = "createdAt", orderDirection = "DESC" } = req.query;
+    const { equipmentSheetID, folderInterestID, page = 1, pageSize = 5, orderBy = "createdAt", orderDirection = "DESC" } = req.query;
 
     const where = {}; // Filtros da tabela Interest
 

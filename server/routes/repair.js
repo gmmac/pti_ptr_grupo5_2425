@@ -15,7 +15,7 @@ router.get("/displayTable", async (req, res) => {
       modelName,
       createdAt,
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       sortField = "id",
       sortOrder = "ASC",
     } = req.query;
@@ -142,7 +142,7 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
       modelName,
       createdAt,
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       sortField = "id",
       sortOrder = "ASC",
       activeRepairs,

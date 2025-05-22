@@ -7,7 +7,7 @@ const { Op } = require('sequelize'); // Certifique-se de importar o operador Op
 http://localhost:4005/api/interestsFolder/?name=&clientNIC=&orderBy=createdAt&orderDirection=ASC&page=2&pageSize=3
 router.get("/", async (req, res) => {
   try {
-    const { name, clientNIC, page = 1, pageSize = 10, orderBy, orderDirection } = req.query;
+    const { name, clientNIC, page = 1, pageSize = 5, orderBy, orderDirection } = req.query;
     const where = {};
     
     if (name) {

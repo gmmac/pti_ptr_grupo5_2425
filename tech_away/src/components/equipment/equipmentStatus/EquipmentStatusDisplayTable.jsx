@@ -11,7 +11,7 @@ export default function EquipmentStatusDisplayTable({ onDelete, onEdit, refreshK
   const [data, setData] = useState([]);
   const [lazyState, setLazyState] = useState({
     first: 0,
-    rows: 10,
+    rows: 5,
     page: 0,
     sortField: null,
     sortOrder: null,
@@ -28,7 +28,7 @@ export default function EquipmentStatusDisplayTable({ onDelete, onEdit, refreshK
     const { page, rows, sortField, sortOrder, filters } = lazyState;
     const params = {
       page: (page ?? 0) + 1,
-      pageSize: rows ?? 10,
+      pageSize: rows ?? 5,
       sortField,
       sortOrder,
       isActive: isActiveFilter
@@ -68,7 +68,7 @@ export default function EquipmentStatusDisplayTable({ onDelete, onEdit, refreshK
   );
 
   return (
-    <div className="d-none d-lg-table">
+    <div className="d-none d-lg-table w-100">
       <DataTable
         value={data}
         lazy

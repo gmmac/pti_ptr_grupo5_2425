@@ -12,7 +12,7 @@ router.get('/displayTable', async (req, res) => {
       createdAt,
       isActive = '1',
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       sortField = 'id',
       sortOrder = 'ASC'
     } = req.query;
@@ -36,7 +36,19 @@ router.get('/displayTable', async (req, res) => {
 
     const limit = parseInt(pageSize, 10);
     const offset = (parseInt(page, 10) - 1) * limit;
-    const order = [[Sequelize.col(sortField), sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC']];
+    const order = [];
+
+    if (sortField === "state") {
+      order.push([
+        Sequelize.fn("LOWER", Sequelize.col("RepairStatus.state")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField) {
+      order.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
 
     const { count, rows } = await models.RepairStatus.findAndCountAll({
       where,

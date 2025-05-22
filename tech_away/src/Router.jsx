@@ -41,6 +41,7 @@ import TestPage from "./pages/TestPage";
 import CartMobilePage from "./pages/CartMobilePage";
 import AboutPage from "./pages/AboutPage";
 import OurStores from "./pages/OurStores";
+import ReportPage from "./pages/ReportPage";
 
 export default function Router() {
 	return (
@@ -104,6 +105,8 @@ export default function Router() {
 								<Route index element={<EmployeeHomePage />} />
 								<Route path="manage" element={<EmployeeManagePage />} />
 							</Route>
+
+							<Route path="reports/:type" element={<ReportPage />} />
 
 							<Route path="login" element={<EmployeeLoginPage />} />
 							<Route path="register" element={<EmployeeRegisterPage />} />
