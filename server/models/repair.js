@@ -24,9 +24,9 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "SET NULL",
       });
 
-      Repair.belongsTo(models.UsedEquipment, {
-        foreignKey: "usedEquipmentId",
-        targetKey: "id",
+      Repair.belongsTo(models.EquipmentSheet, {
+        foreignKey: "equipmentSheetID",
+        targetKey: "barcode",
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       });
@@ -64,8 +64,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(20),
         allowNull: false,
       },
-      usedEquipmentId: {
-        type: DataTypes.INTEGER,
+      equipmentSheetID: {
+        type: DataTypes.STRING(20),
         allowNull: false,
       },
     },

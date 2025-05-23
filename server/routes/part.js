@@ -100,6 +100,21 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.get("/equipmentSheet/:equipmentSheetID", async (req, res) => {
+  try {
+    const equipmentSheetID = req.params.equipmentSheetID;
+
+    const parts = await models.Part.findAll({
+      where: { equipmentId: equipmentSheetID },
+    });
+
+    res.status(200).json(parts);
+  } catch (error) {
+    console.error("Erro no GET /part/:equipmentSheetID:", error);
+    res.status(500).json({ error: "Error fetching parts." });
+  }
+});
+
 router.post("/", async (req, res) => {
   try {
     const { name, price, arriveTime, equipmentId } = req.body;

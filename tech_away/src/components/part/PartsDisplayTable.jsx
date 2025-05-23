@@ -119,7 +119,6 @@ export default function PartsDisplayTable({activeParts = "1", refreshAllTables=n
 
     return (
         <>
-            <ConfirmDialog />
             <div className="">
                 <DataTable
                     value={data}

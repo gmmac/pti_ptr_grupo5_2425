@@ -12,6 +12,7 @@ import { Calendar } from 'primereact/calendar';
 import RepairInfo from "./RepairInfo";
 import NewRepairStatusLog from "./NewRepairStatusLog";
 import EditRepairForms from "./EditRepairForms";
+import OrderPartsForms from "../part/OrderPartsForms";
 
 export default function EmployeeRepairsCatalog({refreshRepairs}) {
 	const [loading, setLoading] = useState(false);
@@ -19,7 +20,9 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
 	const [showRepairInfo, setShowRepairInfo] = useState(false);
     const [showChangeRepairStatus, setShowChangeRepairStatus] = useState(false);
     const [showEditRepair, setShowEditRepair] = useState(false);
+    const [showOrderPartsModal, setShowOrderPartsModal] = useState(false);
 	const [repairID, setRepairID] = useState(null);
+    const [equipmentSheetID, setEquipmentSheetID] = useState(null);
 
     const [lazyState, setLazyState] = useState({
         first: 0,
@@ -75,7 +78,9 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
         api.get("/api/repair/displayTable/", { params: params }).then((res) => {
             const responseData = res.data;
             if (responseData.data.length > 0) {
-                const allColumns = Object.keys(responseData.data[0]);
+                const allColumns = Object.keys(responseData.data[0]).filter(
+                    col => col !== "equipmentSheetID"
+                );
                 setData(responseData.data);
                 setColumns(allColumns);
             } else {
@@ -115,6 +120,12 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
     const openEditRepairModal = (repairID) => {
         setShowEditRepair(true);
         setRepairID(repairID);
+    };
+
+    const orderParts = (repairInfo) => {
+        setShowOrderPartsModal(true);
+        setRepairID(repairInfo.id);
+        setEquipmentSheetID(repairInfo.equipmentSheetID);
     };
 
     const refreshTable = () => {
@@ -220,7 +231,13 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
                                     label: "Edit Repair",
                                     icon: "pi pi-pencil",
                                     command: () => openEditRepairModal(rowData.id),
+                                },
+                                {
+                                    label: "Order Parts",
+                                    icon: "pi pi-shopping-cart",
+                                    command: () => orderParts(rowData),
                                 }
+
                             ];
                             return (
                                 <>
@@ -312,6 +329,7 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
             <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
             <NewRepairStatusLog repairId={repairID} showModal={showChangeRepairStatus} closeModal={() => setShowChangeRepairStatus(false)} setRefreshRepairs={refreshTable}/>
             <EditRepairForms repairID={repairID} showModal={showEditRepair} closeModal={() => setShowEditRepair(false)} setRefreshRepairs={refreshTable}/>
+            <OrderPartsForms equipmentSheetID={equipmentSheetID} repairID={repairID} showModal={showOrderPartsModal} closeModal={() => setShowOrderPartsModal(false)}/>
         </>
     );
 }

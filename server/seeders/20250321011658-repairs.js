@@ -11,7 +11,7 @@ module.exports = {
         estimatedDeliverDate: new Date(),
         employeeId: 123456789,
         clientId: 123456789,
-        usedEquipmentId: 5,
+        equipmentSheetID: "34567890123456789012",
         createdAt: new Date(), 
         updatedAt: new Date() 
       },
@@ -23,7 +23,7 @@ module.exports = {
         estimatedDeliverDate: new Date(),
         employeeId: 123456789,
         clientId: 123456789,
-        usedEquipmentId: 4,
+        equipmentSheetID: "23456789012345678901",
         createdAt: new Date(), 
         updatedAt: new Date() 
       },
@@ -35,7 +35,7 @@ module.exports = {
         estimatedDeliverDate: new Date(),
         employeeId: 123456789,
         clientId: 123456789,
-        usedEquipmentId: 1,
+        equipmentSheetID: "12345678901234567890",
         createdAt: new Date(), 
         updatedAt: new Date() 
       },
