@@ -19,7 +19,7 @@ module.exports = {
         completionDate: new Date('2023-05-20'),
         name: "Recolha Escolar 2024",
         organizerNic: '122454888',
-        status: 5,
+        status: 3,
         warehouseID: 1,
         isActive: "1",
         createdAt: new Date('2022-10-01'),

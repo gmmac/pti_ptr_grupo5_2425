@@ -48,7 +48,7 @@ export default function ProjectFilter({ setFilters }) {
                   <Form.Group controlId="filterId">
                     <Form.Label>Project ID</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="number"
                       name="id"
                       placeholder="Enter project ID"
                       value={localFilters.id}

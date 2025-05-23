@@ -19,7 +19,16 @@ export default function CharityProjectCardView({ projects, onOpenDetails, onDele
                 <strong>Completion:</strong>{" "}
                 {project.completionDate ? new Date(project.completionDate).toLocaleDateString() : "—"} <br />
                 <strong>Status:</strong> {project.status || "—"} <br />
-                <strong>Warehouse:</strong> {project.warehouse || "—"} <br />
+                {!isOrganizer &&
+                  <>
+                    <strong>Warehouse:</strong> {project.warehouse || "—"} <br />
+                  </>
+                }
+                { isOrganizer &&
+                  <>
+                    <strong>Warehouse:</strong> {project.Warehouse.name || "—"} <br />
+                  </>
+                }
               </Card.Text>
               <div className="d-flex justify-content-end gap-2">
                 <Button size="sm" onClick={() => onOpenDetails(project.id)}>

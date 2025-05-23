@@ -184,7 +184,7 @@ export default function CharityProjectInfoEditor({ project, onChangeAlert, onRef
                     </Button>
                     ) : (
                     <div className="d-flex gap-2">
-                        <Button variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}} disabled={!hasChanged()}>
+                        <Button variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}} disabled={!hasChanged()} onClick={handleSave}>
                         Save
                         </Button>
                         <Button variant="outline-danger" onClick={handleCancel}>

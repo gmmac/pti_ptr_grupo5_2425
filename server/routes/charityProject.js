@@ -163,7 +163,7 @@ router.get('/displayTable', async (req, res) => {
 
     const data = rows.map(p => ({
       id: p.id, name: p.name,
-      organizer: `${p.Organizer.firstName} ${p.Organizer.lastName}`,
+      organizerName: `${p.Organizer.firstName} ${p.Organizer.lastName}`,
       status: p.ProjectStatus.state, statusID: p.ProjectStatus.id,
       warehouse: p.Warehouse.name, warehouseID: p.Warehouse.id,
       startDate: p.startDate, completionDate: p.completionDate
@@ -587,7 +587,7 @@ router.get("/:ID", async (req, res) => {
 
 router.put('/:ID', async (req, res) => {
   const projectId = req.params.ID;
-  const { name, startDate, completionDate, warehouseID, statusID } = req.body;
+  const { name, startDate, completionDate, warehouseID, statusID, statusName } = req.body;
 
   try {
     // 1) Load the project
@@ -636,6 +636,23 @@ router.put('/:ID', async (req, res) => {
     project.startDate      = startDate      ?? project.startDate;
     project.completionDate = completionDate ?? project.completionDate;
     project.status         = statusID       ?? project.status;
+
+    if (statusName) {
+      const status = await models.ProjectStatus.findOne({ attributes: ['id'], where: { state: statusName } });
+      if (!status) return res.status(404).json({ error: 'Status not found.' });
+      const newStatusID = status.id;
+
+      // check if completionDate is before today
+      const compDate = project.completionDate ? new Date(project.completionDate) : null;
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      if (compDate && compDate < today && newStatusID !== 3) {
+        return res.status(400).json({ error: "Cannot change a completed project's status." });
+      }
+
+      project.status = newStatusID;
+    }
 
     await project.save();
 

@@ -310,8 +310,8 @@ module.exports = {
           releaseYear: 2022,
           brand_id: 11,
           isActive: "1",
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name: "Mi Pad 5",
@@ -319,8 +319,8 @@ module.exports = {
           releaseYear: 2021,
           brand_id: 11,
           isActive: "1",
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name: "Mi Smart Band 6",
@@ -328,8 +328,8 @@ module.exports = {
           releaseYear: 2021,
           brand_id: 11,
           isActive: "1",
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
 
         // Corsair
@@ -339,8 +339,8 @@ module.exports = {
           releaseYear: 2020,
           brand_id: 12,
           isActive: "1",
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name: "K70 RGB MK.2",
@@ -348,8 +348,8 @@ module.exports = {
           releaseYear: 2019,
           brand_id: 12,
           isActive: "1",
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name: "Dark Core RGB Pro",
@@ -357,8 +357,8 @@ module.exports = {
           releaseYear: 2021,
           brand_id: 12,
           isActive: "1",
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
 
         // JBL
@@ -368,8 +368,8 @@ module.exports = {
           releaseYear: 2019,
           brand_id: 13,
           isActive: "1",
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name: "Pulse 4",
@@ -377,8 +377,8 @@ module.exports = {
           releaseYear: 2020,
           brand_id: 13,
           isActive: "1",
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name: "Bar 5.1 Surround",
@@ -386,8 +386,8 @@ module.exports = {
           releaseYear: 2021,
           brand_id: 13,
           isActive: "1",
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
       {}
