@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef} from "react";
 import { Dialog } from "primereact/dialog";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import api from "../../utils/axios";
+import { Toast } from "primereact/toast";
 import "./OrderPartsForms.css";
 
 export default function OrderPartsForms({ equipmentSheetID, repairID, showModal, closeModal }) {
     const [cart, setCart] = useState([]);
     const [parts, setParts] = useState([]);
+
+    const toast = useRef(null);
 
     useEffect(() => {
         if (!equipmentSheetID) return;
@@ -19,6 +22,15 @@ export default function OrderPartsForms({ equipmentSheetID, repairID, showModal,
                 setParts([]);
             });
     }, [equipmentSheetID]);
+
+    const showSuccess = () => {
+        toast.current.show({
+        severity: "success",
+        summary: "Order Placed",
+        detail: "The parts have been successfully linked to the repair.",
+        life: 3000,
+        });
+    };
 
     const addToCart = (part) => {
         setCart((prev) => {
@@ -51,7 +63,11 @@ export default function OrderPartsForms({ equipmentSheetID, repairID, showModal,
             ));
 
             setCart([]);
-            closeModal();
+            showSuccess();
+
+            setTimeout(() => {
+                closeModal();
+            }, 3000);
         } catch (error) {
             console.error("Error:", error);
         }
@@ -138,6 +154,7 @@ export default function OrderPartsForms({ equipmentSheetID, repairID, showModal,
                     </div>
                 </div>
             </div>
+            <Toast ref={toast} />
         </Dialog>
     );
 }
