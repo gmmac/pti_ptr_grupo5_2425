@@ -43,9 +43,6 @@ export default function MapProvider({ children, filters, setFilters }) {
 			.catch((error) => console.error("Error getting stores: ", error));
 	}, []);
 
-	useEffect(() => {
-		console.log(stores);
-	}, [stores]);
 
 	// para a localização atual do utilizador
 	useEffect(() => {

@@ -15,7 +15,6 @@ export default function Filters({ filters, setFilters }) {
 			.get("/api/equipmentStatus")
 			.then((res) => {
 				const statesObj = res.data;
-				console.log(statesObj);
 
 				const statesArray = Object.keys(statesObj).map((key) => ({
 					id: statesObj[key].id,
@@ -31,10 +30,6 @@ export default function Filters({ filters, setFilters }) {
 	const clearFilters = () => {
 		setFilters({ orderBy: "", state: "" });
 	};
-
-	useEffect(() => {
-		console.log("states", states);
-	}, [states]);
 
 	return (
 		<Stack

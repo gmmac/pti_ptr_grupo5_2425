@@ -12,6 +12,7 @@ router.get("/in-stock", async (req, res) => {
 			pageSize = 6,
 			orderBy = "recent-date",
 			stateId,
+			storeId,
 		} = req.query;
 
 		const offset = (parseInt(page) - 1) * parseInt(pageSize);
@@ -21,12 +22,14 @@ router.get("/in-stock", async (req, res) => {
 			? { equipmentId: equipmentId }
 			: {};
 		const stateCondition = stateId ? { id: stateId } : {};
+		const storeCondition = storeId ? { storeId } : {};
 
 		const { count, rows } = await models.UsedEquipment.findAndCountAll({
 			where: {
 				purchaseDate: null,
 				putOnSaleDate: { [Op.not]: null },
 				...equipmentIdCondition,
+				...storeCondition,
 			},
 			include: [
 				{ model: models.Store, as: "Store", attributes: ["name"] },

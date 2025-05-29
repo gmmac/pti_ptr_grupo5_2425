@@ -319,7 +319,6 @@ router.get("/in-stock", async (req, res) => {
 		const brandCondition = brandId ? { id: brandId } : {};
 		const storeCondition = storeId ? { storeId } : {};
 
-
 		const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
 		const { count, rows } = await models.EquipmentSheet.findAndCountAll({

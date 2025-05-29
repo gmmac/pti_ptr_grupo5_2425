@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Container, Image, Stack, Row, Col } from "react-bootstrap";
+import { Container, Stack, Row, Col, Button } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import api from "../utils/axios";
 import EquipmentSheetInfo from "../components/EquipmentSheetPage/EquipmentSheetInfo";
@@ -8,6 +8,7 @@ import MapProvider from "../contexts/MapProvider";
 import { IsMobileContext } from "../contexts/IsMobileContext";
 import PaginationControl from "../components/pagination/PaginationControl";
 import Filters from "../components/EquipmentSheetPage/Filters";
+import DisplayedFilters from "../components/StorePage/DisplayedFilters";
 
 export default function EquipmentSheetPage() {
 	const location = useLocation();
@@ -24,6 +25,8 @@ export default function EquipmentSheetPage() {
 		orderBy: "",
 		state: "",
 	});
+
+	const [showMap, setShowMap] = useState(false);
 
 	const isMobile = useContext(IsMobileContext);
 
@@ -57,6 +60,7 @@ export default function EquipmentSheetPage() {
 					equipmentId: barcode,
 					stateId: getId(filters.state),
 					orderBy: filters.orderBy || "recent-date",
+					storeId: getId(filters.store),
 					page: currentPage,
 					pageSize: itemsPerPage,
 				};
@@ -77,13 +81,33 @@ export default function EquipmentSheetPage() {
 	return (
 		<Container className="mb-navbar">
 			<Stack direction="vertical" gap={3}>
-				<Stack direction="horizontal" gap={3}>
+				<Stack direction={isMobile ? "vertical" : "horizontal"} gap={3}>
 					<EquipmentSheetInfo equipmentInfo={equipmentSheet} />
-					{!isMobile && (
+					{(!isMobile || showMap) && (
 						<MapProvider filters={filters} setFilters={setFilters} />
 					)}
 				</Stack>
-				<Filters filters={filters} setFilters={setFilters} />
+				<Stack direction="vertical" gap={2}>
+					{isMobile && (
+						<Button
+							className="rounded-pill px-3 py-3 d-flex justify-content-center align-items-center gap-2"
+							style={{
+								backgroundColor: "var(--variant-two)",
+								border: "none",
+								color: "var(--dark-grey)",
+								boxShadow: "var(--shadow-default)",
+							}}
+							onClick={() => setShowMap(!showMap)}
+						>
+							<i className="pi pi-map"></i>
+							<p className="m-0">{showMap ? "Hide Map" : "Show Map"}</p>
+						</Button>
+					)}
+					<div className="flex-grow-1">
+						<Filters filters={filters} setFilters={setFilters} />
+					</div>
+				</Stack>
+				<DisplayedFilters filters={filters} setFilters={setFilters} />
 				<Row className="g-4">
 					{usedEquipmentList && usedEquipmentList.length > 0 ? (
 						usedEquipmentList.map((usedEquipment, index) => (
