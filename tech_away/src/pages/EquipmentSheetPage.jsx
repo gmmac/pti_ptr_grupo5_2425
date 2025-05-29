@@ -46,11 +46,16 @@ export default function EquipmentSheetPage() {
 
 	// Fetch used equipment list
 	useEffect(() => {
+		const getId = (value) => {
+			if (Array.isArray(value)) return value.map((v) => v.id);
+			if (typeof value === "object" && value !== null) return value.id;
+			return value;
+		};
 		const fetchUsedEquipment = async () => {
 			try {
 				const params = {
 					equipmentId: barcode,
-					stateId: filters.state || "",
+					stateId: getId(filters.state),
 					orderBy: filters.orderBy || "recent-date",
 					page: currentPage,
 					pageSize: itemsPerPage,
