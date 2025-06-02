@@ -9,7 +9,7 @@ module.exports = {
 				primaryKey: true,
 				type: Sequelize.INTEGER,
 			},
-			client: {
+			clientNic: {
 				type: Sequelize.STRING(9),
 				allowNull: false,
 				references: {

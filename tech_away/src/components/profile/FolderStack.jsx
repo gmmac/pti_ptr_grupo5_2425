@@ -3,8 +3,14 @@ import { Stack, Button, Modal, Form } from "react-bootstrap";
 import { useInterests } from "../../contexts/InterestsProvider";
 
 const FolderStack = () => {
-	const { folders, fetchInterestFolders, userLoaded, createFolder } =
-		useInterests();
+	const {
+		folders,
+		fetchInterestFolders,
+		userLoaded,
+		createFolder,
+		setFolderToOpen,
+		folderToOpen,
+	} = useInterests();
 	const [showModal, setShowModal] = useState(false);
 	const [folderName, setFolderName] = useState("");
 
@@ -18,10 +24,14 @@ const FolderStack = () => {
 				<Button
 					className="rounded-pill py-2 px-4"
 					style={{
-						backgroundColor: "var(--variant-one-light)",
+						backgroundColor:
+							folderToOpen == null
+								? "var(--variant-one)"
+								: "var(--variant-one-light)",
 						border: "none",
 						color: "var(--dark-grey)",
 					}}
+					onClick={() => setFolderToOpen(null)}
 				>
 					All
 				</Button>
@@ -31,10 +41,14 @@ const FolderStack = () => {
 							key={folder.id}
 							className="rounded-pill py-2 px-4"
 							style={{
-								backgroundColor: "var(--variant-one-light)",
+								backgroundColor:
+									folderToOpen == folder.id
+										? "var(--variant-one)"
+										: "var(--variant-one-light)",
 								border: "none",
 								color: "var(--dark-grey)",
 							}}
+							onClick={() => setFolderToOpen(folder.id)}
 						>
 							{folder.name}
 						</Button>

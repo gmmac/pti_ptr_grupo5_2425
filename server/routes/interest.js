@@ -1,233 +1,109 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
+const { Op } = require("sequelize");
 
-// filtro e paginação da interestFolder
-//localhost:4005/api/interest/?equipmentSheetID=&folderInterestID=&orderBy=createdAt&orderDirection=ASC&page=2&pageSize=3
-http: router.get("/", async (req, res) => {
+router.get("/", async (req, res) => {
 	try {
-		const {
-			equipmentSheetID,
-			folderInterestID,
-			page = 1,
-			pageSize = 10,
-			orderBy = "createdAt",
-			orderDirection = "DESC",
-		} = req.query;
-
-		const where = {}; // Filtros da tabela Interest
-
-		if (folderInterestID) {
-			where.folderInterestID = folderInterestID;
-		}
-
-		const equipmentCondition = equipmentSheetID
-			? { barcode: equipmentSheetID }
-			: {};
-
-		const offset = (parseInt(page) - 1) * parseInt(pageSize);
-
-		const { count, rows } = await models.Interest.findAndCountAll({
-			where, // Aplica os filtros
-			attributes: {
-				exclude: ["equipmentSheetID", "folderInterestID"],
-			},
-			include: [
-				{
-					model: models.EquipmentSheet,
-					as: "equipmentSheet",
-					where: equipmentCondition,
-					include: [
-						{
-							model: models.EquipmentModel,
-							attributes: ["id", "name"],
-							include: [
-								{
-									model: models.Brand,
-									attributes: ["id", "name"],
-								},
-							],
-						},
-						{
-							model: models.EquipmentType,
-							attributes: ["id", "name"],
-						},
-					],
-					attributes: {
-						exclude: ["model", "type"],
-					},
-				},
-				{
-					model: models.FolderInterest,
-					as: "folderInterest",
-				},
-			],
-			limit: parseInt(pageSize),
-			offset: offset,
-			order: [[orderBy, orderDirection]],
-		});
-
-		res.json({
-			totalItems: count,
-			totalPages: Math.ceil(count / pageSize),
-			currentPage: parseInt(page),
-			pageSize: parseInt(pageSize),
-			data: rows,
-		});
+		const interests = await models.User.findAll();
+		res.json(interests);
 	} catch (error) {
 		console.error("Error fetching interests:", error);
-		res.status(500).json({ error: "Error fetching interests." });
+		res.status(500).json({ error: "Internal server error" });
 	}
 });
 
-router.get("/client/:nic", async (req, res) => {
+router.get("/:userNic/:folderId", async (req, res) => {
 	try {
-		const {
-			page = 1,
-			pageSize = 10,
-			orderBy = "createdAt",
-			orderDirection = "DESC",
-		} = req.query;
+		const { userNic, folderId } = req.params;
 
-		const nic = req.params.nic;
-
-		const offset = (parseInt(page) - 1) * parseInt(pageSize);
-
-		const { count, rows } = await models.Interests.findAndCountAll({
-			where: { clientNIC: nic },
-			include: [
-				{
-					model: models.EquipmentSheet,
-					as: "equipmentSheet",
-					include: [
-						{
-							model: models.EquipmentModel,
-							attributes: ["id", "name"],
-							include: [
-								{
-									model: models.Brand,
-									attributes: ["id", "name"],
-								},
-							],
-						},
-						{
-							model: models.EquipmentType,
-							attributes: ["id", "name"],
-						},
-					],
-					attributes: {
-						exclude: ["model", "type"],
+		if (folderId === "undefined") {
+			const allInterests = await models.Interest.findAll({
+				where: {
+					clientNIC: userNic,
+				},
+			});
+			res.json(allInterests);
+		} else {
+			const interestsIds = await models.FolderInterestEquipments.findAll({
+				where: {
+					clientNIC: userNic,
+					folderId: folderId,
+				},
+			});
+			const interests = {};
+			for (const interest of interestsIds) {
+				const interestData = await models.Interest.findOne({
+					where: {
+						id: interest.interestId,
 					},
-				},
-				{
-					model: models.FolderInterest,
-					as: "folderInterest",
-					attributes: ["id", "name"],
-				},
-			],
-			limit: parseInt(pageSize),
-			offset: offset,
-			order: [[orderBy, orderDirection]],
-		});
-
-		res.json({
-			totalItems: count,
-			totalPages: Math.ceil(count / pageSize),
-			currentPage: parseInt(page),
-			pageSize: parseInt(pageSize),
-			data: rows,
-		});
+				});
+				if (interestData) {
+					interests[interestData.id] = interestData;
+				}
+			}
+			res.json(interests);
+		}
 	} catch (error) {
 		console.error("Error fetching interests:", error);
-		res.status(500).json({ error: "Error fetching interests." });
+		res.status(500).json({ error: "Internal server error" });
 	}
 });
 
 router.post("/", async (req, res) => {
 	try {
-		const { equipmentSheetID, folderInterestID } = req.body;
-
-		if (!equipmentSheetID || !folderInterestID) {
-			return res
-				.status(400)
-				.json({ error: "equipmentSheetID and folderInterestID are required" });
-		}
-
-		const newInterest = await models.Interests.create({
+		const {
+			clientNic,
+			brandID,
+			modelID,
 			equipmentSheetID,
-			folderInterestID,
-			createdAt: new Date(),
-			updatedAt: new Date(),
+			equipmentStatusID,
+			minLaunchYear,
+			maxLaunchYear,
+			minPrice,
+			maxPrice,
+			preferredStoreIDs,
+		} = req.body;
+
+		// Criação do Interest
+		const newInterest = await models.Interest.create({
+			clientNic: clientNic,
+			brandID: brandID || null,
+			modelID: modelID || null,
+			equipmentSheetID: equipmentSheetID || null,
+			equipmentStatusID: equipmentStatusID || null,
+			minLaunchYear: minLaunchYear || null,
+			maxLaunchYear: maxLaunchYear || null,
+			minPrice: minPrice || null,
+			maxPrice: maxPrice || null,
 		});
+
+		if (preferredStoreIDs && Array.isArray(preferredStoreIDs)) {
+			for (const storeId of preferredStoreIDs) {
+				try {
+					await models.PreferredStoresInterets.create({
+						interestId: newInterest.id,
+						storeId: storeId,
+					});
+				} catch (error) {
+					console.error("Error associating store to interest:", error);
+					res
+						.status(500)
+						.json({ error: "Failed to associate store with interest" });
+					return;
+				}
+			}
+		}
 
 		res.status(201).json(newInterest);
 	} catch (error) {
-		res.status(500).json({ error: error.message });
+		console.error("Error creating interest:", error);
+		res.status(500).json({ error: "Internal server error" });
 	}
 });
 
-router.post("/:nic/:interestId", async (req, res) => {
-	try {
-		const { nic, interestId } = req.params;
-		const interest = await models.Interests.findByPk(interestId);
-		if (!interest) {
-			return res.status(404).json({ error: "Interest not found" });
-		}
-		const newInterest = await models.Interests.create({
-			equipmentSheetID: interest.equipmentSheetID,
-			folderInterestID: interest.folderInterestID,
-			clientNIC: nic,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		});
-		res.status(201).json(newInterest);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
-}); 
+router.put("/:id", async (req, res) => {});
 
-router.get("/:id", async (req, res) => {
-	try {
-		const interest = await models.Interests.findByPk(req.params.id);
-		if (!interest) {
-			return res.status(404).json({ error: "Interest not found" });
-		}
-		res.json(interest);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
-});
-
-router.put("/:id", async (req, res) => {
-	try {
-		const { equipmentSheetID, folderInterestID } = req.body;
-
-		const interest = await models.Interests.findByPk(req.params.id);
-		if (!interest) {
-			return res.status(404).json({ error: "Interest not found" });
-		}
-		await interest.update({
-			equipmentSheetID,
-			folderInterestID,
-			updatedAt: new Date(),
-		});
-		res.json(interest);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
-});
-
-router.delete("/:id", async (req, res) => {
-	try {
-		const interest = await models.Interests.findByPk(req.params.id);
-		if (!interest) {
-			return res.status(404).json({ error: "Interest not found" });
-		}
-		await interest.destroy();
-		res.status(204).send();
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
-});
+router.delete("/:id", async (req, res) => {});
 
 module.exports = router;

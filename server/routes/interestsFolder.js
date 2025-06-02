@@ -34,8 +34,42 @@ router.post("/", async (req, res) => {
 	}
 });
 
-router.put("/:id", async (req, res) => {});
+router.put("/:id", async (req, res) => {
+	try {
+		const folderId = req.params.id;
+		const { name } = req.body;
 
-router.delete("/:id", async (req, res) => {});
+		const updatedFolder = await models.FolderInterest.update(
+			{ name },
+			{
+				where: { id: folderId },
+				returning: true,
+			}
+		);
+		if (updatedFolder[0] === 0) {
+			return res.status(404).json({ error: "Folder not found" });
+		}
+		res.json(updatedFolder[1][0]);
+	} catch (error) {
+		console.error("Error updating interest folder:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+router.delete("/:id", async (req, res) => {
+	try {
+		const folderId = req.params.id;
+		const deletedFolder = await models.FolderInterest.destroy({
+			where: { id: folderId },
+		});
+		if (deletedFolder === 0) {
+			return res.status(404).json({ error: "Folder not found" });
+		}
+		res.status(204).send();
+	} catch (error) {
+		console.error("Error deleting interest folder:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
 
 module.exports = router;

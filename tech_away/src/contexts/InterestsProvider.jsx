@@ -9,13 +9,17 @@ const InterestsProvider = ({ children }) => {
 	const [userLoaded, setUserLoaded] = useState(false);
 	const [loadedInterests, setLoadedInterests] = useState([]);
 	const [folders, setFolders] = useState([]);
-	const [folderToOpen, setFolderToOpen] = useState("");
+	const [folderToOpen, setFolderToOpen] = useState(null);
 
 	useEffect(() => {
 		if (user && !userLoaded) {
 			setUserLoaded(true);
 		}
 	}, []);
+
+	useEffect(() => {
+		console.log(folderToOpen);
+	}, [folderToOpen]);
 
 	const createFolder = async (folderName) => {
 		try {
@@ -58,6 +62,7 @@ const InterestsProvider = ({ children }) => {
 				folderToOpen,
 				setFolderToOpen,
 				createFolder,
+				
 			}}
 		>
 			{children}

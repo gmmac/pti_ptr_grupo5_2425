@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Stack } from "react-bootstrap";
 import FolderStack from "./FolderStack";
-import InterestsCat from "./InterestsCat";
+import FolderContent from "./FolderContent";
 
 export default function InterestsTab() {
 	return (
@@ -34,7 +34,7 @@ export default function InterestsTab() {
 			</Stack>
 			<Stack>
 				<FolderStack />
-				<InterestsCat />
+				<FolderContent />
 			</Stack>
 		</Stack>
 	);

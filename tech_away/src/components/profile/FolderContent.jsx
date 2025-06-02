@@ -1,7 +1,6 @@
 import React from 'react'
 
-export default function InterestsCat() {
-    
+export default function FolderContent() {
   return (
     <div>
       

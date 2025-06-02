@@ -4,16 +4,10 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
 	class Interest extends Model {
 		static associate(models) {
-			Interest.belongsToMany(models.Store, {
-				through: "InterestStore",
-				foreignKey: "interestID",
-				otherKey: "storeID",
-				as: "preferredStores",
-			});
 
 			// Cliente
 			Interest.belongsTo(models.Client, {
-				foreignKey: "clientID",
+				foreignKey: "clientNic",
 				as: "client",
 				onDelete: "CASCADE",
 				onUpdate: "CASCADE",
@@ -55,8 +49,8 @@ module.exports = (sequelize, DataTypes) => {
 
 	Interest.init(
 		{
-			clientID: {
-				type: DataTypes.INTEGER,
+			clientNic: {
+				type: DataTypes.STRING(9),
 				allowNull: false,
 			},
 			brandID: {
