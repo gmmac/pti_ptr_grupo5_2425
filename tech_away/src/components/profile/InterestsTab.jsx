@@ -19,10 +19,11 @@ export default function InterestsTab() {
 				<h5 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
 					My Interests
 				</h5>
+
 				<Button
 					className="rounded-pill py-2 px-3 d-flex gap-2 justify-content-center align-items-center gap-2"
 					style={{
-						backgroundColor: "var(--variant-one)",
+						backgroundColor: "var(--variant-two)",
 						color: "var(--white)",
 						border: "none",
 					}}

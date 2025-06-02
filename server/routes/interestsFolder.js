@@ -8,9 +8,9 @@ router.get("/", async (req, res) => {});
 router.get("/:userNic", async (req, res) => {
 	try {
 		const userNic = req.params.userNic;
-		const interestFolders = await models.InterestFolder.findAll({
+		const interestFolders = await models.FolderInterest.findAll({
 			where: {
-				client: userNic,
+				clientNIC: userNic,
 			},
 		});
 		res.json(interestFolders);
@@ -20,7 +20,19 @@ router.get("/:userNic", async (req, res) => {
 	}
 });
 
-
+router.post("/", async (req, res) => {
+	try {
+		const { name, clientNIC } = req.body;
+		const newFolder = await models.FolderInterest.create({
+			name,
+			clientNIC,
+		});
+		res.status(201).json(newFolder);
+	} catch (error) {
+		console.error("Error creating interest folder:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
 
 router.put("/:id", async (req, res) => {});
 

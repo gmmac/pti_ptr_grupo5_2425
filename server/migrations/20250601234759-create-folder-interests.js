@@ -13,7 +13,7 @@ module.exports = {
 				type: Sequelize.STRING(100),
 				allowNull: false,
 			},
-			client: {
+			clientNIC: {
 				type: Sequelize.STRING(9),
 				allowNull: false,
 				references: {
