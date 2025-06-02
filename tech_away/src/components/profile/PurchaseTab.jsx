@@ -31,12 +31,15 @@ export default function PurchaseTab() {
 			<h5 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
 				My Orders
 			</h5>
-			<Stack direction="vertical" gap={2}>
-				<Stack direction="vertical" gap={2} >
-					{purchases.map((purchase) => (
-						<OrderCard key={purchase.id} order={purchase} />
-					))}
-				</Stack>
+			<Stack
+				direction="vertical"
+				className="pe-2"
+				gap={2}
+				style={{ overflowY: "auto", height: "450px" }}
+			>
+				{purchases.map((purchase) => (
+					<OrderCard key={purchase.id} order={purchase} />
+				))}
 			</Stack>
 		</Stack>
 	);
