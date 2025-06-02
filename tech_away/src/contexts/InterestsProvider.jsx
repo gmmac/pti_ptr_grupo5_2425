@@ -1,55 +1,54 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthenticationProviders/AuthProvider";
-
 import api from "../utils/axios";
 
 const InterestsContext = createContext();
 
-export const InterestsProvider = ({ children }) => {
+const InterestsProvider = ({ children }) => {
 	const { user } = useAuth();
-	const [interests, setInterests] = useState([]);
+	const [loadedInterests, setLoadedInterests] = useState([]);
+	const [folders, setFolders] = useState([]);
+	const [folderToOpen, setFolderToOpen] = useState("");
 
-	const fetchClientInterests = async () => {
+	const fetchInterestFolders = async () => {
+		if (user) {
+			console.log("user", user);
+
+			try {
+				console.log(user.nic);
+
+				const res = await api.get(`/api/interestsFolder/${user.nic}`);
+				setFolders(res.data);
+			} catch (error) {
+				console.error("Error fetching interest folders:", error);
+			}
+		}
+	};
+
+	const fetchInterests = async () => {
 		try {
-			const response = await api.get(`/api/interest/client/${user.nic}`);
-			setInterests(response.data);
+			const res = await api.get(`/api/interests/${user.nic}/${folderToOpen}`);
+			setLoadedInterests(res.data);
 		} catch (error) {
 			console.error("Error fetching interests:", error);
 		}
 	};
 
-	const addInterest = async (interestId) => {
-		try {
-			const response = await api.post(
-				`/api/interest/${user.nic}/${interestId}`
-			);
-			setInterests((prevInterests) => [...prevInterests, response.data]);
-		} catch (error) {
-			console.error("Error adding interest:", error);
-		}
-	};
-
-	const removeInterest = async (interestId) => {
-		try {
-			await api.delete(`/api/interest/${user.nic}/${interestId}`);
-			setInterests((prevInterests) =>
-				prevInterests.filter((interest) => interest.id !== interestId)
-			);
-		} catch (error) {
-			console.error("Error removing interest:", error);
-		}
-	};
+	return (
+		<InterestsContext.Provider
+			value={{
+				loadedInterests,
+				folders,
+				fetchInterestFolders,
+				fetchInterests,
+				folderToOpen,
+				setFolderToOpen,
+			}}
+		>
+			{children}
+		</InterestsContext.Provider>
+	);
 };
 
-return (
-	<InterestsContext.Provider
-		value={{
-			interests,
-			fetchClientInterests,
-			addInterest,
-			removeInterest,
-		}}
-	>
-		{children}
-	</InterestsContext.Provider>
-);
+export default InterestsProvider;
+export const useInterests = () => useContext(InterestsContext);

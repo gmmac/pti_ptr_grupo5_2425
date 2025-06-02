@@ -47,9 +47,9 @@ export default function ProfilePageClient() {
 						<ProfileTabs />
 					</Col>
 				</Row>
-				<Stack direction="horizontal" gap={3}>
+				<Row>
 					<InterestsTab />
-				</Stack>
+				</Row>
 			</Stack>
 		</Container>
 	);

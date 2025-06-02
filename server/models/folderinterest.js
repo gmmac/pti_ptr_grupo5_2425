@@ -9,13 +9,6 @@ module.exports = (sequelize, DataTypes) => {
 				targetKey: "nic",
 				as: "client",
 			});
-			FolderInterest.belongsTo(models.Interest, {
-				foreignKey: "interestId",
-				targetKey: "id",
-				as: "interest",
-				onDelete: "SET NULL",
-				onUpdate: "CASCADE",
-			});
 		}
 	}
 
@@ -28,10 +21,6 @@ module.exports = (sequelize, DataTypes) => {
 			clientNIC: {
 				type: DataTypes.STRING(9),
 				allowNull: false,
-			},
-			interestId: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
 			},
 		},
 		{

@@ -23,16 +23,7 @@ module.exports = {
 				onUpdate: "CASCADE",
 				onDelete: "CASCADE",
 			},
-			interestId: {
-				type: Sequelize.INTEGER,
-				allowNull: true,
-				references: {
-					model: "Interests",
-					key: "id",
-				},
-				onUpdate: "CASCADE",
-				onDelete: "SET NULL",
-			},
+
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
