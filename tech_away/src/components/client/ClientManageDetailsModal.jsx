@@ -57,7 +57,7 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
 
     let newErrors = { ...errors };
 
-    if (!value) {
+    if (!value && !["address", "latitude", "longitude"].includes(field)) {
         newErrors[field] = "This field is required";
     } else if (field === 'birthDate') {
         const birthDate = new Date(value);
@@ -90,7 +90,8 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
     let newErrors = {};
 
     Object.keys(editedClient).forEach((field) => {
-        if (!editedClient[field]) {
+        if (!editedClient[field] &&
+        !["address", "latitude", "longitude"].includes(field)) {
             newErrors[field] = "This field is required";
             hasError = true;
         }
@@ -120,6 +121,8 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
 
     try {
       await api.put(`/api/client/${clientNIC}`, {
+        firstName: editedClient.firstName,
+        lastName: editedClient.lastName,
         phone: editedClient.phone,
         birthDate: editedClient.birthDate,
         gender: editedClient.gender,
@@ -140,7 +143,7 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
     <Dialog
       header="Client Details"
       visible={showModal}
-      style={{ width: '55vw', minWidth: '360px' }}
+      style={{ width: "55vw", minWidth: "360px" }}
       onHide={() => {
         closeModal();
         setEditMode(false);
@@ -149,81 +152,193 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
       draggable={false}
       className="p-fluid"
     >
-      <Container style={{ padding: '1rem 1.5rem' }}>
-        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap text-center text-md-start">
-            <h5 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
-                <i className="pi pi-user" style={{ marginRight: 8 }}></i>
-                {client.firstName || ''} {client.lastName || ''}
-            </h5>
-            <Tag
-                severity={client.isActive === '1' ? 'success' : 'danger'}
-                className="mt-2 mt-md-0"
-            >
-                {client.isActive === '1' ? 'Active' : 'Inactive'}
-            </Tag>
+      <Container className="px-3">
+        {/* Header Section */}
+         <div className="d-flex flex-column flex-lg-nowrap flex-wrap flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-2">
+          <div className="flex-grow-1" >
+            {editMode ? (
+              <Row className="g-2 mt-0">
+                <Col xs={12} md={6} className="d-flex align-items-center mb-2">
+                  <i className="pi pi-user me-2" />
+                  <Form.Control
+                    className="w-100"
+                    placeholder="First Name"
+                    value={editedClient.firstName || ""}
+                    onChange={(e) => handleChange("firstName", e.target.value)}
+                    isInvalid={!!errors.firstName}
+                  />
+                </Col>
+                <Col xs={12} md={6} className="d-flex align-items-center mb-2">
+                  <Form.Control
+                    className="w-100"
+                    placeholder="Last Name"
+                    value={editedClient.lastName || ""}
+                    onChange={(e) => handleChange("lastName", e.target.value)}
+                    isInvalid={!!errors.lastName}
+                  />
+                </Col>
+              </Row>
+            ) : (
+              <>
+              <h5 className='m-0 align-items-center' style={{ fontWeight: "bold" }}>
+                <i className="pi pi-user me-2" />
+                {client.firstName || ""} {client.lastName || ""}
+              </h5>
+              </>
+            )}
+          </div>
+
+          <div className="d-flex flex-wrap gap-2 align-items-center">
+            <div className="d-flex align-items-center gap-2">
+              <Tag severity={client.isActive === "1" ? "success" : "danger"} style={{
+                    fontSize: "0.95rem",
+                    fontWeight: "normal"
+                  }}>
+                {client.isActive === "1" ? "Active" : "Inactive"}
+              </Tag>
+              {!editMode ? (
+                client.isActive === "1" && (
+                  <Button
+                  icon="pi pi-user-edit"
+                  className="p-1 px-3 border-0 text-white"
+                  style={{
+                    backgroundColor: "var(--variant-one)",
+                    fontSize: "1.05rem",
+                    borderRadius: "6px",
+                  }}
+                  onClick={() => setEditMode(true)}
+                  label="Edit"
+                />
+                )
+              ) : (
+                <Stack direction="horizontal" gap={2}>
+                  <Button
+                  icon="pi pi-times"
+                  label="Cancel"
+                  className="p-1 px-3 border-0 text-white"
+                  style={{
+                    fontSize: "1.05rem",
+                    borderRadius: "6px",
+                    minWidth: "fit-content",
+                    backgroundColor: "#6c757d",
+                  }}
+                  onClick={() => {
+                    setEditMode(false);
+                    setEditedClient(client);
+                    setErrors({});
+                  }}
+                />
+                  <Button
+                  icon="pi pi-save"
+                  label="Save"
+                  className="p-1 px-3 border-0 text-white"
+                  style={{
+                    backgroundColor: "var(--variant-one)",
+                    fontSize: "1.05rem",
+                    borderRadius: "6px",
+                  }}
+                  onClick={handleSave}
+                />
+                </Stack>
+              )}
+            </div>
+          </div>
         </div>
 
-        <Divider />
+        <Divider className="my-3"/>
 
-        <Row className="mb-3">
+        {/* Main Form Section */}
+        <Row>
           {/* Left Column */}
           <Col md={6}>
             <div className="mb-3">
-              <strong><i className="pi pi-id-card" /> NIC:</strong><br />
+              <strong>
+                <i className="pi pi-id-card" /> NIC:
+              </strong>
+              <br />
               {client.nic}
             </div>
             <div className="mb-3">
-              <strong><i className="pi pi-id-card" /> NIF:</strong><br />
-              {client.nif || '-'}
+              <strong>
+                <i className="pi pi-id-card" /> NIF:
+              </strong>
+              <br />
+              {client.nif || "-"}
             </div>
             <div className="mb-3">
-              <strong><i className="pi pi-envelope" /> Email:</strong><br />
-              {client.email || '-'}
+              <strong>
+                <i className="pi pi-envelope" /> Email:
+              </strong>
+              <br />
+              {client.email || "-"}
             </div>
             <div className="mb-3">
-              <strong><i className="pi pi-phone" /> Phone Number:</strong><br />
+              <strong>
+                <i className="pi pi-phone" /> Phone:
+              </strong>
+              <br />
               {!editMode ? (
-                client.phone || '-'
+                client.phone || "-"
               ) : (
                 <>
-                <Form.Control
-                  value={editedClient.phone || ''}
-                  isInvalid={!!errors.phone}
-                  onChange={(e) => handleChange('phone', e.target.value)}
-                />
-                <Form.Control.Feedback type="invalid">{errors.phone}</Form.Control.Feedback>
+                  <Form.Control
+                    value={editedClient.phone || ""}
+                    isInvalid={!!errors.phone}
+                    onChange={(e) => handleChange("phone", e.target.value)}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.phone}
+                  </Form.Control.Feedback>
                 </>
               )}
             </div>
             <div className="mb-3">
-              <strong><i className="pi pi-calendar" /> Birthdate:</strong><br />
+              <strong>
+                <i className="pi pi-calendar" /> Birthdate:
+              </strong>
+              <br />
               {!editMode ? (
                 formatDate(client.birthDate)
               ) : (
                 <>
-                <Calendar
-                  value={editedClient.birthDate ? new Date(editedClient.birthDate) : null}
-                  onChange={(e) => handleChange('birthDate', e.value)}
-                  dateFormat="dd/mm/yy"
-                  showIcon
-                />
-                {errors.birthDate && (
-                    <div className="invalid-feedback" style={{ display: 'block' }}>
-                    {errors.birthDate}
+                  <Calendar
+                    value={
+                      editedClient.birthDate
+                        ? new Date(editedClient.birthDate)
+                        : null
+                    }
+                    onChange={(e) => handleChange("birthDate", e.value)}
+                    dateFormat="dd/mm/yy"
+                    showIcon
+                  />
+                  {errors.birthDate && (
+                    <div className="invalid-feedback d-block">
+                      {errors.birthDate}
                     </div>
-                )}
+                  )}
                 </>
               )}
             </div>
             <div className="mb-3">
-              <strong><i className="pi pi-user-plus" /> Gender:</strong><br />
+              <strong>
+                <i className="pi pi-user-plus" /> Gender:
+              </strong>
+              <br />
               {!editMode ? (
-                client.gender === 'M' ? 'Male' : client.gender === 'F' ? 'Female' : client.gender === 'O' ? 'Other' : '-'
+                client.gender === "M" ? (
+                  "Male"
+                ) : client.gender === "F" ? (
+                  "Female"
+                ) : client.gender === "O" ? (
+                  "Other"
+                ) : (
+                  "-"
+                )
               ) : (
                 <Dropdown
                   value={editedClient.gender}
                   options={genderOptions}
-                  onChange={(e) => handleChange('gender', e.value)}
+                  onChange={(e) => handleChange("gender", e.value)}
                   placeholder="Select"
                 />
               )}
@@ -233,78 +348,81 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
           {/* Right Column */}
           <Col md={6}>
             <div className="mb-3">
-              <strong><i className="pi pi-map-marker" /> Address:</strong><br />
+              <strong>
+                <i className="pi pi-map-marker" /> Address:
+              </strong>
+              <br />
               {!editMode ? (
-                client.address || '-'
+                client.address || "-"
               ) : (
                 <>
-                <Form.Control
-                  value={editedClient.address || ''}
-                  isInvalid={!!errors.address}
-                  onChange={(e) => handleChange('address', e.target.value)}
-                />
-                <Form.Control.Feedback type="invalid">{errors.address}</Form.Control.Feedback>
+                  <Form.Control
+                    value={editedClient.address || ""}
+                    isInvalid={!!errors.address}
+                    onChange={(e) => handleChange("address", e.target.value)}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.address}
+                  </Form.Control.Feedback>
                 </>
               )}
             </div>
             <div className="mb-3">
-              <strong><i className="pi pi-compass" /> Latitude:</strong><br />
+              <strong>
+                <i className="pi pi-compass" /> Latitude:
+              </strong>
+              <br />
               {!editMode ? (
-                client.latitude || '-'
+                client.latitude || "-"
               ) : (
                 <>
-                <Form.Control
-                  value={editedClient.latitude || ''}
-                  isInvalid={!!errors.latitude}
-                  onChange={(e) => handleChange('latitude', e.target.value)}
-                />
-                <Form.Control.Feedback type="invalid">{errors.latitude}</Form.Control.Feedback>
+                  <Form.Control
+                    value={editedClient.latitude || ""}
+                    isInvalid={!!errors.latitude}
+                    onChange={(e) => handleChange("latitude", e.target.value)}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.latitude}
+                  </Form.Control.Feedback>
                 </>
               )}
             </div>
             <div className="mb-3">
-              <strong><i className="pi pi-compass" /> Longitude:</strong><br />
+              <strong>
+                <i className="pi pi-compass" /> Longitude:
+              </strong>
+              <br />
               {!editMode ? (
-                client.longitude || '-'
+                client.longitude || "-"
               ) : (
                 <>
-                <Form.Control
-                  value={editedClient.longitude || ''}
-                  isInvalid={!!errors.longitude}
-                  onChange={(e) => handleChange('longitude', e.target.value)}
-                />
-                <Form.Control.Feedback type="invalid">{errors.longitude}</Form.Control.Feedback>
+                  <Form.Control
+                    value={editedClient.longitude || ""}
+                    isInvalid={!!errors.longitude}
+                    onChange={(e) => handleChange("longitude", e.target.value)}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.longitude}
+                  </Form.Control.Feedback>
                 </>
               )}
             </div>
             <div className="mb-3">
-              <strong><i className="pi pi-calendar-plus" /> Created at:</strong><br />
-              {formatDateTime(client.createdAt) || '-'}
+              <strong>
+                <i className="pi pi-calendar-plus" /> Created at:
+              </strong>
+              <br />
+              {formatDateTime(client.createdAt)}
             </div>
             <div className="mb-3">
-              <strong><i className="pi pi-calendar-clock" /> Last updated at:</strong><br />
-              {formatDateTime(client.updatedAt) || '-'}
+              <strong>
+                <i className="pi pi-calendar-clock" /> Last updated:
+              </strong>
+              <br />
+              {formatDateTime(client.updatedAt)}
             </div>
           </Col>
         </Row>
-        <div className="mt-2 mt-md-0">
-            {!editMode ? ( client.isActive == "1" &&
-                    <Button
-                        className="rounded-pill ms-auto"
-                        label="Edit"
-                        icon="pi pi-user-edit"
-                        iconPos="right"
-                        style={{ backgroundColor: "var(--variant-one)", border: "none" }}
-                        onClick={() => setEditMode(true)}
-                    />
-            ) : (
-                <Stack gap={2} direction="horizontal">
-                    <Button className="rounded-pill" label="Cancel" severity="secondary" icon="pi pi-times" 
-                    onClick={() => {setEditMode(false); setEditedClient(client); setErrors({})}}/>
-                    <Button icon="pi pi-save" className="rounded-pill ms-auto" label="Save changes" style={{ backgroundColor: "var(--variant-one)", border: "none" }} onClick={handleSave}></Button>
-                </Stack>
-            )}
-          </div>
       </Container>
     </Dialog>
   );
