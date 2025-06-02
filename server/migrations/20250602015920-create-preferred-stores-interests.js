@@ -1,33 +1,34 @@
 "use strict";
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-	up: async (queryInterface, Sequelize) => {
-		await queryInterface.createTable("Interests", {
+	async up(queryInterface, Sequelize) {
+		await queryInterface.createTable("PreferredStoresInterets", {
 			id: {
 				allowNull: false,
 				autoIncrement: true,
 				primaryKey: true,
 				type: Sequelize.INTEGER,
 			},
-			equipmentSheetID: {
-				type: Sequelize.STRING(20),
+			storeId: {
+				type: Sequelize.STRING(9),
 				allowNull: false,
 				references: {
-					model: "EquipmentSheets",
-					key: "barcode",
+					model: "Stores",
+					key: "nipc",
 				},
 				onUpdate: "CASCADE",
-				onDelete: "CASCADE", // Ao apagar o equipamento, apaga o interesse
+				onDelete: "CASCADE",
 			},
-			folderInterestID: {
+			interestId: {
 				type: Sequelize.INTEGER,
 				allowNull: false,
 				references: {
-					model: "FolderInterests",
+					model: "Interests",
 					key: "id",
 				},
 				onUpdate: "CASCADE",
-				onDelete: "CASCADE", // Ao apagar a pasta de interesses, apaga o interesse
+				onDelete: "CASCADE",
 			},
 			createdAt: {
 				allowNull: false,
@@ -39,7 +40,8 @@ module.exports = {
 			},
 		});
 	},
-	down: async (queryInterface, Sequelize) => {
-		await queryInterface.dropTable("Interests");
+
+	async down(queryInterface, Sequelize) {
+		await queryInterface.dropTable("PreferredStoresInterets");
 	},
 };

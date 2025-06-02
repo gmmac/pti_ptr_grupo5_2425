@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, use } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Container, Row, Col, Stack, Button } from "react-bootstrap";
 import EquipmentSheetCard from "../components/StorePage/EquipmentSheetCard";
 import PaginationControl from "../components/pagination/PaginationControl";
@@ -6,7 +6,6 @@ import api from "../utils/axios";
 import Filters from "../components/StorePage/Filters";
 import MapProvider from "../contexts/MapProvider";
 import { IsMobileContext } from "../contexts/IsMobileContext";
-import Swirl from "../components/svg/Swirl";
 import SecondLife from "../components/decoration/SecondLife";
 import SecondLifeSm from "../components/decoration/SecondLifeSm";
 import DisplayedFilters from "../components/StorePage/DisplayedFilters";

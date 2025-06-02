@@ -13,7 +13,7 @@ module.exports = {
 				type: Sequelize.STRING(100),
 				allowNull: false,
 			},
-			clientNIC: {
+			client: {
 				type: Sequelize.STRING(9),
 				allowNull: false,
 				references: {
@@ -21,7 +21,17 @@ module.exports = {
 					key: "nic",
 				},
 				onUpdate: "CASCADE",
-				onDelete: "CASCADE", // Ao apagar o cliente, apaga a pasta
+				onDelete: "CASCADE",
+			},
+			interestId: {
+				type: Sequelize.INTEGER,
+				allowNull: true,
+				references: {
+					model: "Interests",
+					key: "id",
+				},
+				onUpdate: "CASCADE",
+				onDelete: "SET NULL",
 			},
 			createdAt: {
 				allowNull: false,
@@ -33,6 +43,7 @@ module.exports = {
 			},
 		});
 	},
+
 	down: async (queryInterface, Sequelize) => {
 		await queryInterface.dropTable("FolderInterests");
 	},
