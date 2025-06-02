@@ -18,8 +18,8 @@ const InterestsProvider = ({ children }) => {
 	}, []);
 
 	useEffect(() => {
-		console.log(folderToOpen);
-	}, [folderToOpen]);
+		console.log("loadedInterests", loadedInterests);
+	}, [loadedInterests]);
 
 	const createFolder = async (folderName) => {
 		try {
@@ -44,11 +44,8 @@ const InterestsProvider = ({ children }) => {
 
 	const fetchInterests = async () => {
 		try {
-			console.log(`/api/interest/${user.nic}/${folderToOpen}`);
-
 			const res = await api.get(`/api/interest/${user.nic}/${folderToOpen}`);
 			setLoadedInterests(res.data);
-			console.log("loadedInterests", loadedInterests);
 		} catch (error) {
 			console.error("Error fetching interests:", error);
 		}

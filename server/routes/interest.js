@@ -29,6 +29,8 @@ router.get("/:userNic/:folderId", async (req, res) => {
 					"minLaunchYear",
 					"minPrice",
 					"maxPrice",
+					"createdAt",
+					"updatedAt",
 				],
 				include: [
 					{
@@ -74,6 +76,8 @@ router.get("/:userNic/:folderId", async (req, res) => {
 						"minLaunchYear",
 						"minPrice",
 						"maxPrice",
+						"createdAt",
+						"updatedAt",
 					],
 					include: [
 						{

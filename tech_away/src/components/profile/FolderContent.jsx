@@ -29,8 +29,25 @@ export default function FolderContent() {
 					</p>
 				</Stack>
 			)}
-			{loadedInterests != null &&
-				loadedInterests.map((interest, index) => <Stack key={index}></Stack>)}
+			<Stack direction="horizontal" gap={4} className="flex-wrap">
+				{loadedInterests != null &&
+					loadedInterests.map((interest, index) => (
+						<Stack
+							key={index}
+							className="p-3"
+							style={{
+								backgroundColor: "var(--variant-one-light)",
+								borderRadius: "16px",
+							}}
+						>
+							<p className="m-0">Interest ID: {interest.id}</p>
+							<p className="m-0">
+								Creation date:{" "}
+								{new Date(interest.createdAt).toLocaleDateString("pt-PT")}{" "}
+							</p>
+						</Stack>
+					))}
+			</Stack>
 		</Stack>
 	);
 }

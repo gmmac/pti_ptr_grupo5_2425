@@ -3,10 +3,7 @@ import { Button, Stack } from "react-bootstrap";
 import FolderStack from "./FolderStack";
 import FolderContent from "./FolderContent";
 
-
 export default function InterestsTab() {
-
-
 	return (
 		<Stack
 			direction="vertical"
@@ -16,6 +13,7 @@ export default function InterestsTab() {
 				fontFamily: "var(--body-font)",
 				backgroundColor: "var(--white)",
 				borderRadius: "var(--rounded-sm)",
+				boxShadow: "var(--shadow-default)",
 			}}
 		>
 			<Stack direction="horizontal" className="justify-content-between">
