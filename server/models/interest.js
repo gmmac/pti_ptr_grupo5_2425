@@ -4,7 +4,6 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
 	class Interest extends Model {
 		static associate(models) {
-
 			// Cliente
 			Interest.belongsTo(models.Client, {
 				foreignKey: "clientNic",
@@ -25,6 +24,13 @@ module.exports = (sequelize, DataTypes) => {
 			Interest.belongsTo(models.EquipmentModel, {
 				foreignKey: "modelID",
 				as: "model",
+				onDelete: "SET NULL",
+				onUpdate: "CASCADE",
+			});
+
+			Interest.belongsTo(models.EquipmentType, {
+				foreignKey: "typeID",
+				as: "type",
 				onDelete: "SET NULL",
 				onUpdate: "CASCADE",
 			});
@@ -58,6 +64,10 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: true,
 			},
 			modelID: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
+			},
+			typeID: {
 				type: DataTypes.INTEGER,
 				allowNull: true,
 			},

@@ -39,6 +39,18 @@ module.exports = {
 				onUpdate: "CASCADE",
 				onDelete: "SET NULL",
 			},
+
+			typeID: {
+				type: Sequelize.INTEGER,
+				allowNull: true,
+				references: {
+					model: "EquipmentTypes",
+					key: "id",
+				},
+				onUpdate: "CASCADE",
+				onDelete: "SET NULL",
+			},
+
 			equipmentSheetID: {
 				type: Sequelize.STRING(20),
 				allowNull: true,

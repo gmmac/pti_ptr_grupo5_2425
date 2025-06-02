@@ -44,8 +44,11 @@ const InterestsProvider = ({ children }) => {
 
 	const fetchInterests = async () => {
 		try {
-			const res = await api.get(`/api/interests/${user.nic}/${folderToOpen}`);
+			console.log(`/api/interest/${user.nic}/${folderToOpen}`);
+
+			const res = await api.get(`/api/interest/${user.nic}/${folderToOpen}`);
 			setLoadedInterests(res.data);
+			console.log("loadedInterests", loadedInterests);
 		} catch (error) {
 			console.error("Error fetching interests:", error);
 		}
@@ -62,7 +65,6 @@ const InterestsProvider = ({ children }) => {
 				folderToOpen,
 				setFolderToOpen,
 				createFolder,
-				
 			}}
 		>
 			{children}

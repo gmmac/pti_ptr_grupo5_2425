@@ -3,7 +3,10 @@ import { Button, Stack } from "react-bootstrap";
 import FolderStack from "./FolderStack";
 import FolderContent from "./FolderContent";
 
+
 export default function InterestsTab() {
+
+
 	return (
 		<Stack
 			direction="vertical"
@@ -32,7 +35,7 @@ export default function InterestsTab() {
 					<span>Add New Interest</span>
 				</Button>
 			</Stack>
-			<Stack>
+			<Stack direction="vertical" gap={4}>
 				<FolderStack />
 				<FolderContent />
 			</Stack>

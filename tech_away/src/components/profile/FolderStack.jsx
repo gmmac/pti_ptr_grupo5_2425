@@ -64,7 +64,10 @@ const FolderStack = () => {
 						}}
 						onClick={() => setShowModal(true)}
 					>
-						<i className="pi pi-plus" style={{ color: "var(--dark-grey)" }}></i>
+						<i
+							className="pi pi-folder-plus"
+							style={{ color: "var(--dark-grey)" }}
+						></i>
 					</Button>
 				)}
 			</Stack>

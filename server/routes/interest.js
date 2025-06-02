@@ -17,17 +17,47 @@ router.get("/:userNic/:folderId", async (req, res) => {
 	try {
 		const { userNic, folderId } = req.params;
 
-		if (folderId === "undefined") {
+		if (folderId === "null") {
 			const allInterests = await models.Interest.findAll({
 				where: {
-					clientNIC: userNic,
+					clientNic: userNic,
 				},
+				attributes: [
+					"id",
+					"equipmentSheetID",
+					"maxLaunchYear",
+					"minLaunchYear",
+					"minPrice",
+					"maxPrice",
+				],
+				include: [
+					{
+						model: models.Brand,
+						as: "brand",
+						attributes: ["id", "name"],
+					},
+					{
+						model: models.EquipmentModel,
+						as: "model",
+						attributes: ["id", "name"],
+					},
+					{
+						model: models.EquipmentType,
+						as: "type",
+						attributes: ["id", "name"],
+					},
+					{
+						model: models.EquipmentStatus,
+						as: "equipmentStatus",
+						attributes: ["id", "state"],
+					},
+				],
 			});
 			res.json(allInterests);
 		} else {
 			const interestsIds = await models.FolderInterestEquipments.findAll({
 				where: {
-					clientNIC: userNic,
+					clientNic: userNic,
 					folderId: folderId,
 				},
 			});
@@ -37,6 +67,36 @@ router.get("/:userNic/:folderId", async (req, res) => {
 					where: {
 						id: interest.interestId,
 					},
+					attributes: [
+						"id",
+						"equipmentSheetID",
+						"maxLaunchYear",
+						"minLaunchYear",
+						"minPrice",
+						"maxPrice",
+					],
+					include: [
+						{
+							model: models.Brand,
+							as: "brand",
+							attributes: ["id", "name"],
+						},
+						{
+							model: models.EquipmentModel,
+							as: "model",
+							attributes: ["id", "name"],
+						},
+						{
+							model: models.EquipmentType,
+							as: "type",
+							attributes: ["id", "name"],
+						},
+						{
+							model: models.EquipmentStatus,
+							as: "equipmentStatus",
+							attributes: ["id", "state"],
+						},
+					],
 				});
 				if (interestData) {
 					interests[interestData.id] = interestData;
@@ -56,6 +116,7 @@ router.post("/", async (req, res) => {
 			clientNic,
 			brandID,
 			modelID,
+			typeID,
 			equipmentSheetID,
 			equipmentStatusID,
 			minLaunchYear,
@@ -70,6 +131,7 @@ router.post("/", async (req, res) => {
 			clientNic: clientNic,
 			brandID: brandID || null,
 			modelID: modelID || null,
+			typeID: typeID || null,
 			equipmentSheetID: equipmentSheetID || null,
 			equipmentStatusID: equipmentStatusID || null,
 			minLaunchYear: minLaunchYear || null,
@@ -104,6 +166,22 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {});
 
-router.delete("/:id", async (req, res) => {});
+router.delete("/:id", async (req, res) => {
+	try {
+		const interestId = req.params.id;
+		const deletedInterest = await models.Interest.destroy({
+			where: { id: interestId },
+		});
+
+		if (deletedInterest === 0) {
+			return res.status(404).json({ error: "Interest not found" });
+		}
+
+		res.status(204).send();
+	} catch (error) {
+		console.error("Error deleting interest:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
 
 module.exports = router;
