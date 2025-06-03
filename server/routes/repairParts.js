@@ -8,7 +8,14 @@ router.get("/:repairID", async (req, res) => {
     const { repairID } = req.params;
 	try {
 		const repairParts = await models.RepairParts.findAll({
-			where: { repairID: repairID }
+			where: { repairID: repairID },
+
+            include: [
+				{
+					model: models.Part,
+					attributes: ["name"],
+				},
+			],
 		});
 
 		if (repairParts) {
@@ -30,6 +37,7 @@ router.post("/", async (req, res) => {
             partID,
             quantity,
             totalPrice,
+            arrivalDate,
         } = req.body;
 
         if (!repairID) {
@@ -48,11 +56,16 @@ router.post("/", async (req, res) => {
             return res.status(400).json({ error: "Total is required." });
         }
 
+        if (!arrivalDate) {
+            return res.status(400).json({ error: "Arrival date is required." });
+        }
+
         const repairParts = await models.RepairParts.create({
             repairID,
             partID,
             quantity,
             totalPrice,
+            arrivalDate,
             createdAt: new Date(),
             updatedAt: new Date(),
         });

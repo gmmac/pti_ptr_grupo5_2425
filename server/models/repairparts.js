@@ -38,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
+      arrivalDate: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
   }, {
     sequelize,
     modelName: 'RepairParts',

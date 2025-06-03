@@ -9,36 +9,48 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState("");
+  const [repairParts, setRepairParts] = useState([]);
 
-  const fetchRepairsLogs = async () => {
-    try {
-      const response = await api.get(`/api/repairStatusLogs/${repairID}`, {
-        params: { page: currentPage },
-      });
-      setRepairStatusLogs(response.data.data);
-      setTotalPages(response.data.totalPages);
-      setError('');
-    } catch (error) {
-      console.error('Error fetching repairs:', error);
-      setError('Error fetching repairs. Please try again.');
-    }
-  };
+    const fetchRepairsLogs = async () => {
+        try {
+            const response = await api.get(`/api/repairStatusLogs/${repairID}`, {
+            params: { page: currentPage },
+            });
+            setRepairStatusLogs(response.data.data);
+            setTotalPages(response.data.totalPages);
+            setError('');
+        } catch (error) {
+            console.error('Error fetching repairs:', error);
+            setError('Error fetching repairs. Please try again.');
+        }
+    };
 
-  const fetchRepair = async () => {
-    try {
-      const response = await api.get(`/api/repair/${repairID}`);
-      setRepair(response.data);
-      setError('');
-    } catch (error) {
-      console.error('Error fetching repair:', error);
-      setError('Error fetching repair. Please try again.');
-    }
-  };
+    const fetchRepairParts = async () => {
+        try {
+            const response = await api.get(`/api/repairParts/${repairID}`);
+            setRepairParts(response.data.parts);
+            console.log(response.data.parts)
+        } catch (error) {
+            console.error('Error fetching repair parts:', error);
+        }
+    };
+
+    const fetchRepair = async () => {
+        try {
+            const response = await api.get(`/api/repair/${repairID}`);
+            setRepair(response.data);
+            setError('');
+        } catch (error) {
+            console.error('Error fetching repair:', error);
+            setError('Error fetching repair. Please try again.');
+        }
+    };
 
   useEffect(() => {
     if (show) {
       fetchRepair();
       fetchRepairsLogs();
+      fetchRepairParts();
     }
   }, [show, currentPage, repairID]);
 
@@ -121,6 +133,57 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
                 </Card.Body>
               </Card>
             </Col>
+
+            {/* Card: Repair Parts */}
+            <Col xs={12}>
+                <Card className="shadow-sm">
+                    <Card.Body>
+                        <h5 className="fw-bold mb-3">Parts Used in Repair</h5>
+                        {repairParts.length > 0 ? (
+                            <Table responsive hover className="mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Part</th>
+                                        <th>Quantity</th>
+                                        <th>Total Price</th>
+                                        <th>Ordered On</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {repairParts.map((part, index) => {
+                                        const orderedDate = new Date(part.createdAt);
+							            const today = new Date();
+                                        const isArrived = new Date(part.createdAt) <= new Date();
+                                        return (
+                                            <tr key={part.id}>
+                                                <td>{index + 1}</td>
+                                                <td>{part.Part.name}</td>
+                                                <td>{part.quantity}</td>
+                                                <td>${part.totalPrice.toFixed(2)}</td>
+                                                <td>{orderedDate.toLocaleDateString()}</td>
+                                                <td>
+                                                    <span className={`badge px-3 py-2 rounded-pill fw-semibold ${
+                                                        isArrived
+                                                            ? 'bg-success-subtle text-success border border-success'
+                                                            : 'bg-warning-subtle text-warning border border-warning'
+                                                    }`}>
+                                                        {isArrived ? 'Arrived' : 'Pending'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </Table>
+                        ) : (
+                            <p className="text-muted">No parts registered for this repair.</p>
+                        )}
+                    </Card.Body>
+                </Card>
+            </Col>
+
           </Row>
         ) : (
           <p className="text-center text-muted">No repair information available.</p>
