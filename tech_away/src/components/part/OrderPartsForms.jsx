@@ -32,6 +32,15 @@ export default function OrderPartsForms({ equipmentSheetID, repairID, showModal,
         });
     };
 
+    const closeDialog = () => {
+        clearCart();
+        closeModal();
+    };
+
+    const clearCart = () => {
+        setCart([]);
+    };
+
     const addToCart = (part) => {
         setCart((prev) => {
             const existing = prev.find((p) => p.id === part.id);
@@ -77,12 +86,12 @@ export default function OrderPartsForms({ equipmentSheetID, repairID, showModal,
         <Dialog
             header={`Order Parts | Repair #${repairID}`}
             visible={showModal}
-            onHide={closeModal}
+            onHide={closeDialog}
             style={{ width: "95vw", maxWidth: "1000px" }}
             modal
             maximizable
         >
-            <div className="order-dialog-content">
+            <div className="order-dialog-content" style={{ minHeight: "65vh", maxHeight: "80vh", overflowY: "auto" }}>
                 {/* Galeria de peças */}
                 <div className="part-gallery">
                     {parts.map((part) => (
