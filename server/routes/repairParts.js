@@ -4,6 +4,25 @@ const models = require("../models");
 const { Op, Sequelize } = require("sequelize");
 const { sequelize } = require("../models/index");
 
+router.get("/:repairID", async (req, res) => {
+    const { repairID } = req.params;
+	try {
+		const repairParts = await models.RepairParts.findAll({
+			where: { repairID: repairID }
+		});
+
+		if (repairParts) {
+			res.status(200).json({ parts: repairParts });
+		} else {
+			res.status(404).json({ error: "No parts found for this repair." });
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(400).json({ error: "Error retrieving parts associated with repair." });
+	}
+});
+
+
 router.post("/", async (req, res) => {
     try {
         const {
