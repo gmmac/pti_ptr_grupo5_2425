@@ -25,6 +25,9 @@ module.exports = {
       budget: {
         type: Sequelize.FLOAT,
       },
+      currentCost: {
+        type: Sequelize.FLOAT,
+      },
       estimatedDeliverDate: {
         type: Sequelize.DATE,
       },

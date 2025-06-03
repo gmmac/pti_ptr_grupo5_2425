@@ -52,6 +52,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.FLOAT,
         allowNull: true,
       },
+      currentCost: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+      },
       estimatedDeliverDate: {
         type: DataTypes.DATE,
         allowNull: true,

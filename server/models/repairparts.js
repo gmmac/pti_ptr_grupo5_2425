@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      active: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
   }, {
     sequelize,
     modelName: 'RepairParts',
