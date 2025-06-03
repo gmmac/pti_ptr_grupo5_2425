@@ -87,6 +87,10 @@ module.exports = {
 				type: Sequelize.FLOAT,
 				allowNull: true,
 			},
+			description: {
+				type: Sequelize.TEXT,
+				allowNull: true,
+			},
 			notified: {
 				type: Sequelize.BOOLEAN,
 				defaultValue: false,

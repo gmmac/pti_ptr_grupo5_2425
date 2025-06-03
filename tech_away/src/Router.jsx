@@ -13,8 +13,6 @@ import EmployeeRegisterPage from "./pages/Employee/EmployeeRegisterPage";
 import EmployeeLoginPage from "./pages/Employee/EmployeeLoginPage";
 import EmployeeHomePage from "./pages/Employee/EmployeeHomePage";
 
-import InterestsPage from "./pages/InterestsPage";
-import { InterestsFilterProvider } from "./contexts/InterestsFilterProvider";
 import StorePage from "./pages/StorePage";
 import EquipmentSheetPage from "./pages/EquipmentSheetPage";
 
@@ -42,94 +40,86 @@ import AboutPage from "./pages/AboutPage";
 import OurStores from "./pages/OurStores";
 
 export default function Router() {
-	return (
-		<IsMobileProvider>
-			<UserTypeProvider>
-				<BrowserRouter>
-					<Routes>
-						<Route path="*" element={<NotFoundPage />} />
-						<Route path="teste" element={<TestPage />} />
+  return (
+    <IsMobileProvider>
+      <UserTypeProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="*" element={<NotFoundPage />} />
+            <Route path="teste" element={<TestPage />} />
 
-						{/* Rotas do Client */}
-						<Route
-							path="/"
-							element={
-								<AuthProvider userType="client">
-									<LayoutPage />
-								</AuthProvider>
-							}
-						>
-							<Route path="about-us" element={<AboutPage />} />
-							<Route path="our-stores" element={<OurStores />} />
+            {/* Rotas do Client */}
+            <Route
+              path="/"
+              element={
+                <AuthProvider userType="client">
+                  <LayoutPage />
+                </AuthProvider>
+              }
+            >
+              <Route path="about-us" element={<AboutPage />} />
+              <Route path="our-stores" element={<OurStores />} />
 
-							<Route index element={<HomePage />} />
-							<Route path="store" element={<StorePage />} />
-							<Route
-								path="store/:equipmentSheetName"
-								element={<EquipmentSheetPage />}
-							/>
-							
-							<Route path="changePassword" element={<ChangePasswordClient />} />
-							<Route path="register" element={<RegisterPageClient />} />
-							<Route path="login" element={<LoginPageClient />} />
-							<Route path="profile" element={<ProfilePageClient />} />
-							<Route path="cart" element={<CartMobilePage />} />
-							<Route
-								path="interests"
-								element={
-									<InterestsFilterProvider>
-										<InterestsPage />
-									</InterestsFilterProvider>
-								}
-							/>
-							<Route path="checkout-order" element={<CheckoutOrderPage />} />
-							<Route path="payment" element={<Payment />} />
-							<Route path="payment/confirmed" element={<ConfirmedPayment />} />
-						</Route>
+              <Route index element={<HomePage />} />
+              <Route path="store" element={<StorePage />} />
+              <Route
+                path="store/:equipmentSheetName"
+                element={<EquipmentSheetPage />}
+              />
 
-						{/* Rotas do Employee */}
-						<Route
-							path="/employee"
-							element={
-								<EmployeeAuthProvider>
-									<Outlet />
-								</EmployeeAuthProvider>
-							}
-						>
-							<Route element={<EmployeeLayoutPage />}>
-								<Route index element={<EmployeeHomePage />} />
-								<Route path="manage" element={<EmployeeManagePage />} />
-							</Route>
+              <Route path="changePassword" element={<ChangePasswordClient />} />
+              <Route path="register" element={<RegisterPageClient />} />
+              <Route path="login" element={<LoginPageClient />} />
+              <Route path="profile" element={<ProfilePageClient />} />
+              <Route path="cart" element={<CartMobilePage />} />
+              <Route path="checkout-order" element={<CheckoutOrderPage />} />
+              <Route path="payment" element={<Payment />} />
+              <Route path="payment/confirmed" element={<ConfirmedPayment />} />
+            </Route>
 
-							<Route path="login" element={<EmployeeLoginPage />} />
-							<Route path="register" element={<EmployeeRegisterPage />} />
-						</Route>
+            {/* Rotas do Employee */}
+            <Route
+              path="/employee"
+              element={
+                <EmployeeAuthProvider>
+                  <Outlet />
+                </EmployeeAuthProvider>
+              }
+            >
+              <Route element={<EmployeeLayoutPage />}>
+                <Route index element={<EmployeeHomePage />} />
+                <Route path="manage" element={<EmployeeManagePage />} />
+              </Route>
 
-						{/* Rotas do organizador */}
-						<Route
-							path="/organizer"
-							element={
-								<OrganizerAuthProvider>
-									<Outlet />
-								</OrganizerAuthProvider>
-							}
-						>
-							<Route element={<OrganizerLayoutPage />}>
-								<Route index element={<OrganizerHomePage />} />
-								{/* <Route path="manage" element={<EmployeeManagePage />} /> */}
-							</Route>
+              <Route path="login" element={<EmployeeLoginPage />} />
+              <Route path="register" element={<EmployeeRegisterPage />} />
+            </Route>
 
-							<Route path="projects/:id" element={<CharityProjectPage />} />
-							<Route path="login" element={<OrganizerLoginPage />} />
-							<Route path="register" element={<OrganizerRegisterPage />} />
-							<Route
-								path="changePassword"
-								element={<ChangePasswordClient userType="organizer" />}
-							/>
-						</Route>
-					</Routes>
-				</BrowserRouter>
-			</UserTypeProvider>
-		</IsMobileProvider>
-	);
+            {/* Rotas do organizador */}
+            <Route
+              path="/organizer"
+              element={
+                <OrganizerAuthProvider>
+                  <Outlet />
+                </OrganizerAuthProvider>
+              }
+            >
+              <Route element={<OrganizerLayoutPage />}>
+                <Route index element={<OrganizerHomePage />} />
+                {/* <Route path="manage" element={<EmployeeManagePage />} /> */}
+              </Route>
+
+              <Route path="projects/:id" element={<CharityProjectPage />} />
+              <Route path="login" element={<OrganizerLoginPage />} />
+              <Route path="register" element={<OrganizerRegisterPage />} />
+              <Route
+                path="changePassword"
+                element={<ChangePasswordClient userType="organizer" />}
+              />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </UserTypeProvider>
+    </IsMobileProvider>
+  );
 }

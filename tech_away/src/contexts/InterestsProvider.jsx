@@ -5,68 +5,82 @@ import api from "../utils/axios";
 const InterestsContext = createContext();
 
 const InterestsProvider = ({ children }) => {
-	const { user } = useAuth();
-	const [userLoaded, setUserLoaded] = useState(false);
-	const [loadedInterests, setLoadedInterests] = useState([]);
-	const [folders, setFolders] = useState([]);
-	const [folderToOpen, setFolderToOpen] = useState(null);
+  const { user } = useAuth();
+  const [userLoaded, setUserLoaded] = useState(false);
+  const [loadedInterests, setLoadedInterests] = useState([]);
+  const [folders, setFolders] = useState([]);
+  const [folderToOpen, setFolderToOpen] = useState(null);
 
-	useEffect(() => {
-		if (user && !userLoaded) {
-			setUserLoaded(true);
-		}
-	}, []);
+  useEffect(() => {
+    if (user && !userLoaded) {
+      setUserLoaded(true);
+    }
+  }, []);
 
-	useEffect(() => {
-		console.log("loadedInterests", loadedInterests);
-	}, [loadedInterests]);
+  useEffect(() => {
+    console.log("loadedInterests", loadedInterests);
+  }, [loadedInterests]);
 
-	const createFolder = async (folderName) => {
-		try {
-			const res = await api.post(`/api/interestsFolder`, {
-				name: folderName,
-				clientNIC: user.nic,
-			});
-			setFolders((prevFolders) => [...prevFolders, res.data]);
-		} catch (error) {
-			console.error("Error creating interest folder:", error);
-		}
-	};
+  const createFolder = async (folderName) => {
+    try {
+      await api.post(`/api/interestsFolder`, {
+        name: folderName,
+        clientNIC: user.nic,
+      });
+      fetchInterestFolders();
+    } catch (error) {
+      console.error("Error creating interest folder:", error);
+    }
+  };
 
-	const fetchInterestFolders = async () => {
-		try {
-			const res = await api.get(`/api/interestsFolder/${user.nic}`);
-			setFolders(res.data);
-		} catch (error) {
-			console.error("Error fetching interest folders:", error);
-		}
-	};
+  const createGenericInterest = async (newInterest) => {
+    try {
+      await api.post(`/api/interest`, {
+        ...newInterest,
+        clientNIC: user.nic,
+      });
+      fetchInterests();
+      return res.data;
+    } catch (error) {
+      console.error("Error creating interest:", error);
+    }
+  };
 
-	const fetchInterests = async () => {
-		try {
-			const res = await api.get(`/api/interest/${user.nic}/${folderToOpen}`);
-			setLoadedInterests(res.data);
-		} catch (error) {
-			console.error("Error fetching interests:", error);
-		}
-	};
+  const fetchInterestFolders = async () => {
+    try {
+      const res = await api.get(`/api/interestsFolder/${user.nic}`);
+      setFolders(res.data);
+    } catch (error) {
+      console.error("Error fetching interest folders:", error);
+    }
+  };
 
-	return (
-		<InterestsContext.Provider
-			value={{
-				userLoaded,
-				loadedInterests,
-				folders,
-				fetchInterestFolders,
-				fetchInterests,
-				folderToOpen,
-				setFolderToOpen,
-				createFolder,
-			}}
-		>
-			{children}
-		</InterestsContext.Provider>
-	);
+  const fetchInterests = async () => {
+    try {
+      const res = await api.get(`/api/interest/${user.nic}/${folderToOpen}`);
+      setLoadedInterests(res.data);
+    } catch (error) {
+      console.error("Error fetching interests:", error);
+    }
+  };
+
+  return (
+    <InterestsContext.Provider
+      value={{
+        userLoaded,
+        loadedInterests,
+        folders,
+        fetchInterestFolders,
+        fetchInterests,
+        folderToOpen,
+        setFolderToOpen,
+        createFolder,
+        createGenericInterest,
+      }}
+    >
+      {children}
+    </InterestsContext.Provider>
+  );
 };
 
 export default InterestsProvider;

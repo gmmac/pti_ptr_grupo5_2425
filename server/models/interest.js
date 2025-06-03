@@ -95,6 +95,10 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.FLOAT,
 				allowNull: true,
 			},
+			description: {
+				type: DataTypes.TEXT,
+				allowNull: true,
+			},
 			notified: {
 				type: DataTypes.BOOLEAN,
 				defaultValue: false,
