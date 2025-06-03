@@ -2,17 +2,26 @@ import React, { useEffect, useState } from "react";
 import { Modal, Stack, Button, Form } from "react-bootstrap";
 import { useInterests } from "../../contexts/InterestsProvider";
 import ComponentSelectorModalForm from "./ComponentSelectorModalForm";
+import EquipmentSheetModal from "./EquipmentSheetModal";
 
 export default function CreateInterestModal({ show, setShow }) {
   const [brandModal, setBrandModal] = useState(false);
   const [modelModal, setModelModal] = useState(false);
   const [typeModal, setTypeModal] = useState(false);
+  const [equipmentSheetModal, setEquipmentSheetModal] = useState(false);
+  const [sheetSelected, setSheetSelected] = useState(false);
   const { createGenericInterest } = useInterests();
+
   const [formData, setFormData] = useState({
     brandID: { id: "", name: "" },
     modelID: { id: "", name: "" },
     typeID: { id: "", name: "" },
-    equipmentSheetID: { id: "", name: "" },
+    equipmentSheet: {
+      id: "",
+      brand: { id: "", name: "" },
+      model: { id: "", name: "" },
+      type: { id: "", name: "" },
+    },
     equipmentStatusID: { id: "", name: "" },
     minLaunchYear: "",
     maxLaunchYear: "",
@@ -38,13 +47,22 @@ export default function CreateInterestModal({ show, setShow }) {
       preferredStoreIDs: [...prev.preferredStoreIDs, ""],
     }));
   };
+
   useEffect(() => {
-    console.log(formData);
-  }, [formData]);
+    if (sheetSelected) {
+      setFormData((prev) => ({
+        ...prev,
+        brandID: { ...formData.equipmentSheet.brand },
+        modelID: { ...formData.equipmentSheet.model },
+        typeID: { ...formData.equipmentSheet.type },
+      }));
+    }
+    setSheetSelected(false);
+  }, [sheetSelected]);
 
   return (
     <>
-      <Modal show={show} centered>
+      <Modal show={show} centered size="lg">
         <Modal.Header>
           <Stack
             direction="horizontal"
@@ -59,7 +77,7 @@ export default function CreateInterestModal({ show, setShow }) {
         <Modal.Body>
           <Form>
             <Stack
-              className="p-3"
+              className="p-3 flex-wrap"
               direction="vertical"
               gap={3}
               style={{
@@ -67,6 +85,56 @@ export default function CreateInterestModal({ show, setShow }) {
                 borderRadius: "16px",
               }}
             >
+              {/* Equipment Sheet */}
+              <Form.Group controlId="equipmentSheetID">
+                <Form.Label className="text-muted ms-1">
+                  Equipment Sheet
+                </Form.Label>
+                <Stack direction="horizontal" className="mb-2" gap={2}>
+                  <Form.Control
+                    type="text"
+                    name="equipmentSheetID"
+                    className="rounded-pill"
+                    value={formData.equipmentSheet.id}
+                    readOnly
+                  />
+                  <Button
+                    className="rounded-pill mt-2 w-50"
+                    style={{
+                      backgroundColor: "var(--variant-one)",
+                      border: "none",
+                    }}
+                    onClick={() => setEquipmentSheetModal(true)}
+                  >
+                    Select Equipment Sheet
+                  </Button>
+                  <Button
+                    className="rounded-pill mt-2"
+                    style={{
+                      backgroundColor: "var(--variant-one)",
+                      border: "none",
+                    }}
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        equipmentSheet: {
+                          id: "",
+                          brand: { id: "", name: "" },
+                          model: { id: "", name: "" },
+                          type: { id: "", name: "" },
+                        },
+                        brandID: { id: "", name: "" },
+                        modelID: { id: "", name: "" },
+                        typeID: { id: "", name: "" },
+                      }))
+                    }
+                  >
+                    Clear
+                  </Button>
+                </Stack>
+              </Form.Group>
+
+              {/* Brand */}
               <Form.Group controlId="brandID">
                 <Form.Label className="text-muted ms-1">Brand</Form.Label>
                 <Stack direction="horizontal" className="mb-2" gap={2}>
@@ -88,7 +156,7 @@ export default function CreateInterestModal({ show, setShow }) {
                     Select Brand
                   </Button>
                   <Button
-                    className="rounded-pill mt-2 "
+                    className="rounded-pill mt-2"
                     style={{
                       backgroundColor: "var(--variant-one)",
                       border: "none",
@@ -105,12 +173,14 @@ export default function CreateInterestModal({ show, setShow }) {
                   </Button>
                 </Stack>
               </Form.Group>
+
+              {/* Model */}
               <Form.Group controlId="modelID">
                 <Form.Label className="text-muted ms-1">Model</Form.Label>
                 <Stack direction="horizontal" className="mb-2" gap={2}>
                   <Form.Control
                     type="text"
-                    name="ModelID"
+                    name="modelID"
                     className="rounded-pill"
                     value={formData.modelID.name}
                     readOnly
@@ -126,7 +196,7 @@ export default function CreateInterestModal({ show, setShow }) {
                     Select Model
                   </Button>
                   <Button
-                    className="rounded-pill mt-2 "
+                    className="rounded-pill mt-2"
                     style={{
                       backgroundColor: "var(--variant-one)",
                       border: "none",
@@ -142,12 +212,14 @@ export default function CreateInterestModal({ show, setShow }) {
                   </Button>
                 </Stack>
               </Form.Group>
+
+              {/* Type */}
               <Form.Group controlId="typeID">
                 <Form.Label className="text-muted ms-1">Type</Form.Label>
                 <Stack direction="horizontal" className="mb-2" gap={2}>
                   <Form.Control
                     type="text"
-                    name="TypelID"
+                    name="typeID"
                     className="rounded-pill"
                     value={formData.typeID.name}
                     readOnly
@@ -163,7 +235,7 @@ export default function CreateInterestModal({ show, setShow }) {
                     Select Type
                   </Button>
                   <Button
-                    className="rounded-pill mt-2 "
+                    className="rounded-pill mt-2"
                     style={{
                       backgroundColor: "var(--variant-one)",
                       border: "none",
@@ -183,6 +255,8 @@ export default function CreateInterestModal({ show, setShow }) {
           </Form>
         </Modal.Body>
       </Modal>
+
+      {/* MODALS */}
       <ComponentSelectorModalForm
         showModal={brandModal}
         setShowModal={setBrandModal}
@@ -209,6 +283,14 @@ export default function CreateInterestModal({ show, setShow }) {
         onSelect={(selected) =>
           setFormData((prev) => ({ ...prev, typeID: selected }))
         }
+      />
+      <EquipmentSheetModal
+        showModal={equipmentSheetModal}
+        setShowModal={setEquipmentSheetModal}
+        onSelect={(selected) =>
+          setFormData((prev) => ({ ...prev, equipmentSheet: selected }))
+        }
+        setSeetSelected={setSheetSelected}
       />
     </>
   );
