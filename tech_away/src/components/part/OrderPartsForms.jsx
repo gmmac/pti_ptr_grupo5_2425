@@ -62,14 +62,20 @@ export default function OrderPartsForms({ equipmentSheetID, repairID, showModal,
 
     const orderParts = async () => {
         try {
-            await Promise.all(cart.map((item) =>
-                api.post("/api/repairParts/", {
-                    repairID: repairID,
-                    partID: item.id,
-                    quantity: item.quantity,
-                    totalPrice: item.price * item.quantity
+            await Promise.all(
+                cart.map((item) => {
+                    const arrivalDate = new Date();
+                    arrivalDate.setDate(arrivalDate.getDate() + item.arriveTime);
+
+                    return api.post("/api/repairParts/", {
+                        repairID: repairID,
+                        partID: item.id,
+                        quantity: item.quantity,
+                        totalPrice: item.price * item.quantity,
+                        arrivalDate: arrivalDate.toISOString().split("T")[0],
+                    });
                 })
-            ));
+            );
 
             setCart([]);
             showSuccess();
