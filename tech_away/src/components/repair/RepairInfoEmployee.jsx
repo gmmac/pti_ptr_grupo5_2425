@@ -10,6 +10,8 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState("");
   const [repairParts, setRepairParts] = useState([]);
+  const [hoveredRow, setHoveredRow] = useState(null);
+
 
     const fetchRepairsLogs = async () => {
         try {
@@ -140,7 +142,7 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
                     <Card.Body>
                         <h5 className="fw-bold mb-3">Parts Used in Repair</h5>
                         {repairParts.length > 0 ? (
-                            <Table responsive hover className="mb-0">
+                            <Table responsive className="mb-0">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -149,13 +151,17 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
                                         <th>Total Price</th>
                                         <th>Ordered On</th>
                                         <th>Status</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {repairParts.map((part, index) => {
                                         const orderedDate = new Date(part.createdAt);
+                                        const arrivalDate = new Date(part.arrivalDate);
 							            const today = new Date();
-                                        const isArrived = new Date(part.createdAt) <= new Date();
+                                        today.setHours(0, 0, 0, 0); // Garante que a comparação ignora as horas
+                                        arrivalDate.setHours(0, 0, 0, 0);
+                                        const isArrived = arrivalDate <= today;
                                         return (
                                             <tr key={part.id}>
                                                 <td>{index + 1}</td>
@@ -171,6 +177,14 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
                                                     }`}>
                                                         {isArrived ? 'Arrived' : 'Pending'}
                                                     </span>
+                                                </td>
+                                                <td>
+                                                    {!isArrived && (
+                                                        <button
+                                                            className="btn btn-sm btn-outline-danger ms-2" onClick={() => cancelPart(part.id)}>
+                                                            Cancel
+                                                        </button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         );
