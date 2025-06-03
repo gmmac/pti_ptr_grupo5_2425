@@ -275,6 +275,7 @@ router.post("/", async (req, res) => {
 			statusID,
 			description,
 			budget,
+      currentCost: 0,
 			estimatedDeliverDate,
 			employeeId,
 			clientId,

@@ -66,6 +66,7 @@ router.post("/", async (req, res) => {
             quantity,
             totalPrice,
             arrivalDate,
+            active: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
