@@ -38,6 +38,7 @@ router.post("/", async (req, res) => {
             quantity,
             totalPrice,
             arrivalDate,
+            currentCost,
         } = req.body;
 
         if (!repairID) {
@@ -70,6 +71,45 @@ router.post("/", async (req, res) => {
             createdAt: new Date(),
             updatedAt: new Date(),
         });
+
+        const repair = await models.Repair.findByPk(repairID);
+
+        await repair.update({
+			currentCost: currentCost + totalPrice,
+			updatedAt: new Date(),
+		});
+
+        res.status(200).json({
+            data: repairParts,
+        });
+    } catch (error) {
+    res.status(500).json({ error: "Error creating repair." });
+    }
+});
+
+router.put("/cancelOrder", async (req, res) => {
+    try {
+        const {
+            repairPartsID,
+            repairID,
+        } = req.body;
+
+        if (!repairPartsID) {
+            return res.status(400).json({ error: "RepairParts ID is required." });
+        }
+
+        const repair = await models.Repair.findByPk(repairID);
+        const repairParts = await models.RepairParts.findByPk(repairPartsID);
+
+        await repair.update({
+			currentCost: repair.currentCost - repairParts.totalPrice,
+			updatedAt: new Date(),
+		});
+
+        await repairParts.update({
+			active: 0,
+			updatedAt: new Date(),
+		});
 
         res.status(200).json({
             data: repairParts,

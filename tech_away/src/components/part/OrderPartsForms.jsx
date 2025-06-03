@@ -9,18 +9,35 @@ import "./OrderPartsForms.css";
 export default function OrderPartsForms({ equipmentSheetID, repairID, showModal, closeModal }) {
     const [cart, setCart] = useState([]);
     const [parts, setParts] = useState([]);
+    const [repair, setRepair] = useState({});
 
     const toast = useRef(null);
+
+    const fetchRepair = async () => {
+        try {
+            const response = await api.get(`/api/repair/${repairID}`);
+            setRepair(response.data);
+        } catch (error) {
+            console.error('Error fetching repair:', error);
+            setError('Error fetching repair. Please try again.');
+        }
+    };
+
+    const fetchParts = async () => {
+        try {
+            const response = await api.get(`/api/part/equipmentSheet/${equipmentSheetID}`);
+            setParts(response.data);
+        } catch (error) {
+            console.error("Erro ao carregar peças:", error);
+            setParts([]);
+        }
+    };
 
     useEffect(() => {
         if (!equipmentSheetID) return;
 
-        api.get(`/api/part/equipmentSheet/${equipmentSheetID}`)
-            .then((res) => setParts(res.data))
-            .catch((err) => {
-                console.error("Erro ao carregar peças:", err);
-                setParts([]);
-            });
+        fetchParts();
+        fetchRepair();
     }, [equipmentSheetID]);
 
     const showSuccess = () => {
@@ -73,13 +90,15 @@ export default function OrderPartsForms({ equipmentSheetID, repairID, showModal,
                         quantity: item.quantity,
                         totalPrice: item.price * item.quantity,
                         arrivalDate: arrivalDate.toISOString().split("T")[0],
+                        currentCost: repair.currentCost,
                     });
+
                 })
             );
 
             setCart([]);
             showSuccess();
-
+            fetchRepair();
             setTimeout(() => {
                 closeModal();
             }, 3000);
@@ -157,7 +176,22 @@ export default function OrderPartsForms({ equipmentSheetID, repairID, showModal,
                         )}
                     </div>
                     <div className="cart-footer">
-                        <h6>Total: €{total.toFixed(2)}</h6>
+                        <h6>
+                            Budget: €{(repair.budget - repair.currentCost).toFixed(2)}
+                        </h6>
+                        <h6
+                            style={{
+                                color: total > repair.budget ? 'red' : 'inherit',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                            }}
+                        >
+                            Total: €{total.toFixed(2)}
+                            {total > repair.budget && (
+                                <i className="pi pi-exclamation-triangle" style={{ color: 'red' }} title="Total exceeds budget" />
+                            )}
+                        </h6>
                         <Button
                             label="Order"
                             icon="pi pi-check"

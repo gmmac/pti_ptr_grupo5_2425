@@ -10,7 +10,6 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState("");
   const [repairParts, setRepairParts] = useState([]);
-  const [hoveredRow, setHoveredRow] = useState(null);
 
 
     const fetchRepairsLogs = async () => {
@@ -31,7 +30,6 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
         try {
             const response = await api.get(`/api/repairParts/${repairID}`);
             setRepairParts(response.data.parts);
-            console.log(response.data.parts)
         } catch (error) {
             console.error('Error fetching repair parts:', error);
         }
@@ -47,6 +45,16 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
             setError('Error fetching repair. Please try again.');
         }
     };
+
+	const cancelPartsOrder = async (partId) => {
+		try {
+			await api.put('/api/repairParts/cancelOrder', { repairPartsID: partId, repairID: repairID });
+			fetchRepairParts();
+			fetchRepair();
+		} catch (error) {
+			console.error('Error canceling part order:', error);
+		}
+	};
 
   useEffect(() => {
     if (show) {
@@ -82,7 +90,25 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
               <Card className="shadow-sm h-100">
                 <Card.Body>
                     <h5 className="mb-3 fw-bold">Budget & Status</h5>
-                    <p><Wallet className="me-2 text-secondary fs-5" />Budget: <strong>${repair.budget}</strong></p>
+                    <p><Wallet className="me-2 text-secondary fs-5" />Budget: <strong>${(repair.budget ?? 0).toFixed(2)}</strong></p>
+                    <p>
+                        <Wallet className="me-2 text-secondary fs-5" />
+                        Actual Cost:{" "}
+                        <strong className={
+                            repair.currentCost > repair.budget
+                                ? "text-danger d-inline-flex align-items-center"
+                                : ""
+                        }>
+                            ${ (repair.currentCost ?? 0).toFixed(2) }
+                            {repair.currentCost > repair.budget && (
+                                <i
+                                    className="pi pi-exclamation-triangle ms-2"
+                                    style={{ color: 'red' }}
+                                    title="Actual cost exceeds budget"
+                                />
+                            )}
+                        </strong>
+                    </p>
                     <p><CheckCircle className="me-2 text-secondary fs-5" />Current Status:
                         <span className={`ms-2 px-3 py-1 rounded-pill fw-semibold 
                         ${repair.RepairStatus?.state === 'Repair finished'
@@ -151,6 +177,7 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
                                         <th>Total Price</th>
                                         <th>Ordered On</th>
                                         <th>Status</th>
+										<th>Arrival Date</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -158,7 +185,7 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
                                     {repairParts.map((part, index) => {
                                         const orderedDate = new Date(part.createdAt);
                                         const arrivalDate = new Date(part.arrivalDate);
-							            const today = new Date();
+							                          const today = new Date();
                                         today.setHours(0, 0, 0, 0); // Garante que a comparação ignora as horas
                                         arrivalDate.setHours(0, 0, 0, 0);
                                         const isArrived = arrivalDate <= today;
@@ -170,18 +197,23 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
                                                 <td>${part.totalPrice.toFixed(2)}</td>
                                                 <td>{orderedDate.toLocaleDateString()}</td>
                                                 <td>
-                                                    <span className={`badge px-3 py-2 rounded-pill fw-semibold ${
-                                                        isArrived
-                                                            ? 'bg-success-subtle text-success border border-success'
-                                                            : 'bg-warning-subtle text-warning border border-warning'
-                                                    }`}>
-                                                        {isArrived ? 'Arrived' : 'Pending'}
-                                                    </span>
-                                                </td>
+													<span className={`badge px-3 py-2 rounded-pill fw-semibold ${
+														part.active === 0
+														? 'bg-danger-subtle text-danger border border-danger'
+														: isArrived
+															? 'bg-success-subtle text-success border border-success'
+															: 'bg-warning-subtle text-warning border border-warning'
+													}`}>
+														{part.active === 0 ? 'Canceled' : (isArrived ? 'Arrived' : 'Pending')}
+													</span>
+												</td>
+												<td>
+													{arrivalDate.toLocaleDateString()}
+												</td>
                                                 <td>
                                                     {!isArrived && (
                                                         <button
-                                                            className="btn btn-sm btn-outline-danger ms-2" onClick={() => cancelPart(part.id)}>
+                                                            className="btn btn-sm btn-outline-danger ms-2" onClick={() => cancelPartsOrder(part.id)}>
                                                             Cancel
                                                         </button>
                                                     )}
