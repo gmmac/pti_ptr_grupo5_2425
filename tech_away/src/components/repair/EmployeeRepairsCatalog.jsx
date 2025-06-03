@@ -13,6 +13,7 @@ import RepairInfo from "./RepairInfo";
 import NewRepairStatusLog from "./NewRepairStatusLog";
 import EditRepairForms from "./EditRepairForms";
 import OrderPartsForms from "../part/OrderPartsForms";
+import RepairInfoEmployee from "./RepairInfoEmployee";
 
 export default function EmployeeRepairsCatalog({refreshRepairs}) {
 	const [loading, setLoading] = useState(false);
@@ -326,7 +327,7 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
 						`}
 				</style>
             </div>
-            <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
+            <RepairInfoEmployee repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
             <NewRepairStatusLog repairId={repairID} showModal={showChangeRepairStatus} closeModal={() => setShowChangeRepairStatus(false)} setRefreshRepairs={refreshTable}/>
             <EditRepairForms repairID={repairID} showModal={showEditRepair} closeModal={() => setShowEditRepair(false)} setRefreshRepairs={refreshTable}/>
             <OrderPartsForms equipmentSheetID={equipmentSheetID} repairID={repairID} showModal={showOrderPartsModal} closeModal={() => setShowOrderPartsModal(false)}/>
