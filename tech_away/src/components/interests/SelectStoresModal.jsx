@@ -9,15 +9,13 @@ export default function SelectStoresModal({
   setSelectedStores,
 }) {
   const title = "Select Stores";
-  const routeName = "stores";
+  const routeName = "store";
   const [fullList, setFullList] = useState([]);
   const [list, setList] = useState([]);
-  const [columns, setColumns] = useState([]);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [columns] = useState(["name", "email", "phone", "address"]);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
-
-  /* ---------- fetch inicial ---------- */
 
   useEffect(() => {
     if (!showModal) return;
@@ -29,22 +27,47 @@ export default function SelectStoresModal({
         const rows = data.data || [];
         setFullList(rows);
         setList(rows);
-        setColumns(
-          rows.length
-            ? Object.keys(rows[0]).filter(
-                (c) => !["createdAt", "updatedAt"].includes(c)
-              )
-            : []
-        );
+        setSelectedRows(selectedStrores || []);
       } catch (err) {
         console.error(err);
         setFullList([]);
         setList([]);
-        setColumns([]);
       }
     })();
-  }, [showModal, routeName]);
-  /* ---------- render ---------- */
+  }, [showModal]);
+
+  const getRowKey = (row) => row.id || `${row.name}-${row.email}`;
+
+  const handleRowClick = (row) => {
+    const rowKey = getRowKey(row);
+    const isAlreadySelected = selectedRows.some((r) => getRowKey(r) === rowKey);
+
+    if (isAlreadySelected) {
+      setSelectedRows(selectedRows.filter((r) => getRowKey(r) !== rowKey));
+    } else {
+      setSelectedRows([...selectedRows, row]);
+    }
+  };
+
+  const handleConfirm = () => {
+    setSelectedStores(selectedRows);
+    setShowModal(false);
+  };
+
+  useEffect(() => {
+    if (!search.trim()) {
+      setList(fullList);
+      return;
+    }
+    const searchLower = search.toLowerCase();
+    const filtered = fullList.filter((item) =>
+      Object.values(item).some((val) =>
+        String(val).toLowerCase().includes(searchLower)
+      )
+    );
+    setList(filtered);
+  }, [search, fullList]);
+
   return (
     <Modal
       show={showModal}
@@ -55,6 +78,7 @@ export default function SelectStoresModal({
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
         <Stack direction="horizontal" gap={2} className="mb-3">
           <Form.Control
@@ -65,42 +89,62 @@ export default function SelectStoresModal({
             className="rounded-pill"
           />
           <Button
-            className="rounded-pill"
+            className="rounded-pill w-25 d-flex gap-2 justify-content-center align-items-center"
             style={{ backgroundColor: "var(--variant-one)", border: "none" }}
             onClick={() => setSearch(inputValue)}
           >
-            Search
+            <i className="pi pi-search"></i>
+            <span>Search</span>
+          </Button>
+          <Button
+            className="rounded-pill w-25 d-flex gap-2 justify-content-center align-items-center"
+            style={{
+              backgroundColor: "var(--variant-two)",
+              color: "var(--white)",
+              border: "none",
+            }}
+            onClick={() => {
+              setInputValue("");
+              setSearch("");
+              setSelectedRows([]);
+            }}
+          >
+            <i className="pi pi-refresh"></i>
+            <span>Reset</span>
           </Button>
         </Stack>
+
         {list.length > 0 ? (
           <Table striped bordered hover responsive>
             <thead>
               <tr>
-                {columns.map((c) => (
-                  <th key={c}>{c}</th>
+                {columns.map((col) => (
+                  <th key={col}>
+                    {col.charAt(0).toUpperCase() + col.slice(1)}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {list.map((row) => {
-                const isSel = selectedRow?.NIPC === row.NIPC;
+                const rowKey = getRowKey(row);
+                const isSel = selectedRows.some((r) => getRowKey(r) === rowKey);
                 return (
                   <tr
-                    key={row.NIPC}
-                    onClick={() => setSelectedRow(row)}
+                    key={rowKey}
+                    onClick={() => handleRowClick(row)}
                     style={{ cursor: "pointer" }}
                   >
                     {columns.map((col) => (
                       <td
                         key={col}
-                        style={
-                          isSel
-                            ? {
-                                backgroundColor: "var(--variant-one)",
-                                color: "var(--white)",
-                              }
-                            : {}
-                        }
+                        style={{
+                          backgroundColor: isSel
+                            ? "var(--variant-one)"
+                            : undefined,
+                          color: isSel ? "var(--white)" : undefined,
+                          transition: "background-color 0.2s ease",
+                        }}
                       >
                         {row[col]}
                       </td>
@@ -114,6 +158,7 @@ export default function SelectStoresModal({
           <p className="text-center">No stores found</p>
         )}
       </Modal.Body>
+
       <Modal.Footer>
         <Button
           variant="secondary"
@@ -125,8 +170,10 @@ export default function SelectStoresModal({
         <Button
           style={{ backgroundColor: "var(--variant-one)", border: "none" }}
           className="rounded-pill"
+          onClick={handleConfirm}
+          disabled={!selectedRows.length}
         >
-          Select
+          Select ({selectedRows.length})
         </Button>
       </Modal.Footer>
     </Modal>

@@ -517,6 +517,19 @@ export default function CreateInterestModal({ show, setShow }) {
                       >
                         Select Stores
                       </Button>
+                      <Button
+                        variant="secondary"
+                        className="rounded-pill"
+                        disabled={formData.preferredStoreIDs.length == 0}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            preferredStoreIDs: [""],
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
                     </Stack>
                   </Form.Group>
                   {/* Description */}
