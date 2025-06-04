@@ -7,18 +7,17 @@ export default function ComponentSelectorModalForm({
   setShowModal,
   title,
   routeName,
-  selectedItem = null,
   onSelect,
+  displayField = "name", // "name" por defeito, mas podes passar "state"
 }) {
-  /* ---------- estados ---------- */
-  const [fullList, setFullList] = useState([]); // lista completa
-  const [list, setList] = useState([]); // lista filtrada
+  const [fullList, setFullList] = useState([]);
+  const [list, setList] = useState([]);
   const [columns, setColumns] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [inputValue, setInputValue] = useState(""); // texto digitado
-  const [search, setSearch] = useState(""); // termo efectivo
+  const [inputValue, setInputValue] = useState("");
+  const [search, setSearch] = useState("");
 
-  /* ---------- fetch inicial (uma vez por abertura) ---------- */
+  /* ---------- fetch inicial ---------- */
   useEffect(() => {
     if (!showModal) return;
 
@@ -33,53 +32,49 @@ export default function ComponentSelectorModalForm({
         setColumns(
           rows.length
             ? Object.keys(rows[0]).filter(
-                (c) => !["createdAt", "updatedAt", "id"].includes(c)
+                (c) => !["createdAt", "updatedAt"].includes(c)
               )
             : []
         );
       } catch (err) {
-        console.error("API error:", err.message);
+        console.error(err);
         setFullList([]);
         setList([]);
         setColumns([]);
       }
     })();
+  }, [showModal, routeName]);
 
-    setSelectedRow(selectedItem);
-  }, [showModal, routeName, selectedItem]);
-
-  /* ---------- filtragem local ---------- */
+  /* ---------- filtro local ---------- */
   useEffect(() => {
     if (search.trim() === "") {
       setList(fullList);
       return;
     }
     const term = search.trim().toLowerCase();
-    const filtered = fullList.filter((row) =>
-      columns.some((col) => {
-        const v =
-          typeof row[col] === "object" && row[col] !== null
-            ? row[col].name
-            : row[col];
-        return String(v).toLowerCase().includes(term);
-      })
+    setList(
+      fullList.filter((row) =>
+        columns.some((col) =>
+          String(
+            typeof row[col] === "object" && row[col] !== null
+              ? row[col].name
+              : row[col]
+          )
+            .toLowerCase()
+            .includes(term)
+        )
+      )
     );
-    setList(filtered);
   }, [search, fullList, columns]);
 
-  /* ---------- handlers ---------- */
-  const handleRowClick = (item) => setSelectedRow(item);
-
+  /* ---------- confirmar ---------- */
   const handleConfirm = () => {
     if (!selectedRow) return;
-    onSelect({ id: selectedRow.id, name: selectedRow.name });
+    onSelect({
+      id: selectedRow.id,
+      [displayField]: selectedRow[displayField], // devolve id + campo pedido
+    });
     setShowModal(false);
-  };
-
-  const resetSearch = () => {
-    setInputValue("");
-    setSearch("");
-    setSelectedRow(null);
   };
 
   /* ---------- render ---------- */
@@ -89,58 +84,29 @@ export default function ComponentSelectorModalForm({
       size="lg"
       centered
       onHide={() => setShowModal(false)}
-      style={{ fontFamily: "var(--body-font)", color: "var(--dark-grey)" }}
     >
       <Modal.Header closeButton>
-        <Modal.Title style={{ fontFamily: "var(--title-font)" }}>
-          {title}
-        </Modal.Title>
+        <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
-        {/* barra de pesquisa + botões */}
-        <Stack
-          gap={2}
-          direction="horizontal"
-          className="justify-content-between align-items-center mb-3"
-        >
+        <Stack direction="horizontal" gap={2} className="mb-3">
           <Form.Control
-            type="text"
             placeholder="Search..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && setSearch(inputValue)}
             className="rounded-pill"
           />
-
           <Button
-            className="rounded-pill w-25 d-flex gap-2 justify-content-center align-items-center"
-            style={{
-              backgroundColor: "var(--variant-one)",
-              color: "var(--white)",
-              border: "none",
-            }}
+            className="rounded-pill"
+            style={{ backgroundColor: "var(--variant-one)", border: "none" }}
             onClick={() => setSearch(inputValue)}
           >
-            <i className="pi pi-search"></i>
-            <span>Search</span>
-          </Button>
-
-          <Button
-            className="rounded-pill w-25 d-flex gap-2 justify-content-center align-items-center"
-            style={{
-              backgroundColor: "var(--variant-two)",
-              color: "var(--white)",
-              border: "none",
-            }}
-            onClick={resetSearch}
-          >
-            <i className="pi pi-refresh"></i>
-            <span>Reset</span>
+            Search
           </Button>
         </Stack>
 
-        {/* tabela */}
         {list.length ? (
           <Table bordered hover responsive="sm">
             <thead>
@@ -151,12 +117,12 @@ export default function ComponentSelectorModalForm({
               </tr>
             </thead>
             <tbody>
-              {list.map((item, rowIdx) => {
-                const isSel = selectedRow?.id === item.id;
+              {list.map((row) => {
+                const isSel = selectedRow?.id === row.id;
                 return (
                   <tr
-                    key={rowIdx}
-                    onClick={() => handleRowClick(item)}
+                    key={row.id}
+                    onClick={() => setSelectedRow(row)}
                     style={{ cursor: "pointer" }}
                   >
                     {columns.map((col) => (
@@ -168,12 +134,12 @@ export default function ComponentSelectorModalForm({
                                 backgroundColor: "var(--variant-one)",
                                 color: "var(--white)",
                               }
-                            : { backgroundColor: "inherit" }
+                            : {}
                         }
                       >
-                        {typeof item[col] === "object" && item[col] !== null
-                          ? item[col].name || JSON.stringify(item[col])
-                          : item[col]}
+                        {typeof row[col] === "object" && row[col] !== null
+                          ? row[col].name || JSON.stringify(row[col])
+                          : row[col]}
                       </td>
                     ))}
                   </tr>
@@ -189,17 +155,17 @@ export default function ComponentSelectorModalForm({
       <Modal.Footer>
         <Button
           variant="secondary"
-          className="rounded-pill px-4"
           onClick={() => setShowModal(false)}
+          className="rounded-pill"
         >
           Cancel
         </Button>
         <Button
           variant="primary"
-          disabled={!selectedRow}
-          className="rounded-pill px-4"
           style={{ backgroundColor: "var(--variant-one)", border: "none" }}
+          disabled={!selectedRow}
           onClick={handleConfirm}
+          className="rounded-pill"
         >
           Select
         </Button>

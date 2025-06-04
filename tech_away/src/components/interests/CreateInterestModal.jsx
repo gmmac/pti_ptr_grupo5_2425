@@ -5,12 +5,18 @@ import ComponentSelectorModalForm from "./ComponentSelectorModalForm";
 import EquipmentSheetModal from "./EquipmentSheetModal";
 
 export default function CreateInterestModal({ show, setShow }) {
+  /* ---------- modal visibility ---------- */
   const [brandModal, setBrandModal] = useState(false);
   const [modelModal, setModelModal] = useState(false);
   const [typeModal, setTypeModal] = useState(false);
   const [equipmentSheetModal, setEquipmentSheetModal] = useState(false);
+  const [stateModal, setStateModal] = useState(false);
+
+  const isChildOpen =
+    brandModal || modelModal || typeModal || equipmentSheetModal || stateModal;
+
+  /* ---------- data ---------- */
   const [sheetSelected, setSheetSelected] = useState(false);
-  const { createGenericInterest } = useInterests();
 
   const [formData, setFormData] = useState({
     brandID: { id: "", name: "" },
@@ -22,7 +28,7 @@ export default function CreateInterestModal({ show, setShow }) {
       model: { id: "", name: "" },
       type: { id: "", name: "" },
     },
-    equipmentStatusID: { id: "", name: "" },
+    equipmentStatusID: { id: "", state: "" }, // usa .state
     minLaunchYear: "",
     maxLaunchYear: "",
     minPrice: "",
@@ -30,260 +36,283 @@ export default function CreateInterestModal({ show, setShow }) {
     preferredStoreIDs: [""],
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleStoreChange = (index, value) => {
-    const updatedStores = [...formData.preferredStoreIDs];
-    updatedStores[index] = value;
-    setFormData((prev) => ({ ...prev, preferredStoreIDs: updatedStores }));
-  };
-
-  const addStoreField = () => {
-    setFormData((prev) => ({
-      ...prev,
-      preferredStoreIDs: [...prev.preferredStoreIDs, ""],
-    }));
-  };
-
+  /* ---------- copy brand/model/type from sheet ---------- */
   useEffect(() => {
     if (sheetSelected) {
       setFormData((prev) => ({
         ...prev,
-        brandID: { ...formData.equipmentSheet.brand },
-        modelID: { ...formData.equipmentSheet.model },
-        typeID: { ...formData.equipmentSheet.type },
+        brandID: { ...prev.equipmentSheet.brand },
+        modelID: { ...prev.equipmentSheet.model },
+        typeID: { ...prev.equipmentSheet.type },
       }));
+      setSheetSelected(false);
     }
-    setSheetSelected(false);
   }, [sheetSelected]);
 
+  /* ---------- clear sheet if brand/model/type change ---------- */
+  useEffect(() => {
+    const sheet = formData.equipmentSheet;
+    if (!sheet.id) return;
+
+    const same =
+      sheet.brand.id === formData.brandID.id &&
+      sheet.model.id === formData.modelID.id &&
+      sheet.type.id === formData.typeID.id;
+
+    if (!same) {
+      setFormData((prev) => ({
+        ...prev,
+        equipmentSheet: {
+          id: "",
+          brand: { id: "", name: "" },
+          model: { id: "", name: "" },
+          type: { id: "", name: "" },
+        },
+      }));
+    }
+  }, [formData.brandID, formData.modelID, formData.typeID]);
+
+  /* ---------- render ---------- */
   return (
     <>
-      <Modal show={show} centered size="lg">
-        <Modal.Header>
-          <Stack
-            direction="horizontal"
-            className="w-100 justify-content-between"
-          >
-            <h5 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
-              Create New Interest
-            </h5>
-            <Button variant="close" onClick={() => setShow(false)} />
-          </Stack>
+      {/* MAIN MODAL ---------------------------------------------- */}
+      <Modal
+        show={show && !isChildOpen}
+        centered
+        size="lg"
+        onHide={() => setShow(false)}
+        style={{ fontFamily: "var(--body-font)", color: "var(--dark-grey)" }}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title style={{ fontFamily: "var(--title-font)" }}>
+            Create New Interest
+          </Modal.Title>
         </Modal.Header>
+
         <Modal.Body>
           <Form>
-            <Stack
-              className="p-3 flex-wrap"
-              direction="vertical"
-              gap={3}
-              style={{
-                backgroundColor: "var(--variant-one-light)",
-                borderRadius: "16px",
-              }}
-            >
-              {/* Equipment Sheet */}
-              <Form.Group controlId="equipmentSheetID">
-                <Form.Label className="text-muted ms-1">
-                  Equipment Sheet
-                </Form.Label>
-                <Stack direction="horizontal" className="mb-2" gap={2}>
-                  <Form.Control
-                    type="text"
-                    name="equipmentSheetID"
-                    className="rounded-pill"
-                    value={formData.equipmentSheet.id}
-                    readOnly
-                  />
-                  <Button
-                    className="rounded-pill mt-2 w-50"
-                    style={{
-                      backgroundColor: "var(--variant-one)",
-                      border: "none",
-                    }}
-                    onClick={() => setEquipmentSheetModal(true)}
-                  >
-                    Select Equipment Sheet
-                  </Button>
-                  <Button
-                    className="rounded-pill mt-2"
-                    style={{
-                      backgroundColor: "var(--variant-one)",
-                      border: "none",
-                    }}
-                    onClick={() =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        equipmentSheet: {
-                          id: "",
-                          brand: { id: "", name: "" },
-                          model: { id: "", name: "" },
-                          type: { id: "", name: "" },
-                        },
-                        brandID: { id: "", name: "" },
-                        modelID: { id: "", name: "" },
-                        typeID: { id: "", name: "" },
-                      }))
-                    }
-                  >
-                    Clear
-                  </Button>
-                </Stack>
-              </Form.Group>
+            <Stack direction="horizontal" gap={3}>
+              {/* ----------- LEFT COLUMN (Sheet, Brand, Model, Type) ----------- */}
+              <Stack
+                className="p-3 flex-wrap"
+                direction="vertical"
+                gap={3}
+                style={{
+                  backgroundColor: "var(--variant-one-light)",
+                  borderRadius: "16px",
+                }}
+              >
+                {/* Equipment Sheet */}
+                <Form.Group controlId="equipmentSheetID">
+                  <Form.Label className="text-muted ms-1">
+                    Equipment Sheet
+                  </Form.Label>
+                  <Stack direction="horizontal" gap={2}>
+                    <Form.Control
+                      value={formData.equipmentSheet.id}
+                      readOnly
+                      className="rounded-pill"
+                    />
+                    <Button
+                      className="rounded-pill w-50"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() => setEquipmentSheetModal(true)}
+                    >
+                      Select Equipment Sheet
+                    </Button>
+                    <Button
+                      className="rounded-pill"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          equipmentSheet: {
+                            id: "",
+                            brand: { id: "", name: "" },
+                            model: { id: "", name: "" },
+                            type: { id: "", name: "" },
+                          },
+                          brandID: { id: "", name: "" },
+                          modelID: { id: "", name: "" },
+                          typeID: { id: "", name: "" },
+                        }))
+                      }
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Form.Group>
 
-              {/* Brand */}
-              <Form.Group controlId="brandID">
-                <Form.Label className="text-muted ms-1">Brand</Form.Label>
-                <Stack direction="horizontal" className="mb-2" gap={2}>
-                  <Form.Control
-                    type="text"
-                    name="brandID"
-                    className="rounded-pill"
-                    value={formData.brandID.name}
-                    readOnly
-                  />
-                  <Button
-                    className="rounded-pill mt-2 w-50"
-                    style={{
-                      backgroundColor: "var(--variant-one)",
-                      border: "none",
-                    }}
-                    onClick={() => setBrandModal(true)}
-                  >
-                    Select Brand
-                  </Button>
-                  <Button
-                    className="rounded-pill mt-2"
-                    style={{
-                      backgroundColor: "var(--variant-one)",
-                      border: "none",
-                    }}
-                    variant="secondary"
-                    onClick={() =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        brandID: { id: "", name: "" },
-                      }))
-                    }
-                  >
-                    Clear
-                  </Button>
-                </Stack>
-              </Form.Group>
+                {/* Brand */}
+                <Form.Group controlId="brandID">
+                  <Form.Label className="text-muted ms-1">Brand</Form.Label>
+                  <Stack direction="horizontal" gap={2}>
+                    <Form.Control
+                      value={formData.brandID.name}
+                      readOnly
+                      className="rounded-pill"
+                    />
+                    <Button
+                      className="rounded-pill w-50"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() => setBrandModal(true)}
+                    >
+                      Select Brand
+                    </Button>
+                    <Button
+                      className="rounded-pill"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          brandID: { id: "", name: "" },
+                        }))
+                      }
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Form.Group>
 
-              {/* Model */}
-              <Form.Group controlId="modelID">
-                <Form.Label className="text-muted ms-1">Model</Form.Label>
-                <Stack direction="horizontal" className="mb-2" gap={2}>
-                  <Form.Control
-                    type="text"
-                    name="modelID"
-                    className="rounded-pill"
-                    value={formData.modelID.name}
-                    readOnly
-                  />
-                  <Button
-                    className="rounded-pill mt-2 w-50"
-                    style={{
-                      backgroundColor: "var(--variant-one)",
-                      border: "none",
-                    }}
-                    onClick={() => setModelModal(true)}
-                  >
-                    Select Model
-                  </Button>
-                  <Button
-                    className="rounded-pill mt-2"
-                    style={{
-                      backgroundColor: "var(--variant-one)",
-                      border: "none",
-                    }}
-                    onClick={() =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        modelID: { id: "", name: "" },
-                      }))
-                    }
-                  >
-                    Clear
-                  </Button>
-                </Stack>
-              </Form.Group>
+                {/* Model */}
+                <Form.Group controlId="modelID">
+                  <Form.Label className="text-muted ms-1">Model</Form.Label>
+                  <Stack direction="horizontal" gap={2}>
+                    <Form.Control
+                      value={formData.modelID.name}
+                      readOnly
+                      className="rounded-pill"
+                    />
+                    <Button
+                      className="rounded-pill w-50"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() => setModelModal(true)}
+                    >
+                      Select Model
+                    </Button>
+                    <Button
+                      className="rounded-pill"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          modelID: { id: "", name: "" },
+                        }))
+                      }
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Form.Group>
 
-              {/* Type */}
-              <Form.Group controlId="typeID">
-                <Form.Label className="text-muted ms-1">Type</Form.Label>
-                <Stack direction="horizontal" className="mb-2" gap={2}>
-                  <Form.Control
-                    type="text"
-                    name="typeID"
-                    className="rounded-pill"
-                    value={formData.typeID.name}
-                    readOnly
-                  />
-                  <Button
-                    className="rounded-pill mt-2 w-50"
-                    style={{
-                      backgroundColor: "var(--variant-one)",
-                      border: "none",
-                    }}
-                    onClick={() => setTypeModal(true)}
-                  >
-                    Select Type
-                  </Button>
-                  <Button
-                    className="rounded-pill mt-2"
-                    style={{
-                      backgroundColor: "var(--variant-one)",
-                      border: "none",
-                    }}
-                    onClick={() =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        typeID: { id: "", name: "" },
-                      }))
-                    }
-                  >
-                    Clear
-                  </Button>
-                </Stack>
-              </Form.Group>
+                {/* Type */}
+                <Form.Group controlId="typeID">
+                  <Form.Label className="text-muted ms-1">Type</Form.Label>
+                  <Stack direction="horizontal" gap={2}>
+                    <Form.Control
+                      value={formData.typeID.name}
+                      readOnly
+                      className="rounded-pill"
+                    />
+                    <Button
+                      className="rounded-pill w-50"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() => setTypeModal(true)}
+                    >
+                      Select Type
+                    </Button>
+                    <Button
+                      className="rounded-pill"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          typeID: { id: "", name: "" },
+                        }))
+                      }
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Form.Group>
+              </Stack>
+
+              {/* ----------- RIGHT COLUMN (State) ----------- */}
+              <Stack
+                className="p-3 flex-wrap"
+                direction="vertical"
+                gap={3}
+                style={{
+                  backgroundColor: "var(--variant-one-light)",
+                  borderRadius: "16px",
+                }}
+              >
+                <Form.Group controlId="equipmentStatusID">
+                  <Form.Label className="text-muted ms-1">State</Form.Label>
+                  <Stack direction="horizontal" gap={2}>
+                    <Form.Control
+                      value={formData.equipmentStatusID.state}
+                      readOnly
+                      className="rounded-pill"
+                    />
+                    <Button
+                      className="rounded-pill w-50"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() => setStateModal(true)}
+                    >
+                      Select State
+                    </Button>
+                    <Button
+                      className="rounded-pill"
+                      style={{
+                        backgroundColor: "var(--variant-one)",
+                        border: "none",
+                      }}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          equipmentStatusID: { id: "", state: "" },
+                        }))
+                      }
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Form.Group>
+              </Stack>
             </Stack>
           </Form>
         </Modal.Body>
       </Modal>
 
-      {/* MODALS */}
-      <ComponentSelectorModalForm
-        showModal={brandModal}
-        setShowModal={setBrandModal}
-        routeName={"brand"}
-        title="Select Brand"
-        onSelect={(selected) =>
-          setFormData((prev) => ({ ...prev, brandID: selected }))
-        }
-      />
-      <ComponentSelectorModalForm
-        showModal={modelModal}
-        setShowModal={setModelModal}
-        routeName={"model"}
-        title="Select Model"
-        onSelect={(selected) =>
-          setFormData((prev) => ({ ...prev, modelID: selected }))
-        }
-      />
-      <ComponentSelectorModalForm
-        showModal={typeModal}
-        setShowModal={setTypeModal}
-        routeName={"type"}
-        title="Select Type"
-        onSelect={(selected) =>
-          setFormData((prev) => ({ ...prev, typeID: selected }))
-        }
-      />
+      {/* CHILD MODALS ------------------------------------------- */}
       <EquipmentSheetModal
         showModal={equipmentSheetModal}
         setShowModal={setEquipmentSheetModal}
@@ -291,6 +320,50 @@ export default function CreateInterestModal({ show, setShow }) {
           setFormData((prev) => ({ ...prev, equipmentSheet: selected }))
         }
         setSeetSelected={setSheetSelected}
+      />
+
+      <ComponentSelectorModalForm
+        showModal={brandModal}
+        setShowModal={setBrandModal}
+        routeName="brand"
+        title="Select Brand"
+        onSelect={(selected) =>
+          setFormData((prev) => ({ ...prev, brandID: selected }))
+        }
+      />
+
+      <ComponentSelectorModalForm
+        showModal={modelModal}
+        setShowModal={setModelModal}
+        routeName="model"
+        title="Select Model"
+        onSelect={(selected) =>
+          setFormData((prev) => ({ ...prev, modelID: selected }))
+        }
+      />
+
+      <ComponentSelectorModalForm
+        showModal={typeModal}
+        setShowModal={setTypeModal}
+        routeName="type"
+        title="Select Type"
+        onSelect={(selected) =>
+          setFormData((prev) => ({ ...prev, typeID: selected }))
+        }
+      />
+
+      <ComponentSelectorModalForm
+        showModal={stateModal}
+        setShowModal={setStateModal}
+        routeName="equipmentStatus"
+        title="Select State"
+        displayField="state" /* devolve .state */
+        onSelect={(selected) =>
+          setFormData((prev) => ({
+            ...prev,
+            equipmentStatusID: { id: selected.id, state: selected.state },
+          }))
+        }
       />
     </>
   );
