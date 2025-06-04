@@ -6,6 +6,28 @@ import EquipmentSheetModal from "./EquipmentSheetModal";
 import SelectStoresModal from "./SelectStoresModal";
 
 export default function CreateInterestModal({ show, setShow }) {
+  const { createInterest } = useInterests();
+  /* ---------- data ---------- */
+  const [sheetSelected, setSheetSelected] = useState(false);
+
+  const [formData, setFormData] = useState({
+    brandID: { id: "", name: "" },
+    modelID: { id: "", name: "" },
+    typeID: { id: "", name: "" },
+    equipmentSheet: {
+      id: "",
+      brand: { id: "", name: "" },
+      model: { id: "", name: "" },
+      type: { id: "", name: "" },
+    },
+    equipmentStatusID: { id: "", state: "" }, // usa .state
+    minLaunchYear: "",
+    maxLaunchYear: "",
+    minPrice: "",
+    maxPrice: "",
+    preferredStoreIDs: [],
+    description: "",
+  });
   /* ---------- modal visibility ---------- */
   const [brandModal, setBrandModal] = useState(false);
   const [modelModal, setModelModal] = useState(false);
@@ -26,11 +48,18 @@ export default function CreateInterestModal({ show, setShow }) {
   const startYear = 1995;
   const currentYear = new Date().getFullYear();
 
-  // 1) gerar logo decrescente
   const years = Array.from(
     { length: currentYear - startYear + 1 },
     (_, i) => currentYear - i
   );
+
+  const minYearOptions = formData.maxLaunchYear
+    ? years.filter((y) => y <= parseInt(formData.maxLaunchYear))
+    : years;
+
+  const maxYearOptions = formData.minLaunchYear
+    ? years.filter((y) => y >= parseInt(formData.minLaunchYear))
+    : years;
 
   /* ---------- price ---------- */
   const PRICE_MIN = 0;
@@ -42,27 +71,13 @@ export default function CreateInterestModal({ show, setShow }) {
     (_, i) => PRICE_MIN + i * STEP
   );
 
-  /* ---------- data ---------- */
-  const [sheetSelected, setSheetSelected] = useState(false);
+  const minPriceOptions = formData.maxPrice
+    ? priceOptions.filter((p) => p <= parseInt(formData.maxPrice))
+    : priceOptions;
 
-  const [formData, setFormData] = useState({
-    brandID: { id: "", name: "" },
-    modelID: { id: "", name: "" },
-    typeID: { id: "", name: "" },
-    equipmentSheet: {
-      id: "",
-      brand: { id: "", name: "" },
-      model: { id: "", name: "" },
-      type: { id: "", name: "" },
-    },
-    equipmentStatusID: { id: "", state: "" }, // usa .state
-    minLaunchYear: "",
-    maxLaunchYear: "",
-    minPrice: "",
-    maxPrice: "",
-    preferredStoreIDs: [""],
-    description: "",
-  });
+  const maxPriceOptions = formData.minPrice
+    ? priceOptions.filter((p) => p >= parseInt(formData.minPrice))
+    : priceOptions;
 
   /* ---------- copy brand/model/type from sheet ---------- */
   useEffect(() => {
@@ -106,6 +121,34 @@ export default function CreateInterestModal({ show, setShow }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  function verifyInput(input) {
+    if (typeof input !== "string") return null;
+    return input.replace(/['";]|--/g, "").trim();
+  }
+
+  function prepareInterestData(formData) {
+    return {
+      brandID: formData.brandID?.id || null,
+      modelID: formData.modelID?.id || null,
+      typeID: formData.typeID?.id || null,
+      equipmentSheetID: formData.equipmentSheet?.id || null,
+      equipmentStatusID: formData.equipmentStatusID?.id || null,
+      minLaunchYear: formData.minLaunchYear || null,
+      maxLaunchYear: formData.maxLaunchYear || null,
+      minPrice: formData.minPrice || null,
+      maxPrice: formData.maxPrice || null,
+      description: verifyInput(formData.description) || null,
+    };
+  }
+
+  /* ---------- submit ---------- */
+
+  const handleSubmit = async () => {
+    const interestData = prepareInterestData(formData);
+    createInterest(interestData);
+    setShow(false);
+  };
+
   /* ---------- render ---------- */
   return (
     <>
@@ -125,13 +168,13 @@ export default function CreateInterestModal({ show, setShow }) {
 
         <Modal.Body>
           <Form>
-            <Row>
+            <Row className="align-items-stretch">
               {/* ----------- LEFT COLUMN (Sheet, Brand, Model, Type) ----------- */}
-              <Col lg={6} md={12} className="mb-3">
+              <Col lg={6} md={12} className="mb-3 d-flex flex-column">
                 <Stack
                   className="p-3 flex-wrap"
                   direction="vertical"
-                  gap={4}
+                  gap={2}
                   style={{
                     backgroundColor: "var(--variant-one-light)",
                     borderRadius: "16px",
@@ -154,16 +197,6 @@ export default function CreateInterestModal({ show, setShow }) {
                       className="justify-content-stretch"
                     >
                       <Button
-                        className="rounded-pill w-100"
-                        style={{
-                          backgroundColor: "var(--variant-one)",
-                          border: "none",
-                        }}
-                        onClick={() => setEquipmentSheetModal(true)}
-                      >
-                        Select Equipment Sheet
-                      </Button>
-                      <Button
                         className="rounded-pill"
                         variant="secondary"
                         disabled={!formData.equipmentSheet.id}
@@ -184,6 +217,16 @@ export default function CreateInterestModal({ show, setShow }) {
                       >
                         Clear
                       </Button>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setEquipmentSheetModal(true)}
+                      >
+                        Select Equipment Sheet
+                      </Button>
                     </Stack>
                   </Form.Group>
 
@@ -198,16 +241,6 @@ export default function CreateInterestModal({ show, setShow }) {
                     />
                     <Stack direction="horizontal" gap={2}>
                       <Button
-                        className="rounded-pill w-100"
-                        style={{
-                          backgroundColor: "var(--variant-one)",
-                          border: "none",
-                        }}
-                        onClick={() => setBrandModal(true)}
-                      >
-                        Select Brand
-                      </Button>
-                      <Button
                         className="rounded-pill"
                         variant="secondary"
                         disabled={!formData.brandID.id}
@@ -219,6 +252,16 @@ export default function CreateInterestModal({ show, setShow }) {
                         }
                       >
                         Clear
+                      </Button>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setBrandModal(true)}
+                      >
+                        Select Brand
                       </Button>
                     </Stack>
                   </Form.Group>
@@ -233,16 +276,6 @@ export default function CreateInterestModal({ show, setShow }) {
                     />
                     <Stack direction="horizontal" gap={2}>
                       <Button
-                        className="rounded-pill w-100"
-                        style={{
-                          backgroundColor: "var(--variant-one)",
-                          border: "none",
-                        }}
-                        onClick={() => setModelModal(true)}
-                      >
-                        Select Model
-                      </Button>
-                      <Button
                         className="rounded-pill"
                         variant="secondary"
                         disabled={!formData.modelID.id}
@@ -254,6 +287,16 @@ export default function CreateInterestModal({ show, setShow }) {
                         }
                       >
                         Clear
+                      </Button>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setModelModal(true)}
+                      >
+                        Select Model
                       </Button>
                     </Stack>
                   </Form.Group>
@@ -268,16 +311,6 @@ export default function CreateInterestModal({ show, setShow }) {
                     />
                     <Stack direction="horizontal" gap={2}>
                       <Button
-                        className="rounded-pill w-100"
-                        style={{
-                          backgroundColor: "var(--variant-one)",
-                          border: "none",
-                        }}
-                        onClick={() => setTypeModal(true)}
-                      >
-                        Select Type
-                      </Button>
-                      <Button
                         className="rounded-pill"
                         variant="secondary"
                         disabled={!formData.typeID.id}
@@ -290,14 +323,24 @@ export default function CreateInterestModal({ show, setShow }) {
                       >
                         Clear
                       </Button>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setTypeModal(true)}
+                      >
+                        Select Type
+                      </Button>
                     </Stack>
                   </Form.Group>
                 </Stack>
               </Col>
               {/* ----------- RIGHT COLUMN ----------- */}
-              <Col lg={6} md={12} className="mb-3">
+              <Col lg={6} md={12} className="mb-3 d-flex flex-column">
                 <Stack
-                  className="p-3"
+                  className="p-3 flex-wrap"
                   direction="vertical"
                   gap={4}
                   style={{
@@ -314,16 +357,6 @@ export default function CreateInterestModal({ show, setShow }) {
                     />
                     <Stack direction="horizontal" gap={2}>
                       <Button
-                        className="rounded-pill w-100"
-                        style={{
-                          backgroundColor: "var(--variant-one)",
-                          border: "none",
-                        }}
-                        onClick={() => setStateModal(true)}
-                      >
-                        Select State
-                      </Button>
-                      <Button
                         className="rounded-pill"
                         variant="secondary"
                         disabled={!formData.equipmentStatusID.id}
@@ -336,67 +369,24 @@ export default function CreateInterestModal({ show, setShow }) {
                       >
                         Clear
                       </Button>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setStateModal(true)}
+                      >
+                        Select State
+                      </Button>
                     </Stack>
                   </Form.Group>
                   {/* Launch Year */}
                   <Stack
                     direction="horizontal"
                     gap={3}
-                    className="align-items-end justify-content-between"
+                    className="align-items-end justify-content-stretch"
                   >
-                    {/* minLaunchYear */}
-                    <Form.Group controlId="minLaunchYear" className="">
-                      <Form.Label className="text-muted ms-1">
-                        Min Year
-                      </Form.Label>
-
-                      <Form.Select
-                        name="minLaunchYear"
-                        className="rounded-pill"
-                        value={formData.minLaunchYear}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            minLaunchYear: e.target.value,
-                          }))
-                        }
-                      >
-                        <option value="">—</option>
-                        {years.map((y) => (
-                          <option key={y} value={y}>
-                            {y}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </Form.Group>
-
-                    {/* maxLaunchYear */}
-                    <Form.Group controlId="maxLaunchYear" className="">
-                      <Form.Label className="text-muted ms-1">
-                        Max Year
-                      </Form.Label>
-                      <Stack direction="horizontal" gap={2}>
-                        <Form.Select
-                          name="maxLaunchYear"
-                          className="rounded-pill "
-                          value={formData.maxLaunchYear}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              maxLaunchYear: e.target.value,
-                            }))
-                          }
-                        >
-                          <option value="">—</option>
-                          {years.map((y) => (
-                            <option key={y} value={y}>
-                              {y}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </Stack>
-                    </Form.Group>
-
                     <Button
                       className="rounded-pill"
                       variant="secondary"
@@ -413,6 +403,72 @@ export default function CreateInterestModal({ show, setShow }) {
                     >
                       Clear
                     </Button>
+                    {/* minLaunchYear */}
+                    <Form.Group controlId="minLaunchYear" className="">
+                      <Form.Label className="text-muted ms-1">
+                        Min Year
+                      </Form.Label>
+
+                      <Form.Select
+                        name="minLaunchYear"
+                        className="rounded-pill"
+                        value={formData.minLaunchYear}
+                        onChange={(e) => {
+                          const newMin = e.target.value;
+                          setFormData((prev) => ({
+                            ...prev,
+                            minLaunchYear: newMin,
+                            // limpa o max se estiver agora inválido
+                            maxLaunchYear:
+                              prev.maxLaunchYear &&
+                              parseInt(prev.maxLaunchYear) < parseInt(newMin)
+                                ? ""
+                                : prev.maxLaunchYear,
+                          }));
+                        }}
+                      >
+                        <option value="">—</option>
+                        {minYearOptions.map((y) => (
+                          <option key={y} value={y}>
+                            {y}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+
+                    {/* maxLaunchYear */}
+                    <Form.Group controlId="maxLaunchYear" className="">
+                      <Form.Label className="text-muted ms-1">
+                        Max Year
+                      </Form.Label>
+                      <Stack direction="horizontal" gap={2}>
+                        <Form.Select
+                          name="maxLaunchYear"
+                          className="rounded-pill"
+                          value={formData.maxLaunchYear}
+                          onChange={(e) => {
+                            const newMax = e.target.value;
+                            setFormData((prev) => ({
+                              ...prev,
+                              maxLaunchYear: newMax,
+                              // limpa o min se estiver agora inválido
+                              minLaunchYear:
+                                prev.minLaunchYear &&
+                                parseInt(prev.minLaunchYear) > parseInt(newMax)
+                                  ? ""
+                                  : prev.minLaunchYear,
+                            }));
+                          }}
+                        >
+                          <option value="">—</option>
+                          {maxYearOptions.map((y) => (
+                            <option key={y} value={y}>
+                              {y}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Stack>
+                    </Form.Group>
                   </Stack>
                   {/* Price Range */}
                   <Stack
@@ -420,6 +476,20 @@ export default function CreateInterestModal({ show, setShow }) {
                     gap={3}
                     className="align-items-end justify-content-between"
                   >
+                    <Button
+                      className="rounded-pill"
+                      variant="secondary"
+                      disabled={!formData.minPrice && !formData.maxPrice}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          minPrice: "",
+                          maxPrice: "",
+                        }))
+                      }
+                    >
+                      Clear
+                    </Button>
                     {/* minPrice */}
                     <Form.Group controlId="minPrice" className="">
                       <Form.Label className="text-muted ms-1">
@@ -429,15 +499,21 @@ export default function CreateInterestModal({ show, setShow }) {
                         name="minPrice"
                         className="rounded-pill"
                         value={formData.minPrice}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newMin = e.target.value;
                           setFormData((prev) => ({
                             ...prev,
-                            minPrice: e.target.value,
-                          }))
-                        }
+                            minPrice: newMin,
+                            maxPrice:
+                              prev.maxPrice &&
+                              parseInt(prev.maxPrice) < parseInt(newMin)
+                                ? ""
+                                : prev.maxPrice,
+                          }));
+                        }}
                       >
                         <option value="">—</option>
-                        {priceOptions.map((price) => (
+                        {minPriceOptions.map((price) => (
                           <option key={price} value={price}>
                             {price.toLocaleString("pt-PT", {
                               style: "currency",
@@ -457,15 +533,21 @@ export default function CreateInterestModal({ show, setShow }) {
                           name="maxPrice"
                           className="rounded-pill"
                           value={formData.maxPrice}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            const newMax = e.target.value;
                             setFormData((prev) => ({
                               ...prev,
-                              maxPrice: e.target.value,
-                            }))
-                          }
+                              maxPrice: newMax,
+                              minPrice:
+                                prev.minPrice &&
+                                parseInt(prev.minPrice) > parseInt(newMax)
+                                  ? ""
+                                  : prev.minPrice,
+                            }));
+                          }}
                         >
                           <option value="">—</option>
-                          {priceOptions.map((price) => (
+                          {maxPriceOptions.map((price) => (
                             <option key={price} value={price}>
                               {price.toLocaleString("pt-PT", {
                                 style: "currency",
@@ -476,21 +558,6 @@ export default function CreateInterestModal({ show, setShow }) {
                         </Form.Select>
                       </Stack>
                     </Form.Group>
-
-                    <Button
-                      className="rounded-pill"
-                      variant="secondary"
-                      disabled={!formData.minPrice && !formData.maxPrice}
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          minPrice: "",
-                          maxPrice: "",
-                        }))
-                      }
-                    >
-                      Clear
-                    </Button>
                   </Stack>
                   {/* Preferred Stores */}
                   <Form.Group controlId="preferredStoreIDs">
@@ -498,15 +565,19 @@ export default function CreateInterestModal({ show, setShow }) {
                       Preferred Stores
                     </Form.Label>
                     <Stack direction="horizontal" gap={2}>
-                      <Form.Control
-                        value={
-                          formData.preferredStoreIDs.length
-                            ? formData.preferredStoreIDs.join(", ")
-                            : ""
+                      <Button
+                        variant="secondary"
+                        className="rounded-pill"
+                        disabled={formData.preferredStoreIDs.length == 0}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            preferredStoreIDs: [],
+                          }))
                         }
-                        readOnly
-                        className="rounded-pill mb-2"
-                      />
+                      >
+                        Clear
+                      </Button>
                       <Button
                         className="rounded-pill w-100"
                         style={{
@@ -517,20 +588,40 @@ export default function CreateInterestModal({ show, setShow }) {
                       >
                         Select Stores
                       </Button>
-                      <Button
-                        variant="secondary"
-                        className="rounded-pill"
-                        disabled={formData.preferredStoreIDs.length == 0}
-                        onClick={() =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            preferredStoreIDs: [""],
-                          }))
-                        }
-                      >
-                        Clear
-                      </Button>
                     </Stack>
+                    {formData.preferredStoreIDs.length > 0 && (
+                      <Stack
+                        direction="horizontal"
+                        gap={2}
+                        className="mt-2 flex-wrap"
+                        style={{ maxHeight: "80px", overflowY: "auto" }}
+                      >
+                        {formData.preferredStoreIDs.map((store) => (
+                          <Stack
+                            key={store.nipc}
+                            direction="horizontal"
+                            gap={1}
+                            className="rounded-pill px-2 py-1"
+                            style={{ backgroundColor: "var(--white)" }}
+                          >
+                            <span>{store.name}</span>
+                            <i
+                              className="pi pi-times"
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  preferredStoreIDs:
+                                    prev.preferredStoreIDs.filter(
+                                      (s) => s.nipc !== store.nipc
+                                    ),
+                                }))
+                              }
+                            />
+                          </Stack>
+                        ))}
+                      </Stack>
+                    )}
                   </Form.Group>
                   {/* Description */}
                   <Form.Group controlId="description">
@@ -551,6 +642,52 @@ export default function CreateInterestModal({ show, setShow }) {
               </Col>
             </Row>
           </Form>
+          <Stack direction="horizontal" gap={3} className="justify-content-end">
+            <Button
+              variant="secondary"
+              className="rounded-pill"
+              onClick={() => {
+                setShow(false);
+                setFormData({
+                  brandID: { id: "", name: "" },
+                  modelID: { id: "", name: "" },
+                  typeID: { id: "", name: "" },
+                  equipmentSheet: {
+                    id: "",
+                    brand: { id: "", name: "" },
+                    model: { id: "", name: "" },
+                    type: { id: "", name: "" },
+                  },
+                  equipmentStatusID: { id: "", state: "" }, // usa .state
+                  minLaunchYear: "",
+                  maxLaunchYear: "",
+                  minPrice: "",
+                  maxPrice: "",
+                  preferredStoreIDs: [],
+                  description: "",
+                });
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="rounded-pill d-flex align-items-center gap-2 "
+              disabled={
+                !formData.brandID.id &&
+                !formData.modelID.id &&
+                !formData.typeID.id &&
+                !formData.equipmentSheet.id
+              }
+              onClick={() => handleSubmit()}
+              style={{
+                backgroundColor: "var(--variant-two)",
+                border: "none",
+              }}
+            >
+              <i className="pi pi-heart" />
+              <span>Create Interest</span>
+            </Button>
+          </Stack>
         </Modal.Body>
       </Modal>
 
