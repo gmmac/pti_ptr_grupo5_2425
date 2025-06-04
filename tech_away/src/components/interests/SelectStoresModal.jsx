@@ -113,36 +113,21 @@ export default function SelectStoresModal({
         ) : (
           <p className="text-center">No stores found</p>
         )}
-        <Button
-          variant="primary"
-          onClick={() => {
-            if (selectedRow) {
-              setSelectedStores((prev) => {
-                const exists = prev.some(
-                  (store) => store.NIPC === selectedRow.NIPC
-                );
-                if (!exists) {
-                  return [...prev, selectedRow];
-                }
-                return prev;
-              });
-              setSelectedRow(null);
-            }
-          }}
-          className="rounded-pill"
-          disabled={!selectedRow}
-          style={{ backgroundColor: "var(--variant-one)", border: "none" }}
-        >
-          Add Selected Store
-        </Button>
       </Modal.Body>
       <Modal.Footer>
-        <button
-          className="btn btn-secondary"
+        <Button
+          variant="secondary"
           onClick={() => setShowModal(false)}
+          className="rounded-pill"
         >
-          Close
-        </button>
+          Cancel
+        </Button>
+        <Button
+          style={{ backgroundColor: "var(--variant-one)", border: "none" }}
+          className="rounded-pill"
+        >
+          Select
+        </Button>
       </Modal.Footer>
     </Modal>
   );
