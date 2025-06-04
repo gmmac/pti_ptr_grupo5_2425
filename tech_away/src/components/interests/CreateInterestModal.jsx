@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Stack, Button, Form } from "react-bootstrap";
+import { Modal, Stack, Button, Form, Row, Col } from "react-bootstrap";
 import { useInterests } from "../../contexts/InterestsProvider";
 import ComponentSelectorModalForm from "./ComponentSelectorModalForm";
 import EquipmentSheetModal from "./EquipmentSheetModal";
+import SelectStoresModal from "./SelectStoresModal";
 
 export default function CreateInterestModal({ show, setShow }) {
   /* ---------- modal visibility ---------- */
@@ -11,9 +12,35 @@ export default function CreateInterestModal({ show, setShow }) {
   const [typeModal, setTypeModal] = useState(false);
   const [equipmentSheetModal, setEquipmentSheetModal] = useState(false);
   const [stateModal, setStateModal] = useState(false);
+  const [storesModal, setStoresModal] = useState(false);
 
   const isChildOpen =
-    brandModal || modelModal || typeModal || equipmentSheetModal || stateModal;
+    brandModal ||
+    modelModal ||
+    typeModal ||
+    equipmentSheetModal ||
+    stateModal ||
+    storesModal;
+
+  /* ---------- years  ---------- */
+  const startYear = 1995;
+  const currentYear = new Date().getFullYear();
+
+  // 1) gerar logo decrescente
+  const years = Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, i) => currentYear - i
+  );
+
+  /* ---------- price ---------- */
+  const PRICE_MIN = 0;
+  const PRICE_MAX = 1000;
+  const STEP = 25;
+
+  const priceOptions = Array.from(
+    { length: (PRICE_MAX - PRICE_MIN) / STEP + 1 },
+    (_, i) => PRICE_MIN + i * STEP
+  );
 
   /* ---------- data ---------- */
   const [sheetSelected, setSheetSelected] = useState(false);
@@ -34,6 +61,7 @@ export default function CreateInterestModal({ show, setShow }) {
     minPrice: "",
     maxPrice: "",
     preferredStoreIDs: [""],
+    description: "",
   });
 
   /* ---------- copy brand/model/type from sheet ---------- */
@@ -72,6 +100,12 @@ export default function CreateInterestModal({ show, setShow }) {
     }
   }, [formData.brandID, formData.modelID, formData.typeID]);
 
+  /* ---------- helpers ---------- */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   /* ---------- render ---------- */
   return (
     <>
@@ -91,223 +125,418 @@ export default function CreateInterestModal({ show, setShow }) {
 
         <Modal.Body>
           <Form>
-            <Stack direction="horizontal" gap={3}>
+            <Row>
               {/* ----------- LEFT COLUMN (Sheet, Brand, Model, Type) ----------- */}
-              <Stack
-                className="p-3 flex-wrap"
-                direction="vertical"
-                gap={3}
-                style={{
-                  backgroundColor: "var(--variant-one-light)",
-                  borderRadius: "16px",
-                }}
-              >
-                {/* Equipment Sheet */}
-                <Form.Group controlId="equipmentSheetID">
-                  <Form.Label className="text-muted ms-1">
-                    Equipment Sheet
-                  </Form.Label>
-                  <Stack direction="horizontal" gap={2}>
+              <Col lg={6} md={12} className="mb-3">
+                <Stack
+                  className="p-3 flex-wrap"
+                  direction="vertical"
+                  gap={4}
+                  style={{
+                    backgroundColor: "var(--variant-one-light)",
+                    borderRadius: "16px",
+                  }}
+                >
+                  {/* Equipment Sheet */}
+                  <Form.Group controlId="equipmentSheetID">
+                    <Form.Label className="text-muted ms-1">
+                      Equipment Sheet
+                    </Form.Label>
+
                     <Form.Control
                       value={formData.equipmentSheet.id}
                       readOnly
-                      className="rounded-pill"
+                      className="rounded-pill mb-2"
                     />
-                    <Button
-                      className="rounded-pill w-50"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
-                      onClick={() => setEquipmentSheetModal(true)}
+                    <Stack
+                      direction="horizontal"
+                      gap={2}
+                      className="justify-content-stretch"
                     >
-                      Select Equipment Sheet
-                    </Button>
-                    <Button
-                      className="rounded-pill"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          equipmentSheet: {
-                            id: "",
-                            brand: { id: "", name: "" },
-                            model: { id: "", name: "" },
-                            type: { id: "", name: "" },
-                          },
-                          brandID: { id: "", name: "" },
-                          modelID: { id: "", name: "" },
-                          typeID: { id: "", name: "" },
-                        }))
-                      }
-                    >
-                      Clear
-                    </Button>
-                  </Stack>
-                </Form.Group>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setEquipmentSheetModal(true)}
+                      >
+                        Select Equipment Sheet
+                      </Button>
+                      <Button
+                        className="rounded-pill"
+                        variant="secondary"
+                        disabled={!formData.equipmentSheet.id}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            equipmentSheet: {
+                              id: "",
+                              brand: { id: "", name: "" },
+                              model: { id: "", name: "" },
+                              type: { id: "", name: "" },
+                            },
+                            brandID: { id: "", name: "" },
+                            modelID: { id: "", name: "" },
+                            typeID: { id: "", name: "" },
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+                    </Stack>
+                  </Form.Group>
 
-                {/* Brand */}
-                <Form.Group controlId="brandID">
-                  <Form.Label className="text-muted ms-1">Brand</Form.Label>
-                  <Stack direction="horizontal" gap={2}>
+                  {/* Brand */}
+                  <Form.Group controlId="brandID">
+                    <Form.Label className="text-muted ms-1">Brand</Form.Label>
+
                     <Form.Control
                       value={formData.brandID.name}
                       readOnly
-                      className="rounded-pill"
+                      className="rounded-pill mb-2"
                     />
-                    <Button
-                      className="rounded-pill w-50"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
-                      onClick={() => setBrandModal(true)}
-                    >
-                      Select Brand
-                    </Button>
-                    <Button
-                      className="rounded-pill"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          brandID: { id: "", name: "" },
-                        }))
-                      }
-                    >
-                      Clear
-                    </Button>
-                  </Stack>
-                </Form.Group>
+                    <Stack direction="horizontal" gap={2}>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setBrandModal(true)}
+                      >
+                        Select Brand
+                      </Button>
+                      <Button
+                        className="rounded-pill"
+                        variant="secondary"
+                        disabled={!formData.brandID.id}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            brandID: { id: "", name: "" },
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+                    </Stack>
+                  </Form.Group>
 
-                {/* Model */}
-                <Form.Group controlId="modelID">
-                  <Form.Label className="text-muted ms-1">Model</Form.Label>
-                  <Stack direction="horizontal" gap={2}>
+                  {/* Model */}
+                  <Form.Group controlId="modelID">
+                    <Form.Label className="text-muted ms-1">Model</Form.Label>
                     <Form.Control
                       value={formData.modelID.name}
                       readOnly
-                      className="rounded-pill"
+                      className="rounded-pill mb-2"
                     />
-                    <Button
-                      className="rounded-pill w-50"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
-                      onClick={() => setModelModal(true)}
-                    >
-                      Select Model
-                    </Button>
-                    <Button
-                      className="rounded-pill"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          modelID: { id: "", name: "" },
-                        }))
-                      }
-                    >
-                      Clear
-                    </Button>
-                  </Stack>
-                </Form.Group>
+                    <Stack direction="horizontal" gap={2}>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setModelModal(true)}
+                      >
+                        Select Model
+                      </Button>
+                      <Button
+                        className="rounded-pill"
+                        variant="secondary"
+                        disabled={!formData.modelID.id}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            modelID: { id: "", name: "" },
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+                    </Stack>
+                  </Form.Group>
 
-                {/* Type */}
-                <Form.Group controlId="typeID">
-                  <Form.Label className="text-muted ms-1">Type</Form.Label>
-                  <Stack direction="horizontal" gap={2}>
+                  {/* Type */}
+                  <Form.Group controlId="typeID">
+                    <Form.Label className="text-muted ms-1">Type</Form.Label>
                     <Form.Control
                       value={formData.typeID.name}
                       readOnly
-                      className="rounded-pill"
+                      className="rounded-pill mb-2"
                     />
-                    <Button
-                      className="rounded-pill w-50"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
-                      onClick={() => setTypeModal(true)}
-                    >
-                      Select Type
-                    </Button>
-                    <Button
-                      className="rounded-pill"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          typeID: { id: "", name: "" },
-                        }))
-                      }
-                    >
-                      Clear
-                    </Button>
-                  </Stack>
-                </Form.Group>
-              </Stack>
-
-              {/* ----------- RIGHT COLUMN (State) ----------- */}
-              <Stack
-                className="p-3 flex-wrap"
-                direction="vertical"
-                gap={3}
-                style={{
-                  backgroundColor: "var(--variant-one-light)",
-                  borderRadius: "16px",
-                }}
-              >
-                <Form.Group controlId="equipmentStatusID">
-                  <Form.Label className="text-muted ms-1">State</Form.Label>
-                  <Stack direction="horizontal" gap={2}>
+                    <Stack direction="horizontal" gap={2}>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setTypeModal(true)}
+                      >
+                        Select Type
+                      </Button>
+                      <Button
+                        className="rounded-pill"
+                        variant="secondary"
+                        disabled={!formData.typeID.id}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            typeID: { id: "", name: "" },
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+                    </Stack>
+                  </Form.Group>
+                </Stack>
+              </Col>
+              {/* ----------- RIGHT COLUMN ----------- */}
+              <Col lg={6} md={12} className="mb-3">
+                <Stack
+                  className="p-3"
+                  direction="vertical"
+                  gap={4}
+                  style={{
+                    backgroundColor: "var(--variant-one-light)",
+                    borderRadius: "16px",
+                  }}
+                >
+                  <Form.Group controlId="equipmentStatusID">
+                    <Form.Label className="text-muted ms-1">State</Form.Label>
                     <Form.Control
                       value={formData.equipmentStatusID.state}
                       readOnly
-                      className="rounded-pill"
+                      className="rounded-pill mb-2"
                     />
-                    <Button
-                      className="rounded-pill w-50"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
-                      onClick={() => setStateModal(true)}
-                    >
-                      Select State
-                    </Button>
+                    <Stack direction="horizontal" gap={2}>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setStateModal(true)}
+                      >
+                        Select State
+                      </Button>
+                      <Button
+                        className="rounded-pill"
+                        variant="secondary"
+                        disabled={!formData.equipmentStatusID.id}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            equipmentStatusID: { id: "", state: "" },
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+                    </Stack>
+                  </Form.Group>
+                  {/* Launch Year */}
+                  <Stack
+                    direction="horizontal"
+                    gap={3}
+                    className="align-items-end justify-content-between"
+                  >
+                    {/* minLaunchYear */}
+                    <Form.Group controlId="minLaunchYear" className="">
+                      <Form.Label className="text-muted ms-1">
+                        Min Year
+                      </Form.Label>
+
+                      <Form.Select
+                        name="minLaunchYear"
+                        className="rounded-pill"
+                        value={formData.minLaunchYear}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            minLaunchYear: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">—</option>
+                        {years.map((y) => (
+                          <option key={y} value={y}>
+                            {y}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+
+                    {/* maxLaunchYear */}
+                    <Form.Group controlId="maxLaunchYear" className="">
+                      <Form.Label className="text-muted ms-1">
+                        Max Year
+                      </Form.Label>
+                      <Stack direction="horizontal" gap={2}>
+                        <Form.Select
+                          name="maxLaunchYear"
+                          className="rounded-pill "
+                          value={formData.maxLaunchYear}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              maxLaunchYear: e.target.value,
+                            }))
+                          }
+                        >
+                          <option value="">—</option>
+                          {years.map((y) => (
+                            <option key={y} value={y}>
+                              {y}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Stack>
+                    </Form.Group>
+
                     <Button
                       className="rounded-pill"
-                      style={{
-                        backgroundColor: "var(--variant-one)",
-                        border: "none",
-                      }}
+                      variant="secondary"
+                      disabled={
+                        !formData.minLaunchYear && !formData.maxLaunchYear
+                      }
                       onClick={() =>
                         setFormData((prev) => ({
                           ...prev,
-                          equipmentStatusID: { id: "", state: "" },
+                          minLaunchYear: "",
+                          maxLaunchYear: "",
                         }))
                       }
                     >
                       Clear
                     </Button>
                   </Stack>
-                </Form.Group>
-              </Stack>
-            </Stack>
+                  {/* Price Range */}
+                  <Stack
+                    direction="horizontal"
+                    gap={3}
+                    className="align-items-end justify-content-between"
+                  >
+                    {/* minPrice */}
+                    <Form.Group controlId="minPrice" className="">
+                      <Form.Label className="text-muted ms-1">
+                        Min Price
+                      </Form.Label>
+                      <Form.Select
+                        name="minPrice"
+                        className="rounded-pill"
+                        value={formData.minPrice}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            minPrice: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">—</option>
+                        {priceOptions.map((price) => (
+                          <option key={price} value={price}>
+                            {price.toLocaleString("pt-PT", {
+                              style: "currency",
+                              currency: "EUR",
+                            })}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+                    {/* maxPrice */}
+                    <Form.Group controlId="maxPrice" className="">
+                      <Form.Label className="text-muted ms-1">
+                        Max Price
+                      </Form.Label>
+                      <Stack direction="horizontal" gap={2}>
+                        <Form.Select
+                          name="maxPrice"
+                          className="rounded-pill"
+                          value={formData.maxPrice}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              maxPrice: e.target.value,
+                            }))
+                          }
+                        >
+                          <option value="">—</option>
+                          {priceOptions.map((price) => (
+                            <option key={price} value={price}>
+                              {price.toLocaleString("pt-PT", {
+                                style: "currency",
+                                currency: "EUR",
+                              })}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Stack>
+                    </Form.Group>
+
+                    <Button
+                      className="rounded-pill"
+                      variant="secondary"
+                      disabled={!formData.minPrice && !formData.maxPrice}
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          minPrice: "",
+                          maxPrice: "",
+                        }))
+                      }
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                  {/* Preferred Stores */}
+                  <Form.Group controlId="preferredStoreIDs">
+                    <Form.Label className="text-muted ms-1">
+                      Preferred Stores
+                    </Form.Label>
+                    <Stack direction="horizontal" gap={2}>
+                      <Form.Control
+                        value={
+                          formData.preferredStoreIDs.length
+                            ? formData.preferredStoreIDs.join(", ")
+                            : ""
+                        }
+                        readOnly
+                        className="rounded-pill mb-2"
+                      />
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-one)",
+                          border: "none",
+                        }}
+                        onClick={() => setStoresModal(true)}
+                      >
+                        Select Stores
+                      </Button>
+                    </Stack>
+                  </Form.Group>
+                  {/* Description */}
+                  <Form.Group controlId="description">
+                    <Form.Label className="text-muted ms-1">
+                      Description
+                    </Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      style={{ borderRadius: "16px" }}
+                      placeholder="Describe your interest..."
+                    />
+                  </Form.Group>
+                </Stack>
+              </Col>
+            </Row>
           </Form>
         </Modal.Body>
       </Modal>
@@ -362,6 +591,18 @@ export default function CreateInterestModal({ show, setShow }) {
           setFormData((prev) => ({
             ...prev,
             equipmentStatusID: { id: selected.id, state: selected.state },
+          }))
+        }
+      />
+
+      <SelectStoresModal
+        showModal={storesModal}
+        setShowModal={setStoresModal}
+        selectedStores={formData.preferredStoreIDs}
+        setSelectedStores={(selected) =>
+          setFormData((prev) => ({
+            ...prev,
+            preferredStoreIDs: selected,
           }))
         }
       />
