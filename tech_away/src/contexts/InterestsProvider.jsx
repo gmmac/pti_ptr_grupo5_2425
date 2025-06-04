@@ -37,7 +37,7 @@ const InterestsProvider = ({ children }) => {
     try {
       await api.post(`/api/interest`, {
         ...newInterest,
-        clientNIC: user.nic,
+        clientNic: user.nic,
       });
       fetchInterests();
       return res.data;

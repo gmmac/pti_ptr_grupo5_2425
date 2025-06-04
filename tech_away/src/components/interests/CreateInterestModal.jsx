@@ -6,7 +6,7 @@ import EquipmentSheetModal from "./EquipmentSheetModal";
 import SelectStoresModal from "./SelectStoresModal";
 
 export default function CreateInterestModal({ show, setShow }) {
-  const { createInterest } = useInterests();
+  const { createGenericInterest } = useInterests();
   /* ---------- data ---------- */
   const [sheetSelected, setSheetSelected] = useState(false);
 
@@ -145,7 +145,7 @@ export default function CreateInterestModal({ show, setShow }) {
 
   const handleSubmit = async () => {
     const interestData = prepareInterestData(formData);
-    createInterest(interestData);
+    createGenericInterest(interestData);
     setShow(false);
   };
 
