@@ -268,14 +268,16 @@ router.post("/", async (req, res) => {
     } = req.body;
 
     // Verificar se o cliente já existe
+    const searchConditions = [];
+
+    if (nic) searchConditions.push({ nic });
+    if (nif) searchConditions.push({ nif });
+    if (phone) searchConditions.push({ phone });
+    if (email) searchConditions.push({ email });
+
     const existingClient = await models.Client.findOne({
       where: {
-        [Op.or]: [
-          { nic: nic },
-          { nif: nif },
-          { phone: phone },
-          { email: email },
-        ],
+        [Op.or]: searchConditions,
       },
     });
 
