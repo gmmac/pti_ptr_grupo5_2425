@@ -10,7 +10,6 @@ export default function ClientRepairs({isSelected}) {
 
   const handleTabChange = (key) => {
     setActiveTab(key);
-    setCurrentPage(1);
   };
 
   return (

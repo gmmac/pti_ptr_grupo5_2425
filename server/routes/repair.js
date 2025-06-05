@@ -157,9 +157,9 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
     };
 
     if(activeRepairs === "true"){
-      where.statusID = { [Op.ne]: 5 }
+      where.statusID = { [Op.ne]: 2 }
     }else{
-      where.statusID = { [Op.eq]: 5 }
+      where.statusID = { [Op.eq]: 2 }
     }
 
     const whereRepairStatus = {};
@@ -214,17 +214,12 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
           attributes: ["firstName", "lastName"],
         },
         {
-          model: models.UsedEquipment,
+          model: models.EquipmentSheet,
           include: [
             {
-              model: models.EquipmentSheet,
-              include: [
-                {
-                  model: models.EquipmentModel,
-                  attributes: ["name"],
-                  where: whereModel
-                }
-              ]
+              model: models.EquipmentModel,
+              attributes: ["name"],
+              where: whereModel
             }
           ]
         }
@@ -235,13 +230,12 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
     });
 
     const formattedData = rows
-      .filter(item => item.UsedEquipment?.EquipmentSheet?.EquipmentModel)
+      .filter(item => item.EquipmentSheet?.EquipmentModel)
       .map((item) => ({
         id: item.id,
         employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
         state: item.RepairStatus?.state,
-        modelName: item.UsedEquipment.EquipmentSheet.EquipmentModel.name,
-        createdAt: item.createdAt,
+        modelName: item.EquipmentSheet.EquipmentModel.name,
       }));
 
     res.status(200).json({

@@ -41,6 +41,7 @@ export default function ClientRepairsCatalog({activeRepairs}) {
 	const dateFields = ['createdAt', 'updatedAt'];
 
     useEffect(() => {
+        console.log("A carregar repairs ativas")
         loadLazyData();
     }, [lazyState]);
 
@@ -75,6 +76,7 @@ export default function ClientRepairsCatalog({activeRepairs}) {
                 const allColumns = Object.keys(responseData.data[0]);
                 setData(responseData.data);
                 setColumns(allColumns);
+                console.log("data: ", responseData.data)
             } else {
                 setData([]);
             }
