@@ -211,7 +211,7 @@ export default function RepairInfoEmployee({ repairID, show, onClose }) {
 													{arrivalDate.toLocaleDateString()}
 												</td>
                                                 <td>
-                                                    {!isArrived && (
+                                                    {!isArrived && part.active === 1 && (
                                                         <button
                                                             className="btn btn-sm btn-outline-danger ms-2" onClick={() => cancelPartsOrder(part.id)}>
                                                             Cancel
