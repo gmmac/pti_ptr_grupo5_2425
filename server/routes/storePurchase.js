@@ -5,128 +5,159 @@ const { Op, Sequelize } = require("sequelize");
 const { sequelize } = require("../models/index");
 
 router.get("/", async (req, res) => {
-    try {
-      const {
-        id,
-        clientName,
-        employeeName,
-        purchasePrice,
-        modelName,
-        storeName,
-        nic,
-        createdAt,
-        page = 1,
-        pageSize = 10,
-        sortField = "id",
-        sortOrder = "ASC",
-      } = req.query;
-      const where = {};
-      const whereModel = {};
-      const whereStore = {};
-      const whereClient = {}
+  console.log('employeeInfo cookie:', req.cookies.employeeInfo);
+  try {
+    const {
+      id,
+      clientName,
+      employeeName,
+      purchasePrice,
+      modelName,
+      storeName,
+      nic,
+      createdAt,
+      onlyMyPurchases = 'false',
+      storePurchasesOnly = 'false',
+      page = 1,
+      pageSize = 10,
+      sortField = "id",
+      sortOrder = "ASC",
+    } = req.query;
 
-      if (id)
-        where.id = sequelize.where(
-          sequelize.cast(sequelize.col("StorePurchase.id"), "varchar"),
-          { [Op.iLike]: `${id}%` }
-        );
-      if (createdAt) {
-        where.createdAt = {
-          [Op.gte]: new Date(createdAt),
-          [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
-        };
-      }
+    const where = {};
+    const whereEmployee = {};
+    const whereClient = {};
+    const whereModel = {};
+    const whereStore = {};
 
-      if (modelName) whereModel.name = { [Op.iLike]: `%${modelName}%` };
+    // Dados do empregado logado
+    const employeeInfo = req.cookies?.employeeInfo;
+    const loggedEmployeeNic = employeeInfo?.nic;
+    const loggedStoreNIPC = employeeInfo?.storeNIPC;
 
-      if (storeName) whereStore.name = { [Op.iLike]: `%${storeName}%` };
+    // Filtro: só compras feitas pelo empregado logado
+    if (onlyMyPurchases === 'true' && loggedEmployeeNic) {
+      where.employeeID = loggedEmployeeNic;
+    }
 
-      if (purchasePrice && parseFloat(purchasePrice) > 0) {
-        where.purchasePrice = { [Op.eq]: parseFloat(purchasePrice) };
-      } else {
-        // Força exibir apenas vendas (maiores que 0)
-        where.purchasePrice = { [Op.gt]: 0 };
-      }
-        
+    // Filtro: só compras da loja logada
+    if (storePurchasesOnly === 'true' && loggedStoreNIPC) {
+      where.storeID = loggedStoreNIPC;
+    }
 
-      if (employeeName) {
-        where[Op.and] = Sequelize.where(
-          Sequelize.fn(
-            'concat',
-            Sequelize.col('Employee.firstName'),
-            ' ',
-            Sequelize.col('Employee.lastName')
-          ),
-          {
-            [Op.iLike]: `%${employeeName}%`
-          }
-        );
-      }
-      if (clientName) {
-        where[Op.and] = Sequelize.where(
-          Sequelize.fn(
-            'concat',
-            Sequelize.col('Client.firstName'),
-            ' ',
-            Sequelize.col('Client.lastName')
-          ),
-          {
-            [Op.iLike]: `%${clientName}%`
-          }
-        );
-      }
-      if (nic) {
-        whereClient.nic = nic;
-      }
-      
-      const offset = (parseInt(page) - 1) * parseInt(pageSize);
-      const orderClause = [];
-      if (sortField) {
-        orderClause.push([
-          Sequelize.col(sortField),
-          sortOrder == -1 ? "DESC" : "ASC",
-        ]);
-      }
-  
-      const { count, rows } = await models.StorePurchase.findAndCountAll({
-        where,
-        include: [
-          {
-            model: models.Employee,
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: models.Client,
-            attributes: ["firstName", "lastName","nic"],
-            where: whereClient,
-          },
-          {
-            model: models.UsedEquipment,
-            include: [
-              {
-                model: models.EquipmentSheet,
-                include: [
-                  {
-                    model: models.EquipmentModel,
-                    attributes: ["name"],
-                    where: whereModel
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            model: models.Store,
-            attributes: ["name"],
-            where: whereStore
-          },
-        ],
-        limit: parseInt(pageSize),
-        offset,
-        order: orderClause,
-      });
-  
-      const formattedData = rows
+    if (id) {
+      where.id = sequelize.where(
+        sequelize.cast(sequelize.col("StorePurchase.id"), "varchar"),
+        { [Op.iLike]: `${id}%` }
+      );
+    }
+
+    if (createdAt) {
+      where.createdAt = {
+        [Op.gte]: new Date(createdAt),
+        [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+      };
+    }
+
+    if (purchasePrice && parseFloat(purchasePrice) > 0) {
+      where.purchasePrice = { [Op.eq]: parseFloat(purchasePrice) };
+    } else {
+      where.purchasePrice = { [Op.gt]: 0 };
+    }
+
+    if (employeeName) {
+      whereEmployee[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('Employee.firstName'),
+          ' ',
+          Sequelize.col('Employee.lastName')
+        ),
+        {
+          [Op.iLike]: `%${employeeName}%`
+        }
+      );
+    }
+
+    if (clientName) {
+      whereClient[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('Client.firstName'),
+          ' ',
+          Sequelize.col('Client.lastName')
+        ),
+        {
+          [Op.iLike]: `%${clientName}%`
+        }
+      );
+    }
+
+    if (nic) {
+      whereClient.nic = nic;
+    }
+
+    if (modelName) {
+      whereModel.name = { [Op.iLike]: `%${modelName}%` };
+    }
+
+    if (storeName) {
+      whereStore.name = { [Op.iLike]: `%${storeName}%` };
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+    const orderClause = [];
+    if (sortField) {
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
+
+    const { count, rows } = await models.StorePurchase.findAndCountAll({
+      where,
+      include: [
+        {
+          model: models.Employee,
+          attributes: ["firstName", "lastName"],
+          where: Object.keys(whereEmployee).length > 0 ? whereEmployee : undefined,
+          required: Object.keys(whereEmployee).length > 0
+        },
+        {
+          model: models.Client,
+          attributes: ["firstName", "lastName", "nic"],
+          where: Object.keys(whereClient).length > 0 ? whereClient : undefined,
+          required: Object.keys(whereClient).length > 0
+        },
+        {
+          model: models.UsedEquipment,
+          include: [
+            {
+              model: models.EquipmentSheet,
+              include: [
+                {
+                  model: models.EquipmentModel,
+                  attributes: ["name"],
+                  where: Object.keys(whereModel).length > 0 ? whereModel : undefined,
+                  required: Object.keys(whereModel).length > 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          model: models.Store,
+          attributes: ["name"],
+          where: Object.keys(whereStore).length > 0 ? whereStore : undefined,
+          required: Object.keys(whereStore).length > 0
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset,
+      order: orderClause,
+    });
+
+    const formattedData = rows
       .filter(item => item.UsedEquipment?.EquipmentSheet?.EquipmentModel)
       .map((item) => ({
         id: item.id,
@@ -139,18 +170,19 @@ router.get("/", async (req, res) => {
         createdAt: item.createdAt,
       }));
 
-      res.status(200).json({
-        totalItems: count,
-        totalPages: Math.ceil(count / pageSize),
-        currentPage: parseInt(page),
-        pageSize: parseInt(pageSize),
-        data: formattedData,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: "Error fetching brands." });
-    }
+    res.status(200).json({
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+      data: formattedData,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Error fetching purchases." });
+  }
 });
+
 
 router.post("/", async (req, res) => {
 

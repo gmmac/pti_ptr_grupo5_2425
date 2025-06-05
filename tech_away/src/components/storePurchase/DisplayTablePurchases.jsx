@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Menu } from "primereact/menu";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog } from "primereact/confirmdialog";
 import api from "../../utils/axios";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
@@ -11,14 +10,16 @@ import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
 import StorePurchaseForms from "./StorePurchaseForms";
 
-export default function DisplayTablePurchases({ refreshTable }) {
+export default function DisplayTablePurchases({ refreshTable, onlyMyPurchases, storePurchasesOnly }) {
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
-
-  const [refreshPurchases, setRefreshPurchases] = useState(true);
   const [show, setShow] = useState(false);
-  const handleShow = () => setShow(true);
+  const [purchaseData, setPurchaseData] = useState({});
+  const [data, setData] = useState([]);
+  const [columns, setColumns] = useState([]);
+  const dateFields = ["createdAt", "updatedAt"];
 
+  // Estado que guarda pagina, filtros, ordenação
   const [lazyState, setLazyState] = useState({
     first: 0,
     rows: 5,
@@ -34,34 +35,45 @@ export default function DisplayTablePurchases({ refreshTable }) {
       modelName: { value: "", matchMode: "contains" },
       createdAt: { value: "", matchMode: "equals" },
     },
+    // vamos guardar os filtros externos aqui também para usar na consulta
+    onlyMyPurchases: onlyMyPurchases,
+    storePurchasesOnly: storePurchasesOnly,
   });
 
-  const [purchaseData, setPurchaseData] = useState({})
+  // Quando props de filtro mudam, atualiza o estado lazyState para disparar nova busca
+  useEffect(() => {
+    setLazyState((prev) => ({
+      ...prev,
+      first: 0, // reset página para 0 ao mudar filtro
+      onlyMyPurchases,
+      storePurchasesOnly,
+    }));
+  }, [onlyMyPurchases, storePurchasesOnly]);
 
-  const [data, setData] = useState([]);
-  const [columns, setColumns] = useState([]);
-  const dateFields = ["createdAt", "updatedAt"];
-
+  // Dispara o fetch ao mudar lazyState ou refreshTable
   useEffect(() => {
     loadLazyData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshPurchases, refreshTable, lazyState]);
+  }, [lazyState, refreshTable]);
 
   const loadLazyData = () => {
     setLoading(true);
 
-    const { page, rows, sortField, sortOrder, filters } = lazyState;
+    const { page, rows, sortField, sortOrder, filters, onlyMyPurchases, storePurchasesOnly } = lazyState;
 
     const currentPage = isNaN(page) ? 1 : page + 1; // backend pages start at 1
-    const pageSize = isNaN(rows) ? 6 : rows;
+    const pageSize = isNaN(rows) ? 5 : rows;
 
     const params = {
       page: currentPage,
-      pageSize: pageSize,
+      pageSize,
       sortField,
       sortOrder,
+      onlyMyPurchases,
+      storePurchasesOnly,
     };
 
+    // Adiciona filtros textuais/datas
     for (const key in filters) {
       const filterMeta = filters[key];
       if (filterMeta?.value) {
@@ -70,7 +82,7 @@ export default function DisplayTablePurchases({ refreshTable }) {
     }
 
     api
-      .get("/api/storePurchase", { params: params })
+      .get("/api/storePurchase", { params })
       .then((res) => {
         const responseData = res.data;
         if (responseData.data.length > 0) {
@@ -85,6 +97,7 @@ export default function DisplayTablePurchases({ refreshTable }) {
           setColumns(allColumns);
         } else {
           setData([]);
+          setColumns([]);
         }
         setTotalRecords(responseData.totalItems);
         setLoading(false);
@@ -96,29 +109,27 @@ export default function DisplayTablePurchases({ refreshTable }) {
   };
 
   const onPage = (event) => {
-    setLazyState(event);
+    setLazyState((prev) => ({ ...prev, ...event }));
   };
 
   const onSort = (event) => {
-    setLazyState(event);
+    setLazyState((prev) => ({ ...prev, ...event }));
   };
 
   const onFilter = (event) => {
-    event["first"] = 0; // reset to first page on filter change
-    setLazyState(event);
+    // reset primeira página ao filtrar
+    setLazyState((prev) => ({ ...prev, ...event, first: 0 }));
   };
 
-  // Função chamada ao clicar no botão de editar
   const onEditClick = (rowData) => {
-    console.log(rowData)
-    setShow(true);
     setPurchaseData(rowData);
+    setShow(true);
   };
 
   return (
     <>
       <ConfirmDialog />
-      <div className="">
+      <div>
         <DataTable
           value={data}
           lazy
@@ -219,68 +230,12 @@ export default function DisplayTablePurchases({ refreshTable }) {
             style={{ width: "80px", textAlign: "center" }}
           />
         </DataTable>
-
-        <style>
-          {`
-            .p-paginator .p-paginator-pages .p-paginator-page {
-              border: 0 none;
-              color: #374151;
-              min-width: 3rem;
-              height: 3rem;
-              margin: 0.143rem;
-              transition: box-shadow 0.2s;
-              border-radius: 50%;
-            }
-
-            .p-paginator .p-paginator-first:not(.p-disabled):not(.p-highlight):hover, 
-            .p-paginator .p-paginator-prev:not(.p-disabled):not(.p-highlight):hover, 
-            .p-paginator .p-paginator-next:not(.p-disabled):not(.p-highlight):hover, 
-            .p-paginator .p-paginator-last:not(.p-disabled):not(.p-highlight):hover {
-              background: #f3f4f6;
-              border-color: transparent;
-              color: #374151;
-              border-radius: 50%;
-            }
-            .p-dropdown-items{
-              padding-bottom: 0rem !important;
-              padding-left: 0rem !important;
-            }
-            .p-paginator-current{
-              cursor: default;
-            }
-            .p-paginator-page.p-highlight{
-              background: var(--variant-green-highlight)
-            }
-            .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight.p-focus{
-              background: var(--variant-green-highlight) !important;
-            }
-            .p-dropdown-item.p-highlight{
-              background: var(--variant-green-highlight) !important;
-              color: #374151;
-            }
-            .p-dropdown:not(.p-disabled):hover{
-              border-color: var(--variant-green-highlight);
-            }
-            .p-dropdown:not(.p-disabled).p-focus{
-              box-shadow: 0 0 0 0.2rem var(--variant-green-highlight);
-              border-color:rgba(55, 65, 81, 0.35);
-            }
-
-            .p-datepicker-trigger {
-              border: var(--variant-one);
-              border-top-right-radius: 6px !important;
-              border-bottom-right-radius: 6px !important;
-              padding-right: 0.05rem;
-              background-color: var(--variant-one);
-            }
-          `}
-        </style>
       </div>
 
       <StorePurchaseForms
         show={show}
         handleClose={() => setShow(false)}
-        setRefreshPurchases={setRefreshPurchases}
+        setRefreshPurchases={() => loadLazyData()}
         purchaseData={purchaseData}
       />
     </>
