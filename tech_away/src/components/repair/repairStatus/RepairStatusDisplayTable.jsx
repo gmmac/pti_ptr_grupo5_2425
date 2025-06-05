@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
+import { Tooltip } from 'primereact/tooltip';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import api from '../../../utils/axios';
 
@@ -61,37 +62,52 @@ export default function RepairStatusDisplayTable({ onDelete, onEdit, refreshKey,
     });
   };
 
-const renderActions = rowData => (
-  <div className="d-flex justify-content-center align-items-center">
-    {isActiveFilter === '1' && (
-      <Button
-        icon="pi pi-pencil"
-        className="p-button-text p-button-rounded me-3"
-        aria-label="Edit"
-        severity="secondary"
-        onClick={() => onEdit(rowData)}
-      />
-    )}
-    {isActiveFilter === '1' ? (
-      <Button
-        icon="pi pi-trash"
-        className="p-button-text p-button-rounded"
-        aria-label="Delete"
-        severity="danger"
-        onClick={() => confirmToggle(rowData)}
-      />
-    ) : (
-      <Button
-        icon="pi pi-history"
-        className="p-button-text p-button-rounded"
-        aria-label="Restore"
-        severity="success"
-        onClick={() => confirmToggle(rowData)}
-      />
-    )}
-  </div>
-);
+const renderActions = rowData => {
+  if (rowData.protected) {
+    return (
+      <>
+        <i
+          className={`pi pi-lock protected-lock-${rowData.id}`}
+          style={{ fontSize: '1.2rem', color: 'gray' }}
+          data-pr-tooltip="This status is protected and cannot be modified."
+          data-pr-position="top"
+        />
+        <Tooltip target={`.protected-lock-${rowData.id}`} />
+      </>
+    );
+  }
 
+  return (
+    <div className="d-flex justify-content-center align-items-center">
+      {isActiveFilter === '1' && (
+        <Button
+          icon="pi pi-pencil"
+          className="p-button-text p-button-rounded me-3"
+          aria-label="Edit"
+          severity="secondary"
+          onClick={() => onEdit(rowData)}
+        />
+      )}
+      {isActiveFilter === '1' ? (
+        <Button
+          icon="pi pi-trash"
+          className="p-button-text p-button-rounded"
+          aria-label="Delete"
+          severity="danger"
+          onClick={() => confirmToggle(rowData)}
+        />
+      ) : (
+        <Button
+          icon="pi pi-history"
+          className="p-button-text p-button-rounded"
+          aria-label="Restore"
+          severity="success"
+          onClick={() => confirmToggle(rowData)}
+        />
+      )}
+    </div>
+  );
+};
 
   return (
     <div className="d-none d-lg-table w-100">

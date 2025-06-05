@@ -24,6 +24,13 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'RepairStatus',
+    hooks: {
+      beforeDestroy: (instance, options) => {
+        if (instance.protected) {
+          throw new Error(`Repair status "${instance.state}" is protected and cannot be deleted.`);
+        }
+      }
+    },
     timestamps: true,
   });
   return RepairStatus;

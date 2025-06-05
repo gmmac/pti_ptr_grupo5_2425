@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Tooltip } from 'primereact/tooltip';
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import api from "../../../utils/axios";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
@@ -75,22 +76,15 @@ export default function EmployeeRolesDisplayTable({ onDelete, onEdit, refreshKey
 const renderActions = (rowData) => {
   if (rowData.protected) {
     return (
-      <div className="d-flex justify-content-center align-items-center">
-        <Button
-          icon="pi pi-pencil"
-          className="p-button-text p-button-rounded me-3"
-          tooltip="Cannot modify protected roles"
-          severity="secondary"
-          disabled
+      <>
+        <i
+          className={`pi pi-lock protected-lock-${rowData.id}`}
+          style={{ fontSize: '1.2rem', color: 'gray' }}
+          data-pr-tooltip="This role is protected and cannot be modified."
+          data-pr-position="top"
         />
-        <Button
-          icon={isActiveFilter === "1" ? "pi pi-trash" : "pi pi-history"}
-          className="p-button-text p-button-rounded"
-          tooltip="Cannot modify protected roles"
-          severity="danger"
-          disabled
-        />
-      </div>
+        <Tooltip target={`.protected-lock-${rowData.id}`} />
+      </>
     );
   }
 

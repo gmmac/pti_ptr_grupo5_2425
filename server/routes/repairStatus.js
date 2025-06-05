@@ -65,7 +65,8 @@ router.get('/displayTable', async (req, res) => {
       data: rows.map(r => ({
         id: r.id,
         state: r.state,
-        isActive: r.isActive
+        isActive: r.isActive,
+        protected: r.protected
       }))
     });
   } catch (error) {
@@ -93,6 +94,7 @@ router.post('/', async (req, res) => {
     const newStatus = await models.RepairStatus.create({
       state,
       isActive: '1',
+      protected: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
