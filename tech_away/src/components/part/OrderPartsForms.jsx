@@ -181,14 +181,14 @@ export default function OrderPartsForms({ equipmentSheetID, repairID, showModal,
                         </h6>
                         <h6
                             style={{
-                                color: total > repair.budget ? 'red' : 'inherit',
+                                color: total > (repair.budget - repair.currentCost) ? 'red' : 'inherit',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.5rem',
                             }}
                         >
                             Total: €{total.toFixed(2)}
-                            {total > repair.budget && (
+                            {total > (repair.budget - repair.currentCost) && (
                                 <i className="pi pi-exclamation-triangle" style={{ color: 'red' }} title="Total exceeds budget" />
                             )}
                         </h6>
