@@ -11,9 +11,6 @@ export default function OrganizerHomePage() {
 
     return (
     <Tab.Content className="custom-tab-content">
-        <Tab.Pane eventKey="dashboard" className='p-4'>
-            Dashboard
-        </Tab.Pane>
         <Tab.Pane eventKey="warehouses" className='p-4'>
             <WarehouseCatalog />
         </Tab.Pane>

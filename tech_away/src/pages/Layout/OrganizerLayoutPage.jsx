@@ -12,7 +12,7 @@ import {
 import { useOrganizerAuth } from '../../contexts/AuthenticationProviders/OrganizerAuthProvider';
 
 export default function OrganizerLayoutPage() {
-  const [actualTab, setActualTab] = useState(sessionStorage.getItem('organizerSelectedTab') || 'dashboard');
+  const [actualTab, setActualTab] = useState(sessionStorage.getItem('organizerSelectedTab') || 'charityproject');
   const { logOut } = useOrganizerAuth();
 
   const handleChangeTab = (tab) => {
@@ -27,7 +27,6 @@ export default function OrganizerLayoutPage() {
   }, [actualTab]);
 
   const menuItems = [
-    { key: 'dashboard', label: 'Dashboard', icon: <HouseDoorFill />, path: '/organizer' },
     { key: 'charityproject', label: 'Charity Projects', icon: <PeopleFill /> },
     { key: 'warehouses', label: 'Warehouses', icon: <BoxSeamFill /> },
     { key: 'profile', label: 'Profile', icon: <PersonFill /> }
