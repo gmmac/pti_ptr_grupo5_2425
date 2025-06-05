@@ -8,6 +8,7 @@ import PaginationControl from '../../pagination/PaginationControl';
 import api from '../../../utils/axios';
 import EquipmentTypeCard from '../../equipmentType/EquipmentTypeCard';
 import useSafeOrganizerAuth from '../../../utils/auth';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeAlert }) {
   const [equipmentTypes, setEquipmentTypes] = useState([]);
@@ -147,21 +148,39 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
     fetchEquipmentTypes(1, value);
   };
 
+  const confirmSave = () => {
+    confirmDialog({
+      message: `Are you sure you want to save?`,
+      header: "Confirmation",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => handleSave(),
+    });
+  };
+
+  const confirmCancel = () => {
+    confirmDialog({
+      message: `Are you sure you want to cancel?`,
+      header: "Confirmation",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => handleCancel(),
+    });
+  };
+
   return (
     <>
-
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <h5 className="fw-semibold mb-0">Selected Equipment Types</h5>
+      <ConfirmDialog />
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-column flex-lg-row">
+        <h5 className="fw-semibold mb-2">Selected Equipment Types</h5>
 
         {isOrganizer && (
           !isEditing ? (
-            <Button variant="primary" size="sm" onClick={() => setIsEditing(true)}>
+            <Button variant="primary" style={{backgroundColor: "var(--variant-two)", border: "none"}} onClick={() => setIsEditing(true)}>
               Edit
             </Button>
           ) : (
             <div className="d-flex gap-2">
-              <Button variant="success" size="sm" onClick={handleSave}>Save</Button>
-              <Button variant="outline-secondary" size="sm" onClick={handleCancel}>Cancel</Button>
+              <Button variant="primary" style={{backgroundColor: "var(--variant-one)", border: "none"}} onClick={confirmSave}>Save</Button>
+              <Button variant="outline-danger" onClick={confirmCancel}>Cancel</Button>
             </div>
           )
         )}
@@ -188,7 +207,7 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
           <>
             <div className="fw-semibold text-capitalize">{type.name}</div>
             <div> Quantity: {type.currentDonations ?? 0} / {type.quantity} </div>
-            <div className="small text-muted">ID: {type.id}</div>
+            {/* <div className="small">ID: {type.id}</div> */}
           </>
         )}
       />
@@ -216,11 +235,15 @@ export default function CharityProjectEquipmentTypeEditor({ projectId, onChangeA
                   />
                 )}
               />
-              <PaginationControl
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                handlePageChange={(page) => fetchEquipmentTypes(page, search)}
-              />
+              {equipmentTypes.length == 0 ?
+                "No data found" :
+
+                <PaginationControl
+                  currentPage={pagination.currentPage}
+                  totalPages={pagination.totalPages}
+                  handlePageChange={(page) => fetchEquipmentTypes(page, search)}
+                />
+              }
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>

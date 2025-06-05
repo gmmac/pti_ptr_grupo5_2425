@@ -1,130 +1,207 @@
-import React, { useEffect, useState } from 'react';
-import { ListGroup, Container, Button, Row, Col, Modal, Form, Alert } from 'react-bootstrap';
+// src/components/EmployeeRolesCatalog.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { Container, Button, Modal, Form, Tab, Tabs } from 'react-bootstrap';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import api from '../../../utils/axios';
+import EmployeeRolesDisplayTable from './EmployeeRolesDisplayTable';
+import EmployeeRolesCardView from './EmployeeRolesCardView';
+import PaginationControl from '../../pagination/PaginationControl';
+import EmployeeRolesFilter from './EmployeeRolesFilter';
 
 export default function EmployeeRolesCatalog() {
-    const [roles, setRoles] = useState([]);
-    const [showModal, setShowModal] = useState(false);
-    const [currentRole, setCurrentRole] = useState(null);
-    const [roleName, setRoleName] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+  // Modal & CRUD state
+  const [showModal, setShowModal] = useState(false);
+  const [currentRole, setCurrentRole] = useState(null);
+  const [roleName, setRoleName] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-    useEffect(() => {
-        fetchRoles();
-    }, []);
+  // Data & refresh
+  const [roles, setRoles] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
+  // Tabs (active/inactive)
+  const [activeTab, setActiveTab] = useState('active');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Filters
+  const [filters, setFilters] = useState({ role: '' });
+  const [resetFilter, setResetFilter] = useState(false);
+  const handleFilterChange = useCallback((newFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  }, []);
+
+  const onTabSelect = (key) => {
+    setActiveTab(key);
+    setShowModal(false);
+    setCurrentRole(null);
+    setRoleName('');
+    setErrorMessage('');
+    setCurrentPage(1);
+    setResetFilter(r => !r);
+    setRefreshKey(k => k + 1);
+  };
+
+  useEffect(() => {
     const fetchRoles = async () => {
+      try {
+        const isActiveVal = activeTab === 'active' ? '1' : '0';
+        const resp = await api.get('/api/employeeRole/displayTable', {
+          params: {
+            isActive: isActiveVal,
+            page: currentPage,
+            ...filters
+          }
+        });
+        setRoles(resp.data.data || []);
+        setTotalPages(resp.data.totalPages || 1);
+      } catch (err) {
+        console.error('Error fetching roles:', err);
+      }
+    };
+    fetchRoles();
+  }, [activeTab, currentPage, refreshKey, filters]);
+
+  const handleAddRole = () => {
+    setCurrentRole(null);
+    setRoleName('');
+    setErrorMessage('');
+    setShowModal(true);
+  };
+
+  const handleEditRole = (role) => {
+    setCurrentRole(role);
+    setRoleName(role.role);
+    setErrorMessage('');
+    setShowModal(true);
+  };
+
+  const handleToggleRole = async (role) => {
+    try {
+      await api.patch(`/api/employeeRole/activation/${role.id}`);
+      setRefreshKey(k => k + 1);
+    } catch (err) {
+      console.error('Error toggling activation:', err);
+    }
+  };
+
+  const handleSaveRole = () => {
+    if (!roleName.trim()) {
+      setErrorMessage('Role name cannot be empty.');
+      return;
+    }
+    const action = currentRole ? 'update' : 'create';
+    confirmDialog({
+      message: `Are you sure you want to ${action} this role?`,
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      accept: async () => {
         try {
-            const response = await api.get("/api/employeeRole");
-            setRoles(response.data);
-            setErrorMessage(''); 
-        } catch (error) {
-            setErrorMessage('Error fetching roles. Please try again.');
+          if (currentRole) {
+            await api.put(`/api/employeeRole/${currentRole.id}`, { role: roleName });
+          } else {
+            await api.post('/api/employeeRole', { role: roleName, isActive: '1' });
+          }
+          setShowModal(false);
+          setErrorMessage('');
+          setRefreshKey(k => k + 1);
+        } catch (err) {
+          console.error('Error saving role:', err);
+          setErrorMessage(err.response?.data?.message || 'Error saving role.');
         }
-    };
+      }
+    });
+  };
 
-    const handleAddRole = () => {
-        setCurrentRole(null);
-        setRoleName('');
-        setErrorMessage('');
-        setShowModal(true);
-    };
+  return (
+    <>
+      <Container className="mt-4">
+        <div className="d-flex justify-content-end mb-3">
+          <Button
+            onClick={handleAddRole}
+            style={{ backgroundColor: 'var(--variant-one)', border: 'none' }}
+          >
+            Add Role
+          </Button>
+        </div>
 
-    const handleEditRole = (role) => {
-        setCurrentRole(role);
-        setRoleName(role.role);
-        setErrorMessage('');
-        setShowModal(true);
-    };
+        <Tabs
+          id="roles-tabs"
+          activeKey={activeTab}
+          onSelect={onTabSelect}
+          className="custom-manage-tabs mb-3"
+        >
+          {['active','inactive'].map(key => (
+            <Tab key={key} eventKey={key} title={key === 'active' ? 'Active Roles' : 'Deleted Roles'}>
+              <EmployeeRolesDisplayTable
+                isActiveFilter={key === 'active' ? '1' : '0'}
+                onDelete={handleToggleRole}
+                onEdit={handleEditRole}
+                refreshKey={refreshKey}
+              />
 
-    const handleDeleteRole = async (id) => {
-        try {
-            await api.delete(`/api/employeeRole/${id}`);
-            fetchRoles();
-            setErrorMessage('');
-        } catch (error) {
-            console.error('Error deleting role:', error);
-            if (error.response && error.response.data.message) {
-                if (error.response.data.message) {
-                    setErrorMessage(error.response.data.message);
-                }
-            }
-        }
-    };
+              <div className="d-lg-none">
+                <EmployeeRolesFilter
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  resetFilter={resetFilter}
+                />
 
-    const handleSaveRole = async () => {
-        try {
-            if (currentRole) {
-                await api.put(`/api/employeeRole/${currentRole.id}`, { role: roleName });
-            } else {
-                await api.post("/api/employeeRole", { role: roleName });
-            }
-            setShowModal(false);
-            setErrorMessage('');
-            fetchRoles();
-        } catch (error) {
-            console.error('Error saving role:', error);
-            setErrorMessage("Error saving role. Please try again.");
-        }
-    };
-
-    return (
-        <Container className="mt-4">
-            <Row className="mb-3">
-                <Col className="text-end">
-                    <Button variant="success" onClick={handleAddRole}>Add Role</Button>
-                </Col>
-            </Row>
-
-            {errorMessage && (
-                <Alert variant="danger" onClose={() => setErrorMessage('')} dismissible>
-                    {errorMessage}
-                </Alert>
-            )}
-
-            <ListGroup>
-                {roles.length > 0 ? (
-                    roles.map((role) => (
-                        <ListGroup.Item key={role.id} className="d-flex justify-content-between align-items-center">
-                            {role.role}
-                            <div>
-                                <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditRole(role)}>Edit</Button>
-                                <Button variant="danger" size="sm" onClick={() => handleDeleteRole(role.id)}>Delete</Button>
-                            </div>
-                        </ListGroup.Item>
-                    ))
+                {roles.length === 0 ? (
+                  <p>No data Found</p>
                 ) : (
-                    <ListGroup.Item className="text-center text-muted">
-                        No employee roles found.
-                    </ListGroup.Item>
+                  <EmployeeRolesCardView
+                    roles={roles}
+                    isActiveFilter={key === 'active' ? '1' : '0'}
+                    onEdit={handleEditRole}
+                    onDelete={handleToggleRole}
+                  />
                 )}
-            </ListGroup>
 
-            {/* Modal para adicionar/editar roles */}
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{currentRole ? 'Edit Role' : 'Add Role'}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group controlId="roleName">
-                            <Form.Label>Role Name</Form.Label>
-                            <Form.Control 
-                                type="text" 
-                                value={roleName} 
-                                onChange={(e) => setRoleName(e.target.value)} 
-                                placeholder="Enter role name"
-                            />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-                    <Button variant="primary" onClick={handleSaveRole}>
-                        {currentRole ? 'Update' : 'Save'}
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </Container>
-    );
+                <PaginationControl
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  handlePageChange={setCurrentPage}
+                />
+              </div>
+            </Tab>
+          ))}
+        </Tabs>
+
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>{currentRole ? 'Edit Role' : 'Add Role'}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group>
+                <Form.Label>Role Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={roleName}
+                  onChange={e => { setRoleName(e.target.value); setErrorMessage(''); }}
+                  placeholder="Enter role name"
+                  isInvalid={!!errorMessage}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errorMessage}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSaveRole}>
+              {currentRole ? 'Update' : 'Save'}
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Container>
+
+    </>
+  );
 }

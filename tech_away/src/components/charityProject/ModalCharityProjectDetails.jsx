@@ -47,14 +47,20 @@ export default function ModalCharityProjectDetails({ show, handleClose, project,
           <Modal.Title className="fw-bold">{projectData.name} Details</Modal.Title>
         </Modal.Header>
         <Modal.Body className="px-4">
-          <CharityProjectInfoEditor
-            project={localProject}
-            setProject={setProjectData}
-            alert={infoAlert}
-            onChangeAlert={handleInfoAlert}
-            onRefresh={onRefresh}
-            setSelectedProject={setSelectedProject}
-          />
+
+          <Card className="flex-fill mb-3 border shadow-sm" style={{ transform: 'none', transition: 'none',}}>
+            <Card.Body>
+              <CharityProjectInfoEditor
+                  project={localProject}
+                  setProject={setProjectData}
+                  alert={infoAlert}
+                  onChangeAlert={handleInfoAlert}
+                  onRefresh={onRefresh}
+                  setSelectedProject={setSelectedProject}
+                />
+            </Card.Body>
+          </Card>
+  
           <hr className="my-4" />
           <Row className="g-4">
             <Col md={12} lg={6} className="d-flex">

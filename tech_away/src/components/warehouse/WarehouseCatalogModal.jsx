@@ -28,7 +28,7 @@ export default function WarehouseCatalogModal({
       setLoading(true);
       setError(null);
       try {
-        const response = await api.get(`/api/warehouse`, {
+        const response = await api.get(`/api/warehouse/displayTable`, {
           params: {
             ...filters,
             page: currentPage,
@@ -75,7 +75,6 @@ export default function WarehouseCatalogModal({
         <Modal.Title>Warehouse Catalog</Modal.Title>
       </Modal.Header>
       <Modal.Body style={{ minHeight: "450px" }}>
-        {/* Optionally add a filter component here */}
 
         {loading ? (
           <p>Loading data...</p>
@@ -85,14 +84,13 @@ export default function WarehouseCatalogModal({
           <p>No warehouses found.</p>
         ) : (
           <Container>
-            {/* Desktop Table */}
+
             <WarehouseTableModal
               warehouses={warehouses}
               selectedWarehouse={selectedWarehouse}
               handleWarehouseSelection={handleWarehouseSelection}
             />
 
-            {/* Mobile Cards */}
             {warehouses.map((warehouse) => (
               <WarehouseCardModal
                 key={warehouse.id}

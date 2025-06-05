@@ -90,15 +90,13 @@ router.get("/displayTable", async (req, res) => {
 	const {
 	  internNum,
 	  employeeName,
-	//   firstName,
-	//   lastName,
-	  storeNIPC,
+	  store,
 	  email,
 	  phone,
 	  role,
 	  createdAt,
 	  page = 1,
-	  pageSize = 10,
+	  pageSize = 5,
 	  sortField = "internNum",
 	  sortOrder = "ASC",
 	} = req.query;
@@ -106,6 +104,7 @@ router.get("/displayTable", async (req, res) => {
 
 	const where = {};
 	const roleCondition =  {};
+	const storeCondition = {}
 
 	if (internNum)
 	  where.internNum = sequelize.where(
@@ -113,9 +112,8 @@ router.get("/displayTable", async (req, res) => {
 		{ [Op.iLike]: `${internNum}%` }
 	  );
 
-	if (storeNIPC) where.storeNIPC = { [Op.iLike]: `${storeNIPC}%` };
-	// if (firstName) where.firstName = { [Op.iLike]: `${firstName}%` };
-	// if (lastName) where.lastName = { [Op.iLike]: `${lastName}%` };
+	if (store) storeCondition.name = { [Op.iLike]: `%${store}%` };
+
 	if (employeeName) {
 		where[Op.and] = Sequelize.where(
 		  Sequelize.fn(
@@ -149,28 +147,45 @@ router.get("/displayTable", async (req, res) => {
 
 	const orderClause = [];
 
-	if (sortField === "name") {
-	  orderClause.push([
-		Sequelize.fn("LOWER", Sequelize.col("Employee.internNum")),
-		sortOrder == -1 ? "DESC" : "ASC",
-	  ]);
-	} else if (sortField) {
-	  orderClause.push([
-		Sequelize.col(sortField),
-		sortOrder == -1 ? "DESC" : "ASC",
-	  ]);
+	if (sortField === "employeeName") {
+	orderClause.push(["firstName", sortOrder == -1 ? "DESC" : "ASC"]);
+	orderClause.push(["lastName", sortOrder == -1 ? "DESC" : "ASC"]);
+	} else if (sortField === "roleName") {
+	orderClause.push([
+		{ model: models.EmployeeRole },
+		"role",
+		sortOrder == -1 ? "DESC" : "ASC"
+	]);
+	} else if (sortField === "storeName") {
+	orderClause.push([
+		{ model: models.Store },
+		"name",
+		sortOrder == -1 ? "DESC" : "ASC"
+	]);
+	} else {
+	orderClause.push([
+		sortField,
+		sortOrder == -1 ? "DESC" : "ASC"
+	]);
 	}
+
+
 
 
 	const { count, rows } = await models.Employee.findAndCountAll({
 	  where,
-	  include: [
+		include: [
 		{
-		  model: models.EmployeeRole,
-		  attributes: ["id", "role"],
-		  where: roleCondition
-		},    
-	   ],  
+			model: models.EmployeeRole,
+			attributes: ["id", "role"],
+			where: roleCondition
+		},
+		{
+			model: models.Store,
+			attributes: ["nipc", "name"],
+			where: storeCondition
+		}   
+		],
 	  limit: parseInt(pageSize),
 	  offset,
 	  order: orderClause,
@@ -183,8 +198,10 @@ router.get("/displayTable", async (req, res) => {
 		// lastName: item.lastName,
 		email: item.email,
 		phone: item.phone,
-		role: item.EmployeeRole.role,
-		storeNIPC: item.storeNipc,
+		storeNIPC: item.storeNIPC,
+		storeName: item.Store.name,
+		roleId: item.EmployeeRole.id,
+		roleName: item.EmployeeRole.role,
 		isActive: item.isActive
 	}));
 
@@ -303,7 +320,6 @@ router.put("/:internNum", async (req, res) => {
 
 		await employee.update(req.body);
 
-		// Verifica se existe um cookie de employeeInfo e se é o mesmo internNum
 		const currentEmployee = req.cookies.employeeInfo;
 		if (currentEmployee && currentEmployee.internNum == req.params.internNum) {
 			res.cookie("employeeInfo", employee.dataValues, {

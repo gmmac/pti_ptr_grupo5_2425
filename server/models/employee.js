@@ -5,6 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Employee extends Model {
     static associate(models) {
+
       Employee.belongsTo(models.EmployeeRole, {
         foreignKey: 'role',
         targetKey: 'id',
@@ -18,6 +19,14 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       });
+
+			Employee.hasMany(models.ClientPurchase, {
+				foreignKey: 'employeeID',
+				sourceKey: 'nic',
+				onUpdate: 'CASCADE',
+				onDelete: 'SET NULL',
+			});
+
     }
   }
   Employee.init({

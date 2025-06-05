@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
 			adress,
 			createdAt,
 			page = 1,
-			pageSize = 10,
+			pageSize = 5,
 			orderBy,
 			orderDirection,
 		} = req.query;
@@ -105,7 +105,7 @@ router.get("/displayTable", async (req, res) => {
       phone,
       active = "1",
       page = 1,
-      pageSize = 10,
+      pageSize = 5,
       sortField = "nic",
       sortOrder = "ASC",
     } = req.query;

@@ -1,10 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const models = require('../models')
+const { Op, Sequelize } = require('sequelize');
 
 router.get("/", async (req, res) => {
     try {
-      const employeeRoles = await models.EmployeeRole.findAll();
+      const { isActive = '1' } = req.query;
+
+      const where = { isActive };    
+      const employeeRoles = await models.EmployeeRole.findAll({
+        where
+      });
       res.json(employeeRoles);
     } catch (error) {
       console.error(error);
@@ -12,20 +18,134 @@ router.get("/", async (req, res) => {
     }
 });
   
-  router.post("/", async (req, res) => {
-    try {
-      const newEmployeeRole = await models.EmployeeRole.create({
-        role:  req.body.role,
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      });
-      
-      res.status(201).json(newEmployeeRole);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Error creating roles." });
+
+router.get('/displayTable', async (req, res) => {
+  try {
+    const {
+      id,
+      role,
+      createdAt,
+      isActive = "1",
+      page = 1,
+      pageSize = 5,
+      sortField = 'id',
+      sortOrder = 'ASC',
+    } = req.query;
+
+    // Monta o objeto de filtros
+    const where = {};
+
+    // Filtro por ID começando com o valor informado
+    if (id) {
+      where.id = Sequelize.where(
+        Sequelize.cast(Sequelize.col('EmployeeRole.id'), 'varchar'),
+        { [Op.iLike]: `${id}%` }
+      );
     }
-  });
+
+    where.isActive = { [Op.like]: isActive }
+
+    // Filtro por texto no campo `role`
+    if (role) {
+      where.role = { [Op.iLike]: `%${role}%` };
+    }
+
+    // Filtro por data de criação (todas as criações no dia informado)
+    if (createdAt) {
+      const dayStart = new Date(createdAt);
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+      where.createdAt = {
+        [Op.gte]: dayStart,
+        [Op.lt]: dayEnd,
+      };
+    }
+
+    // Paginação
+    const limit = parseInt(pageSize, 10);
+    const offset = (parseInt(page, 10) - 1) * limit;
+
+    // Ordenação dinâmica
+    const orderClause = [];
+
+    if (sortField === "state") {
+      orderClause.push([
+        Sequelize.fn("LOWER", Sequelize.col("EmployeeRole.role")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField) {
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
+
+    // Consulta com contagem total
+    const { count, rows } = await models.EmployeeRole.findAndCountAll({
+      where,
+      limit,
+      offset,
+      order: orderClause,
+    });
+
+    // Formata somente os campos que interessam
+    const data = rows.map(r => ({
+      id: r.id,
+      role: r.role,
+      protected: r.protected,
+      isActive: r.isActive
+    }));
+
+    res.status(200).json({
+      totalItems: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page, 10),
+      pageSize: limit,
+      data,
+    });
+  } catch (error) {
+    console.error('Error fetching employee roles:', error);
+    res.status(500).json({ message: 'Error fetching roles.' });
+  }
+});
+
+router.patch('/activation/:id', async (req, res) => {
+  try {
+    const role = await models.EmployeeRole.findByPk(req.params.id);
+    if (!role) {
+      return res.status(404).json({ error: 'Role not found.' });
+    }
+    
+    role.isActive = role.isActive == 1 ? 0 : 1;
+    console.log(role.isActive)
+
+    await role.save();
+
+    const statusText = role.isActive === 1 ? 'activated' : 'deactivated';
+    res.status(200).json({
+      message: `Role ${statusText} successfully.`,
+      role
+    });
+  } catch (error) {
+    console.error('Error toggling role activation:', error);
+    res.status(500).json({ error: 'Error updating role activation status.' });
+  }
+});
+
+router.post('/', async (req, res) => {
+  try {
+    const { role, isActive = '1' } = req.body;
+    const newEmployeeRole = await models.EmployeeRole.create({
+      role,
+      isActive,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    res.status(201).json(newEmployeeRole);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error creating role.' });
+  }
+});
 
   router.get("/:ID", async (req, res) => {
     try {

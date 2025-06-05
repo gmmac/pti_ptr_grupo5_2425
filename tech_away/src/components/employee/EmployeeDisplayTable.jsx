@@ -9,8 +9,9 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
+import EmployeeEditModal from "./EmployeeEditModal";
 
-export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, refreshKey}) {
+export default function EmployeeDisplayTable({isActiveFilter, onDelete, refreshKey}) {
 	const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
 
@@ -22,8 +23,6 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
         sortOrder: null,
         filters: {
           internNum: { value: '', matchMode: 'contains' },
-        //   firstName: { value: '', matchMode: 'contains' },
-        //   lastName: { value: '', matchMode: 'contains' },
           employeeName: { value: '', matchMode: 'contains' },
           email: { value: '', matchMode: 'contains' },
           phone: { value: '', matchMode: 'contains' },
@@ -68,7 +67,7 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
             setData(items);
             setTotalRecords(res.data.totalItems || 0);
             if (items.length) {
-              const keys = Object.keys(items[0]).filter(k => k !== "CreatedAt");
+              const keys = Object.keys(items[0]).filter(k => k !== "CreatedAt" && k !== "storeNIPC" && k !== "roleId");
               setColumns(keys);
             }
           })
@@ -91,10 +90,10 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
 
     const confirmDelete = (id) => {
         confirmDialog({
-            message: (<>Are you sure you want to delete this Employee?<br />This action will erase other items associated with this Employee.</>),
+            message: (<> Are you sure you want to {isActiveFilter == "1" ? "delete" : "restore"} this Employee?</>),
             header: "Confirmation",
             icon: "pi pi-exclamation-triangle",
-            accept: () => handleDelete(id),
+            accept: () => onDelete(id),
         });
     };
 
@@ -103,22 +102,20 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
         setShowModal(true);
     };
 
-    const handleDelete = (id) => {
-        api.delete(`api/employee/${id}`).then(() => loadLazyData());
-    };
-
-    const handleToggleActivation = async (internNum) => {
+    const handleSaveInfo = async (internNum, payload) => {
         try {
-            await api.patch(`/api/employee/toggle/${internNum}`); // Ajuste conforme a rota da tua API
+            await api.put(`/api/employee/${internNum}`, payload);
+            setShowModal(false);
             loadLazyData();
-        } catch (error) {
-            console.error("Erro ao ativar/desativar:", error);
+        } catch (err) {
+            console.error("Erro ao atualizar funcionário:", err);
         }
     };
 
     return (
         <>
-            <ConfirmDialog />
+            <EmployeeEditModal show={showModal} onHide={() => setShowModal(false)} employee={selectedObj} onSave={handleSaveInfo} />
+            {/* <ConfirmDialog /> */}
             <div className="d-none d-lg-table">
                 <DataTable
                     value={data}
@@ -206,6 +203,7 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
                                                 className="custom-icon-button"
                                                 onClick={() => handleEdit(rowData)}
                                             />
+                                            
                                             <Button
                                                 icon="pi pi-trash"
                                                 text
@@ -213,7 +211,7 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
                                                 label="Delete"
                                                 style={{color: "var(--danger)"}}
                                                 className="custom-icon-button-withtext"
-                                                onClick={() => onDelete(rowData.internNum)}
+                                                onClick={() => confirmDelete(rowData.internNum)}
 
                                             /> 
                                         </> : 
@@ -224,7 +222,7 @@ export default function EmployeeDisplayTable({isActiveFilter, onEdit, onDelete, 
                                         label="Restore"
                                         style={{color: "var(--valid)"}}
                                         className="custom-icon-button-withtext"
-                                        onClick={() => onDelete(rowData.internNum)}
+                                        onClick={() => confirmDelete(rowData.internNum)}
                                     />
                                     }
                                 </div>

@@ -60,6 +60,8 @@ const projectStatus = require("./routes/projectStatus");
 const equipmentType = require("./routes/equipmentType");
 const purchaseCartEquipment = require("./routes/purchaseCartEquipment");
 const orderStatus = require("./routes/orderStatus");
+const report = require("./routes/report");
+const reportType = require("./routes/reportType");
 
 // Definição de endpoints --> rotas
 app.use("/api/address", address);
@@ -95,6 +97,8 @@ app.use("/api/projectStatus", projectStatus);
 app.use("/api/equipmentType", equipmentType);
 app.use("/api/purchaseCartEquipment", purchaseCartEquipment);
 app.use("/api/orderStatus", orderStatus);
+app.use("/api/report", report);
+app.use("/api/reportType", reportType);
 
 app.get("/status", (req, res) => {
 	res.json({

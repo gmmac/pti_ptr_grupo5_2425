@@ -66,6 +66,24 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          name: "Xiaomi",
+          isActive: "1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "Corsair",
+          isActive: "1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "JBL",
+          isActive: "1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );

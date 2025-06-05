@@ -1,22 +1,21 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class RepairStatus extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
+      // define association here (e.g., RepairStatusLog)
     }
   }
   RepairStatus.init({
     state: {
       type: DataTypes.STRING(50),
-      allowNull: false
+      allowNull: false,
+      unique: true
+    },
+    isActive: {
+      type: DataTypes.STRING(1),
+      allowNull: false,
+      defaultValue: '1'
     }
   }, {
     sequelize,

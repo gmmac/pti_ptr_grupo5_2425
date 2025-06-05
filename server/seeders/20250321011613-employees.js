@@ -4,6 +4,24 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert("Employees", [
       {
+        nic: "000000000",
+        nif: "000000000",
+        storeNIPC: "000000000",
+        birthDate: new Date("1910-05-15"),
+        gender: "O",
+        firstName: "Online",
+        lastName: "Employee",
+        email: "employee@online.com",
+        phone: "000000000",
+        address: "Online",
+        latitude: "0",
+        longitude: "0",
+        role: 1,
+        // isActive: "1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
         nic: "123456789",
         nif: "987654321",
         // internNum: "1",

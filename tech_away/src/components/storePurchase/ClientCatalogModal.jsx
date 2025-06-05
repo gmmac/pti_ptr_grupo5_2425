@@ -17,7 +17,7 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
 
   const [filters, setFilters] = useState({
     nic: "",
-    name: "",       // alterado aqui
+    name: "",
     email: "",
     phone: "",
     orderBy: "nic",
@@ -89,10 +89,10 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
     }} 
     size="xl" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Catálogo de Clientes</Modal.Title>
+        <Modal.Title>Clients Catalog</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* Passe agora apenas `name` em vez de firstName/lastName */}
+
         <ClientFilter setFilters={setFilters} />
 
         {loading ? (

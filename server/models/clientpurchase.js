@@ -16,10 +16,26 @@ module.exports = (sequelize, DataTypes) => {
 				onUpdate: "CASCADE",
 				onDelete: "SET NULL",
 			});
+
 			ClientPurchase.belongsTo(models.OrderStatus, {
 				foreignKey: "orderStatusID",
 				targetKey: "id",
 			});
+
+			ClientPurchase.belongsTo(models.Employee, {
+				foreignKey: 'employeeID',
+				targetKey: 'nic',
+				onUpdate: 'CASCADE',
+				onDelete: 'SET NULL'
+			});
+
+			ClientPurchase.hasMany(models.PurchaseCartEquipment, {
+				foreignKey: 'clientPurchaseId',
+				sourceKey: 'id',
+				onUpdate: 'CASCADE',
+				onDelete: 'SET NULL'
+			});
+
 		}
 	}
 	ClientPurchase.init(

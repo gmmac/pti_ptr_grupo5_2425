@@ -1,57 +1,51 @@
+// src/components/EmployeeEditModal.jsx
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, InputGroup, Stack } from "react-bootstrap";
 import api from "../../utils/axios";
 import StoreCatalogModal from "../store/StoreCatalogModal";
+import { confirmDialog } from "primereact/confirmdialog";
 
 export default function EmployeeEditModal({ show, onHide, employee, onSave }) {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    gender: "M",
     internNum: "",
-    storeNIPC: "",
     store: null,
-    role: "",
+    role: null,
   });
-
   const [roles, setRoles] = useState([]);
   const [showStoreModal, setShowStoreModal] = useState(false);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    api.get('/api/employeeRole')
-      .then(res => setRoles(res.data))
-      .catch(err => console.error("Error fetching roles:", err));
+    api.get("/api/employeeRole")
+      .then((res) => setRoles(res.data))
+      .catch((err) => console.error("Error fetching roles:", err));
   }, []);
 
+  // Reset and populate formData when modal opens or employee changes
   useEffect(() => {
-    if (employee) {
+    if (show && employee) {
       setFormData({
-        firstName: employee.firstName || "",
-        lastName: employee.lastName || "",
-        email: employee.email || "",
-        phone: employee.phone || "",
-        gender: employee.gender || "M",
-        internNum: employee.internNum || "",
-        storeNIPC: employee.Store?.nipc || "",
-        store: employee.Store || null,
-        role: employee.EmployeeRole?.id || "",
+        internNum: employee.internNum ?? "",
+        store: {nipc: employee.storeNIPC, name: employee.storeName} || null,
+        role: {id: employee.roleId, name: employee.roleName} || null,
       });
       setErrors({});
     }
-  }, [employee]);
+  }, [show, employee]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "role") {
+      const selectedRole = roles.find((r) => String(r.id) === value) || null;
+      setFormData((prev) => ({ ...prev, role: selectedRole }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSelectStore = (store) => {
     setFormData((prev) => ({
       ...prev,
-      storeNIPC: store?.nipc || "",
       store: store,
     }));
     setErrors((prev) => ({ ...prev, store: null }));
@@ -69,17 +63,35 @@ export default function EmployeeEditModal({ show, onHide, employee, onSave }) {
     }
 
     const dataToSend = {
-      ...formData,
-      storeNIPC: formData.store?.nipc || "",
-      role: formData.role,
+      role: formData.role.id,
+      storeNIPC: formData.store.nipc,
     };
 
     onSave(formData.internNum, dataToSend);
   };
 
+
+    const confirmEdit = (id) => {
+      confirmDialog({
+          message: (<> Are you sure you want to edit this Employee?</>),
+          header: "Confirmation",
+          icon: "pi pi-exclamation-triangle",
+          accept: () => handleSubmit(),
+      });
+    };
+
+    const confirmCancel = (id) => {
+      confirmDialog({
+          message: (<> Are you sure you want to cancel this Employee's edit?</>),
+          header: "Confirmation",
+          icon: "pi pi-exclamation-triangle",
+          accept: () => onHide(),
+      });
+    };
+
   return (
     <>
-      <Modal show={show} onHide={onHide} centered>
+      <Modal show={show} onHide={onHide}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Employee</Modal.Title>
         </Modal.Header>
@@ -92,15 +104,15 @@ export default function EmployeeEditModal({ show, onHide, employee, onSave }) {
                   <Form.Label>Role</Form.Label>
                   <Form.Select
                     name="role"
-                    value={formData.role}
+                    value={formData.role?.id ?? ""}
                     onChange={handleChange}
                     isInvalid={!!errors.role}
-                    className="auth-input"
+                    className="rounded-pill me-2"
                   >
                     <option value="">Select Role</option>
-                    {roles.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.role}
+                    {roles.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.role}
                       </option>
                     ))}
                   </Form.Select>
@@ -123,6 +135,7 @@ export default function EmployeeEditModal({ show, onHide, employee, onSave }) {
                       value={formData.store?.name || ""}
                       placeholder="Select a Store"
                       isInvalid={!!errors.store}
+                      className="rounded-pill me-2"
                     />
                     <Button
                       variant="outline-secondary"
@@ -138,15 +151,24 @@ export default function EmployeeEditModal({ show, onHide, employee, onSave }) {
               </Col>
             </Row>
           </Form>
+
+          <Stack gap={2} direction="horizontal" className="justify-content-end mt-2">
+            <Button
+              className="rounded-pill"
+              variant="secondary"
+              onClick={confirmCancel}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="rounded-pill"
+              style={{ backgroundColor: "var(--variant-one)", border: "none" }}
+              onClick={confirmEdit}
+            >
+              Save Changes
+            </Button>
+          </Stack>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleSubmit}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       <StoreCatalogModal

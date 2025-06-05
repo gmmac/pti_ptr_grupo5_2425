@@ -70,7 +70,7 @@ export default function UsedEquipmentFilter({ setFilters }) {
 
                 <Col xs={12} md={6}>
                   <Form.Group controlId="BrandModel">
-                    <Form.Label>Model (Brand + Model)</Form.Label>
+                    <Form.Label>Model</Form.Label>
                     <Form.Control
                       type="text"
                       name="BrandModel"

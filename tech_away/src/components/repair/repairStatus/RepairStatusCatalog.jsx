@@ -1,130 +1,102 @@
-import React, { useEffect, useState } from 'react';
-import { ListGroup, Container, Button, Row, Col, Modal, Form, Alert } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Container, Button, Modal, Form, Tab, Tabs } from 'react-bootstrap';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import api from '../../../utils/axios';
+import RepairStatusDisplayTable from './RepairStatusDisplayTable';
+import RepairStatusCardView from './RepairStatusCardView';
+import RepairStatusFilter from './RepairStatusFilter';
+import PaginationControl from '../../pagination/PaginationControl';
 
 export default function RepairStatusCatalog() {
-    const [statuses, setStatus] = useState([]);
-    const [showModal, setShowModal] = useState(false);
-    const [currentStatus, setCurrentStatus] = useState(null);
-    const [statusName, setStatusName] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(null);
+  const [statusName, setStatusName] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [statuses, setStatuses] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [activeTab, setActiveTab] = useState('active');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState({ state: '' });
+  const [resetFilter, setResetFilter] = useState(false);
 
-    useEffect(() => {
-        fetchStatus();
-    }, []);
+  const handleFilterChange = useCallback(newFilters => { setFilters(newFilters); setCurrentPage(1); }, []);
+  const onTabSelect = key => { setActiveTab(key); setShowModal(false); setCurrentStatus(null); setStatusName(''); setErrorMessage(''); setCurrentPage(1); setResetFilter(r => !r); setRefreshKey(k => k+1); };
 
-    const fetchStatus = async () => {
-        try {
-            const response = await api.get("/api/repairStatus");
-            setStatus(response.data);
-            setErrorMessage(''); 
-        } catch (error) {
-            setErrorMessage('Error fetching status. Please try again.');
+  useEffect(() => {
+    async function fetchStatuses() {
+      try {
+        const isActiveVal = activeTab === 'active' ? '1' : '0';
+        const resp = await api.get('/api/repairStatus/displayTable', { params: { isActive: isActiveVal, page: currentPage, ...filters } });
+        setStatuses(resp.data.data);
+        setTotalPages(resp.data.totalPages);
+      } catch(e) { console.error(e); }
+    }
+    fetchStatuses();
+  }, [activeTab, currentPage, refreshKey, filters]);
+
+  const handleAdd = () => { setCurrentStatus(null); setStatusName(''); setErrorMessage(''); setShowModal(true); };
+  const handleEdit = status => { setCurrentStatus(status); setStatusName(status.state); setErrorMessage(''); setShowModal(true); };
+  const handleToggle = async status => { await api.patch(`/api/repairStatus/activation/${status.id}`); setRefreshKey(k => k+1); };
+
+  const handleSave = () => {
+    if (!statusName.trim()) { setErrorMessage('Name cannot be empty.'); return; }
+    const action = currentStatus ? 'update' : 'create';
+    confirmDialog({ message: `Are you sure you want to ${action} this status?`, header: 'Confirmation', icon: 'pi pi-exclamation-triangle', accept: async () => {
+      try {
+        if (currentStatus) {
+          await api.put(`/api/repairStatus/${currentStatus.id}`, { state: statusName });
+        } else {
+          await api.post('/api/repairStatus', { state: statusName });
         }
-    };
-
-    const handleAddStatus = () => {
-        setCurrentStatus(null);
-        setStatusName('');
+        setShowModal(false);
         setErrorMessage('');
-        setShowModal(true);
-    };
+        setRefreshKey(k => k+1);
+      } catch(err) {
+        console.error(err);
+        setErrorMessage(err.response?.data?.message || 'Error saving status.');
+      }
+    }});
+  };
 
-    const handleEditStatus = (status) => {
-        setCurrentStatus(status);
-        setStatusName(status.status);
-        setErrorMessage('');
-        setShowModal(true);
-    };
+  return (
+    <Container className="mt-4">
+      
+      <div className="d-flex justify-content-end mb-3">
+        <Button onClick={handleAdd} style={{ backgroundColor: 'var(--variant-one)', border: 'none' }}>Add Status</Button>
+      </div>
 
-    const handleDeleteStatus = async (id) => {
-        try {
-            await api.delete(`/api/repairStatus/${id}`);
-            fetchStatus();
-            setErrorMessage('');
-        } catch (error) {
-            console.error('Error deleting status:', error);
-            if (error.response && error.response.data.message) {
-                if (error.response.data.message) {
-                    setErrorMessage(error.response.data.message);
-                }
-            }
-        }
-    };
+      <Tabs id="status-tabs" activeKey={activeTab} onSelect={onTabSelect} className="custom-manage-tabs mb-3">
+        {['active','inactive'].map(key => (
+          <Tab key={key} eventKey={key} title={key==='active'?'Active Statuses':'Deleted Statuses'}>
+            <RepairStatusDisplayTable isActiveFilter={key==='active'?'1':'0'} onDelete={handleToggle} onEdit={handleEdit} refreshKey={refreshKey} />
+            <div className="d-lg-none">
+              <RepairStatusFilter filters={filters} onFilterChange={handleFilterChange} resetFilter={resetFilter} />
+              {statuses.length===0 ? <p>No data Found</p> : <RepairStatusCardView statuses={statuses} isActiveFilter={key==='active'?'1':'0'} onEdit={handleEdit} onDelete={handleToggle} />}
+              <PaginationControl currentPage={currentPage} totalPages={totalPages} handlePageChange={setCurrentPage} />
+            </div>
+          </Tab>
+        ))}
+      </Tabs>
 
-    const handleSaveStatus = async () => {
-        try {
-            if (currentStatus) {
-                await api.put(`/api/repairStatus/${currentStatus.id}`, { state: statusName });
-            } else {
-                await api.post("/api/repairStatus", { state: statusName });
-            }
-            setShowModal(false);
-            setErrorMessage('');
-            fetchStatus();
-        } catch (error) {
-            console.error('Error saving status:', error);
-            setErrorMessage("Error saving status. Please try again.");
-        }
-    };
-
-    return (
-        <Container className="mt-4">
-            <Row className="mb-3">
-                <Col className="text-end">
-                    <Button variant="success" onClick={handleAddStatus}>Add Status</Button>
-                </Col>
-            </Row>
-
-            {errorMessage && (
-                <Alert variant="danger" onClose={() => setErrorMessage('')} dismissible>
-                    {errorMessage}
-                </Alert>
-            )}
-
-            <ListGroup>
-                {statuses.length > 0 ? (
-                    statuses.map((status) => (
-                        <ListGroup.Item key={status.id} className="d-flex justify-content-between align-items-center">
-                            {status.state}
-                            <div>
-                                <Button variant="warning" size="sm" className="me-2" onClick={() => handleEditStatus(status)}>Edit</Button>
-                                <Button variant="danger" size="sm" onClick={() => handleDeleteStatus(status.id)}>Delete</Button>
-                            </div>
-                        </ListGroup.Item>
-                    ))
-                ) : (
-                    <ListGroup.Item className="text-center text-muted">
-                        No repair status found.
-                    </ListGroup.Item>
-                )}
-            </ListGroup>
-
-            {/* Modal para adicionar/editar status */}
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{currentStatus ? 'Edit Status' : 'Add Status'}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group controlId="statusName">
-                            <Form.Label>Status Name</Form.Label>
-                            <Form.Control 
-                                type="text" 
-                                value={statusName} 
-                                onChange={(e) => setStatusName(e.target.value)} 
-                                placeholder="Enter status name"
-                            />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-                    <Button variant="primary" onClick={handleSaveStatus}>
-                        {currentStatus ? 'Update' : 'Save'}
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </Container>
-    );
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{currentStatus ? 'Edit Status' : 'Add Status'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group>
+              <Form.Label>State Name</Form.Label>
+              <Form.Control type="text" value={statusName} onChange={e=>{setStatusName(e.target.value); setErrorMessage('');}} placeholder="Enter status name" isInvalid={!!errorMessage} />
+              <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={handleSave}>{currentStatus?'Update':'Save'}</Button>
+        </Modal.Footer>
+      </Modal>
+    </Container>
+  );
 }

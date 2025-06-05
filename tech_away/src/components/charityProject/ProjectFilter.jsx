@@ -44,11 +44,11 @@ export default function ProjectFilter({ setFilters }) {
           <Accordion.Body>
             <Form onSubmit={handleSubmit}>
               <Row className="gy-3">
-                <Col xs={12} md={4}>
+                <Col xs={12} md={6}>
                   <Form.Group controlId="filterId">
                     <Form.Label>Project ID</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="number"
                       name="id"
                       placeholder="Enter project ID"
                       value={localFilters.id}
@@ -56,7 +56,7 @@ export default function ProjectFilter({ setFilters }) {
                     />
                   </Form.Group>
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={6}>
                   <Form.Group controlId="filterName">
                     <Form.Label>Project Name</Form.Label>
                     <Form.Control
@@ -68,19 +68,7 @@ export default function ProjectFilter({ setFilters }) {
                     />
                   </Form.Group>
                 </Col>
-                {/* <Col xs={12} md={4}>
-                  <Form.Group controlId="filterStatus">
-                    <Form.Label>Status</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="status"
-                      placeholder="Enter status"
-                      value={localFilters.status}
-                      onChange={handleChange}
-                    />
-                  </Form.Group>
-                </Col> */}
-                <Col xs={12} md={4}>
+                <Col xs={12} md={6}>
                   <Form.Group controlId="filterWarehouse">
                     <Form.Label>Warehouse</Form.Label>
                     <Form.Control
@@ -92,7 +80,7 @@ export default function ProjectFilter({ setFilters }) {
                     />
                   </Form.Group>
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={6}>
                   <Form.Group controlId="filterOrganizer">
                     <Form.Label>Organizer Name</Form.Label>
                     <Form.Control
@@ -104,28 +92,6 @@ export default function ProjectFilter({ setFilters }) {
                     />
                   </Form.Group>
                 </Col>
-                {/* <Col xs={12} md={4}>
-                  <Form.Group controlId="filterStartDate">
-                    <Form.Label>Start Date</Form.Label>
-                    <Form.Control
-                      type="date"
-                      name="startDate"
-                      value={localFilters.startDate}
-                      onChange={handleChange}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col xs={12} md={4}>
-                  <Form.Group controlId="filterCompletionDate">
-                    <Form.Label>Completion Date</Form.Label>
-                    <Form.Control
-                      type="date"
-                      name="completionDate"
-                      value={localFilters.completionDate}
-                      onChange={handleChange}
-                    />
-                  </Form.Group>
-                </Col> */}
               </Row>
               <Row className="mt-4 justify-content-center">
                 <Col xs={12} md={3} className="mb-2">

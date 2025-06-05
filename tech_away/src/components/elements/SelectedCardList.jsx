@@ -25,7 +25,7 @@ export default function SelectedCardList({
           }}
         >
           <Card
-            bg={isEditing ? 'success' : 'light'}
+            bg={isEditing ? 'secondary' : 'light'}
             text={isEditing ? 'white' : 'dark'}
             className="shadow-sm rounded-sm border-0"
             style={{

@@ -1,141 +1,146 @@
-const express = require("express");
-const { Op } = require("sequelize");
+const express = require('express');
 const router = express.Router();
-const models = require("../models");
+const { Op, Sequelize } = require('sequelize');
+const models = require('../models');
 
-router.get("/", async (req, res) => {
+// GET /api/warehouses/displayTable
+router.get('/displayTable', async (req, res) => {
   try {
     const {
+      id,
       name,
       totalSlots,
       availableSlots,
+      isActive = '1',
       page = 1,
-      pageSize = 6,
-      orderBy = "id",
-      orderDirection = "ASC"
+      pageSize = 5,
+      sortField = 'id',
+      sortOrder = 'ASC'
     } = req.query;
 
-    const where = {};
+    const where = { isActive: { [Op.like]: isActive } };
+    if (id) {
+      where.id = Sequelize.where(
+        Sequelize.cast(Sequelize.col('Warehouse.id'), 'varchar'),
+        { [Op.iLike]: `${id}%` }
+      );
+    }
+    if (name) where.name = { [Op.iLike]: `%${name}%` };
+    if (totalSlots) where.totalSlots = parseInt(totalSlots, 10);
+    if (availableSlots) where.availableSlots = parseInt(availableSlots, 10);
 
-    if (name) where.name = { [Op.like]: `%${name}%` };
-    if (totalSlots) where.totalSlots = parseInt(totalSlots);
-    if (availableSlots) where.availableSlots = parseInt(availableSlots);
+    const limit = parseInt(pageSize, 10);
+    const offset = (parseInt(page, 10) - 1) * limit;
+    const order = [[Sequelize.col(sortField), sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC']];
 
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    const order = [[orderBy, orderDirection.toUpperCase()]];
+    const { count, rows } = await models.Warehouse.findAndCountAll({ where, limit, offset, order });
 
-    const { count, rows } = await models.Warehouse.findAndCountAll({
-      where,
-      limit: parseInt(pageSize),
-      offset,
-      order,
-    });
-
-    res.json({
+    res.status(200).json({
       totalItems: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: parseInt(page),
-      pageSize: parseInt(pageSize),
-      data: rows,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page, 10),
+      pageSize: limit,
+      data: rows.map(w => ({
+        id: w.id,
+        name: w.name,
+        totalSlots: w.totalSlots,
+        availableSlots: w.availableSlots,
+        isActive: w.isActive
+      }))
     });
   } catch (error) {
-    console.error("Error fetching warehouses:", error);
-    res.status(500).json({ error: "Error fetching warehouses." });
+    console.error('Error fetching warehouses:', error);
+    res.status(500).json({ message: 'Error fetching warehouses.' });
   }
 });
 
-
-//EXEMPLO DE ROTA PARA À PARTIR DAS WAREHOUSES TER ACESSO AOS SEUS USED_EQUIPMENTS
-router.get("/:ID", async (req, res) => {
-  const warehouse = await models.Warehouse.findByPk(req.params.ID, {
-    include: {
-      model: models.CharityProject,
-      include: {
-        model: models.UsedEquipment
-      }
-    }
-  });
-  
-  res.json(warehouse);
+// GET /api/warehouses
+router.get('/', async (req, res) => {
+  try {
+    const { isActive = '1' } = req.query;
+    const list = await models.Warehouse.findAll({ where: { isActive } });
+    res.status(200).json(list);
+  } catch (error) {
+    console.error('Error fetching warehouses list:', error);
+    res.status(500).json({ message: 'Error fetching warehouses.' });
+  }
 });
 
-router.post("/", async (req, res) => {
+// POST /api/warehouses
+router.post('/', async (req, res) => {
   try {
     const { name, totalSlots, availableSlots } = req.body;
-
-    if (!name || totalSlots == null || availableSlots == null) {
-      return res.status(400).json({ error: "Missing required fields." });
+    // Validation: availableSlots must not exceed totalSlots
+    if (availableSlots > totalSlots) {
+      return res.status(400).json({ message: 'Available slots cannot exceed total slots.' });
     }
-
     const newWarehouse = await models.Warehouse.create({
-      name: name,
+      name,
       totalSlots,
       availableSlots,
+      isActive: '1',
       createdAt: new Date(),
       updatedAt: new Date()
     });
-
     res.status(201).json(newWarehouse);
   } catch (error) {
-    console.error("Error creating warehouse:", error);
-    res.status(500).json({ error: "Error creating warehouse." });
+    console.error('Error creating warehouse:', error);
+    res.status(500).json({ message: 'Error creating warehouse.' });
   }
 });
 
-
-router.put("/:ID", async (req, res) => {
+// GET /api/warehouses/:id
+router.get('/:id', async (req, res) => {
   try {
-    const { ID } = req.params;
-    const { name, totalSlots, availableSlots } = req.body;
+    const warehouse = await models.Warehouse.findByPk(req.params.id);
+    if (!warehouse) return res.status(404).json({ message: 'Warehouse not found.' });
+    res.status(200).json(warehouse);
+  } catch (error) {
+    console.error('Error fetching warehouse:', error);
+    res.status(500).json({ message: 'Error fetching warehouse.' });
+  }
+});
 
-    const warehouse = await models.Warehouse.findByPk(ID);
-    if (!warehouse) {
-      return res.status(404).json({ error: "Warehouse does not exists." });
+// PUT /api/warehouses/:id
+router.put('/:id', async (req, res) => {
+  try {
+    const { name, totalSlots, availableSlots } = req.body;
+    const warehouse = await models.Warehouse.findByPk(req.params.id);
+    if (!warehouse) return res.status(404).json({ message: 'Warehouse not found.' });
+
+    // Determine new values
+    const newTotal = totalSlots != null ? totalSlots : warehouse.totalSlots;
+    const newAvailable = availableSlots != null ? availableSlots : warehouse.availableSlots;
+    // Validation: availableSlots must not exceed totalSlots
+    if (newAvailable > newTotal) {
+      return res.status(400).json({ message: 'Available slots cannot exceed total slots.' });
     }
 
     await warehouse.update({
       name: name ?? warehouse.name,
-      totalSlots: totalSlots ?? warehouse.totalSlots,
-      availableSlots: availableSlots ?? warehouse.availableSlots,
+      totalSlots: newTotal,
+      availableSlots: newAvailable,
+      updatedAt: new Date()
     });
-
-    res.json(warehouse);
+    res.status(200).json(warehouse);
   } catch (error) {
-    console.error("Error updating warehouse:", error);
-    res.status(500).json({ error: "Error updating warehouse." });
+    console.error('Error updating warehouse:', error);
+    res.status(500).json({ message: 'Error updating warehouse.' });
   }
 });
 
-
-router.delete("/:ID", async (req, res) => {
+// PATCH /api/warehouses/activation/:id
+router.patch('/activation/:id', async (req, res) => {
   try {
-    const { ID } = req.params;
-
-    // Verificar se existe algum projeto associado a este armazém
-    const projectsUsingWarehouse = await models.CharityProject.findOne({
-      where: { warehouseID: ID }
-    });
-
-    if (projectsUsingWarehouse) {
-      return res.status(400).json({
-        message: "This warehouse is linked to one or more charity projects and cannot be deleted."
-      });
-    }
-
-    const warehouse = await models.Warehouse.findByPk(ID);
-    if (!warehouse) {
-      return res.status(404).json({ error: "Warehouse not found." });
-    }
-
-    await warehouse.destroy();
-    res.json({ message: "Warehouse deleted successfully." });
+    const warehouse = await models.Warehouse.findByPk(req.params.id);
+    if (!warehouse) return res.status(404).json({ message: 'Warehouse not found.' });
+    warehouse.isActive = warehouse.isActive === '1' ? '0' : '1';
+    await warehouse.save();
+    res.status(200).json(warehouse);
   } catch (error) {
-    console.error("Error deleting warehouse:", error);
-    res.status(500).json({ error: "Error deleting warehouse." });
+    console.error('Error toggling warehouse activation:', error);
+    res.status(500).json({ message: 'Error toggling warehouse activation.' });
   }
 });
-
-
-
 
 module.exports = router;

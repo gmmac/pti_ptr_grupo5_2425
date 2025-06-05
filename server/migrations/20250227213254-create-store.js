@@ -35,6 +35,9 @@ module.exports = {
       longitude: {
         type: Sequelize.STRING(100)
       },
+      isActive: {
+        type: Sequelize.STRING(1),
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

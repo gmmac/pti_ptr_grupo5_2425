@@ -10,13 +10,22 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        type: Sequelize.STRING(50)
+        type: Sequelize.STRING(50),
+        allowNull: false,
+        unique: true
       },
       totalSlots: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false
       },
       availableSlots: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      isActive: {
+        type: Sequelize.STRING(1),
+        allowNull: false,
+        defaultValue: '1'
       },
       createdAt: {
         allowNull: false,

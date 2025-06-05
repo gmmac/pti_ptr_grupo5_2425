@@ -10,6 +10,7 @@ router.get("/", async (req, res) => {
 		res.status(500).json({ error: error.message });
 	}
 });
+
 router.post("/", async (req, res) => {
 	try {
 		const {
@@ -30,11 +31,11 @@ router.post("/", async (req, res) => {
 		const purchase = await models.ClientPurchase.create({
 			clientNIC,
 			total: totalPrice,
-			employeeID: employeeID ?? "123456789", // padrão
+			employeeID: employeeID ?? "000000000", // onlineEmployee
 			orderStatusID: 1, // padrão - pendding approval
 			pickupInStore,
 			address: address ?? "",
-			storeId: storeId ?? null,
+			storeId: storeId ?? "000000000",
 		});
 
 		res.status(201).json({ id: purchase.id });

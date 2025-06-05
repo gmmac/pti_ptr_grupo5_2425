@@ -10,48 +10,43 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
+        type: Sequelize.STRING(50),
         allowNull: false,
-        unique: true,
-        type: Sequelize.STRING(50)
+        unique: true
       },
       startDate: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: true
       },
       completionDate: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: true
       },
       organizerNic: {
         type: Sequelize.STRING(9),
         allowNull: false,
-        references: {
-          model: 'Organizers',
-          key: 'nic',
-        },
+        references: { model: 'Organizers', key: 'nic' },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        onDelete: 'SET NULL'
       },
       status: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'ProjectStatuses',
-          key: 'id',
-        },
+        references: { model: 'ProjectStatuses', key: 'id' },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        onDelete: 'SET NULL'
       },
       warehouseID: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'Warehouses',
-          key: 'id',
-        },
+        references: { model: 'Warehouses', key: 'id' },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        onDelete: 'SET NULL'
       },
-      totalSpace: {
-        type: Sequelize.INTEGER
+      isActive: {
+        type: Sequelize.STRING(1),
+        allowNull: false,
+        defaultValue: '1'
       },
       createdAt: {
         allowNull: false,

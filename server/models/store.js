@@ -12,6 +12,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       });
+
+      Store.hasMany(models.Employee, {
+        foreignKey: 'storeNIPC',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      });
+
     }
   }
   Store.init({
@@ -54,7 +61,10 @@ module.exports = (sequelize, DataTypes) => {
     longitude: {
       type: DataTypes.STRING(100),
       allowNull: true
-    }
+    },
+    isActive: {
+      type: DataTypes.STRING(1),
+    },
   }, {
     sequelize,
     modelName: 'Store',

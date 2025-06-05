@@ -47,14 +47,14 @@ export default function CharityProjectDonationDetails({ projectId }) {
   return (
     <Container className="my-4">
       <Card 
-        className="shadow-sm"
+        className="shadow-sm p-2"
         style={{
           transform: 'none',
           transition: 'none',
         }}
       >
         <Card.Body>
-          <h5 className="fw-bold mb-3">Donations</h5>
+          <h5 className="fw-bold mb-2">Donations</h5>
 
           {loading && (
             <div className="text-center">
@@ -69,7 +69,7 @@ export default function CharityProjectDonationDetails({ projectId }) {
           )}
 
           {!loading && !error && donations.length > 0 && (
-            <div className="overflow-auto mb-3" style={{ maxHeight: '500px' }}>
+            <div className="overflow-auto mb-3 p-2" style={{ maxHeight: '500px' }}>
               {rows.map((rowItems, rowIndex) => (
                 <Row className="g-3 mb-3" key={rowIndex}>
                   {rowItems.map(item => (
