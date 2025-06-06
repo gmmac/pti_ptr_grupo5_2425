@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Form, Modal, Button } from "react-bootstrap";
 import api from "../../utils/axios";
 import ClientCatalogModal from "../storePurchase/ClientCatalogModal";
-import UsedEquipmentSelect from "../equipment/UsedEquipmentSelect";
+import UsedEquipmentSelect from "../equipment/UsedEquipmentSelect"
 import { Toast } from "primereact/toast";
 
 export default function EditRepairForms({ repairID, showModal, closeModal, setRefreshRepairs }) {
@@ -10,19 +10,19 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
     description: '',
     clientId: '',
     statusID: 1,
-    usedEquipmentId: '',
+    equipmentSheet: null, // Alterado aqui
     budget: '',
     estimatedDeliverDate: '',
   });
 
+
   const [errors, setErrors] = useState({});
   const [touchedFields, setTouchedFields] = useState({});
   const [showClientModal, setShowClientModal] = useState(false);
-  const [showUsedEquipmentModal, setShowUsedEquipmentModal] = useState(false);
+  const [showEquipmentSheetModal, setShowEquipmentSheetModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const toast = useRef(null); // Ref para o Toast
-
+  const toast = useRef(null);
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
         description: data.description || '',
         clientId: data.clientId || '',
         statusID: data.statusID || 1,
-        usedEquipmentId: data.usedEquipmentId || '',
+        equipmentSheet: { Barcode: data.equipmentSheetBarcode } || null,
         budget: data.budget || '',
         estimatedDeliverDate: data.estimatedDeliverDate?.split("T")[0] || '',
       });
@@ -106,12 +106,12 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
     setShowClientModal(false);
   };
 
-  const handleSelectUsedEquipment = (usedEquipment) => {
+  const handleSelectUsedEquipment = (sheet) => {
     setRepairInfo(prev => ({
       ...prev,
-      usedEquipmentId: usedEquipment?.id || ''
+      equipmentSheet: sheet || null
     }));
-    setShowUsedEquipmentModal(false);
+    setShowEquipmentSheetModal(false);
   };
 
   const resetForm = () => {
@@ -119,7 +119,7 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
       description: '',
       clientId: '',
       statusID: 1,
-      usedEquipmentId: '',
+      equipmentSheet: '',
       budget: '',
       estimatedDeliverDate: '',
     });
@@ -152,6 +152,7 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
   };
 
   const handleSubmit = async (e) => {
+    // console.log(payload)
     e.preventDefault();
 
     if (!validateFields()) return;
@@ -167,7 +168,7 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
         await api.post("/api/repair/", payload);
       }
 
-      showSuccess();  // Exibe a notificação de sucesso após o envio
+      showSuccess();
 
       setTimeout(() => {
         handleClose();
@@ -224,27 +225,27 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Choose Used Equipment</Form.Label>
+            <Form.Label>Choose Equipment Sheet</Form.Label>
             <div className="d-flex align-items-start">
               <div className="flex-grow-1 me-2">
                 <Form.Control
                   className="rounded-pill"
                   type="text"
-                  name="usedEquipmentId"
-                  value={repairInfo.usedEquipmentId}
-                  isInvalid={!!errors.usedEquipmentId && touchedFields.usedEquipmentId}
+                  name="equipmentSheetBarcode"
+                 value={repairInfo.equipmentSheet?.Barcode || ''}
+                  isInvalid={!!errors.equipmentSheetBarcode && touchedFields.equipmentSheetBarcode}
                   onChange={handleChanges}
-                  placeholder="Selected a used equipment"
+                  placeholder="Selected an equipment sheet"
                   readOnly
                 />
-                {errors.usedEquipmentId && touchedFields.usedEquipmentId && (
-                  <div className="invalid-feedback d-block">{errors.usedEquipmentId}</div>
+                {errors.equipmentSheetBarcode && touchedFields.equipmentSheetBarcode && (
+                  <div className="invalid-feedback d-block">{errors.equipmentSheetBarcode}</div>
                 )}
               </div>
               <Button
                 className="rounded-pill"
                 style={{ backgroundColor: "var(--variant-two)", border: "none", width: "100px" }}
-                onClick={() => setShowUsedEquipmentModal(true)}
+                onClick={() => setShowEquipmentSheetModal(true)}
                 type="button"
               >
                 Select
@@ -326,13 +327,13 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
       />
 
       <UsedEquipmentSelect
-        show={showUsedEquipmentModal}
-        handleClose={() => setShowUsedEquipmentModal(false)}
+        show={showEquipmentSheetModal}
+        handleClose={() => setShowEquipmentSheetModal(false)}
         handleSelectUsedEquipment={handleSelectUsedEquipment}
-        selectedUsedEquipment={repairInfo.usedEquipmentId}
+        selectedUsedEquipment={repairInfo.equipmentSheet}
       />
 
-      <Toast ref={toast} />  {/* Toast Component */}
+      <Toast ref={toast} />
     </Modal>
   );
 }

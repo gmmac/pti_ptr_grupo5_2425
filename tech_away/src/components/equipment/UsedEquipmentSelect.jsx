@@ -2,62 +2,67 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Table, Container } from "react-bootstrap";
 import api from "../../utils/axios";
 import PaginationControl from "../pagination/PaginationControl";
-import UsedEquipmentFilter from "./UsedEquipmentFilter";
-import UsedEquipmentTableModal from "./UsedEquipmentTableModal";
-import UsedEquipmentCardModal from "./UsedEquipmentCardModal";
+import EquipmentSheetTableModal from "../equipmentSheet/EquipmentSheetTableModal";
+import EquipmentSheetCardModal from "../equipmentSheet/EquipmentSheetCardModal";
+// import EquipmentSheetCardModal from "./EquipmentSheetCardModal"; // Você pode criar esse componente se quiser versão mobile
+// import EquipmentSheetFilter from "./EquipmentSheetFilter"; // Precisa adaptar ou criar esse filtro
 
 export default function UsedEquipmentSelect({ show, handleClose, handleSelectUsedEquipment, selectedUsedEquipment }) {
-    const [usedEquipments, setUsedEquipments] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-  
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const itemsPerPage = 4;
-    
-    const [filters, setFilters] = useState({
-        id: "",
-        price: "",
-        equipmentId: "",
-        storeId: "",
-        orderDirection: "ASC"
-    });
+  const [equipmentSheets, setEquipmentSheets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    const handleClosePopUp = () => {
-      handleClose()
-      setFilters({
-        id: "",
-        price: "",
-        equipmentId: "",
-        storeId: "",
-        orderDirection: "ASC"
-      })
-    }
-  
-    useEffect(() => {
-      const fetchUsedEquipments = async () => {
-          setLoading(true);
-          setError(null);
-          try {
-            const response = await api.get(`/api/usedEquipment/usedEquipmentRepairs`, {
-              params: {
-                ...filters,
-                page: currentPage,
-                pageSize: itemsPerPage
-              }
-            });
-            setUsedEquipments(response.data.data || []);
-            setTotalPages(response.data.totalPages);
-          } catch (err) {
-            setError("Error loading used equipments");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 4;
+
+  const [filters, setFilters] = useState({
+    Barcode: "",
+    Brand: "",
+    EquipmentModel: "",
+    EquipmentType: "",
+    BrandModel: "",
+    active: "1",
+    sortOrder: "ASC"
+  });
+
+  const handleClosePopUp = () => {
+    handleClose();
+    setFilters({
+      Barcode: "",
+      Brand: "",
+      EquipmentModel: "",
+      EquipmentType: "",
+      BrandModel: "",
+      active: "1",
+      sortOrder: "ASC"
+    });
+  };
+
+  useEffect(() => {
+    const fetchEquipmentSheets = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await api.get(`/api/equipmentSheet`, {
+          params: {
+            ...filters,
+            page: currentPage,
+            pageSize: itemsPerPage,
           }
-          setLoading(false);
-      };
-  
-      if (show) {
-        fetchUsedEquipments();
+        });
+        setEquipmentSheets(response.data.data || []);
+        setTotalPages(response.data.totalPages);
+      } catch (err) {
+        setError("Error loading equipment sheets");
       }
-    }, [show, currentPage, filters]);
+      setLoading(false);
+    };
+
+    if (show) {
+      fetchEquipmentSheets();
+    }
+  }, [show, currentPage, filters]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -65,40 +70,51 @@ export default function UsedEquipmentSelect({ show, handleClose, handleSelectUse
     }
   };
 
-  const handleUsedEquipmentSelection = (usedEquipment) => {
-    if (selectedUsedEquipment === usedEquipment.id) {
-        handleSelectUsedEquipment(null);
-    } else {
-        handleSelectUsedEquipment(usedEquipment);
-    }
-  };
+const handleEquipmentSheetSelection = (equipmentSheet) => {
+  if (!equipmentSheet) {
+    handleSelectUsedEquipment(null);
+    return;
+  }
+
+  if (selectedUsedEquipment?.Barcode === equipmentSheet.Barcode) {
+    handleSelectUsedEquipment(null);
+  } else {
+    handleSelectUsedEquipment(equipmentSheet);
+  }
+};
+
 
   return (
     <Modal show={show} onHide={handleClose} size="lg" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Used Equipments Catalog</Modal.Title>
+        <Modal.Title>Equipment Sheets Catalog</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <UsedEquipmentFilter setFilters={setFilters} />
+        {/* <EquipmentSheetFilter setFilters={setFilters} /> */}
         {loading ? (
           <p>Loading Data...</p>
         ) : error ? (
           <p className="text-danger">{error}</p>
-        ) : usedEquipments.length === 0 ? (
+        ) : equipmentSheets.length === 0 ? (
           <p>Data not found.</p>
         ) : (
           <Container>
-              {/* Desktop */}
-              {usedEquipments && <UsedEquipmentTableModal equipments={usedEquipments} selectedUsedEquipment={selectedUsedEquipment} handleUsedEquipmentSelection={handleUsedEquipmentSelection} /> }
-              {/* Mobile */}
-              {usedEquipments.map((usedEquipment) => {
-                return <UsedEquipmentCardModal 
-                  key={usedEquipment.id} 
-                  equipment={usedEquipment} 
-                  selectedUsedEquipment={selectedUsedEquipment} 
-                  handleUsedEquipmentSelection={handleUsedEquipmentSelection} 
-                  />
-              })}
+            {/* Desktop */}
+            <EquipmentSheetTableModal
+              equipmentSheets={equipmentSheets}
+              selectedBarcode={selectedUsedEquipment?.Barcode}
+              handleEquipmentSheetSelection={handleEquipmentSheetSelection}
+            />
+
+            {/* Mobile - se quiser */}
+            {equipmentSheets.map(sheet => (
+              <EquipmentSheetCardModal
+                key={sheet.Barcode}
+                sheet={sheet}
+                selectedBarcode={selectedUsedEquipment?.Barcode}
+                handleEquipmentSheetSelection={handleEquipmentSheetSelection}
+              />
+            ))}
 
             <PaginationControl
               handlePageChange={handlePageChange}
@@ -109,7 +125,9 @@ export default function UsedEquipmentSelect({ show, handleClose, handleSelectUse
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClosePopUp}>Fechar</Button>
+        <Button variant="secondary" onClick={handleClosePopUp}>
+          Fechar
+        </Button>
       </Modal.Footer>
     </Modal>
   );

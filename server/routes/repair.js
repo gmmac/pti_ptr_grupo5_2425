@@ -253,18 +253,18 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
 
 
 router.post("/", async (req, res) => {
-	try {
+	// try {
 		const {
 			description,
 			clientId,
 			statusID,
-			usedEquipmentId,
+			equipmentSheet,
 			budget,
 			estimatedDeliverDate,
 		} = req.body;
 		
 		const employeeId = req.cookies.employeeInfo.nic;
-
+    // console.log(equipmentSheet)
 		const repair = await models.Repair.create({
 			statusID,
 			description,
@@ -273,7 +273,7 @@ router.post("/", async (req, res) => {
 			estimatedDeliverDate,
 			employeeId,
 			clientId,
-			usedEquipmentId,
+			equipmentSheetID: equipmentSheet.Barcode,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		});
@@ -289,9 +289,9 @@ router.post("/", async (req, res) => {
 		res.status(200).json({
 			data: repair,
 		});
-	} catch (error) {
-	res.status(500).json({ error: "Error creating repair." });
-	}
+	// } catch (error) {
+	// res.status(500).json({ error: "Error creating repair." });
+	// }
 });
 
 router.get("/:id", async (req, res) => {
@@ -333,7 +333,7 @@ router.put("/:id", async (req, res) => {
 			description,
 			clientId,
 			statusID,
-			usedEquipmentId,
+			equipmentSheet,
 			budget,
 			estimatedDeliverDate,
 		} = req.body;
@@ -349,7 +349,7 @@ router.put("/:id", async (req, res) => {
 			description,
 			clientId,
 			statusID: statusID ?? repair.statusID, // caso venha undefined
-			usedEquipmentId,
+			equipmentSheetID: equipmentSheet.Barcode,
 			budget,
 			estimatedDeliverDate,
 			updatedAt: new Date(),
