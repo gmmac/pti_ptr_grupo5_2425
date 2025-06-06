@@ -204,6 +204,7 @@ router.get("/displayTable", async (req, res) => {
     const storeFilter = store ? `%${store}%` : null;
     const brandModelFilter = brandModel ? `%${brandModel}%` : null;
     const price = query.price ? parseFloat(query.price) : null;
+    const storePurchasePrice = query.storePurchasePrice ? parseFloat(query.storePurchasePrice) : null;
 
     const putOnSaleDate = query.putOnSaleDate || null;
     const purchaseDate = query.purchaseDate || null;
@@ -218,21 +219,22 @@ router.get("/displayTable", async (req, res) => {
     const offset = (page - 1) * pageSize;
     const limit = pageSize;
 
-    const filters = [
-      id,                // $1
-      statusFilter,      // $2
-      equipmentTypeFilter, // $3
-      storeFilter,       // $4
-      brandModelFilter,  // $5
-      price,             // $6
-      putOnSaleDate,     // $7
-      purchaseDate,      // $8
-      date,              // $9
-      action,            // $10
-      sortField,         // $11
-      limit,             // $12
-      offset             // $13
-    ];
+const filters = [
+  id,                     // $1
+  statusFilter,           // $2
+  equipmentTypeFilter,    // $3
+  storeFilter,            // $4
+  brandModelFilter,       // $5
+  price,                  // $6
+  putOnSaleDate,          // $7
+  purchaseDate,           // $8
+  date,                   // $9 - store purchase date
+  storePurchasePrice,     // $10 - novo filtro
+  action,                 // $11
+  sortField,              // $12
+  limit,                  // $13
+  offset                  // $14
+];
 
     console.log(filters, sortOrder)
 
@@ -278,29 +280,39 @@ WHERE
   ($8::date IS NULL OR DATE(ue."purchaseDate") = $8) AND
   ($9::date IS NULL OR DATE(sp."createdAt") = $9) AND
   (
-    $10::text IS NULL OR $10::text = '1' OR
+    $10::numeric IS NULL 
+    OR (
+      sp."purchasePrice" = $10 
+      AND (
+        $10::numeric <> 0 
+        OR ue."action" IS NULL
+      )
+    )
+  ) AND
+  (
+    $11::text IS NULL OR $11::text = '1' OR
     CASE 
-      WHEN $10::text = 'D' THEN ue."action" = 'D'
-      WHEN $10::text = 'S' THEN ue."action" = 'S' OR ue."action" IS NULL
-      WHEN $10::text = 'new' THEN ue."action" IS NULL
-      WHEN $10::text = '0' THEN ue."action" IS NULL
-      ELSE ue."action" = $10::text
+      WHEN $11::text = 'D' THEN ue."action" = 'D'
+      WHEN $11::text = 'S' THEN ue."action" = 'S' OR ue."action" IS NULL
+      WHEN $11::text = 'new' THEN ue."action" IS NULL
+      WHEN $11::text = '0' THEN ue."action" IS NULL
+      ELSE ue."action" = $11::text
     END
   ) AND
   (
-    $10::text IS NULL OR $10::text = '1' OR
+    $11::text IS NULL OR $11::text = '1' OR
     CASE 
-      WHEN $10::text = 'S' THEN ue."putOnSaleDate" IS NOT NULL
-      WHEN $10::text = 'new' THEN ue."putOnSaleDate" IS NULL
-      WHEN $10::text = '0' THEN ue."putOnSaleDate" IS NOT NULL
+      WHEN $11::text = 'S' THEN ue."putOnSaleDate" IS NOT NULL
+      WHEN $11::text = 'new' THEN ue."putOnSaleDate" IS NULL
+      WHEN $11::text = '0' THEN ue."putOnSaleDate" IS NOT NULL
       ELSE ($7::date IS NULL OR DATE(ue."putOnSaleDate") = $7)
     END
   ) AND
   (
-    $10::text IS NULL OR $10::text = '1' OR
+    $11::text IS NULL OR $11::text = '1' OR
     CASE 
-      WHEN $10::text = '0' THEN ue."purchaseDate" IS NULL
-      WHEN $10::text = 'S' THEN ue."purchaseDate" IS NOT NULL
+      WHEN $11::text = '0' THEN ue."purchaseDate" IS NULL
+      WHEN $11::text = 'S' THEN ue."purchaseDate" IS NOT NULL
       ELSE ($8::date IS NULL OR DATE(ue."purchaseDate") = $8)
     END
   )
@@ -315,32 +327,32 @@ GROUP BY
 ORDER BY
   -- TEXT fields
   CASE 
-    WHEN $11 = 'EquipmentSheet.EquipmentType.name' THEN et.name
-    WHEN $11 = 'Store.name' THEN s.name
-    WHEN $11 = 'EquipmentSheet.brandModel' THEN b.name || ' ' || em.name
-    WHEN $11 = 'EquipmentStatus.state' THEN est.state
+    WHEN $12 = 'EquipmentSheet.EquipmentType.name' THEN et.name
+    WHEN $12 = 'Store.name' THEN s.name
+    WHEN $12 = 'EquipmentSheet.brandModel' THEN b.name || ' ' || em.name
+    WHEN $12 = 'EquipmentStatus.state' THEN est.state
     ELSE NULL
   END ${sortOrder},
 
   -- NUMERIC fields
   CASE 
-    WHEN $11 = 'id' THEN ue.id
-    WHEN $11 = 'price' THEN ue.price
-    WHEN $11 = 'Purchase.purchasePrice' THEN MAX(sp."purchasePrice")
+    WHEN $12 = 'id' THEN ue.id
+    WHEN $12 = 'price' THEN ue.price
+    WHEN $12 = 'storePurchasePrice' THEN MAX(sp."purchasePrice")
+    WHEN $12 = 'Purchase.purchasePrice' THEN MAX(sp."purchasePrice")
     ELSE NULL
   END ${sortOrder},
 
   -- DATE fields
   CASE 
-    WHEN $11 = 'putOnSaleDate' THEN ue."putOnSaleDate"
-    WHEN $11 = 'Purchase.purchaseDate' THEN MAX(sp."createdAt")
-    WHEN $11 = 'purchaseDate' THEN MAX(ue."purchaseDate")
+    WHEN $12 = 'putOnSaleDate' THEN ue."putOnSaleDate"
+    WHEN $12 = 'Purchase.purchaseDate' THEN MAX(sp."createdAt")
+    WHEN $12 = 'purchaseDate' THEN MAX(ue."purchaseDate")
     ELSE NULL
   END ${sortOrder},
 
-  -- Desempate sempre por ID
   ue.id ASC
-LIMIT $12 OFFSET $13;
+LIMIT $13 OFFSET $14;
 
 
 
@@ -366,34 +378,44 @@ WHERE
   ($7::date IS NULL OR DATE(ue."putOnSaleDate") = $7) AND
   ($8::date IS NULL OR DATE(ue."purchaseDate") = $8) AND
   ($9::date IS NULL OR DATE(sp."createdAt") = $9) AND
-
   (
-    $10::text IS NULL OR $10::text = '1' OR
+    $10::numeric IS NULL 
+    OR (
+      sp."purchasePrice" = $10 
+      AND (
+        $10::numeric <> 0 
+        OR ue."action" IS NULL
+      )
+    )
+  ) AND
+  (
+    $11::text IS NULL OR $11::text = '1' OR
     CASE 
-      WHEN $10::text = 'D' THEN ue."action" = 'D'
-      WHEN $10::text = 'S' THEN ue."action" = 'S' OR ue."action" IS NULL
-      WHEN $10::text = 'new' THEN ue."action" IS NULL
-      WHEN $10::text = '0' THEN ue."action" IS NULL
-      ELSE ue."action" = $10::text
+      WHEN $11::text = 'D' THEN ue."action" = 'D'
+      WHEN $11::text = 'S' THEN ue."action" = 'S' OR ue."action" IS NULL
+      WHEN $11::text = 'new' THEN ue."action" IS NULL
+      WHEN $11::text = '0' THEN ue."action" IS NULL
+      ELSE ue."action" = $11::text
     END
   ) AND
   (
-    $10::text IS NULL OR $10::text = '1' OR
+    $11::text IS NULL OR $11::text = '1' OR
     CASE 
-      WHEN $10::text = 'S' THEN ue."putOnSaleDate" IS NOT NULL
-      WHEN $10::text = 'new' THEN ue."putOnSaleDate" IS NULL
-      WHEN $10::text = '0' THEN ue."putOnSaleDate" IS NOT NULL
+      WHEN $11::text = 'S' THEN ue."putOnSaleDate" IS NOT NULL
+      WHEN $11::text = 'new' THEN ue."putOnSaleDate" IS NULL
+      WHEN $11::text = '0' THEN ue."putOnSaleDate" IS NOT NULL
       ELSE ($7::date IS NULL OR DATE(ue."putOnSaleDate") = $7)
     END
   ) AND
   (
-    $10::text IS NULL OR $10::text = '1' OR
+    $11::text IS NULL OR $11::text = '1' OR
     CASE 
-      WHEN $10::text = '0' THEN ue."purchaseDate" IS NULL
-      WHEN $10::text = 'S' THEN ue."purchaseDate" IS NOT NULL
+      WHEN $11::text = '0' THEN ue."purchaseDate" IS NULL
+      WHEN $11::text = 'S' THEN ue."purchaseDate" IS NOT NULL
       ELSE ($8::date IS NULL OR DATE(ue."purchaseDate") = $8)
     END
   );
+
 
 
 `;
@@ -404,7 +426,7 @@ WHERE
       type: Sequelize.QueryTypes.SELECT,
     });
 
-    const countFilters = filters.slice(0, 10);
+    const countFilters = filters.slice(0, 11);
 
 
     const [countResult] = await db.sequelize.query(countSql, {

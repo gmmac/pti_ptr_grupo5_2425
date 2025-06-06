@@ -10,6 +10,7 @@ import UsedEquipmentCardView from './UsedEquipmentCardView';
 import UsedEquipmentFilter from './UsedEquipmentFilter';
 import PaginationControl from '../pagination/PaginationControl';
 import api from '../../utils/axios';
+import DonationForms from '../donations/DonationForms';
 
 export default function UsedEquipmentCatalog() {
   const [activeTab, setActiveTab] = useState('active');
@@ -20,6 +21,15 @@ export default function UsedEquipmentCatalog() {
   const itemsPerPage = 6;
   const [refreshKey, setRefreshKey] = useState(0);
   const [resetFilter, setResetFilter] = useState(false);
+
+  const [showDonationModal, setShowDonationModal] = useState(false);
+  const [donationEquipment, setDonationEquipment] = useState(null);
+
+  
+  const handleDonate = (rowData) => {
+    setDonationEquipment(rowData);
+    setShowDonationModal(true);
+  };
 
   const defaultFilters = {
     usedEquipmentId: '',
@@ -110,14 +120,20 @@ export default function UsedEquipmentCatalog() {
     }
   };
 
+  const handleDonationComplete = () => {
+    setRefreshKey(prev => prev + 1);  // 🔄 força o reload da tabela
+  };
+
   const renderTabContent = ({ tableFilterProps = {}, cardFilterProps = {} }) => (
     <>
+    
       {/* DESKTOP */}
       <div className="d-none d-lg-block">
         <UsedEquipmentDisplayTable
           {...tableFilterProps}
           refreshKey={refreshKey}
           onOpenDetails={handleEdit}
+          handleDonate={handleDonate}
           putOnSale={putOnSale}
         />
       </div>
@@ -139,6 +155,7 @@ export default function UsedEquipmentCatalog() {
             onEdit={handleEdit}
             onDelete={handleToggleActivation}
             putOnSale={putOnSale}
+            handleDonate={handleDonate}
           />
         )}
 
@@ -191,6 +208,13 @@ export default function UsedEquipmentCatalog() {
           })}
         </Tab>
       </Tabs>
+
+      <DonationForms
+        show={showDonationModal}
+        handleClose={() => setShowDonationModal(false)}
+        equipment={donationEquipment}
+        handleDonationComplete={handleDonationComplete}
+      />
     </Container>
   );
 }

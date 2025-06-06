@@ -66,7 +66,7 @@ export default function DisplayTablePurchases({refreshTable}) {
         }
 
         // Faz a requisição ao backend
-        api.get("/api/storePurchase", { params: params }).then((res) => {
+        api.get("/api/storePurchase", { params: params, allPrice:"1" }).then((res) => {
             const responseData = res.data;
             if (responseData.data.length > 0) {
                 const allColumns = Object.keys(responseData.data[0]).filter(

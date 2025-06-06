@@ -4,7 +4,7 @@ import api from '../../utils/axios';
 import ClientCatalogModal from './ClientCatalogModal';
 import EquipmentCatalogModal from './EquipmentCatalogModal';
 
-export default function StorePurchaseForms({ show, handleClose, setRefreshPurchases }) {
+export default function StorePurchaseForms({ show, handleClose, setRefreshPurchases, setRefreshCounter  }) {
     const [form, setForm] = useState({
         statusID: '',
         price: '',
@@ -194,7 +194,13 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                 setSuccessMessage("Purchase registered successfully!");
                 setError("");
 
-                setRefreshPurchases(prev => !prev);
+                if(setRefreshPurchases){
+                    setRefreshPurchases(prev => !prev);
+                }
+
+                if(setRefreshCounter){
+                    setRefreshCounter(prev => prev + 1);
+                }
 
                 setClientData({
                     nic: '',
@@ -225,10 +231,10 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                     setSuccessMessage("");
                 }, 1000);
             })
-            .catch(error => {
-                console.error("Error registering purchase: ", error.response?.data);
-                setError("An error occurred while registering the purchase.");
-            });
+            // .catch(error => {
+            //     console.error("Error registering purchase: ", error.response?.data);
+            //     setError("An error occurred while registering the purchase.");
+            // });
 
         handleClose();
     };

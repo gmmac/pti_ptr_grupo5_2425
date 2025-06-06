@@ -31,7 +31,14 @@ export default function CharityProjectCardView({ projects, onOpenDetails, onDele
                 }
               </Card.Text>
               <div className="d-flex justify-content-end gap-2">
-                <Button size="sm" onClick={() => onOpenDetails(project.id)}>
+                <Button                    
+                className="p-button-rounded p-button-secondary"
+                style={{
+                  backgroundColor: "var(--variant-two)",
+                  color: "white",
+                  border: "none",
+                }}
+                onClick={() => onOpenDetails(project.id)}>
                   See Details
                 </Button>
                 {isOrganizer && (

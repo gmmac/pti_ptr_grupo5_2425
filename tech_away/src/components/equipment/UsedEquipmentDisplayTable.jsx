@@ -10,7 +10,7 @@ import api from "../../utils/axios";
 import { Dialog } from "primereact/dialog";
 import { InputNumber } from "primereact/inputnumber";
 
-export default function UsedEquipmentDisplayTable({ isActiveFilter, actionFilter, onOpenDetails, putOnSale, refreshKey }) {
+export default function UsedEquipmentDisplayTable({ isActiveFilter, actionFilter, onOpenDetails, putOnSale,handleDonate, refreshKey }) {
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [lazyState, setLazyState] = useState({
@@ -40,7 +40,6 @@ export default function UsedEquipmentDisplayTable({ isActiveFilter, actionFilter
   const [showPriceModal, setShowPriceModal] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [price, setPrice] = useState(null);
-
 
   useEffect(() => {
     loadLazyData();
@@ -240,15 +239,21 @@ useEffect(() => {
           header=""
           body={(rowData, options) => {
             const menuItems = [];
-
-            if (isActiveFilter === "new") {
+            console.log(rowData)
+            if (isActiveFilter === "new" && rowData.Purchase.purchasePrice != 0) {
               menuItems.push({
                 label: "Put on Sale",
                 icon: "pi pi-cart-plus",
                 command: () => handleOpenPriceModal(rowData),
               });
             }
-
+            if (isActiveFilter === "new" && rowData.Purchase.purchasePrice == 0) {
+              menuItems.push({
+                label: "Donate",
+                icon: "pi pi-gift",
+                command: () => handleDonate(rowData),
+              });
+            }
             return (
               <>
                 {menuItems.length > 0 && (
@@ -280,6 +285,7 @@ useEffect(() => {
       visible={showPriceModal}
       style={{ width: '400px' }}
       onHide={() => setShowPriceModal(false)}
+      modal
       footer={
         <div className="d-flex justify-content-end gap-2">
           <Button
@@ -296,7 +302,6 @@ useEffect(() => {
           />
         </div>
       }
-      modal
     >
       <div className="p-fluid">
         <div className="field">

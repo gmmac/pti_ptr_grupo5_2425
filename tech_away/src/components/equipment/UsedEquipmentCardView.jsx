@@ -12,21 +12,11 @@ export default function UsedEquipmentCardView({
   actionFilter,
   onDelete,
   putOnSale,
+  handleDonate
 }) {
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [showPriceModal, setShowPriceModal] = useState(false);
   const [price, setPrice] = useState(null);
-
-  // const confirmDelete = (id) => {
-  //   confirmDialog({
-  //     message: `Are you sure you want to ${
-  //       isActiveFilter === "1" ? "delete" : "restore"
-  //     } this Used Equipment?`,
-  //     header: "Confirmation",
-  //     icon: "pi pi-exclamation-triangle",
-  //     accept: () => onDelete(id),
-  //   });
-  // };
 
   const handleOpenPriceModal = (equipment) => {
     setSelectedEquipment(equipment);
@@ -118,7 +108,7 @@ export default function UsedEquipmentCardView({
                 </Card.Text>
 
                 <div className="d-flex gap-2 justify-content-center align-items-center">
-                  {isActiveFilter === "new" && (
+                  {isActiveFilter === "new" && equipment.Purchase?.purchasePrice !== 0 &&(
                     <Button
                       icon="pi pi-cart-plus"
                       label="Put on Sale"
@@ -133,14 +123,21 @@ export default function UsedEquipmentCardView({
                     />
                   )}
 
-                  {/* {(isActiveFilter === "1" || isActiveFilter === "0") && (
+                  {isActiveFilter === "new" && equipment.Purchase?.purchasePrice === 0 && (
                     <Button
-                      icon={`pi pi-${isActiveFilter === "1" ? "trash" : "undo"}`}
-                      className="p-button-rounded p-button-danger"
-                      onClick={() => confirmDelete(equipment.id)}
-                      tooltip={isActiveFilter === "1" ? "Delete" : "Restore"}
+                      icon="pi pi-gift"
+                      label="Donate"
+                      className="p-button-rounded p-button-secondary"
+                      aria-label="Donate"
+                      style={{
+                        backgroundColor: "var(--variant-two)",
+                        color: "white",
+                        border: "none",
+                      }}
+                      onClick={() => handleDonate(equipment)}
                     />
-                  )} */}
+                  )}
+
                 </div>
               </Card.Body>
             </Card>

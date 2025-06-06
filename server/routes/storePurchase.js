@@ -15,6 +15,7 @@ router.get("/", async (req, res) => {
         storeName,
         nic,
         createdAt,
+        allPrice,
         page = 1,
         pageSize = 5,
         sortField = "id",
@@ -24,6 +25,9 @@ router.get("/", async (req, res) => {
       const whereModel = {};
       const whereStore = {};
       const whereClient = {}
+
+
+      console.log(req.query)
 
       if (id)
         where.id = sequelize.where(
@@ -45,7 +49,9 @@ router.get("/", async (req, res) => {
         where.purchasePrice = { [Op.eq]: parseFloat(purchasePrice) };
       } else {
         // Força exibir apenas vendas (maiores que 0)
-        where.purchasePrice = { [Op.gt]: 0 };
+        if(allPrice == "0"){
+          where.purchasePrice = { [Op.gt]: 0 };
+        }
       }
         
 

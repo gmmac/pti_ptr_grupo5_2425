@@ -5,30 +5,36 @@ import PaginationControl from '../pagination/PaginationControl';
 import UsedEquipmentTableModal from './UsedEquipmentTableModal';
 import UsedEquipmentCardModal from './UsedEquipmentCardModal';
 import UsedEquipmentFilter from './UsedEquipmentFilter';
+import StorePurchaseForms from '../storePurchase/StorePurchaseForms';
 
-export default function UsedEquipmentCatalogModal({ show, handleClose, handleSelectEquipment, selectedEquipmentID }) {
+const initialFilters = {
+  usedEquipmentId: '',
+  Barcode: '',
+  BrandModel: '',
+  EquipmentType: '',
+  sortField: 'id',
+  sortOrder: 'ASC',
+};
+
+export default function UsedEquipmentCatalogModal({
+  show,
+  handleClose,
+  handleSelectEquipment,
+  selectedEquipmentID,
+}) {
   const [equipments, setEquipments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filters, setFilters] = useState({    
-    usedEquipmentId: '',
-    Barcode: '',
-    BrandModel: '',
-    EquipmentType: '',
-    sortField: 'id',
-    sortOrder: 'ASC'});
+  const [showStorePurchaseForm, setShowStorePurchaseForm] = useState(false);
+  const [filters, setFilters] = useState(initialFilters);
+  const [refreshCounter, setRefreshCounter] = useState(0);
+
 
   const handleClosePopUp = () => {
     handleClose();
-    setFilters({    
-    usedEquipmentId: '',
-    Barcode: '',
-    BrandModel: '',
-    EquipmentType: '',
-    sortField: 'id',
-    sortOrder: 'ASC'});
+    setFilters(initialFilters);
     setCurrentPage(1);
   };
 
@@ -38,7 +44,7 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
       setError(null);
       try {
         const response = await api.get('/api/usedEquipment/displayTable', {
-          params: { ...filters, page: currentPage, price: null }
+          params: { ...filters, page: currentPage, storePurchasePrice: '0' },
         });
         setEquipments(response.data.data || []);
         setTotalPages(response.data.totalPages);
@@ -49,14 +55,13 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
     };
 
     if (show) fetchEquipments();
-  }, [show, currentPage, filters]);
+  }, [show, currentPage, filters, refreshCounter]);
+
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-
-  // Pass full equipment object back to parent so barcode stays defined
   const onSelect = (equipment) => {
     if (selectedEquipmentID === equipment.id) {
       handleSelectEquipment(null);
@@ -66,25 +71,26 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
   };
 
   return (
-    <Modal show={show} onHide={handleClosePopUp} 
-      onExited={() => {
-        setFilters({    
-        usedEquipmentId: '',
-        Barcode: '',
-        BrandModel: '',
-        EquipmentType: '',
-        sortField: 'id',
-        sortOrder: 'ASC'});
-      }}
-      size="xl" 
-      centered>
-      
+    <Modal
+      show={show}
+      onHide={handleClosePopUp}
+      onExited={() => setFilters(initialFilters)}
+      size="xl"
+      centered
+    >
       <Modal.Header closeButton>
         <Modal.Title>Catalog of Used Equipment</Modal.Title>
       </Modal.Header>
-      <UsedEquipmentFilter filters={filters} onFilterChange={setFilters} resetFilter={false} />
 
       <Modal.Body>
+        <div className="mb-3 text-end">
+          <Button variant="primary" onClick={() => setShowStorePurchaseForm(true)}>
+            Add New Used Equipment
+          </Button>
+        </div>
+
+        <UsedEquipmentFilter filters={filters} onFilterChange={setFilters} resetFilter={false} />
+
         {loading ? (
           <p>Loading Data...</p>
         ) : error ? (
@@ -113,6 +119,16 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
             />
           </Container>
         )}
+
+        <StorePurchaseForms
+          show={showStorePurchaseForm}
+          setRefreshCounter={setRefreshCounter}
+          handleClose={() => {
+            setShowStorePurchaseForm(false);
+            setRefreshCounter(prev => prev + 1); // força o recarregamento ao fechar
+          }}
+        />
+        
       </Modal.Body>
     </Modal>
   );
