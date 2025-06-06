@@ -1,15 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Container, Row, Col, Accordion } from "react-bootstrap";
 
-export default function UsedEquipmentFilter({ setFilters }) {
-  const [localFilters, setLocalFilters] = useState({
-    usedEquipmentId: '',
-    Barcode: '',
-    BrandModel: '',
-    EquipmentType: '',
-    sortField: 'id',
-    sortOrder: 'ASC'
-  });
+export default function UsedEquipmentFilter({ filters, onFilterChange, resetFilter }) {
+  const [localFilters, setLocalFilters] = useState(filters);
+
+  useEffect(() => {
+    setLocalFilters(filters);
+  }, [filters, resetFilter]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,20 +15,21 @@ export default function UsedEquipmentFilter({ setFilters }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFilters(localFilters);
+    onFilterChange(localFilters);
   };
 
   const handleClear = () => {
     const cleared = {
       usedEquipmentId: '',
-      Barcode: '',
       BrandModel: '',
       EquipmentType: '',
+      Store: '',
+      Status: '',
       sortField: 'id',
       sortOrder: 'ASC'
     };
     setLocalFilters(cleared);
-    setFilters(cleared);
+    onFilterChange(cleared);
   };
 
   return (
@@ -44,11 +42,11 @@ export default function UsedEquipmentFilter({ setFilters }) {
               <Row className="gy-3">
                 <Col xs={12} md={6}>
                   <Form.Group controlId="usedEquipmentId">
-                    <Form.Label>Used Equipment ID</Form.Label>
+                    <Form.Label>ID</Form.Label>
                     <Form.Control
                       type="number"
                       name="usedEquipmentId"
-                      value={localFilters.usedEquipmentId}
+                      value={localFilters?.usedEquipmentId}
                       onChange={handleChange}
                       placeholder="Enter ID"
                     />
@@ -56,40 +54,53 @@ export default function UsedEquipmentFilter({ setFilters }) {
                 </Col>
 
                 <Col xs={12} md={6}>
-                  <Form.Group controlId="Barcode">
-                    <Form.Label>Barcode</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="Barcode"
-                      value={localFilters.Barcode}
-                      onChange={handleChange}
-                      placeholder="Enter Barcode"
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col xs={12} md={6}>
                   <Form.Group controlId="BrandModel">
-                    <Form.Label>Model</Form.Label>
+                    <Form.Label>Brand & Model</Form.Label>
                     <Form.Control
                       type="text"
                       name="BrandModel"
-                      value={localFilters.BrandModel}
+                      value={localFilters?.BrandModel}
                       onChange={handleChange}
-                      placeholder="Enter Brand Model"
+                      placeholder="Ex: Apple iPhone 15"
                     />
                   </Form.Group>
                 </Col>
 
                 <Col xs={12} md={6}>
                   <Form.Group controlId="EquipmentType">
-                    <Form.Label>Equipment Type</Form.Label>
+                    <Form.Label>Type</Form.Label>
                     <Form.Control
                       type="text"
                       name="EquipmentType"
-                      value={localFilters.EquipmentType}
+                      value={localFilters?.EquipmentType}
                       onChange={handleChange}
-                      placeholder="Enter Type"
+                      placeholder="Ex: Smartphone"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col xs={12} md={6}>
+                  <Form.Group controlId="Store">
+                    <Form.Label>Store</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="Store"
+                      value={localFilters?.Store}
+                      onChange={handleChange}
+                      placeholder="Ex: Loja Lisboa"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col xs={12} md={6}>
+                  <Form.Group controlId="Status">
+                    <Form.Label>Status</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="Status"
+                      value={localFilters?.Status}
+                      onChange={handleChange}
+                      placeholder="Ex: New"
                     />
                   </Form.Group>
                 </Col>

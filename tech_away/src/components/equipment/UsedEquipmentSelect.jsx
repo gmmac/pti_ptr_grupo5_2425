@@ -89,12 +89,12 @@ export default function UsedEquipmentSelect({ show, handleClose, handleSelectUse
         ) : (
           <Container>
               {/* Desktop */}
-              <UsedEquipmentTableModal usedEquipments={usedEquipments} selectedUsedEquipment={selectedUsedEquipment} handleUsedEquipmentSelection={handleUsedEquipmentSelection} /> 
+              {usedEquipments && <UsedEquipmentTableModal equipments={usedEquipments} selectedUsedEquipment={selectedUsedEquipment} handleUsedEquipmentSelection={handleUsedEquipmentSelection} /> }
               {/* Mobile */}
               {usedEquipments.map((usedEquipment) => {
                 return <UsedEquipmentCardModal 
                   key={usedEquipment.id} 
-                  usedEquipment={usedEquipment} 
+                  equipment={usedEquipment} 
                   selectedUsedEquipment={selectedUsedEquipment} 
                   handleUsedEquipmentSelection={handleUsedEquipmentSelection} 
                   />

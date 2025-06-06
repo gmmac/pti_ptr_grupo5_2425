@@ -4,7 +4,7 @@ import api from '../../utils/axios';
 import ClientCatalogModal from './ClientCatalogModal';
 import EquipmentCatalogModal from './EquipmentCatalogModal';
 
-export default function StorePurchaseForms({show, handleClose, setRefreshPurchases}) {
+export default function StorePurchaseForms({ show, handleClose, setRefreshPurchases }) {
     const [form, setForm] = useState({
         statusID: '',
         price: '',
@@ -38,30 +38,36 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
 
     const [showModal, setShowModal] = useState(false);
     const [showModalEq, setShowModalEq] = useState(false);
-
-
+    
     useEffect(() => {
         api.get(`/api/equipmentStatus/`)
             .then(res => setStatusList(res.data))
-            .catch(error => console.error('Erro ao buscar estados:', error.message));
+            .catch(error => console.error('Error fetching statuses:', error.message));
     }, []);
 
     useEffect(() => {
         api.get(`/api/model/`)
             .then(res => setModelsList(res.data))
-            .catch(error => console.error('Erro ao buscar modelos:', error.message));
+            .catch(error => console.error('Error fetching models:', error.message));
     }, []);
 
     useEffect(() => {
-        api.get(`/api/equipmentSheet/teste`)
-            .then(res => setEquipmentList(res.data.data.map(e => e.barcode)))
-            .catch(error => console.error('Erro ao buscar equipamentos:', error.message));
+    api.get(`/api/equipmentSheet`)
+        .then(res => setEquipmentList(res.data.data.map(e => e.Barcode)))
+        .catch(error => console.error('Error fetching equipment:', error.message));
+        console.log(equipmentList)
+
     }, []);
+
+
+    useEffect(() => {
+        console.log(form)
+    }, [form])
 
     useEffect(() => {
         api.get(`/api/client/`)
             .then(res => setClientList(res.data.data.map(e => e.nic)))
-            .catch(error => console.error('Erro ao buscar NICs:', error.message));
+            .catch(error => console.error('Error fetching clients:', error.message));
     }, []);
 
     const handleSelectClient = (client) => {
@@ -77,7 +83,7 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
                 phone: client.phone
             });
 
-            setForm((prevForm) => ({
+            setForm(prevForm => ({
                 ...prevForm,
                 clientNic: client.nic
             }));
@@ -93,27 +99,28 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
                 phone: ''
             });
 
-            setForm((prevForm) => ({
+            setForm(prevForm => ({
                 ...prevForm,
                 clientNic: ''
             }));
         }
 
         setShowModal(false);
+         setError("");
     };
 
     const handleSelectEquipment = (equipment) => {
         if (equipment) {
             setEquipmentData({
-                barcode: equipment.barcode,
+                barcode: equipment.Barcode,
                 model: equipment.model,
                 releaseYear: equipment.releaseYear,
                 type: equipment.type
             });
 
-            setForm((prevForm) => ({
+            setForm(prevForm => ({
                 ...prevForm,
-                equipmentBarcode: equipment.barcode
+                equipmentBarcode: equipment.Barcode
             }));
         } else {
             setEquipmentData({
@@ -123,14 +130,16 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
                 type: ''
             });
 
-            setForm((prevForm) => ({
+            setForm(prevForm => ({
                 ...prevForm,
                 equipmentBarcode: ''
             }));
         }
 
         setShowModalEq(false);
+         setError("");
     };
+
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -139,9 +148,9 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
 
         if (name === "equipmentBarcode") {
             if (!/^\d*$/.test(value)) {
-                setError("O Código de barras do equipamento deve conter apenas números.");
+                setError("Equipment barcode must contain only digits.");
             } else if (value.length > 20) {
-                setError("O Código de barras do equipamento deve ter 20 algarismos.");
+                setError("Equipment barcode must be exactly 20 digits long.");
             } else {
                 setError("");
             }
@@ -149,9 +158,9 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
 
         if (name === "clientNic") {
             if (!/^\d*$/.test(value)) {
-                setError("O NIC do cliente deve conter apenas números.");
+                setError("Client NIC must contain only digits.");
             } else if (value.length > 9) {
-                setError("O NIC do cliente deve ter 9 algarismos.");
+                setError("Client NIC must be exactly 9 digits long.");
             } else {
                 setError("");
             }
@@ -167,29 +176,25 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
         e.preventDefault();
 
         if (form.equipmentBarcode.length !== 20) {
-            setError("O Código de barras do equipamento deve ter exatamente 20 algarismos.");
+            setError("Equipment barcode must be exactly 20 digits long.");
             return;
         }
+        // if (!equipmentList.includes(form.equipmentBarcode)) {
+        //     setError("No equipment found with the provided barcode.");
+        //     return;
+        // }
 
-        if (!equipmentList.includes(form.equipmentBarcode)) {
-            setError("Não existe nenhum equipamento com o Código de barras fornecido.");
-            return;
-        }
-
-        if (!clientList.includes(form.clientNic)) {
-            setError("Não existe nenhum cliente com o NIC fornecido.");
-            return;
-        }
+        // if (!clientList.includes(form.clientNic)) {
+        //     setError("No client found with the provided NIC.");
+        //     return;
+        // }
 
         await api.post('/api/storePurchase', form)
             .then(response => {
-                setSuccessMessage("Venda registada com sucesso!");
+                setSuccessMessage("Purchase registered successfully!");
                 setError("");
 
-                setRefreshPurchases(prev => {
-                    console.log("Valor anterior de refreshPurchases:", prev);
-                    return !prev;
-                });
+                setRefreshPurchases(prev => !prev);
 
                 setClientData({
                     nic: '',
@@ -218,73 +223,67 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
 
                 setTimeout(() => {
                     setSuccessMessage("");
-                    setForm({
-                        statusID: '',
-                        price: '',
-                        clientNic: '',
-                        equipmentBarcode: '',
-                    });
                 }, 1000);
             })
             .catch(error => {
-                console.error("Erro ao registrar venda: ", error.response.data);
-                setError("Ocorreu um erro ao registar a venda.");
+                console.error("Error registering purchase: ", error.response?.data);
+                setError("An error occurred while registering the purchase.");
             });
 
-            handleClose();
+        handleClose();
     };
 
     return (
         <>
-            <Modal show={show} onHide={handleClose} size="lg" centered>
+            <Modal show={show} onHide={handleClose} size="xl" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Registar Venda de Produto</Modal.Title>
+                    <Modal.Title>Register Product Sale</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
 
                     <Form onSubmit={handleSubmit}>
                         <Row className="mb-3">
-                            <Form.Group controlId="formEstado">
-                                <Form.Label>Estado do Equipamento</Form.Label>
+                            <Form.Group controlId="formStatus">
+                                <Form.Label>Equipment Status</Form.Label>
                                 <Form.Control as="select" name="statusID" value={form.statusID} onChange={handleChange} required>
-                                    <option value="">Selecione...</option>
+                                    <option value="">Select...</option>
                                     {statusList.map((s, idx) => <option key={idx} value={s.id}>{s.state}</option>)}
                                 </Form.Control>
                             </Form.Group>
                         </Row>
 
                         <Row className="mb-3">
-                            <Form.Group controlId="formPreco">
-                                <Form.Label>Preço</Form.Label>
-                                <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Digite o preço" required />
+                            <Form.Group controlId="formPrice">
+                                <Form.Label>Price</Form.Label>
+                                <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Enter price" required />
                             </Form.Group>
                         </Row>
 
                         <Row className="mb-3">
                             <Col md={6}>
                                 <Form.Group controlId="formClientNic">
-                                    <Form.Label>NIC do cliente</Form.Label>
-                                    <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Digite o NIC" required />
+                                    <Form.Label>Client NIC</Form.Label>
+                                    <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Enter NIC" required disabled />
                                 </Form.Group>
                             </Col>
                             <Col md={6} className="d-flex align-items-end">
                                 <Button onClick={() => setShowModal(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
-                                    Procurar cliente
+                                    Browse Clients
                                 </Button>
                             </Col>
                         </Row>
 
                         <Row className="mb-3">
                             <Col md={6}>
-                                <Form.Group controlId="formBarcodeEquipamento">
-                                    <Form.Label>Código de barras do Equipamento</Form.Label>
-                                    <Form.Control type="number" name="equipmentBarcode" value={form.equipmentBarcode} onChange={handleChange} placeholder="Digite o código de barras" required />
+                                <Form.Group controlId="formEquipmentBarcode">
+                                    <Form.Label>Equipment Barcode</Form.Label>
+                                    <Form.Control type="number" name="equipmentBarcode" value={form.equipmentBarcode} onChange={handleChange} placeholder="Enter barcode" required disabled />
                                 </Form.Group>
                             </Col>
                             <Col md={6} className="d-flex align-items-end">
                                 <Button onClick={() => setShowModalEq(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
-                                    Procurar equipamento
+                                    Browse Equipment
                                 </Button>
                             </Col>
                         </Row>
@@ -292,7 +291,7 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
                         {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
                         <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg">
-                            Registar Venda
+                            Register Sale
                         </Button>
                     </Form>
                 </Modal.Body>

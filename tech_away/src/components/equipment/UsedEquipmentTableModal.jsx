@@ -7,9 +7,11 @@ export default function UsedEquipmentTableModal({ equipments, selectedEquipmentI
       <thead>
         <tr>
           <th>ID</th>
-          <th>Barcode</th>
+          {/* <th>Barcode</th> */}
           <th>Model</th>
           <th>Type</th>
+          <th>Store</th>
+          <th>Status</th>
           <th>Select Equipment</th>
         </tr>
       </thead>
@@ -17,9 +19,11 @@ export default function UsedEquipmentTableModal({ equipments, selectedEquipmentI
         {equipments.map((e) => (
           <tr key={e.id}>
             <td>{e.id}</td>
-            <td>{e.EquipmentSheet.barcode}</td>
+            {/* <td>{e.EquipmentSheet.barcode}</td> */}
             <td>{e.EquipmentSheet.brandModel}</td>
             <td>{e.EquipmentSheet.EquipmentType.name}</td>
+            <td>{e.Store.name}</td>
+            <td>{e.EquipmentStatus.state}</td>
             <td>
               <Button
                 size="sm"

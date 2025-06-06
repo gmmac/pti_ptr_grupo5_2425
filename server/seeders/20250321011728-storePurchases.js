@@ -10,7 +10,7 @@ module.exports = {
         employeeID: '123355888',
         purchasePrice: 0,
         usedEquipmentID: 1,
-        createdAt: new Date(),
+        createdAt: new Date("2025-5-10"),
         updatedAt: new Date()
       },
       {
@@ -19,7 +19,7 @@ module.exports = {
         employeeID: '123355888',
         purchasePrice: 0,
         usedEquipmentID: 5,
-        createdAt: new Date(),
+        createdAt: new Date("2025-5-15"),
         updatedAt: new Date()
       },
       {

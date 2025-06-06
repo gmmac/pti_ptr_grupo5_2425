@@ -38,7 +38,7 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
       setError(null);
       try {
         const response = await api.get('/api/usedEquipment/displayTable', {
-          params: { ...filters, page: currentPage }
+          params: { ...filters, page: currentPage, price: null }
         });
         setEquipments(response.data.data || []);
         setTotalPages(response.data.totalPages);
@@ -82,7 +82,8 @@ export default function UsedEquipmentCatalogModal({ show, handleClose, handleSel
       <Modal.Header closeButton>
         <Modal.Title>Catalog of Used Equipment</Modal.Title>
       </Modal.Header>
-      <UsedEquipmentFilter setFilters={setFilters} />
+      <UsedEquipmentFilter filters={filters} onFilterChange={setFilters} resetFilter={false} />
+
       <Modal.Body>
         {loading ? (
           <p>Loading Data...</p>

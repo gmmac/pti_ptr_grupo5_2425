@@ -66,7 +66,7 @@ module.exports = {
 					purchaseDate: null,
 					equipmentId: "45678901234567890123", // Referência ao barcode do equipamento "XPS 13" na tabela EquipmentSheets
 					storeId: "123456789",
-					action: "D",
+					// action: "D",
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},

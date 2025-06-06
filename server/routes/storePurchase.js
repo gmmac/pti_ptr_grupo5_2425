@@ -157,11 +157,11 @@ router.post("/", async (req, res) => {
     try {
         const {statusID, price, clientNic, equipmentBarcode} = req.body;
 
+        console.log(req.body)
         const storeID = req.cookies["employeeInfo"].storeNIPC
         const employeeID = req.cookies["employeeInfo"].nic
 
-
-        const usedEquipment = await models.UsedEquipment.create({ statusID: statusID, price: price, purchaseDate: new Date(), equipmentId: equipmentBarcode, storeId: storeID, createdAt: new Date(), updatedAt: new Date() });
+        const usedEquipment = await models.UsedEquipment.create({ statusID: statusID, equipmentId: equipmentBarcode, storeId: storeID, createdAt: new Date(), updatedAt: new Date() });
         
         // só cria a compra da loja, caso o equipamento usado exista (tenha sido criado)
         if(usedEquipment){

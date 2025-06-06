@@ -5,8 +5,7 @@ import SearchBar from "../searchBar/SearchBar";
 export default function EquipmentFilter({ setFilters }) {
     const [localFilters, setLocalFilters] = useState({
         barcode: "",
-        model: "",
-        releaseYear: "",
+        brandModel: "", // substitui model
         type: "",
         orderDirection: "ASC"
     });
@@ -21,28 +20,34 @@ export default function EquipmentFilter({ setFilters }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setFilters((prevFilters) => ({
-            ...prevFilters,
-            ...localFilters, // Atualiza os filtros
-            orderBy: orderField,
-            orderDirection: orderDirection,
-        }));
+        setFilters({
+            Barcode: localFilters.barcode,
+            BrandModel: localFilters.brandModel,
+            EquipmentType: localFilters.type,
+            sortField: orderField,
+            sortOrder: orderDirection,
+        });
     };
-    
 
     const handleClear = () => {
         const clearedFilters = {
-            barcode: "",
-            model: "",
-            releaseYear: "",
-            type: "",
-            orderDirection: "ASC"
+            Barcode: "",
+            BrandModel: "",
+            EquipmentType: "",
+            sortField: "barcode",
+            sortOrder: "ASC",
         };
 
-        setLocalFilters(clearedFilters);
-        setFilters(clearedFilters);
+        setLocalFilters({
+            barcode: "",
+            brandModel: "",
+            type: "",
+            orderDirection: "ASC"
+        });
+
         setOrderField("barcode");
         setOrderDirection("ASC");
+        setFilters(clearedFilters);
     };
 
     return (
@@ -54,7 +59,7 @@ export default function EquipmentFilter({ setFilters }) {
                         <Form onSubmit={handleSubmit}>
                             <Row className="gy-3 d-block d-flex flex-md-row">
 
-                                <Col xs={12} md={6}>
+                                <Col xs={12} md={12}>
                                     <Form.Group controlId="filterName">
                                         <Form.Label>Barcode</Form.Label>
                                         <Form.Control 
@@ -72,27 +77,15 @@ export default function EquipmentFilter({ setFilters }) {
                                         <Form.Label>Model</Form.Label>
                                         <Form.Control 
                                         type="text" 
-                                        name="model" 
-                                        value={localFilters.model} 
+                                        name="brandModel" 
+                                        value={localFilters.brandModel} 
                                         placeholder="Insert model"
                                         onChange={handleChange} 
                                         />
                                     
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12} md={6}>
-                                    <Form.Group controlId="filterName">
-                                        <Form.Label>Release Year</Form.Label>
-                                        <Form.Control 
-                                        type="number" 
-                                        name="releaseYear" 
-                                        value={localFilters.releaseYear} 
-                                        placeholder="Insert release year"
-                                        onChange={handleChange} 
-                                        />
-                                    
-                                    </Form.Group>
-                                </Col>
+
                                 <Col xs={12} md={6}>
                                     <Form.Group controlId="filterName">
                                         <Form.Label>Type</Form.Label>

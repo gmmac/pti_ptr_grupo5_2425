@@ -6,6 +6,7 @@ import EquipmentFilter from "./EquipmentFilter";
 import EquipmentTableModal from "./EquipmentTableModal";
 import EquipmentCardModal from "./EquipmentCardModal";
 import AddEquipmentModal from "./AddEquipmentModal";
+
 export default function EquipmentCatalogModal({ show, handleClose, handleSelectEquipment, selectedEquipment }) {
   const [equipments, setEquipments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +14,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 4;
+  // const itemsPerPage = 5;
 
   const [filters, setFilters] = useState({
     barcode: "",
@@ -23,7 +24,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
     orderDirection: "ASC"
   });
 
-  const [showAddModal, setShowAddModal] = useState(false); // CONTROLA MODAL DE ADIÇÃO
+  const [showAddModal, setShowAddModal] = useState(false); // CONTROL ADD MODAL
 
   const handleClosePopUp = () => {
     handleClose();
@@ -40,17 +41,18 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get(`/api/equipmentSheet/teste`, {
+      const response = await api.get(`/api/equipmentSheet`, {
         params: {
           ...filters,
           page: currentPage,
-          pageSize: itemsPerPage
+          // pageSize: itemsPerPage
         }
       });
+      console.log(response.data.data)
       setEquipments(response.data.data || []);
       setTotalPages(response.data.totalPages);
     } catch (err) {
-      setError("Erro ao carregar os equipamentos");
+      setError("Error loading equipment list");
     }
     setLoading(false);
   };
@@ -68,7 +70,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
   };
 
   const handleEquipmentSelection = (equipment) => {
-    if (selectedEquipment === equipment.barcode) {
+    if (selectedEquipment === equipment.Barcode) {
       handleSelectEquipment(null);
     } else {
       handleSelectEquipment(equipment);
@@ -76,41 +78,41 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
   };
 
   const handleAddEquipment = (newEquipment) => {
-    // Aqui pode fazer POST para API se quiser persistir
+    // Here you could POST to the API if persistence is needed
     setEquipments((prev) => [newEquipment, ...prev]);
     setShowAddModal(false);
   };
 
   return (
     <>
-      <Modal show={show} onHide={handleClose} size="xl" centered backdrop="static">
+      <Modal show={show} onHide={handleClose} size="lg" centered backdrop="static">
         <Modal.Header closeButton>
-          <Modal.Title>Catálogo de Equipamentos</Modal.Title>
+          <Modal.Title>Equipment Catalog</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {/* BOTÃO ADICIONAR */}
+          {/* ADD BUTTON */}
           <div className="mb-3 text-end">
             <Button variant="primary" onClick={() => setShowAddModal(true)}>
-              Adicionar Equipamento
+              Add Equipment
             </Button>
           </div>
 
           <EquipmentFilter setFilters={setFilters} />
           {loading ? (
-            <p>Loading Data...</p>
+            <p>Loading data...</p>
           ) : error ? (
             <p className="text-danger">{error}</p>
           ) : equipments.length === 0 ? (
-            <p>Data not found.</p>
+            <p>No equipment found.</p>
           ) : (
             <Container>
-              {/* Desktop */}
+              {/* Desktop View */}
               <EquipmentTableModal
                 equipments={equipments}
                 selectedEquipment={selectedEquipment}
                 handleEquipmentSelection={handleEquipmentSelection}
               />
-              {/* Mobile */}
+              {/* Mobile View */}
               {equipments.map((e) => (
                 <EquipmentCardModal
                   key={e.barcode}
@@ -128,11 +130,11 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClosePopUp}>Fechar</Button>
+          <Button variant="secondary" onClick={handleClosePopUp}>Close</Button>
         </Modal.Footer>
       </Modal>
 
-      {/* MODAL DE ADICIONAR EQUIPAMENTO */}
+      {/* ADD EQUIPMENT MODAL */}
       <AddEquipmentModal
         show={showAddModal}
         handleClose={() => setShowAddModal(false)}

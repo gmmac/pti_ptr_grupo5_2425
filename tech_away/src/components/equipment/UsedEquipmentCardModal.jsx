@@ -7,9 +7,10 @@ export default function UsedEquipmentCardModal({ equipment, selectedEquipmentID,
       <Card.Body>
         <Card.Title>ID: {equipment.id}</Card.Title>
         <Card.Text>
-          <strong>Barcode:</strong> {equipment.EquipmentSheet.barcode}<br />
+          {/* <strong>Barcode:</strong> {equipment.EquipmentSheet.barcode}<br /> */}
           <strong>Model:</strong> {equipment.EquipmentSheet.brandModel}<br />
-          <strong>Type:</strong> {equipment.EquipmentSheet.EquipmentType.name}
+          <strong>Type:</strong> {equipment.EquipmentSheet.EquipmentType.name}<br />
+          <strong>Status:</strong> {equipment.EquipmentStatus.state}
         </Card.Text>
         <Button
           style={{

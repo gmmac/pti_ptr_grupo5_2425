@@ -29,6 +29,7 @@ export default function EmployeeHomeDashboard() {
         { title: 'Equipment Status', key: 'equipmentStatusManage' },
         { title: 'Repair Status', key: 'repairStatusManage' },
         { title: 'Stores', key: 'storeManage' },
+        { title: "Used Equipments", key: "usedEquipments"}
       ];
 
 

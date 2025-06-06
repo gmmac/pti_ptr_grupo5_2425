@@ -13,6 +13,7 @@ import EquipmentTypeManage from "../../components/HomePageEmployee/Manage/Equipm
 import PartsManage from "../../components/HomePageEmployee/Manage/PartsManage";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import ClientsManage from "../../components/HomePageEmployee/Manage/ClientsManage";
+import UsedEquipmentManage from "../../components/HomePageEmployee/Manage/UsedEquipmentManage"
 
 
 const componentMap = {
@@ -26,7 +27,8 @@ const componentMap = {
   equipmentSheetManage: <EquipmentSheetManage />,
   equipmentTypeManage: <EquipmentTypeManage />,
   partsManage: <PartsManage />,
-  clientsManage: <ClientsManage />
+  clientsManage: <ClientsManage />,
+  usedEquipments: <UsedEquipmentManage />
 };
 
 export default function ManagePage() {

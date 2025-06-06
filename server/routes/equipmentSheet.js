@@ -107,108 +107,144 @@ const { Op, Sequelize } = require("sequelize");
 //     res.status(500).json({ error: "Error fetching equipment sheets." });
 //   }
 // });
-
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const {
       Barcode,
-      EquipmentModel: model,
-      EquipmentType: type,
+      EquipmentModel,
+      EquipmentType,
       Brand,
       BrandModel,
-      active = '1',
+      active = "1",
       page = 1,
       pageSize = 5,
-      sortField = 'EquipmentModel',
-      sortOrder = 'ASC',
+      sortField = "EquipmentModel",
+      sortOrder = "ASC",
     } = req.query;
 
-    const where = {};
+    const andConditions = [];
 
-    // Barcode filter
-    if (Barcode) {
-      where.barcode = { [Op.iLike]: `%${Barcode}%` };
-    }
-
-    // Active status filter
+    // Filtro: Ativo ou Inativo
     if (active !== undefined) {
-      where.isActive = { [Op.eq]: active };
+      andConditions.push({ isActive: { [Op.eq]: active } });
     }
 
-    // Combined BrandModel filter takes precedence
-    if (BrandModel) {
-      where[Op.or] = [
-        { '$EquipmentModel.name$': { [Op.iLike]: `%${BrandModel}%` } },
-        { '$EquipmentModel.Brand.name$': { [Op.iLike]: `%${BrandModel}%` } },
-      ];
+    // Filtro: Barcode
+    if (Barcode?.trim()) {
+      andConditions.push({
+        barcode: { [Op.iLike]: `${Barcode.trim()}%` },
+      });
+    }
+
+    // Filtro: BrandModel (marca + modelo combinados ou individuais)
+    if (BrandModel?.trim()) {
+      const cleanedValue = BrandModel.trim().replace(/\s+/g, " ").toLowerCase();
+
+      andConditions.push({
+        [Op.or]: [
+          Sequelize.where(
+            Sequelize.fn(
+              "LOWER",
+              Sequelize.fn(
+                "concat",
+                Sequelize.col("EquipmentModel->Brand.name"),
+                " ",
+                Sequelize.col("EquipmentModel.name")
+              )
+            ),
+            { [Op.like]: `%${cleanedValue}%` }
+          ),
+          Sequelize.where(
+            Sequelize.fn("LOWER", Sequelize.col("EquipmentModel->Brand.name")),
+            { [Op.like]: `%${cleanedValue}%` }
+          ),
+          Sequelize.where(
+            Sequelize.fn("LOWER", Sequelize.col("EquipmentModel.name")),
+            { [Op.like]: `%${cleanedValue}%` }
+          ),
+        ],
+      });
     } else {
-      // Separate Model filter
-      if (model) {
-        where['$EquipmentModel.name$'] = { [Op.iLike]: `%${model}%` };
+      // Filtro: Modelo
+      if (EquipmentModel?.trim()) {
+        andConditions.push({
+          "$EquipmentModel.name$": {
+            [Op.iLike]: `%${EquipmentModel.trim()}%`,
+          },
+        });
       }
-      // Separate Brand filter
-      if (Brand) {
-        where['$EquipmentModel.Brand.name$'] = { [Op.iLike]: `%${Brand}%` };
+
+      // Filtro: Marca
+      if (Brand?.trim()) {
+        andConditions.push({
+          "$EquipmentModel.Brand.name$": {
+            [Op.iLike]: `%${Brand.trim()}%`,
+          },
+        });
       }
     }
 
-    // EquipmentType filter
-    if (type) {
-      where['$EquipmentType.name$'] = { [Op.iLike]: `%${type}%` };
+    // Filtro: Tipo de Equipamento
+    if (EquipmentType?.trim()) {
+      andConditions.push({
+        "$EquipmentType.name$": {
+          [Op.iLike]: `%${EquipmentType.trim()}%`,
+        },
+      });
     }
 
-    // Pagination
+    // Paginação
     const limit = parseInt(pageSize, 10);
     const offset = (parseInt(page, 10) - 1) * limit;
 
-    // Sorting
-    const order = [];
-    const direction = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-    switch (sortField) {
-      case 'Brand':
-        order.push([Sequelize.col('EquipmentModel.Brand.name'), direction]);
-        break;
-      case 'EquipmentModel':
-        order.push([Sequelize.col('EquipmentModel.name'), direction]);
-        break;
-      case 'EquipmentType':
-        order.push([Sequelize.col('EquipmentType.name'), direction]);
-        break;
-      case 'Barcode':
-        order.push([Sequelize.col('barcode'), direction]);
-        break;
-      default:
-        order.push([Sequelize.col(sortField), direction]);
-    }
+    // Ordenação
+    const direction = sortOrder.toUpperCase() === "DESC" ? "DESC" : "ASC";
+    const orderMap = {
+      Brand: [Sequelize.col("EquipmentModel->Brand.name"), direction],
+      EquipmentModel: [Sequelize.col("EquipmentModel.name"), direction],
+      EquipmentType: [Sequelize.col("EquipmentType.name"), direction],
+      Barcode: [Sequelize.col("barcode"), direction],
+    };
+    const order = [orderMap[sortField] || [Sequelize.col(sortField), direction]];
 
-    // Fetch
+    // Query principal
     const result = await models.EquipmentSheet.findAndCountAll({
-      where,
+      where: andConditions.length ? { [Op.and]: andConditions } : {},
       include: [
         {
           model: models.EquipmentModel,
-          as: 'EquipmentModel',
-          attributes: ['id', 'name'],
+          required: true,
           include: [
-            { model: models.Brand, as: 'Brand', attributes: ['id', 'name'] },
+            {
+              model: models.Brand,
+              required: true,
+            },
           ],
         },
-        { model: models.EquipmentType, as: 'EquipmentType', attributes: ['id', 'name'] },
+        {
+          model: models.EquipmentType,
+          required: true,
+        },
       ],
       limit,
       offset,
       order,
     });
 
-    // Format response
-    const formattedData = result.rows.map(item => ({
-      Barcode: item.barcode,
-      CreatedAt: item.createdAt,
-      UpdatedAt: item.updatedAt,
-      EquipmentModel: { id: item.EquipmentModel.id, name: item.EquipmentModel.name },
-      Brand: { id: item.EquipmentModel.Brand.id, name: item.EquipmentModel.Brand.name },
-      EquipmentType: { id: item.EquipmentType.id, name: item.EquipmentType.name },
-    }));
+    const formattedData = result.rows.map((item) => {
+      const model = item.EquipmentModel;
+      const brand = model?.Brand;
+      const type = item.EquipmentType;
+
+      return {
+        Barcode: item.barcode,
+        CreatedAt: item.createdAt,
+        UpdatedAt: item.updatedAt,
+        EquipmentModel: model ? { id: model.id, name: model.name, sheetPrice: model.price } : null,
+        Brand: brand ? { id: brand.id, name: brand.name } : null,
+        EquipmentType: type ? { id: type.id, name: type.name } : null,
+      };
+    });
 
     res.json({
       totalItems: result.count,
@@ -217,10 +253,9 @@ router.get('/', async (req, res) => {
       pageSize: limit,
       data: formattedData,
     });
-
   } catch (error) {
-    console.error('Error fetching equipment sheets:', error);
-    res.status(500).json({ error: 'Error fetching equipment sheets.' });
+    console.error("Error fetching equipment sheets:", error);
+    res.status(500).json({ error: "Error fetching equipment sheets." });
   }
 });
 
