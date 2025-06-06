@@ -44,7 +44,7 @@ export default function EmployeeStorePurchase() {
                         accentColor: '#b5a8c9', 
                     }}
                     />
-                    Compras feitas por mim
+                    Purchases by me
                 </label>
 
                 <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontWeight: '600', color: '#333' }}>
@@ -60,11 +60,9 @@ export default function EmployeeStorePurchase() {
                         accentColor: '#b5a8c9',
                     }}
                     />
-                    Compras feitas pela minha loja
+                    Purchases by my store
                 </label>
                 </div>
-
-            <hr />
 
         <DisplayTablePurchases
             refreshTable={refreshPurchases} 

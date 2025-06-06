@@ -102,19 +102,10 @@ export default function EquipmentCatalogModal({
     <>
       <Modal show={show} onHide={handleClose} size="xl" centered>
         <Modal.Header closeButton>
-          <Modal.Title>Catálogo de Equipamentos</Modal.Title>
+          <Modal.Title>All equipments</Modal.Title>
           
         </Modal.Header>
         <Modal.Body>
-
-          {/* BOTAO ADICIONAR EQUIPAMENTO -------------------------------------------------------------------------*/}
-          {/* <Button
-            variant="primary"
-            className="ms-3"
-            onClick={() => setShowAddModal(true)}
-          >
-            + Adicionar Equipamento
-          </Button> */}
           
           <EquipmentFilter setFilters={setFilters} />
           {loading ? (
@@ -149,7 +140,7 @@ export default function EquipmentCatalogModal({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClosePopUp}>
-            Fechar
+            Close
           </Button>
         </Modal.Footer>
       </Modal>

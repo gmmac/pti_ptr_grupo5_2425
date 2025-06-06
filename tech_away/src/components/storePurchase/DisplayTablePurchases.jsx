@@ -218,13 +218,13 @@ export default function DisplayTablePurchases({ refreshTable, onlyMyPurchases, s
 
           {/* Coluna Editar com botão */}
           <Column
-            header="Editar"
+            header="Edit"
             body={(rowData) => (
               <Button
                 icon="pi pi-pencil"
                 className="p-button-rounded p-button-text p-button-info"
                 onClick={() => onEditClick(rowData)}
-                aria-label="Editar"
+                aria-label="Edit"
               />
             )}
             style={{ width: "80px", textAlign: "center" }}

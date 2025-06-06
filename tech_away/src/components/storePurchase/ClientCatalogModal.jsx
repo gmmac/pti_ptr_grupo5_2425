@@ -89,7 +89,7 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
     }} 
     size="xl" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Catálogo de Clientes</Modal.Title>
+        <Modal.Title>All clients</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {/* Passe agora apenas `name` em vez de firstName/lastName */}
@@ -129,7 +129,7 @@ export default function ClientCatalogModal({ show, handleClose, handleSelectClie
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClosePopUp}>
-          Fechar
+          Close
         </Button>
       </Modal.Footer>
     </Modal>

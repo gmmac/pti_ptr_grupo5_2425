@@ -176,8 +176,8 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
             setTimeout(() => setSuccessMessage(""), 1000);
             handleClose();
         } catch (error) {
-            console.error("Erro ao salvar venda: ", error.response?.data || error.message);
-            setError("Ocorreu um erro ao salvar a venda.");
+            console.error("Error saving sale: ", error.response?.data || error.message);
+            setError("An error occurred while saving the sale.");
         }
     };
 
@@ -185,7 +185,7 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
         <>
             <Modal show={show} onHide={handleClose} size="lg" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>{purchaseData ? "Editar Venda" : "Criar Nova Venda"}</Modal.Title>
+                    <Modal.Title>{purchaseData ? "Edit purchase" : "New purchase"}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
@@ -193,9 +193,9 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                     <Form onSubmit={handleSubmit}>
                         <Row className="mb-3">
                             <Form.Group controlId="formEstado">
-                                <Form.Label>Estado do Equipamento</Form.Label>
+                                <Form.Label>Equipment status</Form.Label>
                                 <Form.Control as="select" name="statusID" value={form.statusID} onChange={handleChange} required>
-                                    <option value="">Selecione...</option>
+                                    <option value="">Select...</option>
                                     {statusList.map((s, idx) => <option key={idx} value={s.id}>{s.state}</option>)}
                                 </Form.Control>
                             </Form.Group>
@@ -203,7 +203,7 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
 
                         <Row className="mb-3">
                             <Form.Group controlId="formPreco">
-                                <Form.Label>Preço</Form.Label>
+                                <Form.Label>Price</Form.Label>
                                 <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Digite o preço" required />
                             </Form.Group>
                         </Row>
@@ -211,13 +211,13 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                         <Row className="mb-3">
                             <Col md={6}>
                                 <Form.Group controlId="formClientNic">
-                                    <Form.Label>NIC do cliente</Form.Label>
+                                    <Form.Label>Client NIC</Form.Label>
                                     <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Digite o NIC" required />
                                 </Form.Group>
                             </Col>
                             <Col md={6} className="d-flex align-items-end">
                                 <Button onClick={() => setShowModal(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
-                                    Procurar cliente
+                                    Search client
                                 </Button>
                             </Col>
                         </Row>
@@ -225,13 +225,13 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                         <Row className="mb-3">
                             <Col md={6}>
                                 <Form.Group controlId="formBarcodeEquipamento">
-                                    <Form.Label>Código de barras do Equipamento</Form.Label>
+                                    <Form.Label>Equipment barcode</Form.Label>
                                     <Form.Control type="number" name="equipmentBarcode" value={form.equipmentBarcode} onChange={handleChange} placeholder="Digite o código de barras" required />
                                 </Form.Group>
                             </Col>
                             <Col md={6} className="d-flex align-items-end">
                                 <Button onClick={() => setShowModalEq(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
-                                    Procurar equipamento
+                                    Search equipment
                                 </Button>
                             </Col>
                         </Row>
