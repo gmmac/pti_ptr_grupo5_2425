@@ -150,6 +150,39 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/totalOnSaleStock", async (req, res) => {
+	try {
+		const total = await models.UsedEquipment.count({
+			where: {
+				putOnSaleDate: {
+					[Op.ne]: null,
+				},
+			},
+		});
+
+		res.json({ total });
+	} catch (error) {
+		console.error("Error fetching total sale stock:", error);
+		res.status(500).json({ error: "Error fetching total sale stock." });
+	}
+});
+
+router.get("/totalSoldEquipments", async (req, res) => {
+	try {
+		const total = await models.UsedEquipment.count({
+			where: {
+				purchaseDate: {
+					[Op.ne]: null,
+				},
+			},
+		});
+
+		res.json({ total });
+	} catch (error) {
+		console.error("Error fetching total sold equipments:", error);
+		res.status(500).json({ error: "Error fetching total sold equipments." });
+	}
+});
 
 
 router.get("/displayTable", async (req, res) => {

@@ -19,6 +19,7 @@ router.get("/displayTable", async (req, res) => {
       sortField = "id",
       sortOrder = "ASC",
     } = req.query;
+
     const where = {};
     const whereRepairStatus = {};
     const whereModel = {};
@@ -28,14 +29,17 @@ router.get("/displayTable", async (req, res) => {
         sequelize.cast(sequelize.col("Repair.id"), "varchar"),
         { [Op.iLike]: `${id}%` }
       );
+
     if (createdAt) {
       where.createdAt = {
         [Op.gte]: new Date(createdAt),
         [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
       };
     }
+
     if (state) whereRepairStatus.state = { [Op.iLike]: `%${state}%` };
     if (modelName) whereModel.name = { [Op.iLike]: `%${modelName}%` };
+
     if (employeeName) {
       where[Op.and] = Sequelize.where(
         Sequelize.fn(
@@ -49,6 +53,7 @@ router.get("/displayTable", async (req, res) => {
         }
       );
     }
+
     if (clientName) {
       where[Op.and] = Sequelize.where(
         Sequelize.fn(
@@ -62,9 +67,10 @@ router.get("/displayTable", async (req, res) => {
         }
       );
     }
-    
+
     const offset = (parseInt(page) - 1) * parseInt(pageSize);
     const orderClause = [];
+
     if (sortField) {
       orderClause.push([
         Sequelize.col(sortField),
@@ -89,17 +95,12 @@ router.get("/displayTable", async (req, res) => {
           attributes: ["firstName", "lastName"],
         },
         {
-          model: models.UsedEquipment,
+          model: models.EquipmentSheet,
           include: [
             {
-              model: models.EquipmentSheet,
-              include: [
-                {
-                  model: models.EquipmentModel,
-                  attributes: ["name"],
-                  where: whereModel
-                }
-              ]
+              model: models.EquipmentModel,
+              attributes: ["name"],
+              where: whereModel
             }
           ]
         }
@@ -110,15 +111,16 @@ router.get("/displayTable", async (req, res) => {
     });
 
     const formattedData = rows
-    .filter(item => item.UsedEquipment?.EquipmentSheet?.EquipmentModel)
-    .map((item) => ({
-      id: item.id,
-      employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
-      clientName: item.Client?.firstName + " " + item.Client?.lastName,
-      state: item.RepairStatus?.state,
-      modelName: item.UsedEquipment.EquipmentSheet.EquipmentModel.name,
-      createdAt: item.createdAt,
-    }));
+      .filter(item => item.EquipmentSheet?.EquipmentModel)
+      .map((item) => ({
+        id: item.id,
+        employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
+        clientName: item.Client?.firstName + " " + item.Client?.lastName,
+        state: item.RepairStatus?.state,
+        modelName: item.EquipmentSheet.EquipmentModel.name,
+        equipmentSheetID: item.equipmentSheetID,
+        createdAt: item.createdAt,
+      }));
 
     res.status(200).json({
       totalItems: count,
@@ -128,10 +130,11 @@ router.get("/displayTable", async (req, res) => {
       data: formattedData,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Error fetching brands." });
+    console.error("Erro no endpoint /displayTable:", error);
+    res.status(500).json({ error: "Error fetching repairs." });
   }
 });
+
 
 router.get("/displayTable/:clientNIC", async (req, res) => {
   try {
@@ -154,9 +157,9 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
     };
 
     if(activeRepairs === "true"){
-      where.statusID = { [Op.ne]: 5 }
+      where.statusID = { [Op.ne]: 2 }
     }else{
-      where.statusID = { [Op.eq]: 5 }
+      where.statusID = { [Op.eq]: 2 }
     }
 
     const whereRepairStatus = {};
@@ -211,17 +214,12 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
           attributes: ["firstName", "lastName"],
         },
         {
-          model: models.UsedEquipment,
+          model: models.EquipmentSheet,
           include: [
             {
-              model: models.EquipmentSheet,
-              include: [
-                {
-                  model: models.EquipmentModel,
-                  attributes: ["name"],
-                  where: whereModel
-                }
-              ]
+              model: models.EquipmentModel,
+              attributes: ["name"],
+              where: whereModel
             }
           ]
         }
@@ -232,13 +230,12 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
     });
 
     const formattedData = rows
-      .filter(item => item.UsedEquipment?.EquipmentSheet?.EquipmentModel)
+      .filter(item => item.EquipmentSheet?.EquipmentModel)
       .map((item) => ({
         id: item.id,
         employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
         state: item.RepairStatus?.state,
-        modelName: item.UsedEquipment.EquipmentSheet.EquipmentModel.name,
-        createdAt: item.createdAt,
+        modelName: item.EquipmentSheet.EquipmentModel.name,
       }));
 
     res.status(200).json({
@@ -272,6 +269,7 @@ router.post("/", async (req, res) => {
 			statusID,
 			description,
 			budget,
+      currentCost: 0,
 			estimatedDeliverDate,
 			employeeId,
 			clientId,

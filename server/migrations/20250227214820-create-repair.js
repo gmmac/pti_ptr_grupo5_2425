@@ -25,6 +25,9 @@ module.exports = {
       budget: {
         type: Sequelize.FLOAT,
       },
+      currentCost: {
+        type: Sequelize.FLOAT,
+      },
       estimatedDeliverDate: {
         type: Sequelize.DATE,
       },
@@ -48,12 +51,12 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
-      usedEquipmentId: {
-        type: Sequelize.INTEGER,
+      equipmentSheetID: {
+        type: Sequelize.STRING(20),
         allowNull: false,
         references: {
-          model: "UsedEquipments",
-          key: "id",
+          model: "EquipmentSheets",
+          key: "barcode",
         },
         onUpdate: "CASCADE",
         onDelete: "SET NULL",

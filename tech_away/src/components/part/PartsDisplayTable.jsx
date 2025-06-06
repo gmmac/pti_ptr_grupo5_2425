@@ -2,22 +2,20 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Menu } from "primereact/menu";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import api from "../../utils/axios";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
-import RepairInfo from "../repair/RepairInfo";
-import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
+import NewPartForms from "../repair/NewPartForms";
 
-export default function ClientRepairsCatalog({activeRepairs}) {
+export default function PartsDisplayTable({activeParts = "1", refreshAllTables=null}) {
 	const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [showRepairInfo, setShowRepairInfo] = useState(false);
-    const [repairID, setRepairID] = useState(null);
-    const {user} = useAuth();
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [partID, setPartID] = useState(0);
+    const handleClose = () => setShowEditModal(false);
 
     const [lazyState, setLazyState] = useState({
         first: 0,
@@ -27,10 +25,9 @@ export default function ClientRepairsCatalog({activeRepairs}) {
         sortOrder: null,
         filters: {
 			'id': { value: '', matchMode: 'contains' },
-            'employeeName': { value: '', matchMode: 'contains' },
-            'description': { value: '', matchMode: 'contains' },
-            'state': { value: '', matchMode: 'contains' },
-            'modelName': { value: '', matchMode: 'contains' },
+            'name': { value: '', matchMode: 'contains' },
+            'price': { value: '', matchMode: 'equals' },
+            'arriveTime': { value: '', matchMode: 'equals' },
             'createdAt': { value: '', matchMode: 'equals' },
 		}
     });
@@ -41,7 +38,6 @@ export default function ClientRepairsCatalog({activeRepairs}) {
 	const dateFields = ['createdAt', 'updatedAt'];
 
     useEffect(() => {
-        console.log("A carregar repairs ativas")
         loadLazyData();
     }, [lazyState]);
 
@@ -70,13 +66,12 @@ export default function ClientRepairsCatalog({activeRepairs}) {
         }
 
         // Faz a requisição ao backend
-        api.get(`/api/repair/displayTable/${user?.nic}`, { params: { ...params, activeRepairs: activeRepairs } }).then((res) => {
+        api.get("/api/part/", { params: { ...params, active: activeParts } }).then((res) => {
             const responseData = res.data;
             if (responseData.data.length > 0) {
                 const allColumns = Object.keys(responseData.data[0]);
                 setData(responseData.data);
                 setColumns(allColumns);
-                console.log("data: ", responseData.data)
             } else {
                 setData([]);
             }
@@ -101,14 +96,29 @@ export default function ClientRepairsCatalog({activeRepairs}) {
         setLazyState(event);
     };
 
-    const openRepairInfo = (repairID) => {
-        setShowRepairInfo(true);
-        setRepairID(repairID);
+    const handleEdit = (PartData) => {
+        setPartID(PartData.id);
+        setShowEditModal(true);
+    };
+
+    const confirmDelete = (id) => {
+        confirmDialog({
+            message: (<> Are you sure you want to {activeParts == "1" ? "delete" : "restore"} this part?<br />This action can erase other items associated with this part.</>),
+            header: "Confirmation",
+            icon: "pi pi-exclamation-triangle",
+            accept: () => handleDelete(id),
+        });
+    };
+
+    const handleDelete = (id) => {
+        api.patch(`/api/part/activation/${id}`).then(() => {
+            loadLazyData(); 
+            refreshAllTables();
+        });
     };
 
     return (
         <>
-            <ConfirmDialog />
             <div className="">
                 <DataTable
                     value={data}
@@ -169,6 +179,14 @@ export default function ClientRepairsCatalog({activeRepairs}) {
                             filterPlaceholder={dateFields.includes(column) ? undefined : "Search"}
                             body={(rowData) => {
 								const value = rowData[column];
+                                if (column === 'arriveTime' && value !== null && value !== undefined) {
+                                    return `${value} Days`;
+                                }
+
+                                if (column === 'price' && value !== null && value !== undefined) {
+                                    return `${value} €`;
+                                }
+
 								if (typeof value === "object" && value !== null) {
                                     const firstTextField = Object.values(value).find(val => typeof val === "string" || typeof val === "number");
                                     return firstTextField ?? "N/A";
@@ -192,28 +210,43 @@ export default function ClientRepairsCatalog({activeRepairs}) {
                         body={(rowData, options) => {
                             const menuItems = [
                                 {
-                                    label: "See Details",
-                                    icon: "pi pi-info-circle",
-                                    command: () => openRepairInfo(rowData.id),
+
                                 },
                             ];
                             return (
-                                <>
-                                    <Menu
-                                        model={menuItems}
-                                        popup
-                                        ref={(el) => (menuRefs.current[options.rowIndex] = el)}
-                                    />
+                                <div style={{ display: "flex", gap: "0.3rem", justifyContent: "center" }}>
+                                    {activeParts=="1" ? 
+                                        <>
+                                            <Button
+                                                icon="pi pi-pencil"
+                                                rounded
+                                                text
+                                                severity="secondary"
+                                                aria-label="Edit"
+                                                className="custom-icon-button"
+                                                onClick={() => handleEdit(rowData)}
+                                            />
+                                            <Button
+                                                icon="pi pi-trash"
+                                                text
+                                                severity="danger"
+                                                label="Delete"
+                                                style={{color: "var(--danger)"}}
+                                                className="custom-icon-button-withtext"
+                                                onClick={() => confirmDelete(rowData.id)}
+                                            /> 
+                                        </> : 
                                     <Button
-                                        icon="pi pi-ellipsis-v"
+                                        icon="pi pi-history"
                                         text
-                                        severity="secondary"
-                                        onClick={(e) =>
-                                            menuRefs.current[options.rowIndex].toggle(e)
-                                        }
-                                        className="rounded-5"
+                                        severity="success"
+                                        label="Restore"
+                                        style={{color: "var(--valid)"}}
+                                        className="custom-icon-button-withtext"
+                                        onClick={() => confirmDelete(rowData.id)}
                                     />
-                                </>
+                                    }
+                                </div>
                             );
                         }}
                     />
@@ -283,7 +316,7 @@ export default function ClientRepairsCatalog({activeRepairs}) {
 						`}
 				</style>
             </div>
-            <RepairInfo repairID={repairID} show={showRepairInfo} onClose={() => setShowRepairInfo(false)}/>
+            <NewPartForms partID={partID} showModal={showEditModal} closeModal={handleClose} refreshTable={refreshAllTables}/>
         </>
     );
 }
