@@ -82,7 +82,7 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
         hasError = true;
       }
       if (field === "budget" && isNaN(repairInfo[field])) {
-        newErrors[field] = "Orçamento inválido";
+        newErrors[field] = "Invalid budget";
         hasError = true;
       }
     }

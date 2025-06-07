@@ -74,7 +74,7 @@ export default function LoginForms({
 		} else if (name == "email") {
 			const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 			if (!emailPattern.test(value)) {
-				newErrors[name] = "O email deve ser válido";
+				newErrors[name] = "Email must be valid";
 			} else {
 				newErrors[name] = "";
 			}

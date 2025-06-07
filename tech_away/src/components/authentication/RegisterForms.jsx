@@ -52,22 +52,22 @@ export default function RegisterForms({ userType = "client" }) {
 		const numbers = /[0-9]/;
 
 		if (password.length < minLength) {
-			errors.push("ter pelo menos 8 caracteres");
+			errors.push("have at least 8 characters");
 		}
 		if (!specialChars.test(password)) {
-			errors.push("conter pelo menos um caractere especial (@#$%^&*)");
+			errors.push("contain at least one special character (@#$%^&*)");
 		}
 		if (!lowerCase.test(password)) {
-			errors.push("conter pelo menos uma letra minúscula");
+			errors.push("contain at least one lowercase letter");
 		}
 		if (!upperCase.test(password)) {
-			errors.push("conter pelo menos uma letra maiúscula");
+			errors.push("contain at least one capital letter");
 		}
 		if (!numbers.test(password)) {
-			errors.push("conter pelo menos um número");
+			errors.push("contain at least one number");
 		}
 
-		return errors.length > 0 ? `A senha deve ${errors.join(", ")}.` : "";
+		return errors.length > 0 ? `The password must ${errors.join(", ")}.` : "";
 	};
 
 	const handleSubmit = async (e) => {
@@ -116,7 +116,7 @@ export default function RegisterForms({ userType = "client" }) {
 				if (response.data.errorTag) {
 					let newErrors = { ...errors };
 					newErrors[response.data.errorTag] =
-						"Já existe um utilizador com este " + response.data.errorTag;
+						"There is already a user with this " + response.data.errorTag;
 					setErrors(newErrors);
 				} else {
 					await api.post("/api/auth/register", {
@@ -144,7 +144,7 @@ export default function RegisterForms({ userType = "client" }) {
 			const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 			newErrors[name] = emailPattern.test(value)
 				? ""
-				: "O email deve ser válido";
+				: "Email must be valid";
 		} else if (name === "password") {
 			newErrors[name] = validatePassword(value);
 		} else if (name === "birthDate") {
@@ -157,7 +157,7 @@ export default function RegisterForms({ userType = "client" }) {
 					today.getDate() >= birthDate.getDate());
 
 			if (age < 16 || (age === 16 && !isBirthdayPassed)) {
-				newErrors[name] = "Deves ter pelo menos 16 anos para criar uma conta.";
+				newErrors[name] = "You must be at least 16 years old to create an account.";
 			} else {
 				newErrors[name] = "";
 			}
