@@ -14,7 +14,7 @@ export default function DisplayTablePurchases({ refreshTable, onlyMyPurchases, s
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [show, setShow] = useState(false);
-  const [purchaseData, setPurchaseData] = useState({});
+  const [purchaseID, setPurchaseID] = useState(null);
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const dateFields = ["createdAt", "updatedAt"];
@@ -122,7 +122,7 @@ export default function DisplayTablePurchases({ refreshTable, onlyMyPurchases, s
   };
 
   const onEditClick = (rowData) => {
-    setPurchaseData(rowData);
+    setPurchaseID(rowData.id);
     setShow(true);
   };
 
@@ -236,7 +236,7 @@ export default function DisplayTablePurchases({ refreshTable, onlyMyPurchases, s
         show={show}
         handleClose={() => setShow(false)}
         setRefreshPurchases={() => loadLazyData()}
-        purchaseData={purchaseData}
+        purchaseID={purchaseID}
       />
     </>
   );

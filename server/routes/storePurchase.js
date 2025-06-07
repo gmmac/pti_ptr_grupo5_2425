@@ -5,7 +5,6 @@ const { Op, Sequelize } = require("sequelize");
 const { sequelize } = require("../models/index");
 
 router.get("/", async (req, res) => {
-  console.log('employeeInfo cookie:', req.cookies.employeeInfo);
   try {
     const {
       id,
@@ -180,6 +179,71 @@ router.get("/", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error fetching purchases." });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Busca a compra
+    const purchase = await models.StorePurchase.findByPk(id);
+
+    if (!purchase) {
+      return res.status(404).json({ error: "Purchase not found." });
+    }
+
+    // Busca os dados do equipamento usado vinculado à compra
+    const usedEquipment = await models.UsedEquipment.findByPk(purchase.usedEquipmentID, {
+      attributes: ["statusID", "equipmentId"]
+    });
+
+    // Monta a resposta com dados extras do equipamento
+    const response = {
+      ...purchase.toJSON(),
+      statusID: usedEquipment?.statusID || null,
+      equipmentID: usedEquipment?.equipmentId || null
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("Error in GET /:id", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { statusID, price, clientNic, equipmentBarcode } = req.body;
+
+    // 1. Verifica se a compra existe
+    const purchase = await models.StorePurchase.findByPk(id);
+    if (!purchase) {
+      return res.status(404).json({ error: "Purchase not found." });
+    }
+
+    // 2. Atualiza a compra
+    await purchase.update({
+      clientNIC: clientNic,
+      purchasePrice: price,
+      updatedAt: new Date()
+    });
+
+    // 3. Atualiza o equipamento usado
+    const usedEquipment = await models.UsedEquipment.findByPk(purchase.usedEquipmentID);
+    if (usedEquipment) {
+      await usedEquipment.update({
+        statusID: statusID,
+        equipmentId: equipmentBarcode,
+        updatedAt: new Date()
+      });
+    }
+
+    return res.status(200).json({ message: "Purchase updated successfully." });
+  } catch (error) {
+    console.error("Error in PUT /:id", error);
+    return res.status(500).json({ error: "Internal server error." });
   }
 });
 

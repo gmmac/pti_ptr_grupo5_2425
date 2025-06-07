@@ -4,7 +4,7 @@ import api from '../../utils/axios';
 import ClientCatalogModal from './ClientCatalogModal';
 import EquipmentCatalogModal from './EquipmentCatalogModal';
 
-export default function StorePurchaseForms({ show, handleClose, setRefreshPurchases, purchaseData }) {
+export default function StorePurchaseForms({ show, handleClose, setRefreshPurchases, purchaseID }) {
     const [form, setForm] = useState({
         statusID: '',
         price: '',
@@ -64,15 +64,27 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
 
     // Preencher formulário em modo edição
     useEffect(() => {
-        if (purchaseData) {
-            setForm({
-                statusID: '', // você pode adicionar isso se o estado estiver disponível em purchaseData
-                price: purchaseData.purchasePrice || '',
-                clientNic: '', // preencher se disponível
-                equipmentBarcode: '', // preencher se disponível
+    if (purchaseID != null) {
+        api.get(`/api/storePurchase/${purchaseID}`)
+            .then(res => {
+                const data = res.data;
+
+                setForm({
+                    statusID: data.statusID || '',
+                    price: data.purchasePrice || '',
+                    clientNic: data.clientNIC || '',
+                    equipmentBarcode: data.equipmentID || '',
+                });
+
+                // Opcional: preencher clientData e equipmentData com mais detalhes, se desejar
+            })
+            .catch(err => {
+                console.error("Erro ao buscar dados da compra:", err.message);
+                setError("Erro ao carregar os dados da compra.");
             });
         }
-    }, [purchaseData]);
+    }, [purchaseID, successMessage]);
+
 
     const handleSelectClient = (client) => {
         if (client) {
@@ -138,19 +150,9 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
             return;
         }
 
-        if (!equipmentList.includes(form.equipmentBarcode)) {
-            setError("Não existe nenhum equipamento com o Código de barras fornecido.");
-            return;
-        }
-
-        if (!clientList.includes(form.clientNic)) {
-            setError("Não existe nenhum cliente com o NIC fornecido.");
-            return;
-        }
-
         try {
-            if (purchaseData) {
-                await api.put(`/api/storePurchase/${purchaseData.id}`, form);
+            if (purchaseID) {
+                await api.put(`/api/storePurchase/${purchaseID}`, form);
                 setSuccessMessage("Venda atualizada com sucesso!");
             } else {
                 await api.post('/api/storePurchase', form);
@@ -185,7 +187,7 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
         <>
             <Modal show={show} onHide={handleClose} size="lg" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>{purchaseData ? "Edit purchase" : "New purchase"}</Modal.Title>
+                    <Modal.Title>{purchaseID ? "Edit purchase" : "New purchase"}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
@@ -239,7 +241,7 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                         {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
                         <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg">
-                            {purchaseData ? "Salvar Alterações" : "Registar Venda"}
+                            {purchaseID ? "Salvar Alterações" : "Registar Venda"}
                         </Button>
                     </Form>
                 </Modal.Body>
