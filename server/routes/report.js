@@ -300,5 +300,97 @@ router.get('/projects', async (req, res, next) => {
   }
 });
 
+router.get('/interests', async (req, res, next) => {
+  try {
+    const { Interest, FolderInterest, EquipmentSheet, EquipmentModel, EquipmentType } = models;
+
+    // Total de interesses
+    const totalInterests = await Interest.count();
+
+    // Total de InterestsFolder
+    const totalFolderInterests = await FolderInterest.count();
+
+    // Interesses por tipo de equipamento
+    const interestsByType = await Interest.findAll({
+      attributes: [
+        [fn('COUNT', col('Interest.id')), 'interestCount'],
+        [col('equipmentSheet.EquipmentType.name'), 'typeName']
+      ],
+      include: [{
+        model: EquipmentSheet,
+        as: 'equipmentSheet', // este precisa existir no model Interest
+        attributes: [],
+        include: [{
+          model: EquipmentType, // sem alias personalizado
+          attributes: []
+        }]
+      }],
+      group: ['equipmentSheet.EquipmentType.name'],
+      raw: true
+    });
+
+    // Interesses por equipamento específico (EquipmentSheet)
+    const interestsByEquipment = await Interest.findAll({
+      attributes: [
+        [fn('COUNT', col('Interest.id')), 'interestCount'],
+        [col('equipmentSheet.barcode'), 'equipmentBarcode']
+      ],
+      include: [{
+        model: EquipmentSheet,
+        as: 'equipmentSheet',
+        attributes: []
+      }],
+      group: ['equipmentSheet.barcode'],
+      raw: true
+    });
+
+    // Interesses por modelo
+    const interestsByModel = await Interest.findAll({
+      attributes: [
+        [fn('COUNT', col('Interest.id')), 'interestCount'],
+        [col('equipmentSheet.EquipmentModel.name'), 'modelName']
+      ],
+      include: [{
+        model: EquipmentSheet,
+        as: 'equipmentSheet',
+        attributes: [],
+        include: [{
+          model: EquipmentModel, // sem alias
+          attributes: []
+        }]
+      }],
+      group: ['equipmentSheet.EquipmentModel.name'],
+      raw: true
+    });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const interestsToday = await Interest.count({
+      where: {
+        createdAt: {
+          [Op.gte]: today,
+          [Op.lt]: tomorrow
+        }
+      }
+    });
+
+    return res.json({
+      totalInterests,
+      totalFolderInterests,
+      interestsByType,
+      interestsByEquipment,
+      interestsByModel,
+      interestsToday
+    });
+
+  } catch (err) {
+    return next(err);
+  }
+});
+
 
 module.exports = router;

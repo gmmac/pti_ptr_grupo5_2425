@@ -5,6 +5,7 @@ import { Container, Alert, Spinner } from 'react-bootstrap';
 import RepairsReport from '../components/reports/RepairsReport';
 import SalesReport from '../components/reports/SalesReport';
 import ProjectReport from '../components/reports/ProjectReport';
+import InterestsReport from '../components/reports/InterestsReport';
 
 export default function ReportPage() {
   const { type } = useParams();
@@ -16,8 +17,10 @@ export default function ReportPage() {
         return <SalesReport reportType={type} handleChangePage={handleChangePage} />;
       case 'repairs':
         return <RepairsReport reportType={type} handleChangePage={handleChangePage} />;
-    case 'charityProjects':
+      case 'charityProjects':
         return <ProjectReport reportType={type} handleChangePage={handleChangePage} />;
+      case 'interests':
+        return <InterestsReport reportType={type} handleChangePage={handleChangePage} />;
       default:
         return (
           <Alert variant="warning">
