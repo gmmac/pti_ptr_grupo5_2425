@@ -2,9 +2,11 @@ import React, { useContext } from "react";
 import { Stack } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { IsMobileContext } from "../../contexts/IsMobileContext";
+import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 
 export default function DivJoin() {
 	const isMobile = useContext(IsMobileContext);
+	const { user } = useAuth();
 
 	return (
 		<Stack
@@ -17,7 +19,10 @@ export default function DivJoin() {
 			}`}
 		>
 			<p className="fs-3 text-center">100k + people joined the plataform</p>
-			<Link style={{ textDecoration: "none" }}>
+			<Link
+				style={{ textDecoration: "none" }}
+				to={user ? "/profile" : "/register"}
+			>
 				<Stack
 					direction="horizontal"
 					gap={2}

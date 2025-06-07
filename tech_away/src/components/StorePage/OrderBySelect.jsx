@@ -29,7 +29,7 @@ export default function OrderBySelect({
 				type="button"
 				style={{
 					backgroundColor: value ? "var(--variant-one)" : "var(--light-grey)",
-					color: "var(--dark-grey)",
+					color: value ? "var(--white)" : "var(--dark-grey)",
 					border: "none",
 					boxShadow: "var(--shadow-default)",
 				}}

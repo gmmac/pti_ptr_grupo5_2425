@@ -24,7 +24,7 @@ export default function DivOurServices() {
 				}}
 				className="m-0 fs-3"
 			>
-				Our Services
+				Our Services in Store
 			</h3>
 			<Stack gap={3}>
 				<Stack

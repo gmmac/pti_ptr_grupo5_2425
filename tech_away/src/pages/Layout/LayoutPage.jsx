@@ -8,6 +8,8 @@ import BottomNavBar from "../../components/Navbar/BottomNavBar";
 import LoggedInNavBar from "../../components/Navbar/LoggedInNavBar";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 import { CartProvider } from "../../contexts/CartProvider";
+import InterestsProvider from "../../contexts/InterestsProvider";
+
 function LayoutPage() {
 	const isMobile = useContext(IsMobileContext);
 	const { user, isUserLoggedIn } = useAuth();
@@ -41,9 +43,11 @@ function LayoutPage() {
 		>
 			<CartProvider>
 				{renderNavBar()}
-				<div className="flex-grow-1 overflow-auto">
-					<Outlet />
-				</div>
+				<InterestsProvider>
+					<div className="flex-grow-1 overflow-auto">
+						<Outlet />
+					</div>
+				</InterestsProvider>
 			</CartProvider>
 		</Stack>
 	);

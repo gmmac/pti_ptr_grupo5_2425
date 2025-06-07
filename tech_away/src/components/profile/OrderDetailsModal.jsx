@@ -117,7 +117,7 @@ export default function OrderDetailsModal({
 								direction="horizontal"
 								className="justify-content-between align-items-center"
 								style={{
-									backgroundColor: "#eae6f0",
+									backgroundColor: "var(--variant-two-light)",
 									padding: "20px",
 									borderRadius: "16px",
 									marginBottom: "10px",

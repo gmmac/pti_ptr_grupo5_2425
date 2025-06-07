@@ -26,7 +26,7 @@ export default function CartMobilePage() {
 
   return (
     <>
-      <Container style={{ fontFamily: "var(--body-font)" }}>
+      <Container style={{ fontFamily: "var(--body-font)" }} className="mb-navbar">
         <Stack direction="vertical" gap={4}>
           <Stack
             direction="horizontal"

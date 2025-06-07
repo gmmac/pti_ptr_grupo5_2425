@@ -7,6 +7,7 @@ const SmNavBar = () => {
 		<Navbar
 			style={{
 				backgroundColor: "var(--light-grey)",
+				boxShadow: "var(--shadow-default)",
 			}}
 		>
 			<Container>
