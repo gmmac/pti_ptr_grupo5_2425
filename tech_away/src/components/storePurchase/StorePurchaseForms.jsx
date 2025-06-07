@@ -42,7 +42,7 @@ export default function StorePurchaseForms({show, handleClose, setRefreshPurchas
 
     useEffect(() => {
         api.get(`/api/equipmentStatus/`)
-            .then(res => setStatusList(res.data))
+            .then(res => setStatusList(res.data.data))
             .catch(error => console.error('Erro ao buscar estados:', error.message));
     }, []);
 

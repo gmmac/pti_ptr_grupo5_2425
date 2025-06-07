@@ -57,7 +57,7 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
 
     let newErrors = { ...errors };
 
-    if (!value && !["address", "latitude", "longitude"].includes(field)) {
+    if (!value && !["phone", "email", "birthDate", "gender", "address", "latitude", "longitude"].includes(field)) {
         newErrors[field] = "This field is required";
     } else if (field === 'birthDate') {
         const birthDate = new Date(value);
@@ -72,8 +72,10 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
         } else {
             newErrors[field] = '';
         }
-    } else if (field === 'phone' && value.length !==9) {
+    } else if (value && field === 'phone' && value.length !==9) {
         newErrors[field] = "Phone number must be 9 digits.";
+    } else if (field === "address" && value && value.length > 50){
+        newErrors[field] = "Address cannot exceed 50 characters.";
     }
     else {
         newErrors[field] = null;
@@ -89,30 +91,44 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
     let hasError = false;
     let newErrors = {};
 
+    const requiredFields = ["firstName", "lastName", "nic", "nif"];
+
     Object.keys(editedClient).forEach((field) => {
-        if (!editedClient[field] &&
-        !["address", "latitude", "longitude"].includes(field)) {
+      const value = editedClient[field];
+
+        if (requiredFields.includes(field)) {
+          if (value === null || value === '' || value === undefined) {
             newErrors[field] = "This field is required";
             hasError = true;
+          }
         }
-        if (field === 'birthDate') {
-            const birthDate = new Date(editedClient[field]);
+
+        if (field === 'birthDate' && value) {
+          const birthDate = new Date(value);
+          if (!isNaN(birthDate)) {
             const today = new Date();
             const age = today.getFullYear() - birthDate.getFullYear();
             const isBirthdayPassed =
-                today.getMonth() > birthDate.getMonth() ||
-                (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-    
+              today.getMonth() > birthDate.getMonth() ||
+              (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+
             if (age < 16 || (age === 16 && !isBirthdayPassed)) {
-                newErrors[field] = "The client must be at least 16 years old.";
-                hasError = true;
+              newErrors[field] = "The client must be at least 16 years old.";
+              hasError = true;
             } else {
                 newErrors[field] = null;
             }
+          }
         }
-        if (field === "phone" && editedClient[field].length !== 9) {
-            newErrors[field] = "Phone number must be 9 digits.";
-            hasError = true;
+
+        if (value && field === "phone" && value.length !== 9) {
+          newErrors[field] = "Phone number must be 9 digits.";
+          hasError = true;
+        }
+
+        if (value && field === "address" && value.length > 50) {
+          newErrors[field] = "Address cannot exceed 50 characters.";
+          hasError = true;
         }
     });
 
@@ -364,6 +380,11 @@ export default function ClientManageDetailsModal({ clientNIC, showModal, closeMo
                   <Form.Control.Feedback type="invalid">
                     {errors.address}
                   </Form.Control.Feedback>
+                  <div className="text-end">
+                    <small className="text-muted">
+                      {editedClient.address?.length || 0}/50
+                    </small>
+                  </div>
                 </>
               )}
             </div>
