@@ -72,7 +72,7 @@ export default function ClientInfo({ userType = "client" }) {
 
 		let newErrors = { ...errors };
 		if (!value) {
-			newErrors[name] = "Este campo é obrigatório";
+			newErrors[name] = "This field is mandatory";
 		} else if (name === "birthDate") {
 			const birthDate = new Date(value);
 			const today = new Date();

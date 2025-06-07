@@ -79,7 +79,7 @@ export default function RegisterForms({ userType = "client" }) {
 
 		Object.keys(formData).forEach((field) => {
 			if (!formData[field]) {
-				newErrors[field] = "Este campo é obrigatório";
+				newErrors[field] = "This field is mandatory";
 				hasError = true;
 			} else {
 				newErrors[field] = ""; // Limpa erro se o campo não estiver vazio
@@ -139,7 +139,7 @@ export default function RegisterForms({ userType = "client" }) {
 		let newErrors = { ...errors };
 
 		if (!value) {
-			newErrors[name] = "Este campo é obrigatório";
+			newErrors[name] = "This field is mandatory";
 		} else if (name === "email") {
 			const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 			newErrors[name] = emailPattern.test(value)
@@ -197,7 +197,7 @@ export default function RegisterForms({ userType = "client" }) {
 								isInvalid={!!errors.firstName}
 							/>
 							<Form.Control.Feedback type="invalid">
-								{errors.name}
+								{errors.firstName}
 							</Form.Control.Feedback>
 						</Form.Group>
 					</Col>
