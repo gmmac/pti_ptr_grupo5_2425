@@ -52,22 +52,22 @@ export default function RegisterForms({ userType = "client" }) {
 		const numbers = /[0-9]/;
 
 		if (password.length < minLength) {
-			errors.push("have at least 8 characters");
+			errors.push("Have at least 8 characters");
 		}
 		if (!specialChars.test(password)) {
-			errors.push("contain at least one special character (@#$%^&*)");
+			errors.push("Contain at least one special character (@#$%^&*)");
 		}
 		if (!lowerCase.test(password)) {
-			errors.push("contain at least one lowercase letter");
+			errors.push("Contain at least one lowercase letter");
 		}
 		if (!upperCase.test(password)) {
-			errors.push("contain at least one capital letter");
+			errors.push("Contain at least one capital letter");
 		}
 		if (!numbers.test(password)) {
-			errors.push("contain at least one number");
+			errors.push("Contain at least one number");
 		}
 
-		return errors.length > 0 ? `The password must ${errors.join(", ")}.` : "";
+		return errors.length > 0 ? `The password must:\n${errors.join("\n")}` : "";
 	};
 
 	const handleSubmit = async (e) => {
@@ -375,7 +375,7 @@ export default function RegisterForms({ userType = "client" }) {
 						onChange={handleChange}
 						isInvalid={!!errors.password}
 					/>
-					<Form.Control.Feedback type="invalid">
+					<Form.Control.Feedback type="invalid" style={{ whiteSpace: "pre-line" }}>
 						{errors.password}
 					</Form.Control.Feedback>
 				</Form.Group>
