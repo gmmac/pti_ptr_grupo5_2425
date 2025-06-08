@@ -326,21 +326,7 @@ router.get('/interests', async (req, res, next) => {
         }]
       }],
       group: ['equipmentSheet.EquipmentType.name'],
-      raw: true
-    });
-
-    // Interesses por equipamento específico (EquipmentSheet)
-    const interestsByEquipment = await Interest.findAll({
-      attributes: [
-        [fn('COUNT', col('Interest.id')), 'interestCount'],
-        [col('equipmentSheet.barcode'), 'equipmentBarcode']
-      ],
-      include: [{
-        model: EquipmentSheet,
-        as: 'equipmentSheet',
-        attributes: []
-      }],
-      group: ['equipmentSheet.barcode'],
+      order: [[fn('COUNT', col('Interest.id')), 'DESC']],
       raw: true
     });
 
@@ -360,6 +346,7 @@ router.get('/interests', async (req, res, next) => {
         }]
       }],
       group: ['equipmentSheet.EquipmentModel.name'],
+      order: [[fn('COUNT', col('Interest.id')), 'DESC']],
       raw: true
     });
 
@@ -382,7 +369,6 @@ router.get('/interests', async (req, res, next) => {
       totalInterests,
       totalFolderInterests,
       interestsByType,
-      interestsByEquipment,
       interestsByModel,
       interestsToday
     });

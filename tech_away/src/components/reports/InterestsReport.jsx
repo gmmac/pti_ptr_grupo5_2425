@@ -45,13 +45,6 @@ export default function InterestsReport({ reportType = 'projects', handleChangeP
             TotalInterests: d.interestCount
           }));
         }
-    
-        if (report.interestsByEquipment?.length) {
-          sheets['InterestsByEquipmentSheet'] = report.interestsByEquipment.map(d => ({
-            EquipmentBarcode: d.equipmentBarcode,
-            TotalInterests: d.interestCount
-          }));
-        }
 
         sheets['SimpleStatistics'] = [{
             TotalInterests: report.totalInterests,
@@ -132,15 +125,6 @@ export default function InterestsReport({ reportType = 'projects', handleChangeP
                 columns={[
                     { key: 'modelName', label: 'Store'    },
                     { key: 'interestCount', label: 'Total Interests' }
-                ]}
-            />
-
-            <ReportSection
-                title="Interests by Equipment Sheet"
-                data={report.interestsByEquipment}
-                columns={[
-                    { key: 'equipmentBarcode',        label: 'equipmentBarcode'  },
-                    { key: 'interestCount', label: 'Total Interests'   }
                 ]}
             />
         </div>
