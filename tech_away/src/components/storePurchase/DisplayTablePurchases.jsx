@@ -101,7 +101,7 @@ export default function DisplayTablePurchases({refreshTable}) {
 
     return (
         <>
-            <ConfirmDialog />
+            {/* <ConfirmDialog /> */}
             <div className="">
                 <DataTable
                     value={data}

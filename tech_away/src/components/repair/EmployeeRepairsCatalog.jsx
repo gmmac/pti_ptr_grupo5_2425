@@ -9,7 +9,6 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
-import RepairInfo from "./RepairInfo";
 import NewRepairStatusLog from "./NewRepairStatusLog";
 import EditRepairForms from "./EditRepairForms";
 import OrderPartsForms from "../part/OrderPartsForms";
