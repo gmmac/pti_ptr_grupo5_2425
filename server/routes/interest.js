@@ -53,6 +53,17 @@ router.get("/:userNic/:folderId", async (req, res) => {
 						as: "equipmentStatus",
 						attributes: ["id", "state"],
 					},
+					{
+						 model: models.PreferredStoresInterets,
+							as: "preferredStores",
+							include: [
+								{
+								model: models.Store,
+								as: "store",
+								attributes: ["nipc", "name", "email", "phone", "address"],
+								},
+							],
+					},
 				],
 			});
 			res.json(allInterests);
@@ -68,7 +79,7 @@ router.get("/:userNic/:folderId", async (req, res) => {
 				const interestData = await models.Interest.findOne({
 					where: {
 						id: interest.interestId,
-					},
+					},	
 					attributes: [
 						"id",
 						"equipmentSheetID",
@@ -143,21 +154,15 @@ router.post("/", async (req, res) => {
 			minPrice: minPrice || null,
 			maxPrice: maxPrice || null,
 		});
-
+		
 		if (preferredStoreIDs && Array.isArray(preferredStoreIDs)) {
 			for (const storeId of preferredStoreIDs) {
-				try {
+					console.log(storeId);
+					
 					await models.PreferredStoresInterets.create({
 						interestId: newInterest.id,
 						storeId: storeId,
 					});
-				} catch (error) {
-					console.error("Error associating store to interest:", error);
-					res
-						.status(500)
-						.json({ error: "Failed to associate store with interest" });
-					return;
-				}
 			}
 		}
 

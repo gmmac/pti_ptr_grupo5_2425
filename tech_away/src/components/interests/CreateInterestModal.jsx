@@ -138,6 +138,7 @@ export default function CreateInterestModal({ show, setShow }) {
       minPrice: formData.minPrice || null,
       maxPrice: formData.maxPrice || null,
       description: verifyInput(formData.description) || null,
+      preferredStoreIDs: formData.preferredStoreIDs.map((store) => store.nipc),
     };
   }
 

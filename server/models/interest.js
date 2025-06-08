@@ -50,6 +50,10 @@ module.exports = (sequelize, DataTypes) => {
 				onDelete: "SET NULL",
 				onUpdate: "CASCADE",
 			});
+			Interest.hasMany(models.PreferredStoresInterets, {
+  				foreignKey: 'interestId',
+  				as: 'preferredStores',
+			});
 		}
 	}
 

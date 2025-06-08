@@ -35,6 +35,8 @@ const InterestsProvider = ({ children }) => {
 
   const createGenericInterest = async (newInterest) => {
     try {
+      console.log(newInterest);
+      
       await api.post(`/api/interest`, {
         ...newInterest,
         clientNic: user.nic,
@@ -57,6 +59,8 @@ const InterestsProvider = ({ children }) => {
 
   const fetchInterests = async () => {
     try {
+      console.log(`/api/interest/${user.nic}/${folderToOpen}`);
+
       const res = await api.get(`/api/interest/${user.nic}/${folderToOpen}`);
       setLoadedInterests(res.data);
     } catch (error) {
