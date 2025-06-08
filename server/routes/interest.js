@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const models = require('../models')
 
-// filtro e paginação da interestFolder
-http://localhost:4005/api/interest/?equipmentSheetID=&folderInterestID=&orderBy=createdAt&orderDirection=ASC&page=2&pageSize=3
 router.get("/", async (req, res) => {
   try {
     const { equipmentSheetID, folderInterestID, page = 1, pageSize = 5, orderBy = "createdAt", orderDirection = "DESC" } = req.query;
