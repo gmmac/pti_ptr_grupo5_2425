@@ -1,24 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Stack } from "react-bootstrap";
 import { useInterests } from "../../contexts/InterestsProvider";
 import DetailsModal from "../interests/DetailsModal";
+import DeleteInterestModal from "../interests/DeleteInterestModal";
+import { Toast } from "primereact/toast";
 
 export default function FolderContent() {
-  const { folderToOpen, loadedInterests, fetchInterests } = useInterests();
-  const [detailsModal, setDetailsModal] = useState(false);
+  const { folderToOpen, loadedInterests, fetchInterests, deleteInterest } =
+    useInterests();
   const [selectedInterest, setSelectedInterest] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+
+  const toastRef = useRef(null);
 
   useEffect(() => {
     fetchInterests();
   }, [folderToOpen]);
 
-  const openDetailsModal = (interest) => {
-    setSelectedInterest(interest);
-    setDetailsModal(true);
+  const handleDelete = () => {
+    deleteInterest(selectedInterest.id);
+    setSelectedInterest(null); // limpa o interesse selecionado
+    toastRef.current?.show({
+      severity: "success",
+      summary: "Interest Deleted",
+      detail: "The selected interest was successfully deleted.",
+      life: 3000,
+    });
   };
 
   return (
     <>
+      <Toast ref={toastRef} />
       <Stack direction="vertical" gap={4}>
         {folderToOpen != null && (
           <Stack
@@ -54,9 +67,16 @@ export default function FolderContent() {
             >
               <Stack>
                 <p className="m-0">
-                  Interest in {interest?.model?.name}, {interest?.brand?.name},{" "}
-                  {interest?.type?.name}
+                  Interest in{" "}
+                  {[
+                    interest?.model?.name,
+                    interest?.brand?.name,
+                    interest?.type?.name,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
+
                 {interest?.preferredStores?.length > 0 && (
                   <p className="m-0 text-muted">
                     {interest.preferredStores.map((store, index) => (
@@ -75,18 +95,27 @@ export default function FolderContent() {
               <i
                 className="pi pi-external-link mt-1"
                 style={{ cursor: "pointer" }}
-                onClick={() => openDetailsModal(interest)}
+                onClick={() => {
+                  setSelectedInterest(interest);
+                  setShowDetails(true);
+                }}
               />
             </Stack>
           ))}
         </Stack>
       </Stack>
-
       {/* Modal de detalhes */}
       <DetailsModal
-        show={detailsModal}
-        setShow={setDetailsModal}
+        show={showDetails}
+        setShow={setShowDetails}
         interest={selectedInterest}
+        openDeleteModal={() => setShowDelete(true)}
+      />
+      <DeleteInterestModal
+        show={showDelete}
+        setShow={setShowDelete}
+        onConfirm={handleDelete}
+        reopenDetails={() => setShowDetails(true)}
       />
     </>
   );

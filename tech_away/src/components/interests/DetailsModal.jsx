@@ -1,7 +1,13 @@
 import React from "react";
-import { Col, Modal, Row, Stack, Button } from "react-bootstrap";
+import { Col, Modal, Row, Stack } from "react-bootstrap";
 
-export default function DetailsModal({ show, setShow, interest }) {
+export default function DetailsModal({
+  show,
+  setShow,
+  interest,
+  openDeleteModal,
+  
+}) {
   if (!interest) return null;
 
   return (
@@ -16,15 +22,12 @@ export default function DetailsModal({ show, setShow, interest }) {
           Interest Details
         </Modal.Title>
       </Modal.Header>
-
       <Modal.Body>
         <Row>
-          {/* Coluna 1: Dados principais */}
-          <Col xs={12} lg={6} className="d-flex flex-column">
+          <Col xs={12} lg={6}>
             <Stack
               direction="vertical"
-              gap={2}
-              className="p-3 "
+              className="p-3 align-items-start"
               style={{
                 backgroundColor: "var(--variant-two-light)",
                 borderRadius: "16px",
@@ -42,22 +45,19 @@ export default function DetailsModal({ show, setShow, interest }) {
               <div>
                 <strong>Preferred Stores:</strong>{" "}
                 {interest.preferredStores?.length > 0
-                  ? interest.preferredStores.map((store, index) => (
-                      <span key={index}>
-                        {store.store?.name || store.storeId}
-                        {index < interest.preferredStores.length - 1 && ", "}
+                  ? interest.preferredStores.map((s, i) => (
+                      <span key={i}>
+                        {s.store?.name || s.storeId}
+                        {i < interest.preferredStores.length - 1 && ", "}
                       </span>
                     ))
                   : "—"}
               </div>
             </Stack>
           </Col>
-
-          {/* Coluna 2: Dados complementares */}
-          <Col xs={12} lg={6} className="d-flex flex-column">
+          <Col xs={12} lg={6}>
             <Stack
               direction="vertical"
-              gap={2}
               className="p-3 align-items-start"
               style={{
                 backgroundColor: "var(--variant-two-light)",
@@ -65,12 +65,10 @@ export default function DetailsModal({ show, setShow, interest }) {
               }}
             >
               <p>
-                <strong>Min Launch Year:</strong>{" "}
-                {interest.minLaunchYear || "—"}
+                <strong>Min Year:</strong> {interest.minLaunchYear || "—"}
               </p>
               <p>
-                <strong>Max Launch Year:</strong>{" "}
-                {interest.maxLaunchYear || "—"}
+                <strong>Max Year:</strong> {interest.maxLaunchYear || "—"}
               </p>
               <p>
                 <strong>Min Price:</strong>{" "}
@@ -91,22 +89,33 @@ export default function DetailsModal({ show, setShow, interest }) {
                   : "—"}
               </p>
               <p>
-                <strong>Creation Date:</strong>{" "}
+                <strong>Created:</strong>{" "}
                 {new Date(interest.createdAt).toLocaleDateString("pt-PT")}
               </p>
             </Stack>
           </Col>
         </Row>
       </Modal.Body>
-
       <Modal.Footer>
-        <Button
-          variant="secondary"
-          onClick={() => setShow(false)}
-          className="rounded-pill px-4"
+        <p
+          className="px-4 d-flex flex-row align-items-center gap-2 text-muted"
+          style={{
+            cursor: "pointer",
+            fontSize: "14px",
+            color: "var(--dark-grey)",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "red")}
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.color = "var(--dark-grey)")
+          }
+          onClick={() => {
+            setShow(false);
+            openDeleteModal();
+          }}
         >
-          Close
-        </Button>
+          <i className="pi pi-trash" style={{ fontSize: "14px" }} />
+          <span>Delete this Interest</span>
+        </p>
       </Modal.Footer>
     </Modal>
   );

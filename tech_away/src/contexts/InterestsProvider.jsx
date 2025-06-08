@@ -36,7 +36,7 @@ const InterestsProvider = ({ children }) => {
   const createGenericInterest = async (newInterest) => {
     try {
       console.log(newInterest);
-      
+
       await api.post(`/api/interest`, {
         ...newInterest,
         clientNic: user.nic,
@@ -68,6 +68,15 @@ const InterestsProvider = ({ children }) => {
     }
   };
 
+  const deleteInterest = async (interestId) => {
+    try {
+      await api.delete(`/api/interest/${interestId}`);
+      fetchInterests();
+    } catch (error) {
+      console.error("Error deleting interest:", error);
+    }
+  };
+
   return (
     <InterestsContext.Provider
       value={{
@@ -80,6 +89,7 @@ const InterestsProvider = ({ children }) => {
         setFolderToOpen,
         createFolder,
         createGenericInterest,
+        deleteInterest
       }}
     >
       {children}
