@@ -1,59 +1,93 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Stack } from "react-bootstrap";
 import { useInterests } from "../../contexts/InterestsProvider";
+import DetailsModal from "../interests/DetailsModal";
 
 export default function FolderContent() {
   const { folderToOpen, loadedInterests, fetchInterests } = useInterests();
+  const [detailsModal, setDetailsModal] = useState(false);
+  const [selectedInterest, setSelectedInterest] = useState(null);
 
   useEffect(() => {
     fetchInterests();
-    console.log(loadedInterests);
   }, [folderToOpen]);
 
+  const openDetailsModal = (interest) => {
+    setSelectedInterest(interest);
+    setDetailsModal(true);
+  };
+
   return (
-    <Stack direction="vertical" gap={4}>
-      {folderToOpen != null && (
-        <Stack
-          direction="horizontal"
-          className="justify-content-start align-items-start flex-wrap"
-          gap={5}
-        >
-          <p className="m-0 d-flex gap-2 align-items-center">
-            <i className="pi pi-plus"></i>
-            <span>Add Interests to Folder</span>
-          </p>
-          <p className="m-0 d-flex gap-2 align-items-center">
-            <i className="pi pi-pencil"></i> <span>Edit Folder</span>
-          </p>
-          <p className="m-0 d-flex gap-2 align-items-center">
-            <i className="pi pi-trash"></i>
-            <span>Delete Folder</span>
-          </p>
-        </Stack>
-      )}
-      <Stack direction="horizontal" gap={4} className="flex-wrap">
-        {loadedInterests != null &&
-          loadedInterests.map((interest, index) => (
+    <>
+      <Stack direction="vertical" gap={4}>
+        {folderToOpen != null && (
+          <Stack
+            direction="horizontal"
+            className="justify-content-start align-items-start flex-wrap"
+            gap={5}
+          >
+            <p className="m-0 d-flex gap-2 align-items-center">
+              <i className="pi pi-plus"></i>
+              <span>Add Interests to Folder</span>
+            </p>
+            <p className="m-0 d-flex gap-2 align-items-center">
+              <i className="pi pi-pencil"></i>
+              <span>Edit Folder</span>
+            </p>
+            <p className="m-0 d-flex gap-2 align-items-center">
+              <i className="pi pi-trash"></i>
+              <span>Delete Folder</span>
+            </p>
+          </Stack>
+        )}
+        <Stack direction="horizontal" gap={4} className="flex-wrap">
+          {loadedInterests?.map((interest, index) => (
             <Stack
+              direction="horizontal"
+              gap={4}
               key={index}
-              className="p-3"
+              className="p-3 align-items-start"
               style={{
                 backgroundColor: "var(--variant-one-light)",
                 borderRadius: "16px",
               }}
             >
-              <p className="m-0">
-                Interest in {interest?.model.name}, {interest?.brand.name},{" "}
-                {interest?.type.name}
-              </p>
-
-              <p className="m-0 text-muted">
-                Creation date:{" "}
-                {new Date(interest.createdAt).toLocaleDateString("pt-PT")}{" "}
-              </p>
+              <Stack>
+                <p className="m-0">
+                  Interest in {interest?.model?.name}, {interest?.brand?.name},{" "}
+                  {interest?.type?.name}
+                </p>
+                {interest?.preferredStores?.length > 0 && (
+                  <p className="m-0 text-muted">
+                    {interest.preferredStores.map((store, index) => (
+                      <span key={index}>
+                        {store.store?.name || store.storeId}
+                        {index < interest.preferredStores.length - 1 && ", "}
+                      </span>
+                    ))}
+                  </p>
+                )}
+                <p className="m-0 text-muted">
+                  Creation date:{" "}
+                  {new Date(interest.createdAt).toLocaleDateString("pt-PT")}
+                </p>
+              </Stack>
+              <i
+                className="pi pi-external-link mt-1"
+                style={{ cursor: "pointer" }}
+                onClick={() => openDetailsModal(interest)}
+              />
             </Stack>
           ))}
+        </Stack>
       </Stack>
-    </Stack>
+
+      {/* Modal de detalhes */}
+      <DetailsModal
+        show={detailsModal}
+        setShow={setDetailsModal}
+        interest={selectedInterest}
+      />
+    </>
   );
 }
