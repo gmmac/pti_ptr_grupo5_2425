@@ -31,6 +31,7 @@ router.get("/:userNic/:folderId", async (req, res) => {
 					"maxPrice",
 					"createdAt",
 					"updatedAt",
+					"description"
 				],
 				include: [
 					{
@@ -139,7 +140,9 @@ router.post("/", async (req, res) => {
 			minPrice,
 			maxPrice,
 			preferredStoreIDs,
+			description,
 		} = req.body;
+console.log(description);
 
 		// Criação do Interest
 		const newInterest = await models.Interest.create({
@@ -153,12 +156,11 @@ router.post("/", async (req, res) => {
 			maxLaunchYear: maxLaunchYear || null,
 			minPrice: minPrice || null,
 			maxPrice: maxPrice || null,
+			description: description || null
 		});
 		
 		if (preferredStoreIDs && Array.isArray(preferredStoreIDs)) {
 			for (const storeId of preferredStoreIDs) {
-					console.log(storeId);
-					
 					await models.PreferredStoresInterets.create({
 						interestId: newInterest.id,
 						storeId: storeId,

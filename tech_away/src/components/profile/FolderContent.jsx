@@ -6,8 +6,13 @@ import DeleteInterestModal from "../interests/DeleteInterestModal";
 import { Toast } from "primereact/toast";
 
 export default function FolderContent() {
-  const { folderToOpen, loadedInterests, fetchInterests, deleteInterest } =
-    useInterests();
+  const {
+    folderToOpen,
+    loadedInterests,
+    fetchInterests,
+    deleteInterest,
+    editInterest,
+  } = useInterests();
   const [selectedInterest, setSelectedInterest] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -110,6 +115,7 @@ export default function FolderContent() {
         setShow={setShowDetails}
         interest={selectedInterest}
         openDeleteModal={() => setShowDelete(true)}
+        editInterest={editInterest}
       />
       <DeleteInterestModal
         show={showDelete}

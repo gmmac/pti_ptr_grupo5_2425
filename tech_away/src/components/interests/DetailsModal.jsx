@@ -1,122 +1,539 @@
-import React from "react";
-import { Col, Modal, Row, Stack } from "react-bootstrap";
+import React, { useState, useEffect, use } from "react";
+import { Button, Col, Modal, Row, Stack, Form } from "react-bootstrap";
+import SelectStoresModal from "./SelectStoresModal";
 
 export default function DetailsModal({
   show,
   setShow,
   interest,
   openDeleteModal,
-  
+  editInterest,
 }) {
   if (!interest) return null;
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [storesModal, setStoresModal] = useState(false);
+
+  const [formData, setFormData] = useState(() => ({
+    brandID: interest.brand?.id ?? null,
+    modelID: interest.model?.id ?? null,
+    typeID: interest.type?.id ?? null,
+    equipmentSheet: interest.equipmentSheetID ?? null,
+    equipmentStatusID: interest.equipmentStatus?.id ?? null,
+    minLaunchYear: interest.minLaunchYear ?? "",
+    maxLaunchYear: interest.maxLaunchYear ?? "",
+    minPrice: interest.minPrice ?? "",
+    maxPrice: interest.maxPrice ?? "",
+    preferredStoreIDs:
+      interest.preferredStores?.map((s) => ({
+        name: s.store?.name || s.storeId,
+        nipc: s.store?.nipc || s.storeId,
+      })) ?? [],
+    description: interest.description ?? "",
+  }));
+
+  useEffect(() => {
+    console.log("formData", formData);
+  }, [show]);
+
+  useEffect(() => {
+    if (interest && isEditing) {
+      setFormData({
+        preferredStoreIDs:
+          interest.preferredStores?.map((s) => ({
+            name: s.store?.name || s.storeId,
+            nipc: s.store?.nipc || s.storeId,
+          })) || [],
+      });
+    }
+  }, [isEditing, interest]);
+  /* ---------- years  ---------- */
+  const startYear = 1995;
+  const currentYear = new Date().getFullYear();
+
+  const years = Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, i) => currentYear - i
+  );
+
+  const minYearOptions = formData.maxLaunchYear
+    ? years.filter((y) => y <= parseInt(formData.maxLaunchYear))
+    : years;
+
+  const maxYearOptions = formData.minLaunchYear
+    ? years.filter((y) => y >= parseInt(formData.minLaunchYear))
+    : years;
+
+  /* ---------- price ---------- */
+  const PRICE_MIN = 0;
+  const PRICE_MAX = 1000;
+  const STEP = 25;
+
+  const priceOptions = Array.from(
+    { length: (PRICE_MAX - PRICE_MIN) / STEP + 1 },
+    (_, i) => PRICE_MIN + i * STEP
+  );
+
+  const minPriceOptions = formData.maxPrice
+    ? priceOptions.filter((p) => p <= parseInt(formData.maxPrice))
+    : priceOptions;
+
+  const maxPriceOptions = formData.minPrice
+    ? priceOptions.filter((p) => p >= parseInt(formData.minPrice))
+    : priceOptions;
+
+  /* ---------- helpers ---------- */
+
+  function verifyInput(input) {
+    if (typeof input !== "string") return null;
+    return input.replace(/['";]|--/g, "").trim();
+  }
+
+  function prepareInterestData(formData) {
+    return {
+      brandID: formData.brandID ?? interest.brand?.id ?? null,
+      modelID: formData.modelID ?? interest.model?.id ?? null,
+      typeID: formData.typeID ?? interest.type?.id ?? null,
+      equipmentSheetID:
+        formData.equipmentSheet?.id ?? interest.equipmentSheetID ?? null,
+      equipmentStatusID:
+        formData.equipmentStatusID?.id ?? interest.equipmentStatus?.id ?? null,
+      minLaunchYear:
+        formData.minLaunchYear !== "" && formData.minLaunchYear !== undefined
+          ? formData.minLaunchYear
+          : interest.minLaunchYear ?? null,
+      maxLaunchYear:
+        formData.maxLaunchYear !== "" && formData.maxLaunchYear !== undefined
+          ? formData.maxLaunchYear
+          : interest.maxLaunchYear ?? null,
+      minPrice:
+        formData.minPrice !== "" && formData.minPrice !== undefined
+          ? formData.minPrice
+          : interest.minPrice ?? null,
+      maxPrice:
+        formData.maxPrice !== "" && formData.maxPrice !== undefined
+          ? formData.maxPrice
+          : interest.maxPrice ?? null,
+      description:
+        verifyInput(formData.description) !== ""
+          ? verifyInput(formData.description)
+          : interest.description ?? null,
+      preferredStoreIDs:
+        formData.preferredStoreIDs?.length > 0
+          ? formData.preferredStoreIDs.map((store) => store.nipc)
+          : interest.preferredStores?.map((s) => s.store?.nipc || s.storeId) ??
+            [],
+    };
+  }
+
+  /* ---------- submit ---------- */
+  const handleSubmit = async () => {
+    const interestData = prepareInterestData(formData);
+    editInterest(interestData);
+    setIsEditing(false);
+  };
+  /* ---------- render ---------- */
 
   return (
-    <Modal
-      show={show}
-      onHide={() => setShow(false)}
-      centered
-      style={{ fontFamily: "var(--body-font)", color: "var(--dark-grey)" }}
-    >
-      <Modal.Header closeButton>
-        <Modal.Title style={{ fontFamily: "var(--title-font)" }}>
-          Interest Details
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Row>
-          <Col xs={12} lg={6}>
-            <Stack
-              direction="vertical"
-              className="p-3 align-items-start"
-              style={{
-                backgroundColor: "var(--variant-two-light)",
-                borderRadius: "16px",
-              }}
-            >
-              <p>
-                <strong>Model:</strong> {interest.model?.name || "—"}
-              </p>
-              <p>
-                <strong>Brand:</strong> {interest.brand?.name || "—"}
-              </p>
-              <p>
-                <strong>Type:</strong> {interest.type?.name || "—"}
-              </p>
-              <div>
-                <strong>Preferred Stores:</strong>{" "}
-                {interest.preferredStores?.length > 0
-                  ? interest.preferredStores.map((s, i) => (
-                      <span key={i}>
-                        {s.store?.name || s.storeId}
-                        {i < interest.preferredStores.length - 1 && ", "}
-                      </span>
-                    ))
-                  : "—"}
-              </div>
-            </Stack>
-          </Col>
-          <Col xs={12} lg={6}>
-            <Stack
-              direction="vertical"
-              className="p-3 align-items-start"
-              style={{
-                backgroundColor: "var(--variant-two-light)",
-                borderRadius: "16px",
-              }}
-            >
-              <p>
-                <strong>Min Year:</strong> {interest.minLaunchYear || "—"}
-              </p>
-              <p>
-                <strong>Max Year:</strong> {interest.maxLaunchYear || "—"}
-              </p>
-              <p>
-                <strong>Min Price:</strong>{" "}
-                {interest.minPrice
-                  ? interest.minPrice.toLocaleString("pt-PT", {
-                      style: "currency",
-                      currency: "EUR",
-                    })
-                  : "—"}
-              </p>
-              <p>
-                <strong>Max Price:</strong>{" "}
-                {interest.maxPrice
-                  ? interest.maxPrice.toLocaleString("pt-PT", {
-                      style: "currency",
-                      currency: "EUR",
-                    })
-                  : "—"}
-              </p>
-              <p>
-                <strong>Created:</strong>{" "}
-                {new Date(interest.createdAt).toLocaleDateString("pt-PT")}
-              </p>
-            </Stack>
-          </Col>
-        </Row>
-      </Modal.Body>
-      <Modal.Footer>
-        <p
-          className="px-4 d-flex flex-row align-items-center gap-2 text-muted"
-          style={{
-            cursor: "pointer",
-            fontSize: "14px",
-            color: "var(--dark-grey)",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "red")}
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.color = "var(--dark-grey)")
-          }
-          onClick={() => {
-            setShow(false);
-            openDeleteModal();
-          }}
-        >
-          <i className="pi pi-trash" style={{ fontSize: "14px" }} />
-          <span>Delete this Interest</span>
-        </p>
-      </Modal.Footer>
-    </Modal>
+    <>
+      <Modal
+        show={show}
+        onHide={() => {
+          setShow(false);
+          setIsEditing(false);
+        }}
+        size="lg"
+        centered
+        style={{ fontFamily: "var(--body-font)", color: "var(--dark-grey)" }}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title style={{ fontFamily: "var(--title-font)" }}>
+            Interest Details
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row className="align-items-stretch">
+            <Col xs={12} lg={6}>
+              <Stack
+                direction="vertical"
+                className="p-3 align-items-start"
+                style={{
+                  backgroundColor: "var(--variant-two-light)",
+                  borderRadius: "16px",
+                }}
+              >
+                <p>
+                  <span className="text-muted">Created:</span>{" "}
+                  {new Date(interest.createdAt).toLocaleDateString("pt-PT")}
+                </p>
+                <p>
+                  <span className="text-muted">Model:</span>{" "}
+                  {interest.model?.name || "—"}
+                </p>
+                <p>
+                  <span className="text-muted">Brand:</span>{" "}
+                  {interest.brand?.name || "—"}
+                </p>
+                <p>
+                  <span className="text-muted">Type:</span>{" "}
+                  {interest.type?.name || "—"}
+                </p>
+                {isEditing ? (
+                  <Form.Group controlId="preferredStoreIDs">
+                    <Form.Label className="text-muted ">
+                      Preferred Stores
+                    </Form.Label>
+
+                    {formData?.preferredStoreIDs.length > 0 && (
+                      <Stack
+                        direction="horizontal"
+                        gap={2}
+                        className="mb-2 flex-wrap"
+                        style={{ maxHeight: "80px", overflowY: "auto" }}
+                      >
+                        {formData.preferredStoreIDs.map((store) => (
+                          <Stack
+                            key={store.nipc}
+                            direction="horizontal"
+                            gap={1}
+                            className="rounded-pill px-2 py-1"
+                            style={{ backgroundColor: "var(--white)" }}
+                          >
+                            <span>{store.name}</span>
+                            <i
+                              className="pi pi-times"
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  preferredStoreIDs:
+                                    prev.preferredStoreIDs.filter(
+                                      (s) => s.nipc !== store.nipc
+                                    ),
+                                }))
+                              }
+                            />
+                          </Stack>
+                        ))}
+                      </Stack>
+                    )}
+                    <Stack
+                      direction="horizontal"
+                      gap={2}
+                      className="justify-content-center"
+                    >
+                      <Button
+                        variant="secondary"
+                        className="rounded-pill"
+                        disabled={formData.preferredStoreIDs.length === 0}
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            preferredStoreIDs: [],
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+                      <Button
+                        className="rounded-pill w-100"
+                        style={{
+                          backgroundColor: "var(--variant-two)",
+                          border: "none",
+                        }}
+                        onClick={() => setStoresModal(true)}
+                      >
+                        Select Stores
+                      </Button>
+                    </Stack>
+                  </Form.Group>
+                ) : (
+                  <p>
+                    <span className="text-muted">Preferred Stores:</span>{" "}
+                    {interest.preferredStores?.length > 0
+                      ? interest.preferredStores.map((s, i) => (
+                          <span key={i}>
+                            {s.store?.name || s.storeId}
+                            {i < interest.preferredStores.length - 1 && ", "}
+                          </span>
+                        ))
+                      : "—"}
+                  </p>
+                )}
+              </Stack>
+            </Col>
+            <Col xs={12} lg={6}>
+              <Stack
+                direction="vertical"
+                className="p-3 align-items-start"
+                style={{
+                  backgroundColor: "var(--variant-two-light)",
+                  borderRadius: "16px",
+                }}
+              >
+                {isEditing ? (
+                  <>
+                    <Stack
+                      direction="horizontal"
+                      gap={3}
+                      className="align-items-end justify-content-stretch"
+                    >
+                      <Button className="rounded-pill" variant="secondary">
+                        Clear
+                      </Button>
+                      <Form.Group className="w-100">
+                        <Form.Label className="text-muted">Min Year</Form.Label>
+                        <Form.Select
+                          className="rounded-pill "
+                          value={formData.minLaunchYear || ""}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              minLaunchYear: parseInt(e.target.value),
+                            }))
+                          }
+                        >
+                          <option value="">-</option>
+                          {minYearOptions.map((y) => (
+                            <option key={y} value={y}>
+                              {y}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+
+                      <Form.Group className="w-100">
+                        <Form.Label className="text-muted">Max Year</Form.Label>
+                        <Form.Select
+                          className="rounded-pill"
+                          value={formData.maxLaunchYear || ""}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              maxLaunchYear: parseInt(e.target.value),
+                            }))
+                          }
+                        >
+                          <option value="">-</option>
+                          {maxYearOptions.map((y) => (
+                            <option key={y} value={y}>
+                              {y}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                    </Stack>
+                    <Stack
+                      direction="horizontal"
+                      gap={3}
+                      className="align-items-end justify-content-stretch mb-3"
+                    >
+                      <Button
+                        className="rounded-pill"
+                        variant="secondary"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            minPrice: "",
+                            maxPrice: "",
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+
+                      <Form.Group className="w-100">
+                        <Form.Label className="text-muted">
+                          Min Price
+                        </Form.Label>
+                        <Form.Select
+                          className="rounded-pill"
+                          value={formData.minPrice || ""}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              minPrice: parseInt(e.target.value),
+                            }))
+                          }
+                        >
+                          <option value="">-</option>
+                          {minPriceOptions.map((price) => (
+                            <option key={price} value={price}>
+                              {price.toLocaleString("pt-PT", {
+                                style: "currency",
+                                currency: "EUR",
+                              })}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+
+                      <Form.Group className="w-100">
+                        <Form.Label className="text-muted">
+                          Max Price
+                        </Form.Label>
+                        <Form.Select
+                          className="rounded-pill"
+                          value={formData.maxPrice || ""}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              maxPrice: parseInt(e.target.value),
+                            }))
+                          }
+                        >
+                          <option value="">-</option>
+                          {maxPriceOptions.map((price) => (
+                            <option key={price} value={price}>
+                              {price.toLocaleString("pt-PT", {
+                                style: "currency",
+                                currency: "EUR",
+                              })}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                    </Stack>
+
+                    <Form.Group className="w-100 mb-2">
+                      <Form.Label className="text-muted">
+                        Description
+                      </Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        style={{ borderRadius: "16px" }}
+                        rows={2}
+                        maxLength={200}
+                        value={formData.description || ""}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            description: e.target.value,
+                          }))
+                        }
+                      />
+                      <small className="text-muted">
+                        {formData.description?.length || 0}/200 characters
+                      </small>
+                    </Form.Group>
+                  </>
+                ) : (
+                  <>
+                    <Stack direction="horizontal" gap={4}>
+                      <p>
+                        <span className="text-muted">Min Year:</span>{" "}
+                        {interest.minLaunchYear || "—"}
+                      </p>
+                      <p>
+                        <span className="text-muted">Max Year:</span>{" "}
+                        {interest.maxLaunchYear || "—"}
+                      </p>
+                    </Stack>
+                    <Stack direction="horizontal" gap={4}>
+                      <p>
+                        <span className="text-muted">Min Price:</span>{" "}
+                        {interest.minPrice
+                          ? interest.minPrice.toLocaleString("pt-PT", {
+                              style: "currency",
+                              currency: "EUR",
+                            })
+                          : "—"}
+                      </p>
+                      <p>
+                        <span className="text-muted">Max Price:</span>{" "}
+                        {interest.maxPrice
+                          ? interest.maxPrice.toLocaleString("pt-PT", {
+                              style: "currency",
+                              currency: "EUR",
+                            })
+                          : "—"}
+                      </p>
+                    </Stack>
+
+                    <p>
+                      <span className="text-muted">Description:</span>{" "}
+                      {interest.description || "—"}
+                    </p>
+                  </>
+                )}
+              </Stack>
+            </Col>
+          </Row>
+          <Stack
+            direction="horizontal"
+            gap={3}
+            className="mt-4 justify-content-end"
+          >
+            {isEditing ? (
+              <>
+                <Button
+                  onClick={() => setIsEditing(false)}
+                  className="rounded-pill d-flex gap-2 align-items-center"
+                  variant="secondary"
+                >
+                  <i className="pi pi-refresh" />
+                  <span>Cancel</span>
+                </Button>
+                <Button
+                  className="rounded-pill d-flex gap-2 align-items-center"
+                  style={{
+                    backgroundColor: "var(--variant-one)",
+                    border: "none",
+                  }}
+                  onClick={handleSubmit}
+                >
+                  <i className="pi pi-bookmark" />
+                  <span>Save</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={() => setIsEditing(true)}
+                className="rounded-pill d-flex gap-3 align-items-center"
+                style={{
+                  backgroundColor: "var(--variant-two)",
+                  border: "none",
+                }}
+              >
+                <i className="pi pi-pencil" />
+                <span>Edit Interest</span>
+              </Button>
+            )}
+          </Stack>
+        </Modal.Body>
+        <Modal.Footer>
+          <p
+            className="px-4 d-flex flex-row align-items-center gap-2 text-muted"
+            style={{
+              cursor: "pointer",
+              fontSize: "14px",
+              color: "var(--dark-grey)",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "red")}
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.color = "var(--dark-grey)")
+            }
+            onClick={() => {
+              setShow(false);
+              openDeleteModal();
+            }}
+          >
+            <i className="pi pi-trash" style={{ fontSize: "14px" }} />
+            <span>Delete this Interest</span>
+          </p>
+        </Modal.Footer>
+      </Modal>
+      <SelectStoresModal
+        showModal={storesModal}
+        setShowModal={setStoresModal}
+        selectedStores={formData.preferredStoreIDs}
+        setSelectedStores={(selected) =>
+          setFormData((prev) => ({
+            ...prev,
+            preferredStoreIDs: selected,
+          }))
+        }
+      />
+    </>
   );
 }

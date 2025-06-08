@@ -637,7 +637,14 @@ export default function CreateInterestModal({ show, setShow }) {
                       onChange={handleChange}
                       style={{ borderRadius: "16px" }}
                       placeholder="Describe your interest..."
+                      maxLength={200} // Limite de caracteres
                     />
+                    <div
+                      className="text-muted text-end"
+                      style={{ fontSize: "12px" }}
+                    >
+                      {formData.description.length}/200 characters
+                    </div>
                   </Form.Group>
                 </Stack>
               </Col>

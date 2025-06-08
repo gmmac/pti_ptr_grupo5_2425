@@ -35,8 +35,6 @@ const InterestsProvider = ({ children }) => {
 
   const createGenericInterest = async (newInterest) => {
     try {
-      console.log(newInterest);
-
       await api.post(`/api/interest`, {
         ...newInterest,
         clientNic: user.nic,
@@ -68,12 +66,30 @@ const InterestsProvider = ({ children }) => {
     }
   };
 
+  const editInterest = async (editedInterest) => {
+    try {
+      await api.put(`/api/interest/${editedInterest.id}`, editedInterest);
+      fetchInterests();
+    } catch (error) {
+      console.error("Error editing interest:", error);
+    }
+  };
+
   const deleteInterest = async (interestId) => {
     try {
       await api.delete(`/api/interest/${interestId}`);
       fetchInterests();
     } catch (error) {
       console.error("Error deleting interest:", error);
+    }
+  };
+
+  const deleteInterestFolder = async (folderId) => {
+    try {
+      await api.delete(`/api/interestFolder/${folderId}`);
+      fetchInterestFolders();
+    } catch (error) {
+      console.error("Error deleting folder:", error);
     }
   };
 
@@ -89,7 +105,9 @@ const InterestsProvider = ({ children }) => {
         setFolderToOpen,
         createFolder,
         createGenericInterest,
-        deleteInterest
+        deleteInterest,
+        deleteInterestFolder,
+        editInterest,
       }}
     >
       {children}
