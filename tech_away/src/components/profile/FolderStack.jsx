@@ -42,13 +42,13 @@ const FolderStack = () => {
               className="rounded-pill py-2 px-4"
               style={{
                 backgroundColor:
-                  folderToOpen == folder.id
+                  folderToOpen?.id == folder.id
                     ? "var(--variant-one)"
                     : "var(--variant-one-light)",
                 border: "none",
                 color: "var(--dark-grey)",
               }}
-              onClick={() => setFolderToOpen(folder.id)}
+              onClick={() => setFolderToOpen(folder)}
             >
               {folder.name}
             </Button>

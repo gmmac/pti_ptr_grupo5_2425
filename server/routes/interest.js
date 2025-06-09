@@ -71,7 +71,6 @@ router.get("/:userNic/:folderId", async (req, res) => {
 		} else {
 			const interestsIds = await models.FolderInterestEquipments.findAll({
 				where: {
-					clientNic: userNic,
 					folderId: folderId,
 				},
 			});
