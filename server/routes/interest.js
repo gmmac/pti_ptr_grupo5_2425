@@ -142,7 +142,7 @@ router.post("/", async (req, res) => {
 			preferredStoreIDs,
 			description,
 		} = req.body;
-console.log(description);
+
 
 		// Criação do Interest
 		const newInterest = await models.Interest.create({
@@ -175,7 +175,115 @@ console.log(description);
 	}
 });
 
-router.put("/:id", async (req, res) => {});
+router.put("/:id", async (req, res) => {
+	try {
+		const {
+			brandID,
+			modelID,
+			typeID,
+			equipmentSheetID,
+			equipmentStatusID,
+			minLaunchYear,
+			maxLaunchYear,
+			minPrice,
+			maxPrice,
+			preferredStoreIDs,
+			description,
+		} = req.body;
+
+		const { id } = req.params;
+
+		// Atualiza os dados principais
+		await models.Interest.update(
+			{
+				brandID: brandID || null,
+				modelID: modelID || null,
+				typeID: typeID || null,
+				equipmentSheetID: equipmentSheetID || null,
+				equipmentStatusID: equipmentStatusID || null,
+				minLaunchYear: minLaunchYear || null,
+				maxLaunchYear: maxLaunchYear || null,
+				minPrice: minPrice || null,
+				maxPrice: maxPrice || null,
+				description: description || null,
+			},
+			{ where: { id } }
+		);
+
+		// Atualiza as preferred stores (remove e insere de novo)
+		await models.PreferredStoresInterets.destroy({ where: { interestId: id } });
+
+		if (preferredStoreIDs && Array.isArray(preferredStoreIDs)) {
+			for (const storeId of preferredStoreIDs) {
+				await models.PreferredStoresInterets.create({
+					interestId: id,
+					storeId: storeId,
+				});
+			}
+		}
+
+		// Recolhe o interesse atualizado com todas as associações
+		const updatedInterest = await models.Interest.findByPk(id, {
+			attributes: [
+				"id",
+				"equipmentSheetID",
+				"maxLaunchYear",
+				"minLaunchYear",
+				"minPrice",
+				"maxPrice",
+				"createdAt",
+				"updatedAt",
+				"description"
+			],
+			include: [
+				{
+					model: models.Brand,
+					as: "brand",
+					attributes: ["id", "name"],
+				},
+				{
+					model: models.EquipmentModel,
+					as: "model",
+					attributes: ["id", "name"],
+				},
+				{
+					model: models.EquipmentType,
+					as: "type",
+					attributes: ["id", "name"],
+				},
+				{
+					model: models.EquipmentStatus,
+					as: "equipmentStatus",
+					attributes: ["id", "state"],
+				},
+				{
+					model: models.PreferredStoresInterets,
+					as: "preferredStores",
+					include: [
+						{
+							model: models.Store,
+							as: "store",
+							attributes: [
+								"nipc",
+								"name",
+								"email",
+								"phone",
+								"address",
+							],
+						},
+					],
+				},
+			],
+		});
+
+		res.status(200).json(updatedInterest);
+	} catch (error) {
+		console.error("Error updating interest:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+
 
 router.delete("/:id", async (req, res) => {
 	try {

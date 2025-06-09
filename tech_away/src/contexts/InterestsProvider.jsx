@@ -68,10 +68,15 @@ const InterestsProvider = ({ children }) => {
 
   const editInterest = async (editedInterest) => {
     try {
-      await api.put(`/api/interest/${editedInterest.id}`, editedInterest);
+      const response = await api.put(
+        `/api/interest/${editedInterest.id}`,
+        editedInterest
+      );
       fetchInterests();
+      return response.data; // aqui retornas o objeto atualizado
     } catch (error) {
       console.error("Error editing interest:", error);
+      throw error;
     }
   };
 

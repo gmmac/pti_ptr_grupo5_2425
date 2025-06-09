@@ -11,15 +11,15 @@ export default function DetailsModal({
 }) {
   if (!interest) return null;
   const [isEditing, setIsEditing] = useState(false);
-
+  const [localInterest, setLocalInterest] = useState(interest);
   const [storesModal, setStoresModal] = useState(false);
 
   const [formData, setFormData] = useState(() => ({
-    brandID: interest.brand?.id ?? null,
-    modelID: interest.model?.id ?? null,
-    typeID: interest.type?.id ?? null,
+    brand: interest.brand ?? null,
+    model: interest.model ?? null,
+    type: interest.type ?? null,
     equipmentSheet: interest.equipmentSheetID ?? null,
-    equipmentStatusID: interest.equipmentStatus?.id ?? null,
+    equipmentStatus: interest.equipmentStatus ?? null,
     minLaunchYear: interest.minLaunchYear ?? "",
     maxLaunchYear: interest.maxLaunchYear ?? "",
     minPrice: interest.minPrice ?? "",
@@ -33,24 +33,13 @@ export default function DetailsModal({
   }));
 
   useEffect(() => {
-    console.log("formData", formData);
-  }, [show]);
-
-  useEffect(() => {
-    if (interest && isEditing) {
-      setFormData({
-        preferredStoreIDs:
-          interest.preferredStores?.map((s) => ({
-            name: s.store?.name || s.storeId,
-            nipc: s.store?.nipc || s.storeId,
-          })) || [],
-      });
+    if (interest) {
+      updateFormData(interest);
     }
-  }, [isEditing, interest]);
-  /* ---------- years  ---------- */
+  }, [interest]);
+
   const startYear = 1995;
   const currentYear = new Date().getFullYear();
-
   const years = Array.from(
     { length: currentYear - startYear + 1 },
     (_, i) => currentYear - i
@@ -59,16 +48,13 @@ export default function DetailsModal({
   const minYearOptions = formData.maxLaunchYear
     ? years.filter((y) => y <= parseInt(formData.maxLaunchYear))
     : years;
-
   const maxYearOptions = formData.minLaunchYear
     ? years.filter((y) => y >= parseInt(formData.minLaunchYear))
     : years;
 
-  /* ---------- price ---------- */
   const PRICE_MIN = 0;
   const PRICE_MAX = 1000;
   const STEP = 25;
-
   const priceOptions = Array.from(
     { length: (PRICE_MAX - PRICE_MIN) / STEP + 1 },
     (_, i) => PRICE_MIN + i * STEP
@@ -77,12 +63,30 @@ export default function DetailsModal({
   const minPriceOptions = formData.maxPrice
     ? priceOptions.filter((p) => p <= parseInt(formData.maxPrice))
     : priceOptions;
-
   const maxPriceOptions = formData.minPrice
     ? priceOptions.filter((p) => p >= parseInt(formData.minPrice))
     : priceOptions;
 
-  /* ---------- helpers ---------- */
+  function updateFormData(fromInterest) {
+    setLocalInterest(fromInterest);
+    setFormData({
+      brand: fromInterest.brand ?? null,
+      model: fromInterest.model ?? null,
+      type: fromInterest.type ?? null,
+      equipmentSheet: fromInterest.equipmentSheetID ?? null,
+      equipmentStatus: fromInterest.equipmentStatus ?? null,
+      minLaunchYear: fromInterest.minLaunchYear ?? "",
+      maxLaunchYear: fromInterest.maxLaunchYear ?? "",
+      minPrice: fromInterest.minPrice ?? "",
+      maxPrice: fromInterest.maxPrice ?? "",
+      preferredStoreIDs:
+        fromInterest.preferredStores?.map((s) => ({
+          name: s.store?.name || s.storeId,
+          nipc: s.store?.nipc || s.storeId,
+        })) ?? [],
+      description: fromInterest.description ?? "",
+    });
+  }
 
   function verifyInput(input) {
     if (typeof input !== "string") return null;
@@ -91,47 +95,31 @@ export default function DetailsModal({
 
   function prepareInterestData(formData) {
     return {
-      brandID: formData.brandID ?? interest.brand?.id ?? null,
-      modelID: formData.modelID ?? interest.model?.id ?? null,
-      typeID: formData.typeID ?? interest.type?.id ?? null,
+      id: localInterest.id,
+      brandID: formData.brand?.id ?? null,
+      modelID: formData.model?.id ?? null,
+      typeID: formData.type?.id ?? null,
       equipmentSheetID:
-        formData.equipmentSheet?.id ?? interest.equipmentSheetID ?? null,
-      equipmentStatusID:
-        formData.equipmentStatusID?.id ?? interest.equipmentStatus?.id ?? null,
-      minLaunchYear:
-        formData.minLaunchYear !== "" && formData.minLaunchYear !== undefined
-          ? formData.minLaunchYear
-          : interest.minLaunchYear ?? null,
-      maxLaunchYear:
-        formData.maxLaunchYear !== "" && formData.maxLaunchYear !== undefined
-          ? formData.maxLaunchYear
-          : interest.maxLaunchYear ?? null,
-      minPrice:
-        formData.minPrice !== "" && formData.minPrice !== undefined
-          ? formData.minPrice
-          : interest.minPrice ?? null,
-      maxPrice:
-        formData.maxPrice !== "" && formData.maxPrice !== undefined
-          ? formData.maxPrice
-          : interest.maxPrice ?? null,
-      description:
-        verifyInput(formData.description) !== ""
-          ? verifyInput(formData.description)
-          : interest.description ?? null,
+        formData.equipmentSheet?.id ?? formData.equipmentSheet ?? null,
+      equipmentStatusID: formData.equipmentStatus?.id ?? null,
+      minLaunchYear: formData.minLaunchYear || null,
+      maxLaunchYear: formData.maxLaunchYear || null,
+      minPrice: formData.minPrice || null,
+      maxPrice: formData.maxPrice || null,
+      description: verifyInput(formData.description) || null,
       preferredStoreIDs:
-        formData.preferredStoreIDs?.length > 0
-          ? formData.preferredStoreIDs.map((store) => store.nipc)
-          : interest.preferredStores?.map((s) => s.store?.nipc || s.storeId) ??
-            [],
+        formData.preferredStoreIDs?.map((store) => store.nipc) ?? [],
     };
   }
 
-  /* ---------- submit ---------- */
   const handleSubmit = async () => {
     const interestData = prepareInterestData(formData);
-    editInterest(interestData);
+    const updatedInterest = await editInterest(interestData);
+    updateFormData(updatedInterest);
+    setLocalInterest(updatedInterest);
     setIsEditing(false);
   };
+
   /* ---------- render ---------- */
 
   return (
@@ -153,10 +141,10 @@ export default function DetailsModal({
         </Modal.Header>
         <Modal.Body>
           <Row className="align-items-stretch">
-            <Col xs={12} lg={6}>
+            <Col xs={12} lg={6} className="d-flex flex-column">
               <Stack
                 direction="vertical"
-                className="p-3 align-items-start"
+                className="p-3 align-items-start h-100"
                 style={{
                   backgroundColor: "var(--variant-two-light)",
                   borderRadius: "16px",
@@ -166,17 +154,25 @@ export default function DetailsModal({
                   <span className="text-muted">Created:</span>{" "}
                   {new Date(interest.createdAt).toLocaleDateString("pt-PT")}
                 </p>
+                {localInterest.updatedAt != localInterest.createdAt && (
+                  <p>
+                    <span className="text-muted">Updated:</span>{" "}
+                    {new Date(localInterest.updatedAt).toLocaleDateString(
+                      "pt-PT"
+                    )}
+                  </p>
+                )}
                 <p>
                   <span className="text-muted">Model:</span>{" "}
-                  {interest.model?.name || "—"}
+                  {formData?.model?.name || "—"}
                 </p>
                 <p>
                   <span className="text-muted">Brand:</span>{" "}
-                  {interest.brand?.name || "—"}
+                  {formData?.brand?.name || "—"}
                 </p>
                 <p>
                   <span className="text-muted">Type:</span>{" "}
-                  {interest.type?.name || "—"}
+                  {formData?.type?.name || "—"}
                 </p>
                 {isEditing ? (
                   <Form.Group controlId="preferredStoreIDs">
@@ -225,7 +221,10 @@ export default function DetailsModal({
                       <Button
                         variant="secondary"
                         className="rounded-pill"
-                        disabled={formData.preferredStoreIDs.length === 0}
+                        disabled={
+                          !formData.preferredStoreIDs ||
+                          formData.preferredStoreIDs.length === 0
+                        }
                         onClick={() =>
                           setFormData((prev) => ({
                             ...prev,
@@ -250,11 +249,11 @@ export default function DetailsModal({
                 ) : (
                   <p>
                     <span className="text-muted">Preferred Stores:</span>{" "}
-                    {interest.preferredStores?.length > 0
-                      ? interest.preferredStores.map((s, i) => (
-                          <span key={i}>
-                            {s.store?.name || s.storeId}
-                            {i < interest.preferredStores.length - 1 && ", "}
+                    {formData.preferredStoreIDs?.length > 0
+                      ? formData.preferredStoreIDs.map((s, i) => (
+                          <span key={s.nipc}>
+                            {s.name}
+                            {i < formData.preferredStoreIDs.length - 1 && ", "}
                           </span>
                         ))
                       : "—"}
@@ -262,10 +261,10 @@ export default function DetailsModal({
                 )}
               </Stack>
             </Col>
-            <Col xs={12} lg={6}>
+            <Col xs={12} lg={6} className="d-flex flex-column">
               <Stack
                 direction="vertical"
-                className="p-3 align-items-start"
+                className="p-3 align-items-start h-100"
                 style={{
                   backgroundColor: "var(--variant-two-light)",
                   borderRadius: "16px",
@@ -285,7 +284,7 @@ export default function DetailsModal({
                         <Form.Label className="text-muted">Min Year</Form.Label>
                         <Form.Select
                           className="rounded-pill "
-                          value={formData.minLaunchYear || ""}
+                          value={formData.minLaunchYear}
                           onChange={(e) =>
                             setFormData((prev) => ({
                               ...prev,
@@ -306,7 +305,7 @@ export default function DetailsModal({
                         <Form.Label className="text-muted">Max Year</Form.Label>
                         <Form.Select
                           className="rounded-pill"
-                          value={formData.maxLaunchYear || ""}
+                          value={formData.maxLaunchYear}
                           onChange={(e) =>
                             setFormData((prev) => ({
                               ...prev,
@@ -422,18 +421,18 @@ export default function DetailsModal({
                     <Stack direction="horizontal" gap={4}>
                       <p>
                         <span className="text-muted">Min Year:</span>{" "}
-                        {interest.minLaunchYear || "—"}
+                        {formData.minLaunchYear || "—"}
                       </p>
                       <p>
                         <span className="text-muted">Max Year:</span>{" "}
-                        {interest.maxLaunchYear || "—"}
+                        {formData.maxLaunchYear || "—"}
                       </p>
                     </Stack>
                     <Stack direction="horizontal" gap={4}>
                       <p>
                         <span className="text-muted">Min Price:</span>{" "}
-                        {interest.minPrice
-                          ? interest.minPrice.toLocaleString("pt-PT", {
+                        {formData.minPrice
+                          ? formData.minPrice.toLocaleString("pt-PT", {
                               style: "currency",
                               currency: "EUR",
                             })
@@ -441,8 +440,8 @@ export default function DetailsModal({
                       </p>
                       <p>
                         <span className="text-muted">Max Price:</span>{" "}
-                        {interest.maxPrice
-                          ? interest.maxPrice.toLocaleString("pt-PT", {
+                        {formData.maxPrice
+                          ? formData.maxPrice.toLocaleString("pt-PT", {
                               style: "currency",
                               currency: "EUR",
                             })
@@ -452,7 +451,7 @@ export default function DetailsModal({
 
                     <p>
                       <span className="text-muted">Description:</span>{" "}
-                      {interest.description || "—"}
+                      {formData.description || "—"}
                     </p>
                   </>
                 )}
