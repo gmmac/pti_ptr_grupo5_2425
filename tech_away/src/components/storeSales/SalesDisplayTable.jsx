@@ -2,20 +2,20 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from 'primereact/button';
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Menu } from "primereact/menu";
 import { confirmDialog } from "primereact/confirmdialog";
-import { FilterMatchMode } from "primereact/api";
 import api from "../../utils/axios";
-import ModalEdit from "./ModalEdit";
-import FormsEquipmentSheet from "./FormsEquipmentSheet";
+import ModalEdit from "../equipment/ModalEdit";
+import FormsEquipmentSheet from "../equipment/FormsEquipmentSheet";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
-import FormsEquipmentModel from "./FormsEquipmentModel";
+import FormsEquipmentModel from "../equipment/FormsEquipmentModel";
 import { Calendar } from 'primereact/calendar';
+import { Dropdown } from 'primereact/dropdown';
 
-export default function DisplayTable({ model, active = "1", refreshAllTables=null}) {
-	const [loading, setLoading] = useState(false);
+
+export default function SalesDisplayTable({ salesType, active = "1", refreshAllTables=null}) {
+	  const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
 
     const [lazyState, setLazyState] = useState({
@@ -25,18 +25,14 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
         sortField: null,
         sortOrder: null,
         filters: {
-			'id': { value: '', matchMode: 'contains' },
-			'name': { value: '', matchMode: 'contains' },
-			'price': { value: '', matchMode: 'contains' },
-			'releaseYear': { value: '', matchMode: 'contains' },
-			'Brand': { value: '', matchMode: 'contains' },
-            'Barcode': { value: '', matchMode: 'contains' },
-            'EquipmentModel': { value: '', matchMode: 'contains' },
-            'EquipmentType': { value: '', matchMode: 'contains' },
-            'arriveTime': { value: '', matchMode: 'contains' },
-			'createdAt': { value: '', matchMode: 'equals' },
-			'updatedAt': { value: '', matchMode: 'equals' }
-		}
+          'id': { value: '', matchMode: 'contains' },
+          'total': { value: '', matchMode: 'contains' },
+          'clientNIC': { value: '', matchMode: 'contains' },
+          'employeeNIC': { value: '', matchMode: 'contains' },
+          'state': { value: '', matchMode: 'equals' },
+          'CreatedAt': { value: '', matchMode: 'equals' },
+          'UpdatedAt': { value: '', matchMode: 'equals' }
+        }		
     });
 
     const [data, setData] = useState([]);
@@ -44,11 +40,14 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
     const [selectedObj, setSelectedObj] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const menuRefs = useRef([]);
-	const dateFields = ['createdAt', 'updatedAt']; // adiciona os campos relevantes
+	  const dateFields = ['CreatedAt', 'UpdatedAt']; // adiciona os campos relevantes
+    const [stateOptions, setStateOptions] = useState([]);
+
 
     useEffect(() => {
         loadLazyData();
-    }, [model, lazyState]);
+        loadStateOptions();
+    }, [salesType, lazyState]);
 
     const loadLazyData = () => {
         setLoading(true);
@@ -74,13 +73,14 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                 params[key] = filterMeta.value;
             }
         }
+        
 
         // Faz a requisição ao backend
-        api.get(`api/${model}`, { params }).then((res) => {
+        api.get(`api/clientPurchase/display-table`, { params }).then((res) => {
             const responseData = res.data;
             if (responseData.data.length > 0) {
                 const allColumns = Object.keys(responseData.data[0]).filter(
-                    (col) => col !== "CreatedAt" && col !== "UpdatedAt"
+                    (col) => col !== "UpdatedAt" && col !== "employeeName" && col !== "clientName"
                 );
                 setData(responseData.data);
                 setColumns(allColumns);
@@ -95,6 +95,17 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
         });
     };
 
+    const loadStateOptions = () => {
+      api.get('api/orderStatus/').then((res) => {
+          const options = res.data.map((status) => ({
+              label: status.state,
+              value: status.id
+          }));
+          setStateOptions(options);
+      }).catch((err) => {
+          console.error("Error loading status options:", err);
+    })};
+
     const onPage = (event) => {
         setLazyState(event);
     };
@@ -104,13 +115,13 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
     };
 
     const onFilter = (event) => {
-        event['first'] = 0; // Resetar a página quando o filtro mudar
+        event['first'] = 0;
         setLazyState(event);
     };
 
     const confirmDelete = (id) => {
         confirmDialog({
-            message: (<> Are you sure you want to {active == "1" ? "delete" : "restore"} this {model}?<br />This action can erase other items associated with this {model}.</>),
+            message: (<> Are you sure you want to {active == "1" ? "deactivate" : "restore"} this {model}?</>),
             header: "Confirmation",
             icon: "pi pi-exclamation-triangle",
             accept: () => handleDelete(id),
@@ -118,12 +129,12 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
     };
 
     const handleEdit = (item) => {
-        setSelectedObj(item);
+        setSelectedObj(item.nic);
         setShowModal(true);
     };
 
     const handleDelete = (id) => {
-        api.patch(`/api/${model}/activation/${id}`).then(() => {
+        api.patch(`/api/clientPurchase/activation/${id}`).then(() => {
             loadLazyData(); 
             refreshAllTables();
         });
@@ -131,6 +142,11 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 
     const capitalizeFirstLetter = (value) => {
         if(String(value) == "id") return "ID";
+        if(String(value) == "total") return "Total Price";
+        if(String(value) == "state") return "Status";
+        if(String(value) == "employeeNIC") return "Employee NIC";
+        if(String(value) == "clientNIC") return "Client NIC";
+        if(String(value) == "CreatedAt") return "Date";
         return String(value).charAt(0).toUpperCase() + String(value).slice(1);
     }
 
@@ -154,9 +170,9 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                     filters={lazyState.filters}
                     stripedRows
                     removableSort
-					rowsPerPageOptions={[5, 10, 25, 50]}
-					paginatorTemplate=" FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-					currentPageReportTemplate="{first} to {last} of {totalRecords}"
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                    paginatorTemplate=" FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    currentPageReportTemplate="{first} to {last} of {totalRecords}"
                 >
                     {columns.map((column, index) => (
                         <Column
@@ -165,45 +181,59 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                             header={capitalizeFirstLetter(column)}
                             sortable
                             filter
-							showFilterMenu={false}
-							filterMatchMode={dateFields.includes(column) ? 'equals' : 'contains'}
-							filterElement={dateFields.includes(column) ? (options) => (
-								<Calendar
-									value={options.value ? new Date(options.value) : null}
-									onChange={(e) => {
-										const selectedDate = e.value;
-										if (selectedDate) {
-											selectedDate.setHours(12, 0, 0, 0);
-										}
-										const isoDate = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
-										options.filterCallback(isoDate, options.index);
-										const newFilters = { ...lazyState.filters };
-										newFilters[column].value = isoDate;
-										setLazyState({
-											...lazyState,
-											filters: newFilters,
-										});
-									}}
-									dateFormat="dd/mm/yy"
-									placeholder="Date"
-									showIcon
-									panelStyle={{
-										borderRadius: "10px",
-									}}
-								/>
-							) : undefined}
+                            showFilterMenu={false}
+                            filterMatchMode={dateFields.includes(column) ? 'equals' : 'contains'}
+                            filterElement={dateFields.includes(column) ? (options) => (
+                            <Calendar
+                              value={options.value ? new Date(options.value) : null}
+                              onChange={(e) => {
+                                const selectedDate = e.value;
+                                if (selectedDate) {
+                                  selectedDate.setHours(12, 0, 0, 0);
+                                }
+                                const isoDate = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
+                                options.filterCallback(isoDate, options.index);
+                                const newFilters = { ...lazyState.filters };
+                                newFilters[column].value = isoDate;
+                                setLazyState({
+                                  ...lazyState,
+                                  filters: newFilters,
+                                });
+                              }}
+                              dateFormat="dd/mm/yy"
+                              placeholder="Date"
+                              showIcon
+                              panelStyle={{
+                                borderRadius: "10px",
+                              }}
+                            />
+                          ) : column === 'state' ? (options) => (
+                                  <Dropdown
+                                    value={options.value}
+                                    options={stateOptions}
+                                    onChange={(e) => {
+                                      options.filterCallback(e.value, options.index);
+                                      const newFilters = { ...lazyState.filters };
+                                      newFilters[column].value = e.value;
+                                      setLazyState({
+                                        ...lazyState,
+                                        filters: newFilters
+                                      });
+                                    }}
+                                    placeholder="Select a status"
+                                    className="p-column-filter"
+                                    showClear
+                                  />
+                                ) : undefined }
 
-                            filterPlaceholder={dateFields.includes(column) ? undefined : "Search"}
+                            filterPlaceholder={dateFields.includes(column) || column === 'state' ? undefined : "Search"}
                             body={(rowData) => {
 								const value = rowData[column];
 								if (typeof value === "object" && value !== null) {
 									return value.name || "N/A";
 								}
-                                if (value && column == "price"){
+                                if (value && column == "total"){
                                     return `${value} €`;
-                                }
-                                if (value && column == "arriveTime"){
-                                    return `${value} days`;
                                 }
 								if (dateFields.includes(column) && value) {
 									const date = new Date(value);
@@ -229,7 +259,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                                     {active=="1" ? 
                                         <>
                                           <Button
-                                                icon="pi pi-pencil"
+                                                icon="pi pi-info-circle"
                                                 rounded
                                                 text
                                                 severity="secondary"
@@ -244,18 +274,29 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                                                 label="Delete"
                                                 style={{color: "var(--danger)"}}
                                                 className="custom-icon-button-withtext"
-                                                onClick={() => confirmDelete(model==="equipmentSheet" ? rowData.Barcode: rowData.id)}
+                                                onClick={() => confirmDelete(rowData.nic)}
                                             /> 
                                         </> : 
-                                    <Button
-                                        icon="pi pi-history"
-                                        text
-                                        severity="success"
-                                        label="Restore"
-                                        style={{color: "var(--valid)"}}
-                                        className="custom-icon-button-withtext"
-                                        onClick={() => confirmDelete(model==="equipmentSheet" ? rowData.Barcode: rowData.id)}
-                                    />
+                                        <>
+                                        <Button
+                                                icon="pi pi-info-circle"
+                                                rounded
+                                                text
+                                                severity="secondary"
+                                                aria-label="Edit"
+                                                className="custom-icon-button"
+                                                onClick={() => handleEdit(rowData)}
+                                            />
+                                        <Button
+                                            icon="pi pi-history"
+                                            text
+                                            severity="success"
+                                            label="Restore"
+                                            style={{color: "var(--valid)"}}
+                                            className="custom-icon-button-withtext"
+                                            onClick={() => confirmDelete(rowData.nic)}
+                                        />
+                                        </>
                                     }
                                 </div>
                             );
@@ -312,58 +353,36 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 							padding-right: 0.05rem;
 							background-color: var(--variant-one);
 						}
-                        .custom-icon-button {
-                            width: 2.5rem;
-                            height: 2.5rem;
-                            border-radius: 50% !important;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            padding: 0;
-                        }
-                        .custom-icon-button-withtext {
-                            height: 2.5rem;
-                            border-radius: 20% !important;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            padding: 0.2rem;
-                        }
-                        .custom-icon-button .pi {
-                            font-size: 1.1rem;
-                        }
+            .custom-icon-button {
+                width: 2.5rem;
+                height: 2.5rem;
+                border-radius: 50% !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            .custom-icon-button-withtext {
+                height: 2.5rem;
+                border-radius: 20% !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.2rem;
+            }
+            .custom-icon-button .pi {
+                font-size: 1.1rem;
+            }
 						`}
 				</style>
             </div>
-            {model === "model" ? (
-                <FormsEquipmentModel
-                    showModal={showModal}
-                    closeModal={() => setShowModal(false)}
-                    refreshTable={() => loadLazyData()}
-                    existingModel={selectedObj || {}}
-                />
-            ) : model === "equipmentSheet" ? (
-                <FormsEquipmentSheet
-                    showModal={showModal}
-                    closeModal={() => setShowModal(false)}
-                    refreshTable={() => loadLazyData()}
-                    existingSheet={selectedObj || {}}
-                />
-            ) : (
-                <ModalEdit
-                    show={showModal}
-                    handleClose={() => setShowModal(false)}
-                    modelToEdit={model}
-                    objectToChange={selectedObj || {}}
-                    attributesToEdit={columns}
-                    onSave={() => {
-                        setShowModal(false);
-                        loadLazyData();
-                    }}
-                />
-            )}
-
             
+            {/* <ClientManageDetailsModal 
+                clientNIC={selectedObj || {}}
+                showModal={showModal}
+                refreshTable={() => loadLazyData()}
+                closeModal= {() => setShowModal(false)}
+            /> */}
         </>
     );
 }

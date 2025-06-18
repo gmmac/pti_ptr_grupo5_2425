@@ -129,6 +129,17 @@ router.get("/displayTable", async (req, res) => {
         }
       );
     }
+    if (birthDate) {
+      const dateStart = new Date(birthDate);
+      dateStart.setHours(0, 0, 0, 0);
+
+      const dateEnd = new Date(birthDate);
+      dateEnd.setHours(23, 59, 59, 999);
+
+      where.birthDate = {
+        [Op.between]: [dateStart, dateEnd],
+      };
+    }
     if (active) where.isActive = { [Op.eq]: active };
 
     const offset = (parseInt(page) - 1) * parseInt(pageSize);

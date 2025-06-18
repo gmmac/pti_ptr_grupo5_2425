@@ -108,7 +108,7 @@ export default function EmployeeHomePage() {
                     <EmployeeRepairs />
                 </Tab.Pane>
                 <Tab.Pane eventKey="sales" className='p-4'>
-                    <h3>Store Sales</h3>
+                    <h3>Store Sales Management</h3>
                     <EmployeeStoreSales />
                 </Tab.Pane>
                 <Tab.Pane eventKey="charityproject" className='p-4'>
