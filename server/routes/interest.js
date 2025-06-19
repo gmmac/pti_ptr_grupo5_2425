@@ -13,112 +13,116 @@ router.get("/", async (req, res) => {
 	}
 });
 
-router.get("/:userNic/:folderId", async (req, res) => {
+router.get("/user/:userNic", async (req, res) => {
 	try {
-		const { userNic, folderId } = req.params;
+		const { userNic } = req.params;
 
-		if (folderId === "null") {
-			// Se não houver pasta, buscar todos os interesses do utilizador
-			const allInterests = await models.Interest.findAll({
-				where: { clientNic: userNic },
-				attributes: [
-					"id",
-					"equipmentSheetID",
-					"maxLaunchYear",
-					"minLaunchYear",
-					"minPrice",
-					"maxPrice",
-					"createdAt",
-					"updatedAt",
-					"description",
-				],
-				include: [
-					{ model: models.Brand, as: "brand", attributes: ["id", "name"] },
-					{
-						model: models.EquipmentModel,
-						as: "model",
-						attributes: ["id", "name"],
-					},
-					{
-						model: models.EquipmentType,
-						as: "type",
-						attributes: ["id", "name"],
-					},
-					{
-						model: models.EquipmentStatus,
-						as: "equipmentStatus",
-						attributes: ["id", "state"],
-					},
-					{
-						model: models.PreferredStoresInterets,
-						as: "preferredStores",
-						include: [
-							{
-								model: models.Store,
-								as: "store",
-								attributes: ["nipc", "name", "email", "phone", "address"],
-							},
-						],
-					},
-				],
-			});
-			res.json(allInterests);
-		} else {
-			// Buscar os IDs de interesses ligados à pasta (🛠️ CORRIGIDO AQUI)
-			const interestsIds = await models.FolderInterestEquipments.findAll({
-				where: {
-					folderInterestId: folderId, // ✅ uso correto da coluna
+		const allInterests = await models.Interest.findAll({
+			where: { clientNic: userNic },
+			attributes: [
+				"id",
+				"equipmentSheetID",
+				"maxLaunchYear",
+				"minLaunchYear",
+				"minPrice",
+				"maxPrice",
+				"createdAt",
+				"updatedAt",
+				"description",
+			],
+			include: [
+				{ model: models.Brand, as: "brand", attributes: ["id", "name"] },
+				{
+					model: models.EquipmentModel,
+					as: "model",
+					attributes: ["id", "name"],
 				},
-			});
-
-			const interests = {};
-
-			for (const interest of interestsIds) {
-				const interestData = await models.Interest.findOne({
-					where: {
-						id: interest.interestId,
-						clientNic: userNic, // opcional: filtra por utilizador também
-					},
-					attributes: [
-						"id",
-						"equipmentSheetID",
-						"maxLaunchYear",
-						"minLaunchYear",
-						"minPrice",
-						"maxPrice",
-						"createdAt",
-						"updatedAt",
-						"description",
-					],
+				{ model: models.EquipmentType, as: "type", attributes: ["id", "name"] },
+				{
+					model: models.EquipmentStatus,
+					as: "equipmentStatus",
+					attributes: ["id", "state"],
+				},
+				{
+					model: models.PreferredStoresInterets,
+					as: "preferredStores",
 					include: [
-						{ model: models.Brand, as: "brand", attributes: ["id", "name"] },
 						{
-							model: models.EquipmentModel,
-							as: "model",
-							attributes: ["id", "name"],
-						},
-						{
-							model: models.EquipmentType,
-							as: "type",
-							attributes: ["id", "name"],
-						},
-						{
-							model: models.EquipmentStatus,
-							as: "equipmentStatus",
-							attributes: ["id", "state"],
+							model: models.Store,
+							as: "store",
+							attributes: ["nipc", "name", "email", "phone", "address"],
 						},
 					],
-				});
+				},
+			],
+		});
 
-				if (interestData) {
-					interests[interestData.id] = interestData;
-				}
-			}
-
-			res.json(interests);
-		}
+		res.json(allInterests);
 	} catch (error) {
-		console.error("Error fetching interests:", error);
+		console.error("Error fetching all interests for user:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+router.get("/folder/:userNic/:folderInterestId", async (req, res) => {
+	try {
+		const { userNic, folderInterestId } = req.params;
+
+		// 1. Obter todos os interestId associados à pasta
+		const links = await models.FolderInterestEquipments.findAll({
+			where: { folderInterestId },
+			attributes: ["interestId"],
+		});
+
+		const interestIds = links.map((link) => link.interestId);
+
+		// 2. Buscar os interesses com os mesmos includes da outra rota
+		const interests = await models.Interest.findAll({
+			where: {
+				id: interestIds,
+				clientNic: userNic,
+			},
+			attributes: [
+				"id",
+				"equipmentSheetID",
+				"maxLaunchYear",
+				"minLaunchYear",
+				"minPrice",
+				"maxPrice",
+				"createdAt",
+				"updatedAt",
+				"description",
+			],
+			include: [
+				{ model: models.Brand, as: "brand", attributes: ["id", "name"] },
+				{
+					model: models.EquipmentModel,
+					as: "model",
+					attributes: ["id", "name"],
+				},
+				{ model: models.EquipmentType, as: "type", attributes: ["id", "name"] },
+				{
+					model: models.EquipmentStatus,
+					as: "equipmentStatus",
+					attributes: ["id", "state"],
+				},
+				{
+					model: models.PreferredStoresInterets,
+					as: "preferredStores",
+					include: [
+						{
+							model: models.Store,
+							as: "store",
+							attributes: ["nipc", "name", "email", "phone", "address"],
+						},
+					],
+				},
+			],
+		});
+
+		res.json(interests);
+	} catch (error) {
+		console.error("Error fetching folder interests:", error);
 		res.status(500).json({ error: "Internal server error" });
 	}
 });
@@ -127,7 +131,7 @@ router.get("/not-in-folder/:userNic/:folderInterestId", async (req, res) => {
 	try {
 		const { userNic, folderInterestId } = req.params;
 
-		// 1. todos os interestId já na pasta
+		//todos os interestId já na pasta
 		const links = await models.FolderInterestEquipments.findAll({
 			where: { folderInterestId },
 			attributes: ["interestId"],
@@ -135,7 +139,7 @@ router.get("/not-in-folder/:userNic/:folderInterestId", async (req, res) => {
 
 		const alreadyInFolder = links.map((link) => link.interestId);
 
-		// 2. todos os interesses do userNic que NÃO estão na pasta
+		//todos os interesses do userNic que NÃO estão na pasta
 		const interests = await models.Interest.findAll({
 			where: {
 				clientNic: userNic,

@@ -17,6 +17,10 @@ export default function FolderContent() {
 		editInterest,
 		editFolderName,
 		deleteInterestFolder,
+		fetchInterestsNotInFolder,
+		interestsNotInFolder,
+		addInterestToFolder,
+		removeInterestFromFolder,
 	} = useInterests();
 	const [selectedInterest, setSelectedInterest] = useState(null);
 	const [showDetails, setShowDetails] = useState(false);
@@ -31,6 +35,10 @@ export default function FolderContent() {
 	useEffect(() => {
 		fetchInterests();
 	}, [folderToOpen]);
+
+	useEffect(() => {
+		fetchInterestsNotInFolder(folderToOpen?.id);
+	}, [showManageInterestsInFolder]);
 
 	const handleDelete = () => {
 		deleteInterest(selectedInterest.id);
@@ -84,6 +92,24 @@ export default function FolderContent() {
 					</Stack>
 				)}
 				<Row className="g-4">
+					{(!Array.isArray(loadedInterests) ||
+						loadedInterests.length === 0) && (
+						<Col xs={12}>
+							<Stack
+								className="p-3 align-items-center justify-content-center"
+								style={{
+									backgroundColor: "var(--variant-one-light)",
+									borderRadius: "16px",
+									height: "244px",
+								}}
+							>
+								<p className="m-0 text-muted">
+									No interests found in this folder.
+								</p>
+							</Stack>
+						</Col>
+					)}
+
 					{(Array.isArray(loadedInterests) ? loadedInterests : []).map(
 						(interest, index) => (
 							<Col key={index} xs={12} sm={6} md={4} lg={3}>
@@ -170,6 +196,10 @@ export default function FolderContent() {
 				show={showManageInterestsInFolder}
 				setShow={setShowManageInterestsInFolder}
 				folder={folderToOpen}
+				interestsInFolder={loadedInterests}
+				interestsNotInFolder={interestsNotInFolder}
+				addInterestToFolder={addInterestToFolder}
+				removeInterestFromFolder={removeInterestFromFolder}
 			/>
 		</>
 	);

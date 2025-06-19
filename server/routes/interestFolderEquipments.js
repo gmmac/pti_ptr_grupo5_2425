@@ -54,24 +54,30 @@ router.put("/:id", async (req, res) => {
 
 // DELETE - remover um registo específico por ID (usando query ou body)
 router.delete("/", async (req, res) => {
-	const { id } = req.body;
+	const { folderInterestId, interestId } = req.body;
 
-	if (!id) {
-		return res.status(400).json({ error: "ID do registo em falta." });
+	if (!folderInterestId || !interestId) {
+		return res.status(400).json({ error: "IDs obrigatórios em falta." });
 	}
 
 	try {
 		const deleted = await models.FolderInterestEquipments.destroy({
-			where: { id },
+			where: {
+				folderInterestId,
+				interestId,
+			},
 		});
 
 		if (!deleted) {
 			return res.status(404).json({ error: "Registo não encontrado." });
 		}
 
-		res.status(200).json({ message: "Registo removido com sucesso." });
+		res
+			.status(200)
+			.json({ message: "Interesse removido da pasta com sucesso." });
 	} catch (err) {
-		res.status(500).json({ error: "Erro ao remover o registo." });
+		console.error("Erro ao remover o interesse:", err);
+		res.status(500).json({ error: "Erro interno do servidor." });
 	}
 });
 
