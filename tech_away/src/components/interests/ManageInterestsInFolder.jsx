@@ -27,6 +27,7 @@ export default function ManageInterestsInFolder({
 			show={show}
 			centered
 			size="xl"
+			fullscreen="md-down"
 			onHide={() => setShow(false)}
 			style={{ fontFamily: "var(--body-font)", color: "var(--dark-grey)" }}
 		>
@@ -37,7 +38,7 @@ export default function ManageInterestsInFolder({
 			</Modal.Header>
 			<Modal.Body>
 				<Row className="align-items-stretch">
-					<Col xs={12} lg={6} className="d-flex flex-column ">
+					<Col xs={12} lg={6} className="d-flex flex-column mt-2">
 						<Stack
 							direction="vertical"
 							className="p-3 align-items-start h-100"
@@ -155,7 +156,7 @@ export default function ManageInterestsInFolder({
 							</Stack>
 						</Stack>
 					</Col>
-					<Col xs={12} lg={6} className="d-flex flex-column">
+					<Col xs={12} lg={6} className="d-flex flex-column mt-2">
 						<Stack
 							direction="vertical"
 							className="p-3 align-items-between"
