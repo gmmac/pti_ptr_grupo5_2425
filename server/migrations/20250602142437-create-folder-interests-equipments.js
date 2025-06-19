@@ -10,9 +10,14 @@ module.exports = {
 				primaryKey: true,
 				type: Sequelize.INTEGER,
 			},
-			folderId: {
+			folderInterestId: {
 				type: Sequelize.INTEGER,
-				allowNull: false,
+				references: {
+					model: "FolderInterests",
+					key: "id",
+				},
+				onUpdate: "CASCADE",
+				onDelete: "SET NULL",
 			},
 			interestId: {
 				type: Sequelize.INTEGER,
@@ -24,15 +29,7 @@ module.exports = {
 				onUpdate: "CASCADE",
 				onDelete: "SET NULL",
 			},
-			folderInterestId: {
-				type: Sequelize.INTEGER,
-				references: {
-					model: "FolderInterests",
-					key: "id",
-				},
-				onUpdate: "CASCADE",
-				onDelete: "SET NULL",
-			},
+
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,

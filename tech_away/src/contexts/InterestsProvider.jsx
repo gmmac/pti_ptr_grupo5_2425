@@ -1,7 +1,6 @@
 import { useContext, createContext, useState, useEffect, use } from "react";
 import { useAuth } from "./AuthenticationProviders/AuthProvider";
 import api from "../utils/axios";
-import { set } from "date-fns";
 
 const InterestsContext = createContext();
 
@@ -66,6 +65,18 @@ const InterestsProvider = ({ children }) => {
 		}
 	};
 
+	const fetchInterestsNotInFolder = async (folderId) => {
+		try {
+			const res = await api.get(
+				`/api/interest/not-in-folder/${user.nic}/${folderId}`
+			);
+			return res.data;
+		} catch (error) {
+			console.error("Error fetching interests not in folder:", error);
+			return [];
+		}
+	};
+
 	const editInterest = async (editedInterest) => {
 		try {
 			const response = await api.put(
@@ -116,6 +127,59 @@ const InterestsProvider = ({ children }) => {
 		}
 	};
 
+	const addInterestToFolder = async (folderInterestId, interestIds) => {
+		try {
+			const ids = Array.isArray(interestIds) ? interestIds : [interestIds];
+
+			for (const interestId of ids) {
+				await fetch("/api/folderInterestEquipments", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ folderInterestId, interestId }),
+				});
+			}
+
+			console.log("Interesses adicionados com sucesso.");
+		} catch (error) {
+			console.error("Erro ao adicionar interesses à pasta:", error);
+		}
+	};
+
+	const removeInterestFromFolder = async (folderInterestId, interestIds) => {
+		try {
+			const ids = Array.isArray(interestIds) ? interestIds : [interestIds];
+
+			// Para cada interesse, procura o registo correspondente e remove
+			for (const interestId of ids) {
+				// Primeiro, obter o registo específico (supondo que só existe um registo por combinação)
+				const res = await fetch("/api/folderInterestEquipments");
+				const allItems = await res.json();
+
+				const target = allItems.find(
+					(item) =>
+						item.folderInterestId === folderInterestId &&
+						item.interestId === interestId
+				);
+
+				if (target) {
+					await fetch("/api/folderInterestEquipments", {
+						method: "DELETE",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ id: target.id }),
+					});
+				}
+			}
+
+			console.log("Interesses removidos com sucesso.");
+		} catch (error) {
+			console.error("Erro ao remover interesses da pasta:", error);
+		}
+	};
+
 	return (
 		<InterestsContext.Provider
 			value={{
@@ -124,6 +188,7 @@ const InterestsProvider = ({ children }) => {
 				folders,
 				fetchInterestFolders,
 				fetchInterests,
+				fetchInterestsNotInFolder,
 				folderToOpen,
 				setFolderToOpen,
 				createFolder,
@@ -132,6 +197,8 @@ const InterestsProvider = ({ children }) => {
 				deleteInterestFolder,
 				editInterest,
 				editFolderName,
+				addInterestToFolder,
+				removeInterestFromFolder,
 			}}
 		>
 			{children}

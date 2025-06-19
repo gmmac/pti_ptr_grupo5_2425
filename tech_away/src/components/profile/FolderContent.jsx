@@ -4,9 +4,9 @@ import { useInterests } from "../../contexts/InterestsProvider";
 import DetailsModal from "../interests/DetailsModal";
 import DeleteInterestModal from "../interests/DeleteInterestModal";
 import { Toast } from "primereact/toast";
-import AddInterestToFolderModal from "../interests/AddInterestToFolderModal";
 import EditFolderNameModal from "./EditFolderNameModal";
 import DeleteFolderModal from "./DeletFolderModal";
+import ManageInterestsInFolder from "../interests/ManageInterestsInFolder";
 
 export default function FolderContent() {
 	const {
@@ -21,9 +21,10 @@ export default function FolderContent() {
 	const [selectedInterest, setSelectedInterest] = useState(null);
 	const [showDetails, setShowDetails] = useState(false);
 	const [showDelete, setShowDelete] = useState(false);
-	const [showAddToFolder, setShowAddToFolder] = useState(false);
 	const [showEditFolderName, setShowEditFolderName] = useState(false);
 	const [showDeleteFolder, setShowDeleteFolder] = useState(false);
+	const [showManageInterestsInFolder, setShowManageInterestsInFolder] =
+		useState(false);
 
 	const toastRef = useRef(null);
 
@@ -55,10 +56,10 @@ export default function FolderContent() {
 						<p
 							className="m-0 d-flex gap-2 align-items-center"
 							style={{ cursor: "pointer" }}
-							onClick={() => setShowAddToFolder(true)}
+							onClick={() => setShowManageInterestsInFolder(true)}
 						>
-							<i className="pi pi-plus"></i>
-							<span>Add Interests to Folder</span>
+							<i className="pi pi-objects-column"></i>
+							<span>Manage Interests in Folder</span>
 						</p>
 						<p
 							className="m-0 d-flex gap-2 align-items-center"
@@ -149,11 +150,6 @@ export default function FolderContent() {
 				onConfirm={handleDelete}
 				reopenDetails={() => setShowDetails(true)}
 			/>
-			<AddInterestToFolderModal
-				show={showAddToFolder}
-				setShow={setShowAddToFolder}
-				folder={folderToOpen}
-			/>
 
 			<EditFolderNameModal
 				showModal={showEditFolderName}
@@ -168,6 +164,12 @@ export default function FolderContent() {
 				setShowModal={setShowDeleteFolder}
 				folderToDelete={folderToOpen}
 				onConfirm={deleteInterestFolder}
+			/>
+
+			<ManageInterestsInFolder
+				show={showManageInterestsInFolder}
+				setShow={setShowManageInterestsInFolder}
+				folder={folderToOpen}
 			/>
 		</>
 	);
