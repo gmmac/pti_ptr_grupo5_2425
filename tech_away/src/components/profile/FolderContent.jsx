@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Stack } from "react-bootstrap";
+import { Stack, Row, Col } from "react-bootstrap";
 import { useInterests } from "../../contexts/InterestsProvider";
 import DetailsModal from "../interests/DetailsModal";
 import DeleteInterestModal from "../interests/DeleteInterestModal";
@@ -70,58 +70,58 @@ export default function FolderContent() {
             </p>
           </Stack>
         )}
-        <Stack direction="horizontal" gap={4} className="flex-wrap">
+        <Row className="g-4">
           {(Array.isArray(loadedInterests) ? loadedInterests : []).map(
             (interest, index) => (
-              <Stack
-                direction="horizontal"
-                gap={4}
-                key={index}
-                className="p-3 align-items-start"
-                style={{
-                  backgroundColor: "var(--variant-one-light)",
-                  borderRadius: "16px",
-                }}
-              >
-                <Stack>
-                  <p className="m-0">
-                    Interest in{" "}
-                    {[
-                      interest?.model?.name,
-                      interest?.brand?.name,
-                      interest?.type?.name,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
-
-                  {interest?.preferredStores?.length > 0 && (
-                    <p className="m-0 text-muted">
-                      {interest.preferredStores.map((store, index) => (
-                        <span key={index}>
-                          {store.store?.name || store.storeId}
-                          {index < interest.preferredStores.length - 1 && ", "}
-                        </span>
-                      ))}
-                    </p>
-                  )}
-                  <p className="m-0 text-muted">
-                    Creation date:{" "}
-                    {new Date(interest.createdAt).toLocaleDateString("pt-PT")}
-                  </p>
-                </Stack>
-                <i
-                  className="pi pi-external-link mt-1"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setSelectedInterest(interest);
-                    setShowDetails(true);
+              <Col key={index} xs={12} sm={6} md={4} lg={3}>
+                <Stack
+                  gap={4}
+                  className="p-3 align-items-start h-100"
+                  style={{
+                    backgroundColor: "var(--variant-one-light)",
+                    borderRadius: "16px",
                   }}
-                />
-              </Stack>
+                >
+                  <Stack>
+                    <p className="m-0">
+                      Interest in{" "}
+                      {[
+                        interest?.model?.name,
+                        interest?.brand?.name,
+                        interest?.type?.name,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+
+                    {interest?.preferredStores?.length > 0 && (
+                      <p className="m-0 text-muted">
+                        {interest.preferredStores.map((store, idx) => (
+                          <span key={idx}>
+                            {store.store?.name || store.storeId}
+                            {idx < interest.preferredStores.length - 1 && ", "}
+                          </span>
+                        ))}
+                      </p>
+                    )}
+                    <p className="m-0 text-muted">
+                      Creation date:{" "}
+                      {new Date(interest.createdAt).toLocaleDateString("pt-PT")}
+                    </p>
+                  </Stack>
+                  <i
+                    className="pi pi-external-link mt-1 align-self-end"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setSelectedInterest(interest);
+                      setShowDetails(true);
+                    }}
+                  />
+                </Stack>
+              </Col>
             )
           )}
-        </Stack>
+        </Row>
       </Stack>
       {/* Modal de detalhes */}
       <DetailsModal
