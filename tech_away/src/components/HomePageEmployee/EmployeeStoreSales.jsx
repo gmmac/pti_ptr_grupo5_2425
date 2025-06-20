@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button, Container, Row, Col, Tabs, Tab } from "react-bootstrap";
 import SalesDisplayTable from "../storeSales/SalesDisplayTable";
-//import SalesDisplayTable from "./SalesDisplayTable"; // Componente de tabela a criar
 
 export default function EmployeeStoreSales() {
   const [refreshKey, setRefreshKey] = useState(0);

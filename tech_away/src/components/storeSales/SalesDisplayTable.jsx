@@ -4,19 +4,23 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { confirmDialog } from "primereact/confirmdialog";
 import api from "../../utils/axios";
-import ModalEdit from "../equipment/ModalEdit";
-import FormsEquipmentSheet from "../equipment/FormsEquipmentSheet";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
-import FormsEquipmentModel from "../equipment/FormsEquipmentModel";
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
+import { useAuthEmployee } from "../../contexts/AuthenticationProviders/EmployeeAuthProvider";
+import SalesDetailsModal from "./SalesDetailsModal";
+import { Dialog } from "primereact/dialog";
 
 
-export default function SalesDisplayTable({ salesType, active = "1", refreshAllTables=null}) {
+export default function SalesDisplayTable({ filterType, active = "1", refreshAllTables=null}) {
 	  const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
+    const [statusWarning, setStatusWarning] = useState(null);
+
+
+    const { employee } = useAuthEmployee();
 
     const [lazyState, setLazyState] = useState({
         first: 0,
@@ -37,17 +41,20 @@ export default function SalesDisplayTable({ salesType, active = "1", refreshAllT
 
     const [data, setData] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [selectedObj, setSelectedObj] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-    const menuRefs = useRef([]);
+
+    const [showDetails, setShowDetails] = useState(false);
+    const [detailsSaleId, setDetailsSaleId] = useState(null);
+
 	  const dateFields = ['CreatedAt', 'UpdatedAt']; // adiciona os campos relevantes
     const [stateOptions, setStateOptions] = useState([]);
 
 
     useEffect(() => {
-        loadLazyData();
-        loadStateOptions();
-    }, [salesType, lazyState]);
+        if (employee) {  // Só carrega quando o employee existe
+            loadLazyData();
+            loadStateOptions();
+        }
+    }, [filterType, lazyState]);
 
     const loadLazyData = () => {
         setLoading(true);
@@ -63,17 +70,18 @@ export default function SalesDisplayTable({ salesType, active = "1", refreshAllT
             page: currentPage,
             pageSize: pageSize,
             sortField,
-            sortOrder
+            sortOrder,
+            filterType,
+            employee
         };
 
         // Adiciona os filtros aos params
         for (const key in filters) {
             const filterMeta = filters[key];
-            if (filterMeta?.value) {
+            if (filterMeta?.value !== null && filterMeta?.value !== undefined && filterMeta.value !== '') {
                 params[key] = filterMeta.value;
             }
         }
-        
 
         // Faz a requisição ao backend
         api.get(`api/clientPurchase/display-table`, { params }).then((res) => {
@@ -120,21 +128,23 @@ export default function SalesDisplayTable({ salesType, active = "1", refreshAllT
     };
 
     const confirmDelete = (id) => {
-        confirmDialog({
-            message: (<> Are you sure you want to {active == "1" ? "deactivate" : "restore"} this {model}?</>),
-            header: "Confirmation",
-            icon: "pi pi-exclamation-triangle",
-            accept: () => handleDelete(id),
-        });
+      confirmDialog({
+        message: ( <> Are you sure you want to delete this sale? <br />This action is permanent and irreversible.</>),
+        header: "Confirmation",
+        icon: "pi pi-exclamation-triangle",
+        acceptClassName: "p-button-rounded p-button-danger custom-confirm-yes",
+        rejectClassName: "p-button-rounded custom-confirm-no",
+        accept: () => handleDelete(id)
+      });
     };
 
     const handleEdit = (item) => {
-        setSelectedObj(item.nic);
-        setShowModal(true);
+        setDetailsSaleId(item.id);
+        setShowDetails(true);
     };
 
     const handleDelete = (id) => {
-        api.patch(`/api/clientPurchase/activation/${id}`).then(() => {
+        api.delete(`/api/clientPurchase/${id}`).then(() => {
             loadLazyData(); 
             refreshAllTables();
         });
@@ -149,6 +159,27 @@ export default function SalesDisplayTable({ salesType, active = "1", refreshAllT
         if(String(value) == "CreatedAt") return "Date";
         return String(value).charAt(0).toUpperCase() + String(value).slice(1);
     }
+
+    const [showStatusModal, setShowStatusModal] = useState(false);
+    const [selectedSale, setSelectedSale] = useState(null);
+    const [newStatusId, setNewStatusId] = useState(null);
+
+    const openChangeStatusModal = (sale) => {
+      setSelectedSale(sale);
+      setNewStatusId(sale.orderStatusID); // estado inicial
+      setShowStatusModal(true);
+    };
+
+    const handleStatusSave = () => {
+      api.patch(`api/clientPurchase/${selectedSale.id}/change-status`, { statusId: newStatusId })
+        .then(() => {
+          setShowStatusModal(false);
+          refreshAllTables();
+        })
+        .catch(err => {
+          console.error("Error updating status", err);
+        });
+    };
 
     return (
         <>
@@ -220,7 +251,7 @@ export default function SalesDisplayTable({ salesType, active = "1", refreshAllT
                                         filters: newFilters
                                       });
                                     }}
-                                    placeholder="Select a status"
+                                    placeholder="Select"
                                     className="p-column-filter"
                                     showClear
                                   />
@@ -228,25 +259,25 @@ export default function SalesDisplayTable({ salesType, active = "1", refreshAllT
 
                             filterPlaceholder={dateFields.includes(column) || column === 'state' ? undefined : "Search"}
                             body={(rowData) => {
-								const value = rowData[column];
-								if (typeof value === "object" && value !== null) {
-									return value.name || "N/A";
-								}
-                                if (value && column == "total"){
-                                    return `${value} €`;
-                                }
-								if (dateFields.includes(column) && value) {
-									const date = new Date(value);
-									const formattedDate = date.toLocaleDateString("pt-PT");
-									const formattedTime = date.toLocaleTimeString("pt-PT", {
-										hour: "2-digit",
-										minute: "2-digit",
-										hour12: false,
-									});
-									return `${formattedDate} ${formattedTime}`;
-								}			
-								return value;
-							}}
+                              const value = rowData[column];
+                              if (typeof value === "object" && value !== null) {
+                                return value.name || "N/A";
+                              }
+                                              if (value && column == "total"){
+                                                  return `${value} €`;
+                                              }
+                              if (dateFields.includes(column) && value) {
+                                const date = new Date(value);
+                                const formattedDate = date.toLocaleDateString("pt-PT");
+                                const formattedTime = date.toLocaleTimeString("pt-PT", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: false,
+                                });
+                                return `${formattedDate} ${formattedTime}`;
+                              }			
+                              return value;
+                            }}
                         />
                     ))}
                     <Column
@@ -256,133 +287,204 @@ export default function SalesDisplayTable({ salesType, active = "1", refreshAllT
                         body={(rowData, options) => {
                             return (
                                 <div style={{ display: "flex", gap: "0.3rem", justifyContent: "center" }}>
-                                    {active=="1" ? 
-                                        <>
-                                          <Button
-                                                icon="pi pi-info-circle"
-                                                rounded
-                                                text
-                                                severity="secondary"
-                                                aria-label="Edit"
-                                                className="custom-icon-button"
-                                                onClick={() => handleEdit(rowData)}
-                                            />
-                                            <Button
-                                                icon="pi pi-trash"
-                                                text
-                                                severity="danger"
-                                                label="Delete"
-                                                style={{color: "var(--danger)"}}
-                                                className="custom-icon-button-withtext"
-                                                onClick={() => confirmDelete(rowData.nic)}
-                                            /> 
-                                        </> : 
-                                        <>
-                                        <Button
-                                                icon="pi pi-info-circle"
-                                                rounded
-                                                text
-                                                severity="secondary"
-                                                aria-label="Edit"
-                                                className="custom-icon-button"
-                                                onClick={() => handleEdit(rowData)}
-                                            />
-                                        <Button
-                                            icon="pi pi-history"
-                                            text
-                                            severity="success"
-                                            label="Restore"
-                                            style={{color: "var(--valid)"}}
-                                            className="custom-icon-button-withtext"
-                                            onClick={() => confirmDelete(rowData.nic)}
-                                        />
-                                        </>
-                                    }
+                                  <Button
+                                      icon="pi pi-info-circle"
+                                      rounded
+                                      text
+                                      severity="secondary"
+                                      aria-label="Edit"
+                                      className="custom-icon-button"
+                                      onClick={() => handleEdit(rowData)}
+                                    />
+                                    <Button
+                                      icon="pi pi-sync"
+                                      rounded
+                                      text
+                                      severity="secondary"
+                                      aria-label="Change Status"
+                                      className="custom-icon-button"
+                                      onClick={() => openChangeStatusModal(rowData)}
+                                    />
+                                    <Button
+                                        icon="pi pi-trash"
+                                        text
+                                        severity="danger"
+                                        aria-label="Delete Sale"
+                                        style={{color: "var(--danger)"}}
+                                        className="custom-icon-button"
+                                        onClick={() => confirmDelete(rowData.id)}
+                                    /> 
                                 </div>
                             );
                         }}
                     />
                 </DataTable>
-				<style>
-					{`
-						.p-paginator .p-paginator-pages .p-paginator-page {
-							border: 0 none;
-							color: #374151;
-							min-width: 3rem;
-							height: 3rem;
-							margin: 0.143rem;
-							transition: box-shadow 0.2s;
-							border-radius: 50%;
-						}
+            <style>
+              {`
+                .p-paginator .p-paginator-pages .p-paginator-page {
+                  border: 0 none;
+                  color: #374151;
+                  min-width: 3rem;
+                  height: 3rem;
+                  margin: 0.143rem;
+                  transition: box-shadow 0.2s;
+                  border-radius: 50%;
+                }
 
-						.p-paginator .p-paginator-first:not(.p-disabled):not(.p-highlight):hover, .p-paginator .p-paginator-prev:not(.p-disabled):not(.p-highlight):hover, .p-paginator .p-paginator-next:not(.p-disabled):not(.p-highlight):hover, .p-paginator .p-paginator-last:not(.p-disabled):not(.p-highlight):hover{
-							background: #f3f4f6;
-							border-color: transparent;
-							color: #374151;
-							border-radius: 50%;
-						}
-						.p-dropdown-items{
-							padding-bottom: 0rem !important;
-							padding-left: 0rem !important;
-						}
-						.p-paginator-current{
-							cursor: default;
-						}
-						.p-paginator-page.p-highlight{
-							background: var(--variant-green-highlight)
-						}
-						.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight.p-focus{
-							background: var(--variant-green-highlight) !important;
-						}
-						.p-dropdown-item.p-highlight{
-							background: var(--variant-green-highlight) !important;
-							color: #374151;
-						}
-						.p-dropdown:not(.p-disabled):hover{
-							border-color: var(--variant-green-highlight);
-						}
-						.p-dropdown:not(.p-disabled).p-focus{
-							box-shadow: 0 0 0 0.2rem var(--variant-green-highlight);
-							border-color:rgba(55, 65, 81, 0.35);
-						}
+                .p-paginator .p-paginator-first:not(.p-disabled):not(.p-highlight):hover, .p-paginator .p-paginator-prev:not(.p-disabled):not(.p-highlight):hover, .p-paginator .p-paginator-next:not(.p-disabled):not(.p-highlight):hover, .p-paginator .p-paginator-last:not(.p-disabled):not(.p-highlight):hover{
+                  background: #f3f4f6;
+                  border-color: transparent;
+                  color: #374151;
+                  border-radius: 50%;
+                }
+                .p-dropdown-items{
+                  padding-bottom: 0rem !important;
+                  padding-left: 0rem !important;
+                }
+                .p-paginator-current{
+                  cursor: default;
+                }
+                .p-paginator-page.p-highlight{
+                  background: var(--variant-green-highlight)
+                }
+                .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight.p-focus{
+                  background: var(--variant-green-highlight) !important;
+                }
+                .p-dropdown-item.p-highlight{
+                  background: var(--variant-green-highlight) !important;
+                  color: #374151;
+                }
+                .p-dropdown:not(.p-disabled):hover{
+                  border-color: var(--variant-green-highlight);
+                }
+                .p-dropdown:not(.p-disabled).p-focus{
+                  box-shadow: 0 0 0 0.2rem var(--variant-green-highlight);
+                  border-color:rgba(55, 65, 81, 0.35);
+                }
 
-						.p-datepicker-trigger {
-							border: var(--variant-one);
-							border-top-right-radius: 6px !important;
-							border-bottom-right-radius: 6px !important;
-							padding-right: 0.05rem;
-							background-color: var(--variant-one);
-						}
-            .custom-icon-button {
-                width: 2.5rem;
-                height: 2.5rem;
-                border-radius: 50% !important;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 0;
-            }
-            .custom-icon-button-withtext {
-                height: 2.5rem;
-                border-radius: 20% !important;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 0.2rem;
-            }
-            .custom-icon-button .pi {
-                font-size: 1.1rem;
-            }
-						`}
-				</style>
+                .p-datepicker-trigger {
+                  border: var(--variant-one);
+                  border-top-right-radius: 6px !important;
+                  border-bottom-right-radius: 6px !important;
+                  padding-right: 0.05rem;
+                  background-color: var(--variant-one);
+                }
+                .custom-icon-button {
+                    width: 2.5rem;
+                    height: 2.5rem;
+                    border-radius: 50% !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0;
+                }
+                .custom-icon-button-withtext {
+                    height: 2.5rem;
+                    border-radius: 20% !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0.2rem;
+                }
+                .custom-icon-button .pi {
+                    font-size: 1.1rem;
+                }
+
+                .custom-confirm-yes {
+                  border-radius: 6px !important;
+                  margin-left: 1rem
+                }
+
+                .custom-confirm-no {
+                  color: #6b7280 !important; /* Tailwind gray-500 */
+                  border: none !important;
+                  background: #e5e7eb !important; /* cinza claro no fundo */
+                  border-radius: 6px !important;
+                }
+
+                .custom-confirm-no:hover {
+                  background: #d1d5db !important; /* ligeiro highlight no hover */
+                }
+
+                `}
+            </style>
             </div>
-            
-            {/* <ClientManageDetailsModal 
-                clientNIC={selectedObj || {}}
-                showModal={showModal}
-                refreshTable={() => loadLazyData()}
-                closeModal= {() => setShowModal(false)}
-            /> */}
+
+            <SalesDetailsModal 
+              saleId={detailsSaleId} 
+              visible={showDetails} 
+              onHide={() => setShowDetails(false)} 
+            />
+
+            <Dialog
+              header={`Change status for Sale #${selectedSale?.id}`}
+              visible={showStatusModal}
+              style={{ width: '400px' }}
+              onHide={() => setShowStatusModal(false)}
+              draggable={false}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <Dropdown
+                  value={newStatusId}
+                  options={stateOptions}
+                  onChange={(e) => {
+                    const selectedId = e.value;
+                    setNewStatusId(selectedId);
+
+                    const selectedStatusName = stateOptions.find(opt => opt.value === selectedId)?.label;
+
+                    if (selectedStatusName === selectedSale?.state) {
+                      setStatusWarning("Selected status is already the current one.");
+                    } else {
+                      setStatusWarning(null);
+                    }
+                  }}
+                  placeholder="Select new status"
+                  style={{ width: '100%' }}
+                  showClear
+                />
+
+
+              {statusWarning && (
+                <div style={{ color: 'red', fontSize: '0.85rem' }}>
+                  {statusWarning}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+                <Button
+                  label="Cancel"
+                  icon="pi pi-times"
+                  onClick={() => setShowStatusModal(false)}
+                  style={{
+                    borderRadius: '6px',
+                    backgroundColor: '#e5e7eb',
+                    color: '#374151',
+                    border: 'none',
+                    padding: '0.4rem 1rem',
+                    width: 'auto'
+                  }}
+                />
+                <Button
+                  label="Save"
+                  icon="pi pi-check"
+                  onClick={handleStatusSave}
+                  disabled={
+                    !newStatusId ||
+                    stateOptions.find(opt => opt.value === newStatusId)?.label === selectedSale?.state
+                  }
+                  style={{
+                    borderRadius: '6px',
+                    backgroundColor: 'var(--variant-one)',
+                    border: 'none',
+                    padding: '0.4rem 1rem',
+                    width: 'auto'
+                  }}
+                />
+
+              </div>
+            </div>
+           </Dialog>
         </>
     );
 }

@@ -15,6 +15,7 @@ import { IsMobileContext } from '../../contexts/IsMobileContext';
 import "../../styles/pageElements.css"
 import EmployeeStorePurchase from '../../components/HomePageEmployee/EmployeeStorePurchase';
 import EmployeeStoreSales from '../../components/HomePageEmployee/EmployeeStoreSales';
+import { ConfirmDialog } from "primereact/confirmdialog";
 
 
 export default function EmployeeHomePage() {
@@ -94,7 +95,7 @@ export default function EmployeeHomePage() {
 
     return (
         <>
-
+            <ConfirmDialog />
             <Tab.Content className="custom-tab-content">
                 <Tab.Pane eventKey="dashboard" className='p-4'>
                     <EmployeeHomeDashboard />

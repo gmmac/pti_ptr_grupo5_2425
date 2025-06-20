@@ -3,7 +3,7 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Menu } from "primereact/menu";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { confirmDialog } from "primereact/confirmdialog";
 import api from "../../utils/axios";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
@@ -123,7 +123,6 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
 
     return (
         <>
-            <ConfirmDialog />
             <div className="">
                 <DataTable
                     value={data}
