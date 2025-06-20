@@ -33,7 +33,7 @@ export default function SalesDisplayTable({ filterType, active = "1", refreshAll
           'total': { value: '', matchMode: 'contains' },
           'clientNIC': { value: '', matchMode: 'contains' },
           'employeeNIC': { value: '', matchMode: 'contains' },
-          'state': { value: '', matchMode: 'equals' },
+          'state': { value: null, matchMode: 'equals' },
           'CreatedAt': { value: '', matchMode: 'equals' },
           'UpdatedAt': { value: '', matchMode: 'equals' }
         }		
