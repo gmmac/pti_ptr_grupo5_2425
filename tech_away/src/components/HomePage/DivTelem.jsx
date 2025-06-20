@@ -63,7 +63,7 @@ export default function DivTelem(isMobile) {
 				className="px-5 py-4 justify-content-end align-items-end"
 			>
 				<Link
-					screen="store"
+					to="/store"
 					style={{
 						backgroundColor: "var(--variant-two)",
 						boxShadow: "var(--shadow-default)",
@@ -76,6 +76,7 @@ export default function DivTelem(isMobile) {
 					Check our store
 				</Link>
 				<Link
+					to="/store"
 					style={{
 						backgroundColor: "var(--variant-one)",
 						boxShadow: "var(--shadow-default)",

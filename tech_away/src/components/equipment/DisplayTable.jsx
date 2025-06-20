@@ -90,7 +90,7 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
             setTotalRecords(responseData.totalItems);
             setLoading(false);
         }).catch(err => {
-            console.error("Erro ao carregar dados:", err);
+            console.error("Error fetching data:", err);
             setLoading(false);
         });
     };

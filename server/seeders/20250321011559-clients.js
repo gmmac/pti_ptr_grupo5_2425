@@ -132,6 +132,22 @@ module.exports = {
         createdAt: "2025-03-30T12:00:00Z",
         updatedAt: "2025-03-30T12:00:00Z",
       },
+      {
+        nic: "222444888",
+        nif: "222444888",
+        birthDate: "1987-01-01",
+        gender: "M",
+        firstName: "João",
+        lastName: "Sequinho",
+        email: "fc58817@alunos.fc.ul.pt",
+        phone: "222444888",
+        address: "124 Main Street",
+        latitude: "40.712777",
+        longitude: "-74.005975",
+        isActive: "1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 

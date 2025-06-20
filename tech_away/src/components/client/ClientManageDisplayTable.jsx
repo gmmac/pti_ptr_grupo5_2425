@@ -4,12 +4,9 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { confirmDialog } from "primereact/confirmdialog";
 import api from "../../utils/axios";
-import ModalEdit from "../equipment/ModalEdit";
-import FormsEquipmentSheet from "../equipment/FormsEquipmentSheet";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
-import FormsEquipmentModel from "../equipment/FormsEquipmentModel";
 import { Calendar } from 'primereact/calendar';
 import ClientManageDetailsModal from "./ClientManageDetailsModal";
 

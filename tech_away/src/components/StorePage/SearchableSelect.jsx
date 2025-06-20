@@ -12,6 +12,7 @@ export default function SearchableCheckboxList({
 	const [isOpen, setIsOpen] = useState(false);
 	const [search, setSearch] = useState("");
 	const ref = useRef(null);
+	const safeSelected = Array.isArray(selected) ? selected : [];
 
 	const toggleDropdown = () => setIsOpen((prev) => !prev);
 
@@ -31,11 +32,16 @@ export default function SearchableCheckboxList({
 		item[optionLabel]?.toLowerCase().includes(search.toLowerCase())
 	);
 
-	const handleToggle = (value) => {
-		const isSelected = selected.includes(value);
+	const handleToggle = (item) => {
+		const isArray = Array.isArray(selected);
+		const currentSelected = isArray ? selected : [];
+
+		const isSelected = currentSelected.some((v) => v.id === item.id);
+
 		const newSelected = isSelected
-			? selected.filter((v) => v !== value)
-			: [...selected, value];
+			? currentSelected.filter((v) => v.id !== item.id)
+			: [...currentSelected, item];
+
 		onChange(newSelected);
 	};
 
@@ -49,8 +55,10 @@ export default function SearchableCheckboxList({
 				type="button"
 				style={{
 					backgroundColor:
-						selected.length > 0 ? "var(--variant-one)" : "var(--light-grey)",
-					color: "var(--dark-grey)",
+						safeSelected.length > 0
+							? "var(--variant-one)"
+							: "var(--light-grey)",
+					color: safeSelected.length > 0 ? "var(--white)" : "var(--dark-grey)",
 					border: "none",
 					boxShadow: "var(--shadow-default)",
 				}}
@@ -64,12 +72,16 @@ export default function SearchableCheckboxList({
 				>
 					<span>
 						{label}
-						{selected.length > 0 && `(${selected.length})`}
+						{safeSelected.length > 0 && `(${safeSelected.length})`}
 					</span>
 
 					<i
 						className="pi pi-chevron-down"
-						style={{ color: "var(--dark-grey)", fontSize: "0.8rem" }}
+						style={{
+							color:
+								safeSelected.length > 0 ? "var(--white)" : "var(--dark-grey)",
+							fontSize: "0.8rem",
+						}}
 					></i>
 				</Stack>
 			</Button>
@@ -99,8 +111,10 @@ export default function SearchableCheckboxList({
 								id={`${label}-${item[optionValue]}`}
 								type="checkbox"
 								label={item[optionLabel]}
-								checked={selected.includes(item[optionValue])}
-								onChange={() => handleToggle(item[optionValue])}
+								checked={safeSelected.some(
+									(s) => s[optionValue] === item[optionValue]
+								)}
+								onChange={() => handleToggle(item)}
 							/>
 						))
 					) : (

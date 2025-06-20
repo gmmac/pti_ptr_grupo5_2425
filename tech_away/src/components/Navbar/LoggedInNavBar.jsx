@@ -89,6 +89,7 @@ export default function LoggedInNavBar() {
 											backgroundColor: isActive
 												? "var(--variant-one)"
 												: "transparent",
+											color: isActive ? "var(--white)" : "var(--dark-grey)",
 										}}
 									>
 										{item.name}

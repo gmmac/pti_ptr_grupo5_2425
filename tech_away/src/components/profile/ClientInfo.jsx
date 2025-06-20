@@ -127,6 +127,7 @@ export default function ClientInfo({ userType = "client" }) {
 				fontFamily: "var(--body-font)",
 				backgroundColor: "var(--white)",
 				borderRadius: "var(--rounded-sm)",
+				boxShadow: "var(--shadow-default)",
 			}}
 			className="p-4"
 			gap={3}

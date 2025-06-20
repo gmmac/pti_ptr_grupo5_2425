@@ -1,146 +1,191 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const models = require('../models')
+const models = require("../models");
+const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
-  try {
-    const { equipmentSheetID, folderInterestID, page = 1, pageSize = 5, orderBy = "createdAt", orderDirection = "DESC" } = req.query;
-
-    const where = {}; // Filtros da tabela Interest
-
-    if (folderInterestID) {
-      where.folderInterestID = folderInterestID;
-    }
-
-    const equipmentCondition = equipmentSheetID ? { barcode: equipmentSheetID } : {};
-
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-
-    const { count, rows } = await models.Interest.findAndCountAll({
-      where, // Aplica os filtros
-      attributes: {
-        exclude: ['equipmentSheetID', 'folderInterestID'],
-      },
-      include: [
-        {
-          model: models.EquipmentSheet,
-          as: "equipmentSheet",
-          where: equipmentCondition,
-          include: [
-            {
-              model: models.EquipmentModel,
-              attributes: ["id", "name"],
-              include: [
-                {
-                  model: models.Brand,
-                  attributes: ["id", "name"],
-                }
-              ]
-            },
-            {
-              model: models.EquipmentType,
-              attributes: ["id", "name"],
-            }
-          ],
-          attributes: {
-            exclude: ['model', 'type'],
-          },
-        },
-        {
-          model: models.FolderInterest,
-          as: "folderInterest",
-        }
-      ],
-      limit: parseInt(pageSize),
-      offset: offset,
-      order: [[orderBy, orderDirection]],
-    });
-
-    res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: parseInt(page),
-      pageSize: parseInt(pageSize),
-      data: rows,
-    });
-
-  } catch (error) {
-    console.error("Error fetching interests:", error);
-    res.status(500).json({ error: "Error fetching interests." });
-  }
+	try {
+		const interests = await models.User.findAll();
+		res.json(interests);
+	} catch (error) {
+		console.error("Error fetching interests:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
 });
 
+router.get("/:userNic/:folderId", async (req, res) => {
+	try {
+		const { userNic, folderId } = req.params;
 
-  
+		if (folderId === "null") {
+			const allInterests = await models.Interest.findAll({
+				where: {
+					clientNic: userNic,
+				},
+				attributes: [
+					"id",
+					"equipmentSheetID",
+					"maxLaunchYear",
+					"minLaunchYear",
+					"minPrice",
+					"maxPrice",
+					"createdAt",
+					"updatedAt",
+				],
+				include: [
+					{
+						model: models.Brand,
+						as: "brand",
+						attributes: ["id", "name"],
+					},
+					{
+						model: models.EquipmentModel,
+						as: "model",
+						attributes: ["id", "name"],
+					},
+					{
+						model: models.EquipmentType,
+						as: "type",
+						attributes: ["id", "name"],
+					},
+					{
+						model: models.EquipmentStatus,
+						as: "equipmentStatus",
+						attributes: ["id", "state"],
+					},
+				],
+			});
+			res.json(allInterests);
+		} else {
+			const interestsIds = await models.FolderInterestEquipments.findAll({
+				where: {
+					clientNic: userNic,
+					folderId: folderId,
+				},
+			});
+			const interests = {};
+			for (const interest of interestsIds) {
+				const interestData = await models.Interest.findOne({
+					where: {
+						id: interest.interestId,
+					},
+					attributes: [
+						"id",
+						"equipmentSheetID",
+						"maxLaunchYear",
+						"minLaunchYear",
+						"minPrice",
+						"maxPrice",
+						"createdAt",
+						"updatedAt",
+					],
+					include: [
+						{
+							model: models.Brand,
+							as: "brand",
+							attributes: ["id", "name"],
+						},
+						{
+							model: models.EquipmentModel,
+							as: "model",
+							attributes: ["id", "name"],
+						},
+						{
+							model: models.EquipmentType,
+							as: "type",
+							attributes: ["id", "name"],
+						},
+						{
+							model: models.EquipmentStatus,
+							as: "equipmentStatus",
+							attributes: ["id", "state"],
+						},
+					],
+				});
+				if (interestData) {
+					interests[interestData.id] = interestData;
+				}
+			}
+			res.json(interests);
+		}
+	} catch (error) {
+		console.error("Error fetching interests:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
 router.post("/", async (req, res) => {
+	try {
+		const {
+			clientNic,
+			brandID,
+			modelID,
+			typeID,
+			equipmentSheetID,
+			equipmentStatusID,
+			minLaunchYear,
+			maxLaunchYear,
+			minPrice,
+			maxPrice,
+			preferredStoreIDs,
+		} = req.body;
 
-    try {
-        const { 
-            equipmentSheetID, 
-            folderInterestID 
-        } = req.body;
+		// Criação do Interest
+		const newInterest = await models.Interest.create({
+			clientNic: clientNic,
+			brandID: brandID || null,
+			modelID: modelID || null,
+			typeID: typeID || null,
+			equipmentSheetID: equipmentSheetID || null,
+			equipmentStatusID: equipmentStatusID || null,
+			minLaunchYear: minLaunchYear || null,
+			maxLaunchYear: maxLaunchYear || null,
+			minPrice: minPrice || null,
+			maxPrice: maxPrice || null,
+		});
 
-        if (!equipmentSheetID || !folderInterestID) {
-            return res.status(400).json({ error: 'equipmentSheetID and folderInterestID are required' });
-          }
-      
-          const newInterest = await models.Interests.create({
-            equipmentSheetID,
-            folderInterestID,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          });
-      
-          res.status(201).json(newInterest);
-        } catch (error) {
-          res.status(500).json({ error: error.message });
-        }
+		if (preferredStoreIDs && Array.isArray(preferredStoreIDs)) {
+			for (const storeId of preferredStoreIDs) {
+				try {
+					await models.PreferredStoresInterets.create({
+						interestId: newInterest.id,
+						storeId: storeId,
+					});
+				} catch (error) {
+					console.error("Error associating store to interest:", error);
+					res
+						.status(500)
+						.json({ error: "Failed to associate store with interest" });
+					return;
+				}
+			}
+		}
+
+		res.status(201).json(newInterest);
+	} catch (error) {
+		console.error("Error creating interest:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
 });
 
-router.get('/:id', async (req, res) => {
-    try {
-      const interest = await models.Interests.findByPk(req.params.id);
-      if (!interest) {
-        return res.status(404).json({ error: 'Interest not found' });
-      }
-      res.json(interest);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-  
+router.put("/:id", async (req, res) => {});
 
-  router.put('/:id', async (req, res) => {
-    try {
-        const { 
-            equipmentSheetID, 
-            folderInterestID 
-        } = req.body;
+router.delete("/:id", async (req, res) => {
+	try {
+		const interestId = req.params.id;
+		const deletedInterest = await models.Interest.destroy({
+			where: { id: interestId },
+		});
 
-        const interest = await models.Interests.findByPk(req.params.id);
-        if (!interest) {
-            return res.status(404).json({ error: 'Interest not found' });
-        }
-        await interest.update({ equipmentSheetID, folderInterestID, updatedAt: new Date() });
-        res.json(interest);
+		if (deletedInterest === 0) {
+			return res.status(404).json({ error: "Interest not found" });
+		}
 
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-  
-
-  router.delete('/:id', async (req, res) => {
-    try {
-      const interest = await models.Interests.findByPk(req.params.id);
-      if (!interest) {
-        return res.status(404).json({ error: 'Interest not found' });
-      }
-      await interest.destroy();
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
+		res.status(204).send();
+	} catch (error) {
+		console.error("Error deleting interest:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
 
 module.exports = router;

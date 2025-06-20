@@ -18,9 +18,9 @@ export default function OrderCard({ order }) {
 				gap={2}
 				style={{
 					backgroundColor: "#eae6f0",
-					borderRadius: "10px",
 					padding: "20px",
 					borderRadius: "16px",
+					height: "130px",
 				}}
 				className="p-4"
 			>

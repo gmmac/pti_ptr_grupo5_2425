@@ -2,81 +2,166 @@ const express = require("express");
 const router = express.Router();
 const { Op, Sequelize } = require("sequelize");
 const models = require("../models");
-const db = require("../models");
+
+// ver os que estão disponiveis para compra
+router.get("/in-stock", async (req, res) => {
+	try {
+		const {
+			equipmentId,
+			page = 1,
+			pageSize = 6,
+			orderBy = "recent-date",
+			stateId,
+			storeId,
+		} = req.query;
+
+		const offset = (parseInt(page) - 1) * parseInt(pageSize);
+		const limit = parseInt(pageSize);
+
+		const equipmentIdCondition = equipmentId
+			? { equipmentId: equipmentId }
+			: {};
+		const stateCondition = stateId ? { id: stateId } : {};
+		const storeCondition = storeId ? { storeId } : {};
+
+		const { count, rows } = await models.UsedEquipment.findAndCountAll({
+			where: {
+				purchaseDate: null,
+				putOnSaleDate: { [Op.not]: null },
+				...equipmentIdCondition,
+				...storeCondition,
+			},
+			include: [
+				{ model: models.Store, as: "Store", attributes: ["name"] },
+				{
+					model: models.EquipmentStatus,
+					as: "EquipmentStatus",
+					where: stateCondition,
+					attributes: ["state"],
+				},
+			],
+			limit,
+			offset,
+		});
+
+		const formattedData = rows.map((item) => ({
+			ID: item.id,
+			Price: parseFloat(item.price),
+			PutOnSaleDate: item.putOnSaleDate,
+			CreatedAt: item.createdAt,
+			UpdatedAt: item.updatedAt,
+			Store: item.Store?.name,
+			State: item.EquipmentStatus?.state,
+		}));
+
+		switch (orderBy) {
+			case "price-asc":
+				formattedData.sort((a, b) => a.Price - b.Price);
+				break;
+			case "price-desc":
+				formattedData.sort((a, b) => b.Price - a.Price);
+				break;
+			case "oldest-date":
+				formattedData.sort(
+					(a, b) => new Date(a.PutOnSaleDate) - new Date(b.PutOnSaleDate)
+				);
+				break;
+			case "recent-date":
+			default:
+				formattedData.sort(
+					(a, b) => new Date(b.PutOnSaleDate) - new Date(a.PutOnSaleDate)
+				);
+				break;
+		}
+
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: formattedData,
+		});
+	} catch (error) {
+		console.error("Error fetching used equipments:", error);
+		res.status(500).json({ error: "Error fetching used equipments." });
+	}
+});
 
 router.get("/", async (req, res) => {
-  try {
-    const {
-      Barcode,
-      EquipmentModel,
-      EquipmentType,
-      Brand,
-      Store,
-      Status,
-      active = "1",
-      page = 1,
-      pageSize = 5,
-      sortField = "id",
-      sortOrder = "ASC",
-    } = req.query;
+	try {
+		const {
+			Barcode,
+			EquipmentModel,
+			EquipmentType,
+			Brand,
+			Store,
+			Status,
+			active = "1",
+			page = 1,
+			pageSize = 6,
+			sortField = "id",
+			sortOrder = "ASC",
+		} = req.query;
 
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-    const orderClause = [];
+		const offset = (parseInt(page) - 1) * parseInt(pageSize);
+		const orderClause = [];
 
-    // Ordenação com alias e colunas associadas
-    if (sortField === "Brand") {
-      orderClause.push([
-        Sequelize.fn("LOWER", Sequelize.col("EquipmentSheet.EquipmentModel.Brand.name")),
-        sortOrder == -1 ? "DESC" : "ASC",
-      ]);
-    } else if (sortField === "EquipmentModel") {
-      orderClause.push([
-        Sequelize.fn("LOWER", Sequelize.col("EquipmentSheet.EquipmentModel.name")),
-        sortOrder == -1 ? "DESC" : "ASC",
-      ]);
-    } else if (sortField === "EquipmentType") {
-      orderClause.push([
-        Sequelize.fn("LOWER", Sequelize.col("EquipmentSheet.EquipmentType.name")),
-        sortOrder == -1 ? "DESC" : "ASC",
-      ]);
-    } else if (sortField === "Store") {
-      orderClause.push([
-        Sequelize.fn("LOWER", Sequelize.col("Store.name")),
-        sortOrder == -1 ? "DESC" : "ASC",
-      ]);
-    } else if (sortField) {
-      orderClause.push([
-        Sequelize.col(sortField),
-        sortOrder == -1 ? "DESC" : "ASC",
-      ]);
-    }
+		// Ordenação com alias e colunas associadas
+		if (sortField === "Brand") {
+			orderClause.push([
+				Sequelize.fn(
+					"LOWER",
+					Sequelize.col("EquipmentSheet.EquipmentModel.Brand.name")
+				),
+				sortOrder == -1 ? "DESC" : "ASC",
+			]);
+		} else if (sortField === "EquipmentModel") {
+			orderClause.push([
+				Sequelize.fn(
+					"LOWER",
+					Sequelize.col("EquipmentSheet.EquipmentModel.name")
+				),
+				sortOrder == -1 ? "DESC" : "ASC",
+			]);
+		} else if (sortField === "EquipmentType") {
+			orderClause.push([
+				Sequelize.fn(
+					"LOWER",
+					Sequelize.col("EquipmentSheet.EquipmentType.name")
+				),
+				sortOrder == -1 ? "DESC" : "ASC",
+			]);
+		} else if (sortField === "Store") {
+			orderClause.push([
+				Sequelize.fn("LOWER", Sequelize.col("Store.name")),
+				sortOrder == -1 ? "DESC" : "ASC",
+			]);
+		} else if (sortField) {
+			orderClause.push([
+				Sequelize.col(sortField),
+				sortOrder == -1 ? "DESC" : "ASC",
+			]);
+		}
 
-    const where = {};
-    const sheetWhere = {};
+		const where = {};
+		const sheetWhere = {};
 
-    if (Barcode) sheetWhere.barcode = { [Op.iLike]: `%${Barcode}%` };
-    if (EquipmentModel)
-      sheetWhere["$EquipmentModel.name$"] = { [Op.iLike]: `%${EquipmentModel}%` };
-    if (EquipmentType)
-      sheetWhere["$EquipmentType.name$"] = { [Op.iLike]: `%${EquipmentType}%` };
-    if (Brand)
-      sheetWhere["$EquipmentModel.Brand.name$"] = { [Op.iLike]: `%${Brand}%` };
-    if (Store)
-      where["$Store.name$"] = { [Op.iLike]: `%${Store}%` };
-    if (Status)
-      where.statusID = { [Op.eq]: Status };
-    if (active)
-      sheetWhere.isActive = { [Op.eq]: active };
+		if (Barcode) sheetWhere.barcode = { [Op.iLike]: `%${Barcode}%` };
+		if (EquipmentModel)
+			sheetWhere["$EquipmentModel.name$"] = {
+				[Op.iLike]: `%${EquipmentModel}%`,
+			};
+		if (EquipmentType)
+			sheetWhere["$EquipmentType.name$"] = { [Op.iLike]: `%${EquipmentType}%` };
+		if (Brand)
+			sheetWhere["$EquipmentModel.Brand.name$"] = { [Op.iLike]: `%${Brand}%` };
+		if (Store) where["$Store.name$"] = { [Op.iLike]: `%${Store}%` };
+		if (Status) where.statusID = { [Op.eq]: Status };
+		if (active) sheetWhere.isActive = { [Op.eq]: active };
 
-    where.action = {
-      [Op.or]: [
-        { [Op.ne]: 'D' },
-        { [Op.is]: null },
-        { [Op.eq]: 'S' }
-
-      ]
-    };
-
+		where.action = {
+			[Op.or]: [{ [Op.ne]: "D" }, { [Op.is]: null }, { [Op.eq]: "S" }],
+		};
 
     const { count, rows } = await models.UsedEquipment.findAndCountAll({
       where,
@@ -120,34 +205,34 @@ router.get("/", async (req, res) => {
       order: orderClause,
     });
 
-    const formattedData = rows.map((item) => ({
-      id: item.id,
-      price: item.price,
-      putOnSaleDate: item.putOnSaleDate,
-      purchaseDate: item.purchaseDate,
-      action: item.action,
-      EquipmentStatus: item.EquipmentStatus,
-      Store: item.Store,
-      EquipmentSheet: {
-        barcode: item.EquipmentSheet.barcode,
-        EquipmentModel: item.EquipmentSheet.EquipmentModel,
-        EquipmentType: item.EquipmentSheet.EquipmentType,
-        createdAt: item.EquipmentSheet.createdAt,
-        updatedAt: item.EquipmentSheet.updatedAt,
-      },
-    }));
+		const formattedData = rows.map((item) => ({
+			id: item.id,
+			price: item.price,
+			putOnSaleDate: item.putOnSaleDate,
+			purchaseDate: item.purchaseDate,
+			action: item.action,
+			EquipmentStatus: item.EquipmentStatus,
+			Store: item.Store,
+			EquipmentSheet: {
+				barcode: item.EquipmentSheet.barcode,
+				EquipmentModel: item.EquipmentSheet.EquipmentModel,
+				EquipmentType: item.EquipmentSheet.EquipmentType,
+				createdAt: item.EquipmentSheet.createdAt,
+				updatedAt: item.EquipmentSheet.updatedAt,
+			},
+		}));
 
-    res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: parseInt(page),
-      pageSize: parseInt(pageSize),
-      data: formattedData,
-    });
-  } catch (error) {
-    console.error("Error fetching used equipment:", error);
-    res.status(500).json({ error: "Error fetching used equipment." });
-  }
+		res.json({
+			totalItems: count,
+			totalPages: Math.ceil(count / pageSize),
+			currentPage: parseInt(page),
+			pageSize: parseInt(pageSize),
+			data: formattedData,
+		});
+	} catch (error) {
+		console.error("Error fetching used equipment:", error);
+		res.status(500).json({ error: "Error fetching used equipment." });
+	}
 });
 
 router.get("/totalOnSaleStock", async (req, res) => {
@@ -520,7 +605,7 @@ router.get("/usedEquipmentRepairs", async (req, res) => {
 			offset,
 			order,
 		});
-		
+
 		const formattedData = rows.map((item) => ({
 			id: item.id,
 			price: item.price,
@@ -588,34 +673,6 @@ router.get("/by-used-equiment-id/:ID", async (req, res) => {
 					as: "Store",
 					attributes: ["name"],
 				},
-				{
-					model: models.EquipmentStatus,
-					as: "EquipmentStatus",
-					attributes: ["state"],
-				},
-			],
-		});
-
-		res.json({ usedEquipments });
-	} catch (error) {
-		console.error("Error fetching used equipments:", error);
-		res.status(500).json({ error: "Error fetching used equipments." });
-	}
-});
-
-// ver os que estão disponiveis para compra
-router.get("/in-stock/:ID", async (req, res) => {
-	try {
-		const { ID } = req.params;
-
-		const usedEquipments = await models.UsedEquipment.findAll({
-			where: {
-				equipmentId: ID,
-				purchaseDate: null,
-				putOnSaleDate: { [Op.not]: null },
-			},
-			include: [
-				{ model: models.Store, as: "Store", attributes: ["name"] },
 				{
 					model: models.EquipmentStatus,
 					as: "EquipmentStatus",

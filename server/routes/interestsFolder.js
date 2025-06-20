@@ -1,164 +1,75 @@
 const express = require("express");
 const router = express.Router();
-const models = require('../models');
-const { Op } = require('sequelize'); // Certifique-se de importar o operador Op
+const models = require("../models");
+const { Op } = require("sequelize");
 
-// filtro e paginação da interestFolder
-http://localhost:4005/api/interestsFolder/?name=&clientNIC=&orderBy=createdAt&orderDirection=ASC&page=2&pageSize=3
-router.get("/", async (req, res) => {
-  try {
-    const { name, clientNIC, page = 1, pageSize = 5, orderBy, orderDirection } = req.query;
-    const where = {};
-    
-    if (name) {
-      where.name = { [Op.like]: `%${name}%` };
-    }
+router.get("/", async (req, res) => {});
 
-    const clientCondition = clientNIC ? { nic: clientNIC } : {};
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
-
-    let order = [];
-    if (orderBy && orderDirection) {
-      order = [[orderBy, orderDirection.toUpperCase()]];
-    } else {
-      order = [["createdAt", "DESC"]];
-    }
-
-    console.log("Order applied:", order);
-
-    const { count, rows } = await models.FolderInterest.findAndCountAll({
-      where,
-      attributes: {
-        exclude: ["clientNIC"],
-      },
-      include: [
-        {
-          model: models.Client,
-          as: "client",
-          where: clientCondition,
-          attributes: ["nic", "firstName", "lastName"],
-        },
-      ],
-      limit: parseInt(pageSize),
-      offset,
-      order,
-    });
-
-    res.json({
-      totalItems: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: parseInt(page),
-      pageSize: parseInt(pageSize),
-      data: rows,
-    });
-  } catch (error) {
-    console.error("Error fetching interest folders:", error);
-    res.status(500).json({ error: "Error fetching interest folders." });
-  }
+router.get("/:userNic", async (req, res) => {
+	try {
+		const userNic = req.params.userNic;
+		const interestFolders = await models.FolderInterest.findAll({
+			where: {
+				clientNIC: userNic,
+			},
+		});
+		res.json(interestFolders);
+	} catch (error) {
+		console.error("Error fetching interest folders:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
 });
-
-
 
 router.post("/", async (req, res) => {
-    try {
-      console.log(req.body)
-        const { name, clientNIC } = req.body;
-        const folder = await models.FolderInterest.create({
-          name, 
-          clientNIC,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-      });
-        res.status(201).json(folder);
-    } catch (error) {
-        res.status(400).json({ error: "Error creating interest folder." });
-    }
-});
-
-
-
-// router.get("/filter", async (req, res) => {
-//     try {
-
-//       const { name, clientNIC, page, pageSize, orderBy = "createdAt", orderDirection = "DESC" } = req.query;
-
-//       const where = {};
-//       if (name) {
-//         where.name = {
-//           [Op.like]: `%${name}%`
-//         };
-//       }
-//       const clientCondition = clientNIC ? { nic: clientNIC } : {};
-//       const offset = (parseInt(page) - 1) * parseInt(pageSize);
-  
-//       const { count, rows } = await models.FolderInterest.findAndCountAll({
-//         where, // Filtro aplicado
-//         attributes: {
-//           exclude: ['clientNIC'], // Exclui a coluna clientNIC
-//         },
-//         include: [
-//           "interests", // Associa a tabela de interesses
-//           {
-//             model: models.Client,
-//             as: "client",
-//             where: clientCondition, // Filtro pelo clientNIC
-//           },
-//         ],
-//         limit: parseInt(pageSize),
-//         offset: offset,
-//         order: [[orderBy, orderDirection]], // Ordenação
-//       });
-  
-//       res.json({
-//         totalItems: count,
-//         totalPages: Math.ceil(count / pageSize),
-//         currentPage: page,
-//         pageSize,
-//         data: rows,
-//       });
-  
-//     } catch (error) {
-//       console.error(error); // Registra o erro no console para depuração
-//       res.status(500).json({ error: "Error fetching interest folders." });
-//     }
-//   });
-  
-
-router.get("/:id", async (req, res) => {
-
-    try {
-        const folder = await models.FolderInterest.findByPk(req.params.id, { include: "interests" });
-        if (!folder) return res.status(404).json({ error: "Interest folder not found." });
-        res.json(folder);
-    } catch (error) {
-        res.status(500).json({ error: "Error fetching interest folder." });
-    }
+	try {
+		const { name, clientNIC } = req.body;
+		const newFolder = await models.FolderInterest.create({
+			name,
+			clientNIC,
+		});
+		res.status(201).json(newFolder);
+	} catch (error) {
+		console.error("Error creating interest folder:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
 });
 
 router.put("/:id", async (req, res) => {
-    try {
-        const { name, clientNIC } = req.body;
-        const folder = await models.FolderInterest.findByPk(req.params.id);
-        if (!folder) return res.status(404).json({ error: "Interest folder not found." });
-        
-        await folder.update({ name, clientNIC });
-        res.json(folder);
-    } catch (error) {
-        res.status(400).json({ error: "Error updating interest folder." });
-    }
+	try {
+		const folderId = req.params.id;
+		const { name } = req.body;
+
+		const updatedFolder = await models.FolderInterest.update(
+			{ name },
+			{
+				where: { id: folderId },
+				returning: true,
+			}
+		);
+		if (updatedFolder[0] === 0) {
+			return res.status(404).json({ error: "Folder not found" });
+		}
+		res.json(updatedFolder[1][0]);
+	} catch (error) {
+		console.error("Error updating interest folder:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
 });
 
 router.delete("/:id", async (req, res) => {
-    try {
-        const folder = await models.FolderInterest.findByPk(req.params.id);
-        if (!folder) return res.status(404).json({ error: "Interest folder not found." });
-        
-        await folder.destroy();
-        res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ error: "Error deleting interest folder." });
-    }
+	try {
+		const folderId = req.params.id;
+		const deletedFolder = await models.FolderInterest.destroy({
+			where: { id: folderId },
+		});
+		if (deletedFolder === 0) {
+			return res.status(404).json({ error: "Folder not found" });
+		}
+		res.status(204).send();
+	} catch (error) {
+		console.error("Error deleting interest folder:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
 });
-
 
 module.exports = router;

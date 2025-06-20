@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Container, Row, Col, Tabs, Tab } from "react-bootstrap";
 import ClientManageDisplayTable from "../../client/ClientManageDisplayTable";
+import FormsClientBackoffice from "../../client/FormsClientBackoffice";
 
 export default function ClientsManage() {
 	const [show, setShow] = useState(false);
@@ -34,7 +35,7 @@ export default function ClientsManage() {
                 </Tab>
             </Tabs>
 
-			{/* <FormsEquipmentModel showModal={show} closeModal={handleClose} refreshTable={refreshTable} /> */}
+            <FormsClientBackoffice showModal={show} closeModal={handleClose} refreshTable={refreshTable} />
 		</Container>
 	);
 }

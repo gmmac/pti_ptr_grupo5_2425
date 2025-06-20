@@ -1,38 +1,40 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { Stack } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import Icon from "../svg/Icon";
+import { IsMobileContext } from "../../contexts/IsMobileContext";
 
 export default function EquipmentSheetInfo({ equipmentInfo }) {
 	const navigate = useNavigate();
+	const isMobile = useContext(IsMobileContext);
 
 	const handleGoBack = () => {
-		navigate(-1); // Volta para a página anterior
+		navigate(-1);
 	};
 
 	return (
 		<Stack
 			direction="horizontal"
-			className="rounded-sm p-4 w-100"
+			className="p-4 w-100"
 			style={{
 				backgroundColor: "var(--white)",
 				boxShadow: "var(--shadow-default)",
+				borderRadius: isMobile
+					? "0 0 var(--rounded-sm) var(--rounded-sm)"
+					: "var(--rounded-sm)",
 			}}
 			gap={4}
 		>
 			<Link
 				onClick={handleGoBack}
-				style={{ cursor: "pointer", backgroundColor: "var(--variant-one)" }}
+				style={{
+					cursor: "pointer",
+					backgroundColor: "var(--variant-one)",
+					textDecoration: "none",
+					color: "var(--white)",
+				}}
 				className="rounded-5 p-2 d-flex justify-content-center align-items-center align-self-start"
 			>
-				<Icon
-					d={
-						"M25.3761 9.49597H1.37305M1.37305 9.49597L10.6646 17.1333M1.37305 9.49597L10.6646 1.85863"
-					}
-					w={"27"}
-					h={"19"}
-					color={"var(--white)"}
-				/>
+				<i className="pi pi-angle-left" style={{ fontSize: "1.5rem" }}></i>
 			</Link>
 			<Stack direction="vertical" gap={3}>
 				<h3

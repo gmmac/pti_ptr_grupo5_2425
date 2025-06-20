@@ -41,7 +41,7 @@ export default function PaginationControl({ handlePageChange, currentPage, total
   const pages = createPageItems();
 
   return (
-    <Pagination className="d-flex justify-content-center mt-3">
+    <Pagination className="d-flex justify-content-center mt-3" >
       <Pagination.Prev
         onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}

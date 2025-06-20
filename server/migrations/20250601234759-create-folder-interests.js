@@ -21,8 +21,9 @@ module.exports = {
 					key: "nic",
 				},
 				onUpdate: "CASCADE",
-				onDelete: "CASCADE", // Ao apagar o cliente, apaga a pasta
+				onDelete: "CASCADE",
 			},
+
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
@@ -33,6 +34,7 @@ module.exports = {
 			},
 		});
 	},
+
 	down: async (queryInterface, Sequelize) => {
 		await queryInterface.dropTable("FolderInterests");
 	},
