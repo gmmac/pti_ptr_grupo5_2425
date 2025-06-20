@@ -10,6 +10,7 @@ router.get("/", async (req, res) => {
 		res.status(500).json({ message: "Error." });
 	}
 });
+
 router.post("/", async (req, res) => {
 	try {
 		const orderStatus = await models.OrderStatus.create(req.body);
@@ -18,6 +19,7 @@ router.post("/", async (req, res) => {
 		res.status(500).json({ message: "Error." });
 	}
 });
+
 router.get("/:ID", async (req, res) => {
 	try {
 		const orderStatus = await models.OrderStatus.findByPk(req.params.ID);
@@ -44,6 +46,7 @@ router.put("/:ID", async (req, res) => {
 		res.status(500).json({ message: "Error." });
 	}
 });
+
 router.delete("/:ID", async (req, res) => {
 	try {
 		const orderStatus = await models.OrderStatus.findByPk(req.params.ID);

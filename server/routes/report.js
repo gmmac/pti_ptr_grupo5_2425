@@ -4,7 +4,6 @@ const models = require('../models')
 
 const { Op, Sequelize, fn, col, where, literal } = require("sequelize");
 
-
 router.get('/sales', async (req, res, next) => {
   try {
     //
@@ -98,105 +97,95 @@ router.get('/sales', async (req, res, next) => {
 
 router.get('/repairs', async (req, res, next) => {
   try {
-
     const repairsByStore = await models.Repair.findAll({
-        attributes: [
-            [ Sequelize.col('UsedEquipment.storeId'),    "NIPC"    ],
-            [ Sequelize.col('UsedEquipment.Store.name'), 'storeName' ],
-            [ Sequelize.fn('COUNT', Sequelize.col('Repair.id')), 'repairCount' ]
-        ],
+      attributes: [
+        [Sequelize.col('Employee.storeNIPC'), 'NIPC'],
+        [Sequelize.col('Employee.Store.name'), 'storeName'],
+        [Sequelize.fn('COUNT', Sequelize.col('Repair.id')), 'repairCount']
+      ],
+      include: [{
+        model: models.Employee,
+        attributes: [],
         include: [{
-            model: models.UsedEquipment,
-            attributes: [],
-            include: [{
-            model: models.Store,
-            attributes: []
-            }]
-        }],
-        group: [
-            'UsedEquipment.storeId',
-            'UsedEquipment.Store.name'
-        ],
-        raw: true
+          model: models.Store,
+          attributes: []
+        }]
+      }],
+      group: [
+        'Employee.storeNIPC',
+        'Employee.Store.name'
+      ],
+      raw: true
     });
 
     const repairsByEquipmentSheet = await models.Repair.findAll({
-        attributes: [
-            [ Sequelize.col('UsedEquipment.equipmentId'),                         'barcode'    ],
-            [ Sequelize.col('UsedEquipment.EquipmentSheet.EquipmentModel.name'), 'modelName' ],
-            [ Sequelize.col('UsedEquipment.EquipmentSheet.EquipmentModel.Brand.name'), 'brandName' ],
-            [ Sequelize.fn('COUNT', Sequelize.col('Repair.id')),                 'repairCount']
-        ],
+      attributes: [
+        [Sequelize.col('EquipmentSheet.barcode'), 'barcode'],
+        [Sequelize.col('EquipmentSheet.EquipmentModel.name'), 'modelName'],
+        [Sequelize.col('EquipmentSheet.EquipmentModel.Brand.name'), 'brandName'],
+        [Sequelize.fn('COUNT', Sequelize.col('Repair.id')), 'repairCount']
+      ],
+      include: [{
+        model: models.EquipmentSheet,
+        attributes: [],
         include: [{
-            model: models.UsedEquipment,
-            attributes: [],
-
-                include: [{
-                model: models.EquipmentSheet,
-                attributes: [],
-
-                    include: [{
-                        model: models.EquipmentModel,
-                        attributes: [],
-
-                            include: [{
-                            model: models.Brand,
-                            attributes: []
-                    }]
-                    }]
-
-                }]
-        }],
-        group: [
-            'UsedEquipment.equipmentId',
-            'UsedEquipment.EquipmentSheet.EquipmentModel.name',
-            'UsedEquipment.EquipmentSheet.EquipmentModel.Brand.name'
-        ],
-        raw: true
+          model: models.EquipmentModel,
+          attributes: [],
+          include: [{
+            model: models.Brand,
+            attributes: []
+          }]
+        }]
+      }],
+      group: [
+        'EquipmentSheet.barcode',
+        'EquipmentSheet.EquipmentModel.name',
+        'EquipmentSheet.EquipmentModel.Brand.name'
+      ],
+      raw: true
     });
 
     const repairsByStatus = await models.Repair.findAll({
-        attributes: [
-            [ Sequelize.col('RepairStatus.state'),              'state'       ],
-            [ Sequelize.fn('COUNT', Sequelize.col('Repair.id')), 'repairCount']
-        ],
-        include: [{
-            model: models.RepairStatus,
-            attributes: []
-        }],
-        group: ['RepairStatus.state'],
-        raw: true
+      attributes: [
+        [Sequelize.col('RepairStatus.state'), 'state'],
+        [Sequelize.fn('COUNT', Sequelize.col('Repair.id')), 'repairCount']
+      ],
+      include: [{
+        model: models.RepairStatus,
+        attributes: []
+      }],
+      group: ['RepairStatus.state'],
+      raw: true
     });
 
-    const [ result ] = await models.sequelize.query(`
-    SELECT 
-        AVG(EXTRACT(EPOCH FROM (ts_end - ts_start))) AS avg_seconds
-    FROM (
-        SELECT
-        "repairId",
-        MIN(CASE WHEN "statusId" = 1 THEN "createdAt" END) AS ts_start,
-        MAX(CASE WHEN "statusId" = 6 THEN "createdAt" END) AS ts_end
-        FROM "RepairStatusLogs"
-        GROUP BY "repairId"
-        HAVING MAX(CASE WHEN "statusId" = 6 THEN 1 ELSE 0 END) = 1
-    ) AS sub;
+    const [result] = await models.sequelize.query(`
+      SELECT 
+          AVG(EXTRACT(EPOCH FROM (ts_end - ts_start))) AS avg_seconds
+      FROM (
+          SELECT
+          "repairId",
+          MIN(CASE WHEN "statusId" = 1 THEN "createdAt" END) AS ts_start,
+          MAX(CASE WHEN "statusId" = 6 THEN "createdAt" END) AS ts_end
+          FROM "RepairStatusLogs"
+          GROUP BY "repairId"
+          HAVING MAX(CASE WHEN "statusId" = 6 THEN 1 ELSE 0 END) = 1
+      ) AS sub;
     `, { type: models.sequelize.QueryTypes.SELECT });
 
     const avgSeconds = parseFloat(result.avg_seconds).toFixed(0);
-    const avgHours   = (avgSeconds / 3600).toFixed(2);
-    const avgDays    = (avgSeconds / 86400).toFixed(3);
-
+    const avgHours = (avgSeconds / 3600).toFixed(2);
+    const avgDays = (avgSeconds / 86400).toFixed(3);
 
     return res.json({
-        repairsByStore: repairsByStore,
-        repairsByEquipmentSheet: repairsByEquipmentSheet,
-        repairsByStatus: repairsByStatus,
-        avgEstimateDelivaryDate: [{
-            seconds: avgSeconds,
-            hours: avgHours,
-            days: avgDays
-        }]
-    })
+      repairsByStore,
+      repairsByEquipmentSheet,
+      repairsByStatus,
+      avgEstimateDelivaryDate: [{
+        seconds: avgSeconds,
+        hours: avgHours,
+        days: avgDays
+      }]
+    });
 
   } catch (err) {
     return next(err);

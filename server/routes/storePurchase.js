@@ -13,6 +13,7 @@ router.get("/", async (req, res) => {
         purchasePrice,
         modelName,
         storeName,
+        usedEquipmentID,
         nic,
         createdAt,
         allPrice,
@@ -42,8 +43,13 @@ router.get("/", async (req, res) => {
       }
 
       if (modelName) whereModel.name = { [Op.iLike]: `%${modelName}%` };
-
       if (storeName) whereStore.name = { [Op.iLike]: `%${storeName}%` };
+
+      if (usedEquipmentID) {
+        where.usedEquipmentID = {
+          [Op.eq]: parseInt(usedEquipmentID),
+        };
+      }
 
       if (purchasePrice && parseFloat(purchasePrice) > 0) {
         where.purchasePrice = { [Op.eq]: parseFloat(purchasePrice) };
@@ -93,7 +99,7 @@ router.get("/", async (req, res) => {
           sortOrder == -1 ? "DESC" : "ASC",
         ]);
       }
-  
+      
       const { count, rows } = await models.StorePurchase.findAndCountAll({
         where,
         include: [
@@ -141,6 +147,7 @@ router.get("/", async (req, res) => {
         usedEquipmentID: item.usedEquipmentID,
         employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
         clientName: item.Client?.firstName + " " + item.Client?.lastName,
+        clientNIC: item.Client?.nic,
         modelName: item.UsedEquipment.EquipmentSheet.EquipmentModel.name,
         createdAt: item.createdAt,
       }));
@@ -154,7 +161,7 @@ router.get("/", async (req, res) => {
       });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ error: "Error fetching brands." });
+      res.status(500).json({ error: "Error fetching storePurchase." });
     }
 });
 
@@ -163,7 +170,6 @@ router.post("/", async (req, res) => {
     try {
         const {statusID, price, clientNic, equipmentBarcode} = req.body;
 
-        console.log(req.body)
         const storeID = req.cookies["employeeInfo"].storeNIPC
         const employeeID = req.cookies["employeeInfo"].nic
 
@@ -174,11 +180,11 @@ router.post("/", async (req, res) => {
             const storePurchases = await models.StorePurchase.create({ storeID: storeID, clientNIC: clientNic, employeeID: employeeID, purchasePrice: price, usedEquipmentID: usedEquipment.id, createdAt: new Date(), updatedAt: new Date() });
             res.status(201).json(storePurchases);
         } else{
-            res.status(400).json({ error: "Error." });
+            res.status(400).json({ error: "Error creating equipment." });
         }
 
     } catch (error) {
-        res.status(400).json({ error: "Error." });
+        res.status(400).json({ error: "Error creating storePurchase." });
     }
 });
 
@@ -294,7 +300,7 @@ router.get("/getDonations", async (req, res) => {
     });
   } catch (err) {
     console.error("Error: ", err);
-    return res.status(500).json({ error: 'Erro ao buscar equipamentos doados.' });
+    return res.status(500).json({ error: 'Error fetching donations.' });
   }
 });
 
@@ -326,15 +332,27 @@ router.post("/donate", async (req, res) => {
     }
 
     // 2) Cria StorePurchase
-    const storePurchase = await models.StorePurchase.create({
-      storeID,
-      clientNIC:     clientNic,
-      employeeID,
-      purchasePrice: 0,
-      usedEquipmentID,
-      createdAt:     new Date(),
-      updatedAt:     new Date()
+    let storePurchase = await models.StorePurchase.findOne({
+      where: {
+        storeID,
+        clientNIC: clientNic,
+        employeeID,
+        purchasePrice: 0,
+        usedEquipmentID,
+      }
     });
+
+    if (!storePurchase) {
+      storePurchase = await models.StorePurchase.create({
+        storeID,
+        clientNIC: clientNic,
+        employeeID,
+        purchasePrice: 0,
+        usedEquipmentID,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+    }
 
     // 3) Cria linha de doação
     let donation = null;

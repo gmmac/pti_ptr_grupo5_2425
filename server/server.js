@@ -27,14 +27,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const port = 4005; // usar .env?
 
 // Componentes - Importando todas as rotas
-const address = require("./routes/address");
 const brand = require("./routes/brand");
-const cart = require("./routes/cart");
 const charityProject = require("./routes/charityProject");
 const client = require("./routes/client");
 const clientPurchase = require("./routes/clientPurchase");
 const employee = require("./routes/employee");
-const entity = require("./routes/entity");
 const equipmentSheet = require("./routes/equipmentSheet");
 const equipmentStatus = require("./routes/equipmentStatus");
 const interest = require("./routes/interest");
@@ -64,14 +61,11 @@ const report = require("./routes/report");
 const reportType = require("./routes/reportType");
 
 // Definição de endpoints --> rotas
-app.use("/api/address", address);
 app.use("/api/brand", brand);
-app.use("/api/cart", cart);
 app.use("/api/charityProject", charityProject);
 app.use("/api/client", client);
 app.use("/api/clientPurchase", clientPurchase);
 app.use("/api/employee", employee);
-app.use("/api/entity", entity);
 app.use("/api/equipmentSheet", equipmentSheet);
 app.use("/api/equipmentStatus", equipmentStatus);
 app.use("/api/interest", interest);

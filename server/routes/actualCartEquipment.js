@@ -6,7 +6,7 @@ const models = require("../models");
 router.get("/", async (req, res) => {
 	try {
 		const actualCartEquipments = await models.ActualCartEquipment.findAll();
-		res.json(actualCartEquipments);
+		res.status(200).json(actualCartEquipments);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -29,7 +29,7 @@ router.get("/:cartId", async (req, res) => {
 			where: { cartId: req.params.cartId },
 		});
 
-		if (!cartEquipment.length) return res.json(null); // dá return de null e não da erro no frontend
+		if (!cartEquipment.length) return res.status(404).json(null); // dá return de null e não da erro no frontend
 
 		const equipmentDetails = await Promise.all(
 			cartEquipment.map(async (item) => {
@@ -59,7 +59,7 @@ router.get("/:cartId", async (req, res) => {
 			})
 		);
 
-		res.json(equipmentDetails.filter((e) => e !== null));
+		res.status(200).json(equipmentDetails.filter((e) => e !== null));
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -71,7 +71,7 @@ router.get("/countItems/:cartId", async (req, res) => {
 			where: { cartId: req.params.cartId },
 		});
 
-		res.json({ count: count || 0 }); // Se count for null, retorna 0
+		res.status(200).json({ count: count || 0 }); // Se count for null, retorna 0
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -97,7 +97,7 @@ router.get("/totalPrice/:cartId", async (req, res) => {
 			raw: true,
 		});
 
-		res.json({ totalPrice: result.totalPrice });
+		res.status(200).json({ totalPrice: result.totalPrice });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -109,17 +109,17 @@ router.get("/exists/:cartID/:equipmentID", async (req, res) => {
 
 		// Verificar se os parâmetros existem
 		if (!cartID || !equipmentID) {
-			return res.status(400).json({ error: "Parâmetros inválidos" });
+			return res.status(400).json({ error: "Invalid Params" });
 		}
 
 		const item = await models.ActualCartEquipment.findOne({
 			where: { cartId: cartID, equipmentId: equipmentID },
 		});
 
-		res.json({ exists: !!item });
+		res.status(200).json({ exists: !!item });
 	} catch (error) {
-		console.error("Erro ao verificar se item já está no carrinho:", error);
-		res.status(500).json({ error: "Erro interno do servidor" });
+		console.error("Error verifying if the equipment is in cart:", error);
+		res.status(500).json({ error: error.message });
 	}
 });
 
@@ -131,7 +131,7 @@ router.put("/:id", async (req, res) => {
 		});
 		if (!updated)
 			return res.status(404).json({ error: "ActualCartEquipment not found" });
-		res.json({ message: "ActualCartEquipment updated successfully" });
+		res.status(200).json({ message: "ActualCartEquipment updated successfully" });
 	} catch (error) {
 		res.status(400).json({ error: error.message });
 	}
@@ -146,7 +146,7 @@ router.delete("/:id", async (req, res) => {
 
 		if (!deleted)
 			return res.status(404).json({ error: "ActualCartEquipment not found" });
-		res.json({ message: "ActualCartEquipment deleted successfully" });
+		res.status(200).json({ message: "ActualCartEquipment deleted successfully" });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -159,7 +159,7 @@ router.delete("/clearCart/:id", async (req, res) => {
 		});
 		if (!deleted)
 			return res.status(404).json({ error: "ActualCartEquipment not found" });
-		res.json({ message: "Carrinho apagado com sucesso" });
+		res.status(200).json({ message: "Carrinho apagado com sucesso" });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}

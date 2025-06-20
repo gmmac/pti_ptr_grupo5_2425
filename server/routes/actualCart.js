@@ -6,7 +6,7 @@ const models = require("../models");
 router.get("/", async (req, res) => {
 	try {
 		const actualCarts = await models.ActualCart.findAll();
-		res.json(actualCarts);
+		res.status(200).json(actualCarts);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -27,7 +27,7 @@ router.get("/:id", async (req, res) => {
 	try {
 		const cart = await models.ActualCart.findByPk(req.params.id);
 		if (!cart) return res.status(404).json({ error: "ActualCart not found" });
-		res.json(cart);
+		res.status(200).json(cart);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -41,7 +41,7 @@ router.get("/clientCartID/:clientNic", async (req, res) => {
 		});
 
 		if (!cart) return res.status(404).json({ error: "ActualCart not found" });
-		res.json(cart.id);
+		res.status(200).json(cart.id);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -55,7 +55,7 @@ router.put("/:id", async (req, res) => {
 		});
 		if (!updated)
 			return res.status(404).json({ error: "ActualCart not found" });
-		res.json({ message: "ActualCart updated successfully" });
+		res.status(200).json({ message: "ActualCart updated successfully" });
 	} catch (error) {
 		res.status(400).json({ error: error.message });
 	}
@@ -69,7 +69,7 @@ router.delete("/:id", async (req, res) => {
 		});
 		if (!deleted)
 			return res.status(404).json({ error: "ActualCart not found" });
-		res.json({ message: "ActualCart deleted successfully" });
+		res.status(200).json({ message: "ActualCart deleted successfully" });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}

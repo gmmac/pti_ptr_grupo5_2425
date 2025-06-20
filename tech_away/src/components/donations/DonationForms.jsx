@@ -25,26 +25,43 @@ export default function DonationForms({ show, handleClose, equipment, handleDona
   const [showModalCharity, setShowModalCharity] = useState(false);
 
   useEffect(() => {
+    const fetchClientNicFromEquipment = async (equipmentId) => {
+      try {
+        const res = await api.get('/api/storePurchase', {
+          params: { usedEquipmentID: equipmentId },
+        });
+        const purchase = res.data?.data?.[0];
+        if (purchase?.clientNIC) {
+          setClientData({ nic: purchase.clientNIC });
+          setForm((prev) => ({ ...prev, clientNic: purchase.clientNIC }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch client NIC from equipment ID:', err);
+      }
+    };
+
     if (equipment) {
       setEquipmentData({
         barcode: equipment.id,
         model: equipment.EquipmentSheet?.EquipmentModel?.name || '',
       });
       setForm((prev) => ({ ...prev, usedEquipmentID: equipment.id }));
+      fetchClientNicFromEquipment(equipment.id);
     } else {
       setEquipmentData({});
-      setForm((prev) => ({ ...prev, usedEquipmentID: '' }));
+      setClientData({});
+      setForm({ statusID: '', clientNic: '', usedEquipmentID: '', charityProjectId: '' });
     }
   }, [equipment]);
 
   const handleSelectCharity = (project) => {
     if (project) {
       setCharityProject(project);
-      setForm(prev => ({ ...prev, charityProjectId: project.id }));
+      setForm((prev) => ({ ...prev, charityProjectId: project.id }));
       setError('');
     } else {
       setCharityProject(null);
-      setForm(prev => ({ ...prev, charityProjectId: '' }));
+      setForm((prev) => ({ ...prev, charityProjectId: '' }));
     }
     setShowModalCharity(false);
   };
@@ -52,11 +69,11 @@ export default function DonationForms({ show, handleClose, equipment, handleDona
   const handleSelectClient = (client) => {
     if (client) {
       setClientData(client);
-      setForm(prev => ({ ...prev, clientNic: client.nic }));
+      setForm((prev) => ({ ...prev, clientNic: client.nic }));
       setError('');
     } else {
       setClientData({});
-      setForm(prev => ({ ...prev, clientNic: '' }));
+      setForm((prev) => ({ ...prev, clientNic: '' }));
     }
     setShowModal(false);
   };
@@ -67,18 +84,18 @@ export default function DonationForms({ show, handleClose, equipment, handleDona
         barcode: selected.id,
         model: selected.EquipmentSheet?.EquipmentModel?.name || '',
       });
-      setForm(prev => ({ ...prev, usedEquipmentID: selected.id }));
+      setForm((prev) => ({ ...prev, usedEquipmentID: selected.id }));
       setError('');
     } else {
       setEquipmentData({});
-      setForm(prev => ({ ...prev, usedEquipmentID: '' }));
+      setForm((prev) => ({ ...prev, usedEquipmentID: '' }));
     }
     setShowModalEq(false);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
 
     if (name === 'clientNic') {
       if (!/^\d*$/.test(value)) setError('NIC must contain only numbers.');
@@ -91,39 +108,37 @@ export default function DonationForms({ show, handleClose, equipment, handleDona
     }
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
 
-  if (!form.charityProjectId) {
-    setError('Please select a charity project.');
-    return;
-  }
-
-  try {
-    await api.post('/api/storePurchase/donate', form);
-    setSuccessMessage('Donation registered successfully!');
-
-    setForm({ statusID: '', clientNic: '', usedEquipmentID: '', charityProjectId: '' });
-    setClientData({});
-    setEquipmentData({});
-    setCharityProject(null);
-
-    // Fecha o modal automaticamente se for doação direta de um equipamento
-    if (equipment) {
-      handleClose();
-      if (typeof handleDonationComplete === 'function') {
-        handleDonationComplete();
-      }
-    } else {
-      setTimeout(() => setSuccessMessage(''), 3000);
+    if (!form.charityProjectId) {
+      setError('Please select a charity project.');
+      return;
     }
-  } catch (err) {
-    const backendMsg = err.response?.data?.error;
-    setError(backendMsg || 'An error occurred while registering the donation.');
-  }
-};
 
+    try {
+      await api.post('/api/storePurchase/donate', form);
+      setSuccessMessage('Donation registered successfully!');
+
+      setForm({ statusID: '', clientNic: '', usedEquipmentID: '', charityProjectId: '' });
+      setClientData({});
+      setEquipmentData({});
+      setCharityProject(null);
+
+      if (equipment) {
+        handleClose();
+        if (typeof handleDonationComplete === 'function') {
+          handleDonationComplete();
+        }
+      } else {
+        setTimeout(() => setSuccessMessage(''), 3000);
+      }
+    } catch (err) {
+      const backendMsg = err.response?.data?.error;
+      setError(backendMsg || 'An error occurred while registering the donation.');
+    }
+  };
 
   return (
     <>
@@ -134,6 +149,7 @@ const handleSubmit = async (e) => {
         <Modal.Body>
           {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
           <Form onSubmit={handleSubmit}>
+            {/* Client NIC */}
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
@@ -145,20 +161,24 @@ const handleSubmit = async (e) => {
                     onChange={handleChange}
                     placeholder="Enter NIC"
                     required
+                    readOnly={!!equipment}
                   />
                 </Form.Group>
               </Col>
-              <Col md={6} className="d-flex align-items-end">
-                <Button
-                  variant="outline-secondary"
-                  className="w-100 rounded-pill shadow-sm"
-                  onClick={() => setShowModal(true)}
-                >
-                  Search Client
-                </Button>
-              </Col>
+              {!equipment && (
+                <Col md={6} className="d-flex align-items-end">
+                  <Button
+                    variant="outline-secondary"
+                    className="w-100 rounded-pill shadow-sm"
+                    onClick={() => setShowModal(true)}
+                  >
+                    Search Client
+                  </Button>
+                </Col>
+              )}
             </Row>
 
+            {/* Equipment ID */}
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
@@ -187,6 +207,7 @@ const handleSubmit = async (e) => {
               )}
             </Row>
 
+            {/* Charity Project */}
             <Row className="mb-3">
               <Col>
                 <Form.Group>
@@ -210,8 +231,10 @@ const handleSubmit = async (e) => {
               </Col>
             </Row>
 
+            {/* Errors */}
             {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
+            {/* Submit */}
             <Button
               variant="primary"
               type="submit"
@@ -224,6 +247,7 @@ const handleSubmit = async (e) => {
         </Modal.Body>
       </Modal>
 
+      {/* Modals */}
       <ClientCatalogModal
         show={showModal}
         handleClose={() => setShowModal(false)}

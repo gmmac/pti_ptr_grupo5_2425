@@ -7,8 +7,8 @@ router.get("/", async (req, res) => {
 		const purchaseCartEquipments = await models.PurchaseCartEquipment.findAll();
 		res.status(200).json(purchaseCartEquipments);
 	} catch (error) {
-		console.error("Erro ao buscar PurchaseCartEquipments:", error);
-		res.status(500).json({ error: "Erro ao buscar PurchaseCartEquipments." });
+		console.error("Error fetching PurchaseCartEquipments:", error);
+		res.status(500).json({ error: "Error fetching PurchaseCartEquipments." });
 	}
 });
 
@@ -30,8 +30,8 @@ router.get("/order/:ID", async (req, res) => {
 
 		res.status(200).json(purchaseCartEquipments);
 	} catch (error) {
-		console.error("Erro ao buscar PurchaseCartEquipment:", error);
-		res.status(500).json({ error: "Erro ao buscar PurchaseCartEquipment." });
+		console.error("Error fetching PurchaseCartEquipment:", error);
+		res.status(500).json({ error: "Error fetching PurchaseCartEquipment." });
 	}
 });
 
@@ -44,7 +44,7 @@ router.post("/all-actual-cart", async (req, res) => {
 		if (!clientPurchaseId || !cartId) {
 			return res
 				.status(400)
-				.json({ error: "clientPurchaseId e cartId são obrigatórios." });
+				.json({ error: "clientPurchaseId and cartId are required." });
 		}
 
 		// Procura todos os usedEquipmentIds no carrinho
@@ -55,7 +55,7 @@ router.post("/all-actual-cart", async (req, res) => {
 		if (!cartEquipments.length) {
 			return res
 				.status(404)
-				.json({ error: "Nenhum equipamento encontrado no carrinho." });
+				.json({ error: "Cart is empty." });
 		}
 
 		let totalItems = 0;
@@ -80,12 +80,12 @@ router.post("/all-actual-cart", async (req, res) => {
 		}
 
 		res.status(201).json({
-			message: "Equipamentos adicionados à compra com sucesso.",
+			message: "Equipments add to card successfully.",
 			totalItems,
 		});
 	} catch (error) {
-		console.error("Erro ao adicionar equipamentos da compra:", error);
-		res.status(500).json({ error: "Erro ao processar a compra." });
+		console.error("Error adding equipments to purchase", error);
+		res.status(500).json({ error: "Error processing purchase." });
 	}
 });
 

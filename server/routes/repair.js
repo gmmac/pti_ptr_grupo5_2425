@@ -130,7 +130,7 @@ router.get("/displayTable", async (req, res) => {
       data: formattedData,
     });
   } catch (error) {
-    console.error("Erro no endpoint /displayTable:", error);
+    console.error("Error in endpoint /displayTable:", error);
     res.status(500).json({ error: "Error fetching repairs." });
   }
 });
@@ -280,7 +280,7 @@ router.post("/", async (req, res) => {
 
 		await models.RepairStatusLog.create({
 			statusId: 1,
-			description: 'Pedido de reparação criado',
+			description: 'Repair order created',
 			repairId: repair.id,
 			createdAt: new Date(),
 			updatedAt: new Date(),

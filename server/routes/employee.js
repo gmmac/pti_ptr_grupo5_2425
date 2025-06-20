@@ -16,7 +16,6 @@ router.get("/", async (req, res) => {
             email,
             phone,
 			gender,
-            // address,
             role,
             active = "1",
             page = 1,
@@ -71,7 +70,7 @@ router.get("/", async (req, res) => {
             order,
         });
 
-        res.json({
+        res.status(200).json({
             totalItems: count,
             totalPages: Math.ceil(count / pageSize),
             currentPage: parseInt(page),
@@ -169,9 +168,6 @@ router.get("/displayTable", async (req, res) => {
 	]);
 	}
 
-
-
-
 	const { count, rows } = await models.Employee.findAndCountAll({
 	  where,
 		include: [
@@ -215,7 +211,7 @@ router.get("/displayTable", async (req, res) => {
 
   } catch (error) {
 	console.log(error);
-	res.status(500).json({ error: "Error fetching brands." });
+	res.status(500).json({ error: "Error fetching employees." });
   }
 });
 
@@ -251,7 +247,7 @@ router.post("/", async (req, res) => {
 			return res.status(200).json({ errorTag: errorTag});
 		}
 
-		const employee = await models.Employee.create({ /* Adicionar autoincrement no internNum */ 
+		const employee = await models.Employee.create({ 
 			nic:nic,
             nif:nif,
             storeNIPC:storeNIPC,
@@ -277,10 +273,10 @@ router.post("/", async (req, res) => {
 
 router.get("/user-info", (req, res) => {
 	const employeeInfo = req.cookies.employeeInfo;
-
 	return res.status(200).json({ employeeInfo: employeeInfo });
-  });
-  
+});
+
+
 router.get('/logout', (req, res) => {
 	res.clearCookie("employeeInfo", {
 	  httpOnly: true,
@@ -288,7 +284,7 @@ router.get('/logout', (req, res) => {
 	  sameSite: "Lax"
 	});
   
-	return res.status(200).json({ message: 'Logout realizado com sucesso.' });
+	return res.status(200).json({ message: 'Logout success.' });
 });
 
 
@@ -302,7 +298,7 @@ router.get("/:internNum", async (req, res) => {
 		if (!employee) {
 			return res.status(404).json({ error: "Employee not found" });
 		}
-		res.json(employee);
+		res.status(200).json(employee);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -330,7 +326,7 @@ router.put("/:internNum", async (req, res) => {
 			});
 		}
 
-		res.json(employee);
+		res.status(200).json(employee);
 
 	} catch (error) {
 		res.status(400).json({ error: error.message });
@@ -362,7 +358,7 @@ router.patch("/activation/:internNum", async (req, res) => {
 		});
 
 		if (!employee) {
-			return res.status(404).json({ error: "Funcionário não encontrado." });
+			return res.status(404).json({ error: "Employee not found." });
 		}
 
 		// toggle isActive attribute
@@ -386,8 +382,8 @@ router.patch("/activation/:internNum", async (req, res) => {
 			employee,
 		});
 	} catch (error) {
-		console.error("Erro ao alternar isActive:", error);
-		res.status(500).json({ error: "Erro ao atualizar o status do funcionário." });
+		console.error("Error toggling employee:", error);
+		res.status(500).json({ error: "Error activating employee." });
 	}
 });
 

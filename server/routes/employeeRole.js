@@ -11,10 +11,10 @@ router.get("/", async (req, res) => {
       const employeeRoles = await models.EmployeeRole.findAll({
         where
       });
-      res.json(employeeRoles);
+      res.status(200).json(employeeRoles);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Erroe fetching roles." });
+      res.status(500).json({ message: "Error fetching roles." });
     }
 });
   
@@ -179,7 +179,7 @@ router.put("/:ID", async (req, res) => {
           updatedAt: new Date()
       });
 
-      res.json({ message: "Role updated successfully.", role: employeeRole });
+      res.status(200).json({ message: "Role updated successfully.", role: employeeRole });
   } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Error updating role." });
@@ -206,7 +206,7 @@ router.delete("/:ID", async (req, res) => {
     }
 
     await employeeRole.destroy();
-    res.json({ message: "Role deleted successfully." });
+    res.status(200).json({ message: "Role deleted successfully." });
 
   } catch (error) {
 

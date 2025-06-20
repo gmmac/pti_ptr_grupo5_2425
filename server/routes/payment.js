@@ -8,7 +8,7 @@ const router = express.Router();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 router.get("/config", (req, res) => {
-	res.send({
+	res.status(200).send({
 		publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
 	});
 });
@@ -20,7 +20,7 @@ router.post("/create-payment-intent", async (req, res) => {
 	if (!totalPrice || isNaN(totalPrice)) {
 		return res
 			.status(400)
-			.send({ error: { message: "totalPrice inválido ou ausente." } });
+			.send({ error: { message: "totalPrice invalid or not given." } });
 	}
 
 	// Stripe espera amount em cêntimos (inteiro)
@@ -34,7 +34,7 @@ router.post("/create-payment-intent", async (req, res) => {
 		},
 	});
 
-	res.send({ clientSecret: paymentIntent.client_secret });
+	res.status(200).send({ clientSecret: paymentIntent.client_secret });
 	// } catch (e) {
 	// 	return res.status(400).send({
 	// 		error: {

@@ -84,7 +84,7 @@ router.get("/", async (req, res) => {
       order: [['id', 'ASC']],  // or pull from req.query if you still want ordering
     });
 
-    return res.json({
+    return res.status(200).json({
       totalItems: count,
       totalPages: Math.ceil(count / pageSize),
       currentPage: Number(page),
@@ -169,7 +169,7 @@ router.get('/displayTable', async (req, res) => {
       startDate: p.startDate, completionDate: p.completionDate
     }));
 
-    res.json({ totalItems: count, totalPages: Math.ceil(count/ pageSize), currentPage: Number(page), pageSize: Number(pageSize), data });
+    res.status(200).json({ totalItems: count, totalPages: Math.ceil(count/ pageSize), currentPage: Number(page), pageSize: Number(pageSize), data });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error fetching charity projects.' });
@@ -248,8 +248,6 @@ router.post("/linkEquipmentType", async (req, res) => {
       totalFinal = totalFinal - existingQty + quantity;
     }
 
-
-    
     // Verifica se cabe no espaço disponível
     if (totalFinal > availableSlots) {
       console.error(`Not enough available slots in warehouse. Requested total: ${totalFinal}, Available: ${availableSlots}`)
@@ -272,7 +270,6 @@ router.post("/linkEquipmentType", async (req, res) => {
     }));
 
     const created = await models.CharityProjectEquipmentType.bulkCreate(records);
-
     res.status(201).json({
       message: "Equipment types updated successfully.",
       insertedCount: created.length,
@@ -445,7 +442,7 @@ router.get("/:id/equipmentTypes", async (req, res) => {
       currentDonations: donationCountsMap[type.id] || 0
     }));
 
-    return res.json({
+    return res.status(200).json({
       totalItems:  count,
       totalPages:  Math.ceil(count / limit),
       currentPage: parseInt(page, 10),
@@ -454,8 +451,8 @@ router.get("/:id/equipmentTypes", async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Erro ao buscar tipos vinculados ao projeto:", error);
-    return res.status(500).json({ error: "Erro ao buscar tipos vinculados ao projeto." });
+    console.error("Error fetching project's type:", error);
+    return res.status(500).json({ error: "Error fetching project's type." });
   }
 });
 
@@ -557,8 +554,8 @@ router.get("/:id/equipmentSheet", async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Erro ao buscar EquipmentSheets vinculados ao projeto:", error);
-    res.status(500).json({ error: "Erro ao buscar EquipmentSheets vinculados ao projeto." });
+    console.error("Error fetching project's equipment sheet: ", error);
+    res.status(500).json({ error: "Error fetching project's equipment sheet" });
   }
 });
 
@@ -578,7 +575,7 @@ router.get("/:ID", async (req, res) => {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    res.json(project);
+    res.status(200).json(project);
   } catch (error) {
     console.error("Error fetching project:", error);
     res.status(500).json({ error: "Server error" });
@@ -668,10 +665,10 @@ router.put('/:ID', async (req, res) => {
 router.patch('/activation/:id', async (req, res) => {
   try {
     const project = await models.CharityProject.findByPk(req.params.id);
-    if (!project) return res.status(404).json({ error:'Not found.' });
+    if (!project) return res.status(404).json({ error:'Charity Project not found.' });
     project.isActive = project.isActive==='1'?'0':'1';
     await project.save();
-    res.json(project);
+    res.status(200).json(project);
   } catch(err) {
     console.error(err);
     res.status(500).json({ error:'Error toggling activation.' });

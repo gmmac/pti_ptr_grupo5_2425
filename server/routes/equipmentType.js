@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
       order,
     });
 
-    res.json({
+    res.status(200).json({
       totalItems: count,
       totalPages: Math.ceil(count / pageSize),
       currentPage: parseInt(page),

@@ -11,11 +11,11 @@ router.get("/", async (req, res) => {
 			name,
 			email,
 			phone,
-			openTime,
-			closeTime,
+			// openTime,
+			// closeTime,
 			address,
-			latitude,
-			longitude,
+			// latitude,
+			// longitude,
 			page = 1,
 			pageSize = 5,
 			orderBy,
@@ -114,7 +114,6 @@ router.get('/displayTable', async (req, res) => {
       ]);
     }
 
-
 	const { count, rows } = await models.Store.findAndCountAll({ where, limit, offset, order });
 
 	res.status(200).json({
@@ -134,8 +133,8 @@ router.get('/displayTable', async (req, res) => {
 	  }))
 	});
   } catch (error) {
-	console.error('Error fetching warehouses:', error);
-	res.status(500).json({ message: 'Error fetching warehouses.' });
+	console.error('Error fetching stores:', error);
+	res.status(500).json({ message: 'Error fetching stores.' });
   }
 });
 
@@ -203,7 +202,7 @@ router.get("/:NIPC", async (req, res) => {
 		if (!store) {
 			return res.status(404).json({ error: "Store not found" });
 		}
-		res.json(store);
+		res.status(200).json(store);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -216,7 +215,7 @@ router.put("/:NIPC", async (req, res) => {
 			return res.status(404).json({ error: "Store not found" });
 		}
 		await store.update(req.body);
-		res.json(store);
+		res.status(200).json(store);
 	} catch (error) {
 		res.status(400).json({ error: error.message });
 	}
@@ -252,8 +251,6 @@ router.patch('/activation/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
-
 router.get("/:NIPC/employees", async (req, res) => {
 	try {
 		const store = await models.Store.findByPk(req.params.NIPC);
@@ -263,7 +260,7 @@ router.get("/:NIPC/employees", async (req, res) => {
 		const employees = await models.Employee.findAll({
 			where: { storeNIPC: req.params.NIPC },
 		});
-		res.json(employees);
+		res.status(200).json(employees);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}

@@ -5,7 +5,7 @@ const models = require("../models");
 router.get("/", async (req, res) => {
 	try {
 		const purchases = await models.ClientPurchase.findAll();
-		res.json(purchases);
+		res.status(200).json(purchases);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -25,7 +25,7 @@ router.post("/", async (req, res) => {
 		if (!clientNIC || totalPrice === undefined || totalPrice === null) {
 			return res
 				.status(400)
-				.json({ error: "clientNIC e totalPrice são obrigatórios." });
+				.json({ error: "clientNIC and totalPrice are Required." });
 		}
 
 		const purchase = await models.ClientPurchase.create({
@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
 
 		res.status(201).json({ id: purchase.id });
 	} catch (error) {
-		console.error("Erro ao criar compra:", error);
+		console.error("Error creating Purchase:", error);
 		res.status(400).json({ error: error.message });
 	}
 });
@@ -58,13 +58,13 @@ router.get("/client-orders/:ID", async (req, res) => {
 		});
 
 		if (!cartsIds) {
-			return res.status(404).json({ error: "Carrinhos não encontrados" });
+			return res.status(404).json({ error: "Carts not found" });
 		}
 
 		res.status(200).json(cartsIds);
 	} catch (error) {
-		console.error("Erro ao buscar PurchaseCartEquipment:", error);
-		res.status(500).json({ error: "Erro ao buscar PurchaseCartEquipment." });
+		console.error("Error fetching PurchaseCartEquipment:", error);
+		res.status(500).json({ error: "Error fetching PurchaseCartEquipment." });
 	}
 });
 
@@ -74,7 +74,7 @@ router.get("/:ID", async (req, res) => {
 		if (!purchase) {
 			return res.status(404).json({ error: "Purchase not found" });
 		}
-		res.json(purchase);
+		res.status(200).json(purchase);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -87,7 +87,7 @@ router.put("/:ID", async (req, res) => {
 			return res.status(404).json({ error: "Purchase not found" });
 		}
 		await purchase.update(req.body);
-		res.json(purchase);
+		res.status(200).json(purchase);
 	} catch (error) {
 		res.status(400).json({ error: error.message });
 	}

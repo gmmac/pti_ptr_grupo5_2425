@@ -9,8 +9,6 @@ router.get("/", (req, res) => {
 
 router.post("/", async (req, res) => {
 	try {
-		console.log(req.body);
-
 		const {
 			nic,
 			nif,
@@ -88,7 +86,7 @@ router.put("/:NIC", async (req, res) => {
 			sameSite: "Lax",
 			maxAge: 24 * 60 * 60 * 1000 // 1 dia
 		});
-		res.json(organizer);
+		res.status(200).json(organizer);
 	} catch (error) {
 		res.status(400).json({ error: error.message });
 	}

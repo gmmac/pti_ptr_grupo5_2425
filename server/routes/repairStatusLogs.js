@@ -60,7 +60,6 @@ router.post("/", async (req, res) => {
             updatedAt: new Date(),
         });
 
-        // Atualizar a Repair associada com o novo statusId
         await models.Repair.update(
             { statusID: statusId },
             { where: { id: repairId } }

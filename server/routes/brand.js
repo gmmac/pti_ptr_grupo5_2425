@@ -99,7 +99,7 @@ router.post("/", async (req, res) => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    res.status(200).json({
+    res.status(201).json({
       data: brand,
     });
   } catch (error) {

@@ -160,7 +160,7 @@ router.get("/totalOnSaleStock", async (req, res) => {
 			},
 		});
 
-		res.json({ total });
+		res.status(200).json({ total });
 	} catch (error) {
 		console.error("Error fetching total sale stock:", error);
 		res.status(500).json({ error: "Error fetching total sale stock." });
@@ -177,7 +177,7 @@ router.get("/totalSoldEquipments", async (req, res) => {
 			},
 		});
 
-		res.json({ total });
+		res.status(200).json({ total });
 	} catch (error) {
 		console.error("Error fetching total sold equipments:", error);
 		res.status(500).json({ error: "Error fetching total sold equipments." });
@@ -235,8 +235,6 @@ const filters = [
   limit,                  // $13
   offset                  // $14
 ];
-
-    console.log(filters, sortOrder)
 
     const sql = `
 SELECT 
@@ -416,8 +414,6 @@ WHERE
     END
   );
 
-
-
 `;
 
     // Executa queries
@@ -474,7 +470,7 @@ WHERE
       },
     }));
 
-    res.json({
+    res.status(200).json({
       totalItems: parseInt(countResult.count, 10),
       totalPages: Math.ceil(countResult.count / limit),
       currentPage: page,
@@ -532,7 +528,7 @@ router.get("/usedEquipmentRepairs", async (req, res) => {
 			storeId: item.storeId,
 		}));
 
-		res.json({
+		res.status(200).json({
 			totalItems: count,
 			totalPages: Math.ceil(count / pageSize),
 			currentPage: parseInt(page),
@@ -541,7 +537,7 @@ router.get("/usedEquipmentRepairs", async (req, res) => {
 		});
 	} catch (error) {
 		console.error("Error fetching clients:", error);
-		res.status(500).json({ error: "Error fetching clients." });
+		res.status(500).json({ error: "Error fetching repairs." });
 	}
 });
 
@@ -561,7 +557,7 @@ router.get("/:ID", async (req, res) => {
 			],
 		});
 
-		res.json({ usedEquipments });
+		res.status(200).json({ usedEquipments });
 	} catch (error) {
 		console.error("Error fetching used equipments:", error);
 		res.status(500).json({ error: "Error fetching used equipments." });
@@ -680,15 +676,15 @@ router.post('/', async (req, res) => {
     // (Opcional) Verificar se as FK existem
     const status = await models.EquipmentStatus.findByPk(statusID);
     if (!status) {
-      return res.status(400).json({ error: 'Status inválido' });
+      return res.status(400).json({ error: 'Invalid Status' });
     }
     const sheet = await models.EquipmentSheet.findByPk(equipmentId);
     if (!sheet) {
-      return res.status(400).json({ error: 'EquipmentSheet não encontrado' });
+      return res.status(400).json({ error: 'EquipmentSheet not found' });
     }
     const store = await models.Store.findByPk(storeId);
     if (!store) {
-      return res.status(400).json({ error: 'Store não encontrada' });
+      return res.status(400).json({ error: 'Store not found' });
     }
 
     // Criar novo registo em UsedEquipments
@@ -705,7 +701,7 @@ router.post('/', async (req, res) => {
     return res.status(201).json(used);
   } catch (err) {
     console.error('Erro ao criar UsedEquipment:', err);
-    return res.status(500).json({ error: 'Erro interno no servidor' });
+    return res.status(500).json({ error: 'Error creating equipment' });
   }
 });
 
@@ -722,10 +718,10 @@ router.patch("/:ID", async (req, res) => {
     action,
   } = req.body;
 
-  // try {
+  try {
     const used = await models.UsedEquipment.findByPk(ID);
     if (!used) {
-      return res.status(404).json({ error: "UsedEquipment não encontrado." });
+      return res.status(404).json({ error: "UsedEquipment not found." });
     }
 
     if (statusID !== undefined) used.statusID = statusID;
@@ -740,11 +736,11 @@ router.patch("/:ID", async (req, res) => {
 
     await used.save();
 
-    res.status(200).json({ message: "Atualizado com sucesso", data: used });
-  // } catch (err) {
-  //   console.error("Erro ao atualizar UsedEquipment:", err);
-  //   res.status(500).json({ error: "Erro interno ao atualizar UsedEquipment." });
-  // }
+    res.status(200).json({ message: "updated", data: used });
+  } catch (err) {
+    console.error("Erro ao atualizar UsedEquipment:", err);
+    res.status(500).json({ error: "Error updating equipment." });
+  }
 });
 
 router.put("/:ID", (req, res) => {});

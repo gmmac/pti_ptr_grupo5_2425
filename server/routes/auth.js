@@ -18,7 +18,7 @@ const decryptToken = (encryptedToken) => {
 };
 
 router.put("/generateAuthToken", async (req, res) => {
-  // try {
+  try {
     // Request an access token from Auth0
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
       client_id: process.env.AUTH0_CLIENT_ID,
@@ -56,9 +56,9 @@ router.put("/generateAuthToken", async (req, res) => {
       await models.Token.create({name: "auth", token: encryptToken(token), createdAt: Date.now(), updatedAt: Date.now()});
     }
 
-  // } catch (error) {
-  //   res.status(500);
-  // }
+  } catch (error) {
+    res.status(500);
+  }
 });
 
 router.post("/register", async (req, res) => {
@@ -172,7 +172,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/changePassword", async (req, res) => {
-  // try {
+  try {
     const { email } = req.body;
 
     // Change password
@@ -183,10 +183,10 @@ router.post("/changePassword", async (req, res) => {
     });
     
     res.status(201).json("Email Sent")
-  // } catch (error) {
-  //   console.error(error.status);
-  //   res.sendStatus(error.status); // Internal Server Error
-  // }
+  } catch (error) {
+    console.error(error.status);
+    res.sendStatus(error.status); // Internal Server Error
+  }
 });
 
 
@@ -206,14 +206,14 @@ router.get("/getUserByEmail/:email", async (req, res) => {
     });
 
     if (response.data.length === 0) {
-      return res.status(404).json({ message: "Usuário não encontrado" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(response.data[0]); // Retorna o primeiro usuário encontrado
+    res.status(200).json(response.data[0]); // Retorna o primeiro user encontrado
 
   } catch (error) {
-    console.error("Erro ao buscar usuário:", error.response?.data || error.message);
-    res.status(500).json({ error: "Erro ao buscar usuário" });
+    console.error("Error getting user: ", error.response?.data || error.message);
+    res.status(500).json({ error: "Error getting user" });
   }
 });
 
@@ -249,7 +249,7 @@ router.get('/logout', (req, res) => {
     sameSite: "Lax"
   });
 
-  return res.status(200).json({ message: 'Logout realizado com sucesso.' });
+  return res.status(200).json({ message: 'Logout success.' });
 });
 
 

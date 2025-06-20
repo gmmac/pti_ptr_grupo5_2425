@@ -246,7 +246,7 @@ router.get("/", async (req, res) => {
       };
     });
 
-    res.json({
+    res.status(200).json({
       totalItems: result.count,
       totalPages: Math.ceil(result.count / limit),
       currentPage: parseInt(page, 10),
@@ -349,7 +349,7 @@ router.get("/in-stock", async (req, res) => {
         break;
     }
 
-    res.json({
+    res.status(200).json({
       totalItems: count,
       totalPages: Math.ceil(count / pageSize),
       currentPage: parseInt(page),
@@ -393,7 +393,7 @@ router.post("/", async (req, res) => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    res.status(200).json({ data: newEquipmentSheet });
+    res.status(201).json({ data: newEquipmentSheet });
   } catch (error) {
     console.error("Error creating equipment sheet:", error);
     res.status(500).json({ error: "Error creating equipment sheet." });
@@ -440,17 +440,17 @@ router.get("/:ID", async (req, res) => {
       return res.status(404).json({ error: "EquipmentSheet not found." });
     }
 
-    res.json({ equipmentSheet });
+    res.status(200).json({ equipmentSheet });
   } catch (error) {
     console.error("Error fetching equipment sheet:", error);
     res.status(500).json({ error: "Error fetching equipment sheet." });
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:ID", async (req, res) => {
   try {
     const { barcode, model, type } = req.body;
-    const equipmentSheet = await models.EquipmentSheet.findByPk(req.params.id);
+    const equipmentSheet = await models.EquipmentSheet.findByPk(req.params.ID);
     if (!equipmentSheet) {
       return res.status(404).json({ error: "EquipmentSheet not found." });
     }
