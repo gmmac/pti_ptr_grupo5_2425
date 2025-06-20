@@ -67,7 +67,7 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
     if (touchedFields[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: value ? "" : "Este campo é obrigatório"
+        [name]: value ? "" : "This field is mandatory"
       }));
     }
   };
@@ -78,11 +78,11 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
 
     for (const field in repairInfo) {
       if (!repairInfo[field] && field !== 'statusID') {
-        newErrors[field] = "Este campo é obrigatório";
+        newErrors[field] = "This field is mandatory";
         hasError = true;
       }
       if (field === "budget" && isNaN(repairInfo[field])) {
-        newErrors[field] = "Orçamento inválido";
+        newErrors[field] = "Invalid budget";
         hasError = true;
       }
     }

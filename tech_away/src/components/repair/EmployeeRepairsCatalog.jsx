@@ -3,13 +3,12 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Menu } from "primereact/menu";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { confirmDialog } from 'primereact/confirmdialog';
 import api from "../../utils/axios";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
-import RepairInfo from "./RepairInfo";
 import NewRepairStatusLog from "./NewRepairStatusLog";
 import EditRepairForms from "./EditRepairForms";
 import OrderPartsForms from "../part/OrderPartsForms";
@@ -118,6 +117,26 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
         setRepairID(repairID);
     };
 
+    const handleDelete = async (repairID) => {
+        try {
+            await api.delete(`/api/repair/${repairID}`);
+
+            refreshTable();
+
+        } catch (error) {
+            console.error("Erro ao deletar o reparo:", error);
+        }
+    };
+
+    const deleteRepair = (repairID) => {
+        confirmDialog({
+            message: "Are you sure you want to delete this repair?",
+            header: "Confirmation",
+            icon: "pi pi-exclamation-triangle",
+            accept: () => handleDelete(repairID),
+        });
+    };
+
     const openEditRepairModal = (repairID) => {
         setShowEditRepair(true);
         setRepairID(repairID);
@@ -135,7 +154,6 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
 
     return (
         <>
-            <ConfirmDialog />
             <div className="">
                 <DataTable
                     value={data}
@@ -224,14 +242,19 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
                                     command: () => openRepairInfo(rowData.id),
                                 },
                                 {
+                                    label: "Edit Repair",
+                                    icon: "pi pi-pencil",
+                                    command: () => openEditRepairModal(rowData.id),
+                                },
+                                {
                                     label: "Change Status",
                                     icon: "pi pi-sync",
                                     command: () => changeRepairStatus(rowData.id),
                                 },
                                 {
-                                    label: "Edit Repair",
-                                    icon: "pi pi-pencil",
-                                    command: () => openEditRepairModal(rowData.id),
+                                    label: "Delete Repair",
+                                    icon: "pi pi-trash",
+                                    command: () => deleteRepair(rowData.id),
                                 },
                                 {
                                     label: "Order Parts",

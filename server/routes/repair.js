@@ -4,6 +4,15 @@ const models = require("../models");
 const { Op, Sequelize } = require("sequelize");
 const { sequelize } = require("../models/index");
 
+router.get("/", async (req, res) => {
+  try {
+    const repairs = await models.Repair.findAll();
+
+    res.status(200).json(repairs);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching all repairs." });
+  }
+});
 
 router.get("/displayTable", async (req, res) => {
   try {
@@ -366,6 +375,23 @@ router.put("/:id", async (req, res) => {
 });
 
 
-router.delete("/:id", async (req, res) => {});
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const repair = await models.Repair.findByPk(id);
+    if (!repair) {
+      return res.status(404).json({ error: "Repair not found." });
+    }
+
+    // Remove a repair
+    await repair.destroy();
+
+    res.status(200).json({ message: "Repair deleted successfully." });
+  } catch (error) {
+    console.error("DELETE /repair/:id error:", error);
+    res.status(500).json({ error: "Error deleting repair." });
+  }
+});
 
 module.exports = router;

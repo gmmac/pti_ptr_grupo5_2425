@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "repairId",
         targetKey: "id",
         onUpdate: "CASCADE",
-        onDelete: "SET NULL",
+        onDelete: "CASCADE",
       });
     }
   }

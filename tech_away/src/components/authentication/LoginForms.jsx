@@ -43,7 +43,7 @@ export default function LoginForms({
 
 		Object.keys(formData).forEach((field) => {
 			if (!formData[field]) {
-				newErrors[field] = "Este campo é obrigatório";
+				newErrors[field] = "This field is mandatory";
 				hasError = true;
 			} else {
 				newErrors[field] = ""; // Limpa o erro
@@ -70,11 +70,11 @@ export default function LoginForms({
 
 		// Verifica campos se os campos estão vazios ou inválidos
 		if (!value) {
-			newErrors[name] = "Este campo é obrigatório";
+			newErrors[name] = "This field is mandatory";
 		} else if (name == "email") {
 			const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 			if (!emailPattern.test(value)) {
-				newErrors[name] = "O email deve ser válido";
+				newErrors[name] = "Email must be valid";
 			} else {
 				newErrors[name] = "";
 			}

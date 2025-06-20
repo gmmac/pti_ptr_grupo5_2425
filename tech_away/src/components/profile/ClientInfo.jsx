@@ -72,7 +72,7 @@ export default function ClientInfo({ userType = "client" }) {
 
 		let newErrors = { ...errors };
 		if (!value) {
-			newErrors[name] = "Este campo é obrigatório";
+			newErrors[name] = "This field is mandatory";
 		} else if (name === "birthDate") {
 			const birthDate = new Date(value);
 			const today = new Date();
@@ -83,7 +83,7 @@ export default function ClientInfo({ userType = "client" }) {
 					today.getDate() >= birthDate.getDate());
 
 			if (age < 16 || (age === 16 && !isBirthdayPassed)) {
-				newErrors[name] = "Deves ter pelo menos 16 anos para criar uma conta.";
+				newErrors[name] = "You must be at least 16 years old to have an account.";
 			} else {
 				newErrors[name] = "";
 			}
@@ -93,7 +93,7 @@ export default function ClientInfo({ userType = "client" }) {
 
 		if (name === "nif" || name === "phone") {
 			if (value.length != 9) {
-				newErrors[name] = "Este campo deve ter 9 dígitos!";
+				newErrors[name] = "This field must have 9 digits!";
 			}
 		}
 
@@ -111,7 +111,7 @@ export default function ClientInfo({ userType = "client" }) {
 			.catch((error) => {
 				let newErrors = { ...errors };
 				newErrors[error.response.data.errorTag] =
-					"Já existe um utilizador com este " + error.response.data.errorTag;
+					"There is already a user with this " + error.response.data.errorTag;
 				setErrors(newErrors);
 				console.log("Erro ao atualizar os dados:", error.response.data);
 			});
