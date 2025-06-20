@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 
 	FolderInterestEquipments.init(
 		{
-			folderId: {
+			folderInterestId: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 			},

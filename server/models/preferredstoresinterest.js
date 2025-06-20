@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
 		static associate(models) {
 			PreferredStoresInterets.belongsTo(models.Store, {
 				foreignKey: "storeId",
+  				targetKey: "nipc", 
 				as: "store",
 				onDelete: "CASCADE",
 				onUpdate: "CASCADE",

@@ -13,103 +13,189 @@ router.get("/", async (req, res) => {
 	}
 });
 
-router.get("/:userNic/:folderId", async (req, res) => {
+router.get("/user/:userNic", async (req, res) => {
 	try {
-		const { userNic, folderId } = req.params;
+		const { userNic } = req.params;
 
-		if (folderId === "null") {
-			const allInterests = await models.Interest.findAll({
-				where: {
-					clientNic: userNic,
+		const allInterests = await models.Interest.findAll({
+			where: { clientNic: userNic },
+			attributes: [
+				"id",
+				"equipmentSheetID",
+				"maxLaunchYear",
+				"minLaunchYear",
+				"minPrice",
+				"maxPrice",
+				"createdAt",
+				"updatedAt",
+				"description",
+			],
+			include: [
+				{ model: models.Brand, as: "brand", attributes: ["id", "name"] },
+				{
+					model: models.EquipmentModel,
+					as: "model",
+					attributes: ["id", "name"],
 				},
-				attributes: [
-					"id",
-					"equipmentSheetID",
-					"maxLaunchYear",
-					"minLaunchYear",
-					"minPrice",
-					"maxPrice",
-					"createdAt",
-					"updatedAt",
-				],
-				include: [
-					{
-						model: models.Brand,
-						as: "brand",
-						attributes: ["id", "name"],
-					},
-					{
-						model: models.EquipmentModel,
-						as: "model",
-						attributes: ["id", "name"],
-					},
-					{
-						model: models.EquipmentType,
-						as: "type",
-						attributes: ["id", "name"],
-					},
-					{
-						model: models.EquipmentStatus,
-						as: "equipmentStatus",
-						attributes: ["id", "state"],
-					},
-				],
-			});
-			res.json(allInterests);
-		} else {
-			const interestsIds = await models.FolderInterestEquipments.findAll({
-				where: {
-					clientNic: userNic,
-					folderId: folderId,
+				{ model: models.EquipmentType, as: "type", attributes: ["id", "name"] },
+				{
+					model: models.EquipmentStatus,
+					as: "equipmentStatus",
+					attributes: ["id", "state"],
 				},
-			});
-			const interests = {};
-			for (const interest of interestsIds) {
-				const interestData = await models.Interest.findOne({
-					where: {
-						id: interest.interestId,
-					},
-					attributes: [
-						"id",
-						"equipmentSheetID",
-						"maxLaunchYear",
-						"minLaunchYear",
-						"minPrice",
-						"maxPrice",
-						"createdAt",
-						"updatedAt",
-					],
+				{
+					model: models.PreferredStoresInterets,
+					as: "preferredStores",
 					include: [
 						{
-							model: models.Brand,
-							as: "brand",
-							attributes: ["id", "name"],
-						},
-						{
-							model: models.EquipmentModel,
-							as: "model",
-							attributes: ["id", "name"],
-						},
-						{
-							model: models.EquipmentType,
-							as: "type",
-							attributes: ["id", "name"],
-						},
-						{
-							model: models.EquipmentStatus,
-							as: "equipmentStatus",
-							attributes: ["id", "state"],
+							model: models.Store,
+							as: "store",
+							attributes: ["nipc", "name", "email", "phone", "address"],
 						},
 					],
-				});
-				if (interestData) {
-					interests[interestData.id] = interestData;
-				}
-			}
-			res.json(interests);
-		}
+				},
+			],
+		});
+
+		res.json(allInterests);
 	} catch (error) {
-		console.error("Error fetching interests:", error);
+		console.error("Error fetching all interests for user:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+router.get("/folder/:userNic/:folderInterestId", async (req, res) => {
+	try {
+		const { userNic, folderInterestId } = req.params;
+
+		// 1. Obter todos os interestId associados à pasta
+		const links = await models.FolderInterestEquipments.findAll({
+			where: { folderInterestId },
+			attributes: ["interestId"],
+		});
+
+		const interestIds = links.map((link) => link.interestId);
+
+		// 2. Buscar os interesses com os mesmos includes da outra rota
+		const interests = await models.Interest.findAll({
+			where: {
+				id: interestIds,
+				clientNic: userNic,
+			},
+			attributes: [
+				"id",
+				"equipmentSheetID",
+				"maxLaunchYear",
+				"minLaunchYear",
+				"minPrice",
+				"maxPrice",
+				"createdAt",
+				"updatedAt",
+				"description",
+			],
+			include: [
+				{ model: models.Brand, as: "brand", attributes: ["id", "name"] },
+				{
+					model: models.EquipmentModel,
+					as: "model",
+					attributes: ["id", "name"],
+				},
+				{ model: models.EquipmentType, as: "type", attributes: ["id", "name"] },
+				{
+					model: models.EquipmentStatus,
+					as: "equipmentStatus",
+					attributes: ["id", "state"],
+				},
+				{
+					model: models.PreferredStoresInterets,
+					as: "preferredStores",
+					include: [
+						{
+							model: models.Store,
+							as: "store",
+							attributes: ["nipc", "name", "email", "phone", "address"],
+						},
+					],
+				},
+			],
+		});
+
+		res.json(interests);
+	} catch (error) {
+		console.error("Error fetching folder interests:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+router.get("/not-in-folder/:userNic/:folderInterestId", async (req, res) => {
+	try {
+		const { userNic, folderInterestId } = req.params;
+
+		//todos os interestId já na pasta
+		const links = await models.FolderInterestEquipments.findAll({
+			where: { folderInterestId },
+			attributes: ["interestId"],
+		});
+
+		const alreadyInFolder = links.map((link) => link.interestId);
+
+		//todos os interesses do userNic que NÃO estão na pasta
+		const interests = await models.Interest.findAll({
+			where: {
+				clientNic: userNic,
+				id: {
+					[Op.notIn]: alreadyInFolder.length > 0 ? alreadyInFolder : [0],
+				},
+			},
+			attributes: [
+				"id",
+				"equipmentSheetID",
+				"maxLaunchYear",
+				"minLaunchYear",
+				"minPrice",
+				"maxPrice",
+				"description",
+				"createdAt",
+				"updatedAt",
+			],
+			include: [
+				{
+					model: models.Brand,
+					as: "brand",
+					attributes: ["id", "name"],
+				},
+				{
+					model: models.EquipmentModel,
+					as: "model",
+					attributes: ["id", "name"],
+				},
+				{
+					model: models.EquipmentType,
+					as: "type",
+					attributes: ["id", "name"],
+				},
+				{
+					model: models.EquipmentStatus,
+					as: "equipmentStatus",
+					attributes: ["id", "state"],
+				},
+				{
+					model: models.PreferredStoresInterets,
+					as: "preferredStores",
+					include: [
+						{
+							model: models.Store,
+							as: "store",
+							attributes: ["nipc", "name", "email", "phone", "address"],
+						},
+					],
+				},
+			],
+		});
+
+		res.json(interests);
+	} catch (error) {
+		console.error("Error fetching interests not in folder:", error);
 		res.status(500).json({ error: "Internal server error" });
 	}
 });
@@ -128,6 +214,7 @@ router.post("/", async (req, res) => {
 			minPrice,
 			maxPrice,
 			preferredStoreIDs,
+			description,
 		} = req.body;
 
 		// Criação do Interest
@@ -142,22 +229,15 @@ router.post("/", async (req, res) => {
 			maxLaunchYear: maxLaunchYear || null,
 			minPrice: minPrice || null,
 			maxPrice: maxPrice || null,
+			description: description || null,
 		});
 
 		if (preferredStoreIDs && Array.isArray(preferredStoreIDs)) {
 			for (const storeId of preferredStoreIDs) {
-				try {
-					await models.PreferredStoresInterets.create({
-						interestId: newInterest.id,
-						storeId: storeId,
-					});
-				} catch (error) {
-					console.error("Error associating store to interest:", error);
-					res
-						.status(500)
-						.json({ error: "Failed to associate store with interest" });
-					return;
-				}
+				await models.PreferredStoresInterets.create({
+					interestId: newInterest.id,
+					storeId: storeId,
+				});
 			}
 		}
 
@@ -168,7 +248,107 @@ router.post("/", async (req, res) => {
 	}
 });
 
-router.put("/:id", async (req, res) => {});
+router.put("/:id", async (req, res) => {
+	try {
+		const {
+			brandID,
+			modelID,
+			typeID,
+			equipmentSheetID,
+			equipmentStatusID,
+			minLaunchYear,
+			maxLaunchYear,
+			minPrice,
+			maxPrice,
+			preferredStoreIDs,
+			description,
+		} = req.body;
+
+		const { id } = req.params;
+
+		// Atualiza os dados principais
+		await models.Interest.update(
+			{
+				brandID: brandID || null,
+				modelID: modelID || null,
+				typeID: typeID || null,
+				equipmentSheetID: equipmentSheetID || null,
+				equipmentStatusID: equipmentStatusID || null,
+				minLaunchYear: minLaunchYear || null,
+				maxLaunchYear: maxLaunchYear || null,
+				minPrice: minPrice || null,
+				maxPrice: maxPrice || null,
+				description: description || null,
+			},
+			{ where: { id } }
+		);
+
+		// Atualiza as preferred stores (remove e insere de novo)
+		await models.PreferredStoresInterets.destroy({ where: { interestId: id } });
+
+		if (preferredStoreIDs && Array.isArray(preferredStoreIDs)) {
+			for (const storeId of preferredStoreIDs) {
+				await models.PreferredStoresInterets.create({
+					interestId: id,
+					storeId: storeId,
+				});
+			}
+		}
+
+		// Recolhe o interesse atualizado com todas as associações
+		const updatedInterest = await models.Interest.findByPk(id, {
+			attributes: [
+				"id",
+				"equipmentSheetID",
+				"maxLaunchYear",
+				"minLaunchYear",
+				"minPrice",
+				"maxPrice",
+				"createdAt",
+				"updatedAt",
+				"description",
+			],
+			include: [
+				{
+					model: models.Brand,
+					as: "brand",
+					attributes: ["id", "name"],
+				},
+				{
+					model: models.EquipmentModel,
+					as: "model",
+					attributes: ["id", "name"],
+				},
+				{
+					model: models.EquipmentType,
+					as: "type",
+					attributes: ["id", "name"],
+				},
+				{
+					model: models.EquipmentStatus,
+					as: "equipmentStatus",
+					attributes: ["id", "state"],
+				},
+				{
+					model: models.PreferredStoresInterets,
+					as: "preferredStores",
+					include: [
+						{
+							model: models.Store,
+							as: "store",
+							attributes: ["nipc", "name", "email", "phone", "address"],
+						},
+					],
+				},
+			],
+		});
+
+		res.status(200).json(updatedInterest);
+	} catch (error) {
+		console.error("Error updating interest:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
 
 router.delete("/:id", async (req, res) => {
 	try {

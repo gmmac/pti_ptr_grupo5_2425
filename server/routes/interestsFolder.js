@@ -59,6 +59,8 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
 	try {
 		const folderId = req.params.id;
+		console.log("Deleting folder with ID:", folderId);
+
 		const deletedFolder = await models.FolderInterest.destroy({
 			where: { id: folderId },
 		});
