@@ -193,28 +193,12 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                     {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
 
                     <Form onSubmit={handleSubmit}>
-                        <Row className="mb-3">
-                            <Form.Group controlId="formEstado">
-                                <Form.Label>Equipment status</Form.Label>
-                                <Form.Control as="select" name="statusID" value={form.statusID} onChange={handleChange} required>
-                                    <option value="">Select...</option>
-                                    {statusList.map((s, idx) => <option key={idx} value={s.id}>{s.state}</option>)}
-                                </Form.Control>
-                            </Form.Group>
-                        </Row>
-
-                        <Row className="mb-3">
-                            <Form.Group controlId="formPreco">
-                                <Form.Label>Price</Form.Label>
-                                <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Digite o preço" required />
-                            </Form.Group>
-                        </Row>
 
                         <Row className="mb-3">
                             <Col md={6}>
                                 <Form.Group controlId="formClientNic">
                                     <Form.Label>Client NIC</Form.Label>
-                                    <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Digite o NIC" required />
+                                    <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Insert NIC" required />
                                 </Form.Group>
                             </Col>
                             <Col md={6} className="d-flex align-items-end">
@@ -228,7 +212,7 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                             <Col md={6}>
                                 <Form.Group controlId="formBarcodeEquipamento">
                                     <Form.Label>Equipment barcode</Form.Label>
-                                    <Form.Control type="number" name="equipmentBarcode" value={form.equipmentBarcode} onChange={handleChange} placeholder="Digite o código de barras" required />
+                                    <Form.Control type="number" name="equipmentBarcode" value={form.equipmentBarcode} onChange={handleChange} placeholder="Insert Barcode" required />
                                 </Form.Group>
                             </Col>
                             <Col md={6} className="d-flex align-items-end">
@@ -237,10 +221,28 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                                 </Button>
                             </Col>
                         </Row>
+                        <Row className="mb-3">
+                            <Form.Group controlId="formEstado">
+                                <Form.Label>Equipment status</Form.Label>
+                                <Form.Control as="select" name="statusID" value={form.statusID} onChange={handleChange} required>
+                                    <option value="">Select...</option>
+                                    {statusList.map((s, idx) => <option key={idx} value={s.id}>{s.state}</option>)}
+                                </Form.Control>
+                            </Form.Group>
+                        </Row>
+
+                        <Row className="mb-3">
+                            <Form.Group controlId="formPreco">
+                                <Form.Label>Price</Form.Label>
+                                <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Insert price" required />
+                            </Form.Group>
+                        </Row>
+
+                        
 
                         {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
-                        <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg">
+                        <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg" style={{ backgroundColor: '#b5a8c9', borderColor: '#b5a8c9', color: 'white' }}>
                             {purchaseID ? "Salvar Alterações" : "Registar Venda"}
                         </Button>
                     </Form>
