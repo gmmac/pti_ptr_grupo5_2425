@@ -107,6 +107,7 @@ const { Op, Sequelize } = require("sequelize");
 //     res.status(500).json({ error: "Error fetching equipment sheets." });
 //   }
 // });
+
 router.get("/", async (req, res) => {
   try {
     const {
@@ -333,22 +334,13 @@ router.get("/in-stock", async (req, res) => {
 	try {
 		const {
 			page = 1,
-			pageSize = 6,
+			pageSize = 5,
 			orderBy = "recent-date", // Valor padrão
 			modelId,
 			typeId,
 			brandId,
 			storeId,
 		} = req.query;
-  try {
-    const {
-      page = 1,
-      pageSize = 5,
-      orderBy = "recent-date", // Valor padrão
-      modelId,
-      typeId,
-      brandId,
-    } = req.query;
 
 		// Construção do objeto 'where' dinamicamente
 		const where = {};

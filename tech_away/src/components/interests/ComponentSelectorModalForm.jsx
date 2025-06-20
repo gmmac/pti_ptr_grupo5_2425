@@ -23,16 +23,19 @@ export default function ComponentSelectorModalForm({
 
     (async () => {
       try {
+        console.log(routeName)
         const { data } = await api.get(`api/${routeName}`, {
           params: { pageSize: 5000 },
         });
-        const rows = data.data || [];
+        let rows = data || [];
+        if(rows?.data) rows = rows.data
+        else rows = rows
         setFullList(rows);
         setList(rows);
         setColumns(
           rows.length
             ? Object.keys(rows[0]).filter(
-                (c) => !["createdAt", "updatedAt"].includes(c)
+                (c) => !["createdAt", "updatedAt", "isActive"].includes(c)
               )
             : []
         );

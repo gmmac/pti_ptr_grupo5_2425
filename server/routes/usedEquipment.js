@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Op, Sequelize } = require("sequelize");
 const models = require("../models");
+const db = require("../models");
 
 // ver os que estão disponiveis para compra
 router.get("/in-stock", async (req, res) => {

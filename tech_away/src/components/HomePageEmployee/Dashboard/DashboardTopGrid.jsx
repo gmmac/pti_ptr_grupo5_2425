@@ -32,14 +32,17 @@ export default function DashboardTopGrid() {
 		api.get("/api/interest")
 			.then((res) => {
 				const total = res.data.totalItems;
+				
 				console.log("printt: ",res)
-				setTotalSInterests(total);
+				setTotalSInterests(res.data.totalItems ?? 0);
 			})
 			.catch((err) => {
 				console.error("Error fetching stock total:", err);
 				setTotalSoldEquipments(0); // fallback in case of error
 		});
 	}, []);
+
+	
 
 	return (
 		<Row className="mb-4 justify-content-center g-4">

@@ -5,8 +5,8 @@ const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
 	try {
-		const interests = await models.User.findAll();
-		res.json(interests);
+		const interests = await models.Interest.findAll();
+		res.status(200).json(interests);
 	} catch (error) {
 		console.error("Error fetching interests:", error);
 		res.status(500).json({ error: "Internal server error" });

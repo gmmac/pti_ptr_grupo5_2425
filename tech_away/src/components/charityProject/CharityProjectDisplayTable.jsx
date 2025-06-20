@@ -114,7 +114,7 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
 
   return (
     <>
-      <ConfirmDialog />
+      {/* <ConfirmDialog /> */}
       <div className="d-none d-lg-block">
         <DataTable
           value={data}
