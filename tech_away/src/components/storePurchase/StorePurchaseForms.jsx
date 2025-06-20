@@ -4,7 +4,7 @@ import api from '../../utils/axios';
 import ClientCatalogModal from './ClientCatalogModal';
 import EquipmentCatalogModal from './EquipmentCatalogModal';
 
-export default function StorePurchaseForms({ show, handleClose, setRefreshPurchases, setRefreshCounter  }) {
+export default function StorePurchaseForms({  show, handleClose, setRefreshPurchases, setRefreshCounter  , purchaseID }) {
     const [form, setForm] = useState({
         statusID: '',
         price: '',
@@ -35,10 +35,9 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
     });
 
     const [modelsList, setModelsList] = useState([]);
-
     const [showModal, setShowModal] = useState(false);
     const [showModalEq, setShowModalEq] = useState(false);
-    
+
     useEffect(() => {
         api.get(`/api/equipmentStatus/`)
             .then(res => setStatusList(res.data))
@@ -70,6 +69,30 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
             .catch(error => console.error('Error fetching clients:', error.message));
     }, []);
 
+    // Preencher formulário em modo edição
+    useEffect(() => {
+    if (purchaseID != null) {
+        api.get(`/api/storePurchase/${purchaseID}`)
+            .then(res => {
+                const data = res.data;
+
+                setForm({
+                    statusID: data.statusID || '',
+                    price: data.purchasePrice || '',
+                    clientNic: data.clientNIC || '',
+                    equipmentBarcode: data.equipmentID || '',
+                });
+
+                // Opcional: preencher clientData e equipmentData com mais detalhes, se desejar
+            })
+            .catch(err => {
+                console.error("Erro ao buscar dados da compra:", err.message);
+                setError("Erro ao carregar os dados da compra.");
+            });
+        }
+    }, [purchaseID, successMessage]);
+
+
     const handleSelectClient = (client) => {
         if (client) {
             setClientData({
@@ -89,14 +112,8 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
             }));
         } else {
             setClientData({
-                nic: '',
-                nif: '',
-                birthDate: '',
-                gender: '',
-                firstName: '',
-                lastName: '',
-                email: '',
-                phone: ''
+                nic: '', nif: '', birthDate: '', gender: '',
+                firstName: '', lastName: '', email: '', phone: ''
             });
 
             setForm(prevForm => ({
@@ -104,7 +121,6 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                 clientNic: ''
             }));
         }
-
         setShowModal(false);
          setError("");
     };
@@ -135,7 +151,6 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                 equipmentBarcode: ''
             }));
         }
-
         setShowModalEq(false);
          setError("");
     };
@@ -179,53 +194,31 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
             setError("Equipment barcode must be exactly 20 digits long.");
             return;
         }
-        // if (!equipmentList.includes(form.equipmentBarcode)) {
-        //     setError("No equipment found with the provided barcode.");
-        //     return;
-        // }
 
-        // if (!clientList.includes(form.clientNic)) {
-        //     setError("No client found with the provided NIC.");
-        //     return;
-        // }
+        try {
+            if (purchaseID) {
+                await api.put(`/api/storePurchase/${purchaseID}`, form);
+                setSuccessMessage("Venda atualizada com sucesso!");
+            } else {
+                await api.post('/api/storePurchase', form);
+                setSuccessMessage("Venda registada com sucesso!");
+            }
 
-        await api.post('/api/storePurchase', form)
-            .then(response => {
-                setSuccessMessage("Purchase registered successfully!");
-                setError("");
+            setError("");
+            setRefreshPurchases(prev => !prev);
 
-                if(setRefreshPurchases){
-                    setRefreshPurchases(prev => !prev);
-                }
+            setClientData({
+                nic: '', nif: '', birthDate: '', gender: '',
+                firstName: '', lastName: '', email: '', phone: ''
+            });
 
-                if(setRefreshCounter){
-                    setRefreshCounter(prev => prev + 1);
-                }
+            setEquipmentData({
+                barcode: '', releaseYear: '', type: ''
+            });
 
-                setClientData({
-                    nic: '',
-                    nif: '',
-                    birthDate: '',
-                    gender: '',
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    phone: ''
-                });
-
-                setEquipmentData({
-                    barcode: '',
-                    model: '',
-                    releaseYear: '',
-                    type: ''
-                });
-
-                setForm({
-                    statusID: '',
-                    price: '',
-                    clientNic: '',
-                    equipmentBarcode: '',
-                });
+            setForm({
+                statusID: '', price: '', clientNic: '', equipmentBarcode: ''
+            });
 
                 setTimeout(() => {
                     setSuccessMessage("");
@@ -237,13 +230,19 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
             // });
 
         handleClose();
+            setTimeout(() => setSuccessMessage(""), 1000);
+            handleClose();
+        } catch (error) {
+            console.error("Error saving sale: ", error.response?.data || error.message);
+            setError("An error occurred while saving the sale.");
+        }
     };
 
     return (
         <>
             <Modal show={show} onHide={handleClose} size="xl" centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Register Product Sale</Modal.Title>
+                    <Modal.Title>{purchaseID ? "Edit purchase" : "New purchase"}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
@@ -270,34 +269,52 @@ export default function StorePurchaseForms({ show, handleClose, setRefreshPurcha
                             <Col md={6}>
                                 <Form.Group controlId="formClientNic">
                                     <Form.Label>Client NIC</Form.Label>
-                                    <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Enter NIC" required disabled />
+                                    <Form.Control type="text" name="clientNic" value={form.clientNic} onChange={handleChange} placeholder="Insert NIC" required />
                                 </Form.Group>
                             </Col>
                             <Col md={6} className="d-flex align-items-end">
                                 <Button onClick={() => setShowModal(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
-                                    Browse Clients
+                                    Search client
                                 </Button>
                             </Col>
                         </Row>
 
                         <Row className="mb-3">
                             <Col md={6}>
-                                <Form.Group controlId="formEquipmentBarcode">
-                                    <Form.Label>Equipment Barcode</Form.Label>
-                                    <Form.Control type="number" name="equipmentBarcode" value={form.equipmentBarcode} onChange={handleChange} placeholder="Enter barcode" required disabled />
+                                <Form.Group controlId="formBarcodeEquipamento">
+                                    <Form.Label>Equipment barcode</Form.Label>
+                                    <Form.Control type="number" name="equipmentBarcode" value={form.equipmentBarcode} onChange={handleChange} placeholder="Insert Barcode" required />
                                 </Form.Group>
                             </Col>
                             <Col md={6} className="d-flex align-items-end">
                                 <Button onClick={() => setShowModalEq(true)} className="w-100 rounded-pill shadow-sm" variant="outline-secondary">
-                                    Browse Equipment
+                                    Search equipment
                                 </Button>
                             </Col>
                         </Row>
+                        <Row className="mb-3">
+                            <Form.Group controlId="formEstado">
+                                <Form.Label>Equipment status</Form.Label>
+                                <Form.Control as="select" name="statusID" value={form.statusID} onChange={handleChange} required>
+                                    <option value="">Select...</option>
+                                    {statusList.map((s, idx) => <option key={idx} value={s.id}>{s.state}</option>)}
+                                </Form.Control>
+                            </Form.Group>
+                        </Row>
+
+                        <Row className="mb-3">
+                            <Form.Group controlId="formPreco">
+                                <Form.Label>Price</Form.Label>
+                                <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Insert price" required />
+                            </Form.Group>
+                        </Row>
+
+                        
 
                         {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
-                        <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg">
-                            Register Sale
+                        <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg" style={{ backgroundColor: '#b5a8c9', borderColor: '#b5a8c9', color: 'white' }}>
+                            {purchaseID ? "Salvar Alterações" : "Registar Venda"}
                         </Button>
                     </Form>
                 </Modal.Body>

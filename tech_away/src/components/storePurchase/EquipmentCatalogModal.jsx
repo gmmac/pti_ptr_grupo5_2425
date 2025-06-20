@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Table, Container } from "react-bootstrap";
+import { Modal, Button, Container } from "react-bootstrap";
 import api from "../../utils/axios";
 import PaginationControl from "../pagination/PaginationControl";
 import EquipmentFilter from "./EquipmentFilter";
@@ -21,10 +21,10 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
     model: "",
     releaseYear: "",
     type: "",
-    orderDirection: "ASC"
+    orderDirection: "ASC",
   });
 
-  const [showAddModal, setShowAddModal] = useState(false); // CONTROL ADD MODAL
+  const [showAddModal, setShowAddModal] = useState(false); // <- novo estado
 
   const handleClosePopUp = () => {
     handleClose();
@@ -33,31 +33,42 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
       model: "",
       releaseYear: "",
       type: "",
-      orderDirection: "ASC"
+      orderDirection: "ASC",
     });
   };
 
-  const fetchEquipments = async () => {
-    setLoading(true);
-    setError(null);
+  const handleAddEquipment = async (newEquipment) => {
     try {
-      const response = await api.get(`/api/equipmentSheet`, {
-        params: {
-          ...filters,
-          page: currentPage,
-          // pageSize: itemsPerPage
-        }
-      });
-      console.log(response.data.data)
-      setEquipments(response.data.data || []);
-      setTotalPages(response.data.totalPages);
-    } catch (err) {
-      setError("Error loading equipment list");
+      await api.post("/api/equipmentSheet", newEquipment);
+      // Recarrega os dados
+      setCurrentPage(1);
+      setFilters({ ...filters }); // força novo fetch
+    } catch (error) {
+      console.error("Erro ao adicionar equipamento:", error);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
+    const fetchEquipments = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await api.get(`/api/equipmentSheet`, {
+          params: {
+            ...filters,
+            page: currentPage,
+            // pageSize: itemsPerPage,
+          },
+        });
+        console.log(response.data.data)
+      setEquipments(response.data.data || []);
+        setTotalPages(response.data.totalPages);
+      } catch (err) {
+        setError("Error loading equipment list");
+      }
+      setLoading(false);
+    };
+
     if (show) {
       fetchEquipments();
     }
@@ -78,7 +89,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
   };
 
   const handleAddEquipment = (newEquipment) => {
-    // Here you could POST to the API if persistence is needed
+    // Aqui pode fazer POST para API se quiser persistir
     setEquipments((prev) => [newEquipment, ...prev]);
     setShowAddModal(false);
   };
@@ -86,8 +97,10 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
   return (
     <>
       <Modal show={show} onHide={handleClose} size="lg" centered backdrop="static">
+      <Modal show={show} onHide={handleClose} size="xl" centered>
         <Modal.Header closeButton>
-          <Modal.Title>Equipment Catalog</Modal.Title>
+          <Modal.Title>All equipments</Modal.Title>
+          
         </Modal.Header>
         <Modal.Body>
           {/* ADD BUTTON */}
@@ -106,13 +119,13 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
             <p>No equipment found.</p>
           ) : (
             <Container>
-              {/* Desktop View */}
+              {/* Desktop */}
               <EquipmentTableModal
                 equipments={equipments}
                 selectedEquipment={selectedEquipment}
                 handleEquipmentSelection={handleEquipmentSelection}
               />
-              {/* Mobile View */}
+              {/* Mobile */}
               {equipments.map((e) => (
                 <EquipmentCardModal
                   key={e.barcode}
@@ -121,6 +134,7 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
                   handleEquipmentSelection={handleEquipmentSelection}
                 />
               ))}
+
               <PaginationControl
                 handlePageChange={handlePageChange}
                 currentPage={currentPage}
@@ -134,12 +148,13 @@ export default function EquipmentCatalogModal({ show, handleClose, handleSelectE
         </Modal.Footer>
       </Modal>
 
-      {/* ADD EQUIPMENT MODAL */}
+      {/* Modal de adicionar equipamento */}
       <AddEquipmentModal
         show={showAddModal}
         handleClose={() => setShowAddModal(false)}
-        onAdd={handleAddEquipment}
+        handleSubmit={handleAddEquipment}
       />
     </>
   );
 }
+

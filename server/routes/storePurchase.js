@@ -5,6 +5,58 @@ const { Op, Sequelize } = require("sequelize");
 const { sequelize } = require("../models/index");
 
 router.get("/", async (req, res) => {
+  try {
+    const {
+      id,
+      clientName,
+      employeeName,
+      purchasePrice,
+      modelName,
+      storeName,
+      nic,
+      createdAt,
+      onlyMyPurchases = 'false',
+      storePurchasesOnly = 'false',
+      page = 1,
+      pageSize = 10,
+      sortField = "id",
+      sortOrder = "ASC",
+    } = req.query;
+
+    const where = {};
+    const whereEmployee = {};
+    const whereClient = {};
+    const whereModel = {};
+    const whereStore = {};
+
+    // Dados do empregado logado
+    const employeeInfo = req.cookies?.employeeInfo;
+    const loggedEmployeeNic = employeeInfo?.nic;
+    const loggedStoreNIPC = employeeInfo?.storeNIPC;
+
+    // Filtro: só compras feitas pelo empregado logado
+    if (onlyMyPurchases === 'true' && loggedEmployeeNic) {
+      where.employeeID = loggedEmployeeNic;
+    }
+
+    // Filtro: só compras da loja logada
+    if (storePurchasesOnly === 'true' && loggedStoreNIPC) {
+      where.storeID = loggedStoreNIPC;
+    }
+
+    if (id) {
+      where.id = sequelize.where(
+        sequelize.cast(sequelize.col("StorePurchase.id"), "varchar"),
+        { [Op.iLike]: `${id}%` }
+      );
+    }
+
+    if (createdAt) {
+      where.createdAt = {
+        [Op.gte]: new Date(createdAt),
+        [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+      };
+    }
     try {
       const {
         id,
@@ -61,84 +113,99 @@ router.get("/", async (req, res) => {
       }
         
 
-      if (employeeName) {
-        where[Op.and] = Sequelize.where(
-          Sequelize.fn(
-            'concat',
-            Sequelize.col('Employee.firstName'),
-            ' ',
-            Sequelize.col('Employee.lastName')
-          ),
-          {
-            [Op.iLike]: `%${employeeName}%`
-          }
-        );
-      }
-      if (clientName) {
-        where[Op.and] = Sequelize.where(
-          Sequelize.fn(
-            'concat',
-            Sequelize.col('Client.firstName'),
-            ' ',
-            Sequelize.col('Client.lastName')
-          ),
-          {
-            [Op.iLike]: `%${clientName}%`
-          }
-        );
-      }
-      if (nic) {
-        whereClient.nic = nic;
-      }
-      
-      const offset = (parseInt(page) - 1) * parseInt(pageSize);
-      const orderClause = [];
-      if (sortField) {
-        orderClause.push([
-          Sequelize.col(sortField),
-          sortOrder == -1 ? "DESC" : "ASC",
-        ]);
-      }
-      
-      const { count, rows } = await models.StorePurchase.findAndCountAll({
-        where,
-        include: [
-          {
-            model: models.Employee,
-            attributes: ["firstName", "lastName"],
-          },
-          {
-            model: models.Client,
-            attributes: ["firstName", "lastName","nic"],
-            where: whereClient,
-          },
-          {
-            model: models.UsedEquipment,
-            include: [
-              {
-                model: models.EquipmentSheet,
-                include: [
-                  {
-                    model: models.EquipmentModel,
-                    attributes: ["name"],
-                    where: whereModel
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            model: models.Store,
-            attributes: ["name"],
-            where: whereStore
-          },
-        ],
-        limit: parseInt(pageSize),
-        offset,
-        order: orderClause,
-      });
-  
-      const formattedData = rows
+    if (employeeName) {
+      whereEmployee[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('Employee.firstName'),
+          ' ',
+          Sequelize.col('Employee.lastName')
+        ),
+        {
+          [Op.iLike]: `%${employeeName}%`
+        }
+      );
+    }
+
+    if (clientName) {
+      whereClient[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('Client.firstName'),
+          ' ',
+          Sequelize.col('Client.lastName')
+        ),
+        {
+          [Op.iLike]: `%${clientName}%`
+        }
+      );
+    }
+
+    if (nic) {
+      whereClient.nic = nic;
+    }
+
+    if (modelName) {
+      whereModel.name = { [Op.iLike]: `%${modelName}%` };
+    }
+
+    if (storeName) {
+      whereStore.name = { [Op.iLike]: `%${storeName}%` };
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+    const orderClause = [];
+    if (sortField) {
+      orderClause.push([
+        Sequelize.col(sortField),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    }
+
+    const { count, rows } = await models.StorePurchase.findAndCountAll({
+      where,
+      include: [
+        {
+          model: models.Employee,
+          attributes: ["firstName", "lastName"],
+          where: Object.keys(whereEmployee).length > 0 ? whereEmployee : undefined,
+          required: Object.keys(whereEmployee).length > 0
+        },
+        {
+          model: models.Client,
+          attributes: ["firstName", "lastName", "nic"],
+          where: Object.keys(whereClient).length > 0 ? whereClient : undefined,
+          required: Object.keys(whereClient).length > 0
+        },
+        {
+          model: models.UsedEquipment,
+          include: [
+            {
+              model: models.EquipmentSheet,
+              include: [
+                {
+                  model: models.EquipmentModel,
+                  attributes: ["name"],
+                  where: Object.keys(whereModel).length > 0 ? whereModel : undefined,
+                  required: Object.keys(whereModel).length > 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          model: models.Store,
+          attributes: ["name"],
+          where: Object.keys(whereStore).length > 0 ? whereStore : undefined,
+          required: Object.keys(whereStore).length > 0
+        },
+      ],
+      limit: parseInt(pageSize),
+      offset,
+      order: orderClause,
+    });
+
+    const formattedData = rows
       .filter(item => item.UsedEquipment?.EquipmentSheet?.EquipmentModel)
       .map((item) => ({
         id: item.id,
@@ -152,18 +219,84 @@ router.get("/", async (req, res) => {
         createdAt: item.createdAt,
       }));
 
-      res.status(200).json({
-        totalItems: count,
-        totalPages: Math.ceil(count / pageSize),
-        currentPage: parseInt(page),
-        pageSize: parseInt(pageSize),
-        data: formattedData,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: "Error fetching storePurchase." });
-    }
+    res.status(200).json({
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+      data: formattedData,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Error fetching purchases." });
+  }
 });
+
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Busca a compra
+    const purchase = await models.StorePurchase.findByPk(id);
+
+    if (!purchase) {
+      return res.status(404).json({ error: "Purchase not found." });
+    }
+
+    // Busca os dados do equipamento usado vinculado à compra
+    const usedEquipment = await models.UsedEquipment.findByPk(purchase.usedEquipmentID, {
+      attributes: ["statusID", "equipmentId"]
+    });
+
+    // Monta a resposta com dados extras do equipamento
+    const response = {
+      ...purchase.toJSON(),
+      statusID: usedEquipment?.statusID || null,
+      equipmentID: usedEquipment?.equipmentId || null
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("Error in GET /:id", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { statusID, price, clientNic, equipmentBarcode } = req.body;
+
+    // 1. Verifica se a compra existe
+    const purchase = await models.StorePurchase.findByPk(id);
+    if (!purchase) {
+      return res.status(404).json({ error: "Purchase not found." });
+    }
+
+    // 2. Atualiza a compra
+    await purchase.update({
+      clientNIC: clientNic,
+      purchasePrice: price,
+      updatedAt: new Date()
+    });
+
+    // 3. Atualiza o equipamento usado
+    const usedEquipment = await models.UsedEquipment.findByPk(purchase.usedEquipmentID);
+    if (usedEquipment) {
+      await usedEquipment.update({
+        statusID: statusID,
+        equipmentId: equipmentBarcode,
+        updatedAt: new Date()
+      });
+    }
+
+    return res.status(200).json({ message: "Purchase updated successfully." });
+  } catch (error) {
+    console.error("Error in PUT /:id", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 
 router.post("/", async (req, res) => {
 

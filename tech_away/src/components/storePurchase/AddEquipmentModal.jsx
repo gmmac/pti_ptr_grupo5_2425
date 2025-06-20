@@ -1,147 +1,63 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import axios from "axios";
 
-export default function AddEquipmentModal({ show, handleClose, onAdd }) {
+export default function AddEquipmentModal({ show, handleClose, handleSubmit }) {
   const [formData, setFormData] = useState({
-    barcode: "",
-    model: "",
-    releaseYear: "",
-    type: "",
+    statusID: "",
+    price: "",
+    putOnSaleDate: "",
+    purchaseDate: null,
+    equipmentID: "",
+    storeID: "",
+    action: null,
   });
-  const [equipmentTypes, setEquipmentTypes] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  // Função para buscar os tipos de equipamentos
-  const fetchEquipmentTypes = async (page = 1, pageSize = 10) => {
-    setLoading(true);
-    try {
-      const response = await axios.get("/api/equipment-types", {
-        params: { page, pageSize },
-      });
-
-      // Aqui você pode ajustar se precisar de paginação ou não
-      setEquipmentTypes(response.data.data); // Recebe os tipos de equipamentos
-    } catch (error) {
-      console.error("Error fetching equipment types:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (show) {
-      fetchEquipmentTypes(); // Carrega os tipos de equipamentos quando o modal é aberto
-    }
-  }, [show]); // Executa quando o modal for aberto
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      // Fazendo a requisição POST para adicionar o equipamento
-      const response = await axios.post("/api/used-equipment", formData);
-
-      if (response.status === 200) {
-        onAdd(formData); // callback do pai para atualizar o estado
-        handleClose(); // fecha modal após adicionar
-        setFormData({ barcode: "", model: "", releaseYear: "", type: "" }); // limpa o formulário
-      }
-    } catch (error) {
-      console.error("Error adding equipment:", error);
-    }
+  const handleFormSubmit = () => {
+    handleSubmit(formData);
+    handleClose();
   };
 
   return (
-    <>
-      {/* Força o z-index do backdrop */}
-      <style>
-        {`
-          .modal-backdrop.show {
-            z-index: 1055 !important;
-          }
-        `}
-      </style>
-
-      <Modal
-        show={show}
-        onHide={handleClose}
-        backdrop="static"
-        centered
-        style={{ zIndex: 1056 }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Adicionar Equipamento</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Código de Barras</Form.Label>
-              <Form.Control
-                type="text"
-                name="barcode"
-                value={formData.barcode}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Modelo</Form.Label>
-              <Form.Control
-                type="text"
-                name="model"
-                value={formData.model}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Ano de Lançamento</Form.Label>
-              <Form.Control
-                type="number"
-                name="releaseYear"
-                value={formData.releaseYear}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Tipo</Form.Label>
-              <Form.Control
-                as="select"
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                required
-                disabled={loading} // Desabilita enquanto carrega os tipos
-              >
-                <option value="">Selecione o Tipo</option>
-                {equipmentTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </Form.Control>
-              {loading && <div>A carregar tipos...</div>}
-            </Form.Group>
-
-            <Button variant="primary" type="submit" disabled={loading}>
-              Adicionar
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
-    </>
+    <Modal show={show} onHide={handleClose} centered backdrop="static">
+      <Modal.Header closeButton>
+        <Modal.Title>Adicionar Equipamento</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form>
+          <Form.Group>
+            <Form.Label>Status ID</Form.Label>
+            <Form.Control type="text" name="statusID" value={formData.statusID} onChange={handleChange} />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Preço</Form.Label>
+            <Form.Control type="number" name="price" value={formData.price} onChange={handleChange} />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Data de Colocação à Venda</Form.Label>
+            <Form.Control type="date" name="putOnSaleDate" value={formData.putOnSaleDate} onChange={handleChange} />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Equipment ID</Form.Label>
+            <Form.Control type="text" name="equipmentID" value={formData.equipmentID} onChange={handleChange} />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Store ID</Form.Label>
+            <Form.Control type="text" name="storeID" value={formData.storeID} onChange={handleChange} />
+          </Form.Group>
+        </Form>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
+        <Button variant="primary" onClick={handleFormSubmit}>Salvar</Button>
+      </Modal.Footer>
+    </Modal>
   );
 }
