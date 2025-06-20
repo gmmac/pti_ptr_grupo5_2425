@@ -20,7 +20,7 @@ export default function OrderCard({ order }) {
 					backgroundColor: "#eae6f0",
 					padding: "20px",
 					borderRadius: "16px",
-					height: "130px",
+					maxHeight: "130px",
 				}}
 				className="p-4"
 			>
