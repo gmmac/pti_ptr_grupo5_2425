@@ -128,7 +128,7 @@ export default function DisplayTablePurchases({ refreshTable, onlyMyPurchases, s
 
   return (
     <>
-      <ConfirmDialog />
+      {/* <ConfirmDialog /> */}
       <div>
         <DataTable
           value={data}

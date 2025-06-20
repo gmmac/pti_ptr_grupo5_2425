@@ -195,7 +195,7 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
             return;
         }
 
-        try {
+        // try {
             if (purchaseID) {
                 await api.put(`/api/storePurchase/${purchaseID}`, form);
                 setSuccessMessage("Venda atualizada com sucesso!");
@@ -223,7 +223,7 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
                 setTimeout(() => {
                     setSuccessMessage("");
                 }, 1000);
-            })
+            // })
             // .catch(error => {
             //     console.error("Error registering purchase: ", error.response?.data);
             //     setError("An error occurred while registering the purchase.");
@@ -232,10 +232,10 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
         handleClose();
             setTimeout(() => setSuccessMessage(""), 1000);
             handleClose();
-        } catch (error) {
-            console.error("Error saving sale: ", error.response?.data || error.message);
-            setError("An error occurred while saving the sale.");
-        }
+        // } catch (error) {
+        //     console.error("Error saving sale: ", error.response?.data || error.message);
+        //     setError("An error occurred while saving the sale.");
+        // }
     };
 
     return (

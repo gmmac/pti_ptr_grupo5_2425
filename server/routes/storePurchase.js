@@ -6,22 +6,24 @@ const { sequelize } = require("../models/index");
 
 router.get("/", async (req, res) => {
   try {
-    const {
-      id,
-      clientName,
-      employeeName,
-      purchasePrice,
-      modelName,
-      storeName,
-      nic,
-      createdAt,
-      onlyMyPurchases = 'false',
-      storePurchasesOnly = 'false',
-      page = 1,
-      pageSize = 10,
-      sortField = "id",
-      sortOrder = "ASC",
-    } = req.query;
+      const {
+        id,
+        clientName,
+        employeeName,
+        purchasePrice,
+        modelName,
+        storeName,
+        usedEquipmentID,
+        nic,
+        createdAt,
+        onlyMyPurchases = 'false',
+        storePurchasesOnly = 'false',
+        allPrice,
+        page = 1,
+        pageSize = 5,
+        sortField = "id",
+        sortOrder = "ASC",
+      } = req.query;
 
     const where = {};
     const whereEmployee = {};
@@ -57,27 +59,6 @@ router.get("/", async (req, res) => {
         [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
       };
     }
-    try {
-      const {
-        id,
-        clientName,
-        employeeName,
-        purchasePrice,
-        modelName,
-        storeName,
-        usedEquipmentID,
-        nic,
-        createdAt,
-        allPrice,
-        page = 1,
-        pageSize = 5,
-        sortField = "id",
-        sortOrder = "ASC",
-      } = req.query;
-      const where = {};
-      const whereModel = {};
-      const whereStore = {};
-      const whereClient = {}
 
 
       console.log(req.query)
