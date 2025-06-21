@@ -15,7 +15,9 @@ module.exports = {
       { name: 'Printer', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
       { name: 'Monitor', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
       { name: 'Speaker', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Projector', isActive: "1", createdAt: new Date(), updatedAt: new Date() }
+      { name: 'Projector', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Keyboard', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Mouse', isActive: "1", createdAt: new Date(), updatedAt: new Date() },
     ]);
   },
 
