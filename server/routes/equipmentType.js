@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Op } = require("sequelize");
+const { Op, fn, col, where: sequelizeWhere } = require("sequelize");
 const models = require("../models");
 
 router.get("/", async (req, res) => {
@@ -13,8 +13,13 @@ router.get("/", async (req, res) => {
 			orderDirection = "ASC",
 		} = req.query;
 
-		const where = {};
-		if (name) where.name = { [Op.like]: `%${name}%` };
+		let where = {};
+
+		if (name) {
+			where = sequelizeWhere(fn("LOWER", col("name")), {
+				[Op.like]: `%${name.toLowerCase()}%`,
+			});
+		}
 
 		const offset = (parseInt(page) - 1) * parseInt(pageSize);
 		const order = [[orderBy, orderDirection.toUpperCase()]];

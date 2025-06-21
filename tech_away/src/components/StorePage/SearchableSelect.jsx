@@ -5,12 +5,13 @@ export default function SearchableCheckboxList({
 	label = "Filter",
 	options = [],
 	selected = [],
+	toSearch,
+	setToSearch,
 	onChange,
 	optionLabel = "name",
 	optionValue = "id",
 }) {
 	const [isOpen, setIsOpen] = useState(false);
-	const [search, setSearch] = useState("");
 	const ref = useRef(null);
 	const safeSelected = Array.isArray(selected) ? selected : [];
 
@@ -28,19 +29,19 @@ export default function SearchableCheckboxList({
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, []);
 
+	// Filtra com base em toSearch vindo do pai
 	const filteredOptions = options.filter((item) =>
-		item[optionLabel]?.toLowerCase().includes(search.toLowerCase())
+		item[optionLabel]?.toLowerCase().includes(toSearch?.toLowerCase() || "")
 	);
 
 	const handleToggle = (item) => {
-		const isArray = Array.isArray(selected);
-		const currentSelected = isArray ? selected : [];
-
-		const isSelected = currentSelected.some((v) => v.id === item.id);
+		const isSelected = safeSelected.some(
+			(v) => v[optionValue] === item[optionValue]
+		);
 
 		const newSelected = isSelected
-			? currentSelected.filter((v) => v.id !== item.id)
-			: [...currentSelected, item];
+			? safeSelected.filter((v) => v[optionValue] !== item[optionValue])
+			: [...safeSelected, item];
 
 		onChange(newSelected);
 	};
@@ -72,7 +73,7 @@ export default function SearchableCheckboxList({
 				>
 					<span>
 						{label}
-						{safeSelected.length > 0 && `(${safeSelected.length})`}
+						{safeSelected.length > 0 && ` (${safeSelected.length})`}
 					</span>
 
 					<i
@@ -100,8 +101,8 @@ export default function SearchableCheckboxList({
 						type="text"
 						className="mb-2 rounded-pill"
 						placeholder={`Search ${label.toLowerCase()}`}
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
+						value={toSearch}
+						onChange={(e) => setToSearch(e.target.value)}
 					/>
 
 					{filteredOptions.length > 0 ? (
