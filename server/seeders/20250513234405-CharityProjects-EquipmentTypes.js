@@ -18,13 +18,13 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       },
-      {
-        equipmentTypeId: 6,
-        charityProjectId: 3,
-        quantity: 7,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
+      // {
+      //   equipmentTypeId: 6,
+      //   charityProjectId: 3,
+      //   quantity: 7,
+      //   createdAt: new Date(),
+      //   updatedAt: new Date()
+      // },
       {
         equipmentTypeId: 1,
         charityProjectId: 1,

@@ -292,7 +292,7 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
                                 </Button>
                             </Col>
                         </Row>
-                        <Row className="mb-3">
+                        {/* <Row className="mb-3">
                             <Form.Group controlId="formEstado">
                                 <Form.Label>Equipment status</Form.Label>
                                 <Form.Control as="select" name="statusID" value={form.statusID} onChange={handleChange} required>
@@ -307,7 +307,7 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
                                 <Form.Label>Price</Form.Label>
                                 <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Insert price" required />
                             </Form.Group>
-                        </Row>
+                        </Row> */}
 
                         
 

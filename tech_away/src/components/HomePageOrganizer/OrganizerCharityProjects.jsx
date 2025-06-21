@@ -11,7 +11,7 @@ export default function OrganizerCharityProjects() {
   const [showModal, setShowModal] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
-  const { user, getOrganizerID, isOrganizer } = useOrganizerAuth ();
+  const { user, getOrganizerID, isOrganizer } = useOrganizerAuth();
 
   const [charityProjects, setCharityProjects] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,6 +53,7 @@ export default function OrganizerCharityProjects() {
           page: currentPage
         },
       });
+
 
       setCharityProjects(response.data.data);
       setTotalPages(response.data.totalPages);
