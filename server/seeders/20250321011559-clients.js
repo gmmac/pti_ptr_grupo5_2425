@@ -339,7 +339,17 @@ module.exports = {
       isActive: "1",
       createdAt: "2025-06-21T03:07:10.585Z",
       updatedAt: "2025-06-21T03:07:10.585Z"
-    }
+    },
+    { nic: "593742018", nif: "197563284", birthDate: "2000-06-15T00:00:00.000Z", gender: "M", firstName: "Miguel", lastName: "Santos", email: "miguel.santos@example.com", phone: "912345678", address: null, latitude: null, longitude: null, isActive: "1", createdAt: "2025-06-21T16:22:44.088Z", updatedAt: "2025-06-21T16:22:44.088Z" },
+  { nic: "482091736", nif: "254817369", birthDate: "1987-01-17T00:00:00.000Z", gender: "F", firstName: "Ana", lastName: "Coelho", email: "ana.coelho@gmail.com", phone: "918273645", address: null, latitude: null, longitude: null, isActive: "1", createdAt: "2025-06-21T16:23:26.179Z", updatedAt: "2025-06-21T16:23:26.179Z" },
+  { nic: "715384902", nif: "183746529", birthDate: "1990-06-13T00:00:00.000Z", gender: "M", firstName: "Ricardo", lastName: "Ferreira", email: "ricardo.ferreira@outlook.com", phone: "921837465", address: null, latitude: null, longitude: null, isActive: "1", createdAt: "2025-06-21T16:24:05.078Z", updatedAt: "2025-06-21T16:24:05.078Z" },
+  { nic: "309485716", nif: "295038471", birthDate: "1998-08-22T00:00:00.000Z", gender: "F", firstName: "Inês", lastName: "Mendes", email: "ines.mendes@hotmail.com", phone: "916283745", address: null, latitude: null, longitude: null, isActive: "1", createdAt: "2025-06-21T16:24:45.191Z", updatedAt: "2025-06-21T16:24:45.191Z" },
+  { nic: "864209173", nif: "174902836", birthDate: "2003-12-08T00:00:00.000Z", gender: "M", firstName: "Bruno", lastName: "Ribeiro", email: "bruno.ribeiro@gmail.com", phone: "919283747", address: null, latitude: null, longitude: null, isActive: "1", createdAt: "2025-06-21T16:25:27.587Z", updatedAt: "2025-06-21T16:25:27.587Z" },
+  { nic: "692048173", nif: "247183659", birthDate: "2000-01-01T00:00:00.000Z", gender: "M", firstName: "Paulo", lastName: "Alves", email: "paulo.alves@outlook.com", phone: "914738265", address: null, latitude: null, longitude: null, isActive: "1", createdAt: "2025-06-21T16:25:56.773Z", updatedAt: "2025-06-21T16:25:56.773Z" },
+  { nic: "157493820", nif: "203948571", birthDate: "2001-11-06T00:00:00.000Z", gender: "F", firstName: "Sofia", lastName: "Gomes", email: "sofia.gomes@example.com", phone: "915647382", address: null, latitude: null, longitude: null, isActive: "1", createdAt: "2025-06-21T16:26:43.444Z", updatedAt: "2025-06-21T16:26:43.444Z" },
+  { nic: "278364910", nif: "198374650", birthDate: "1988-05-03T00:00:00.000Z", gender: "M", firstName: "Carlos", lastName: "Pereira", email: "carlos.pereira@gmail.com", phone: "913746582", address: null, latitude: null, longitude: null, isActive: "1", createdAt: "2025-06-21T16:27:15.054Z", updatedAt: "2025-06-21T16:27:15.054Z" },
+  { nic: "536817204", nif: "215384709", birthDate: "2000-11-08T00:00:00.000Z", gender: "F", firstName: "Mariana", lastName: "Castro", email: "mariana.castro@yahoo.com", phone: "917263845", address: null, latitude: null, longitude: null, isActive: "1", createdAt: "2025-06-21T16:27:55.439Z", updatedAt: "2025-06-21T16:27:55.439Z" },
+
     ]);
   },
 
