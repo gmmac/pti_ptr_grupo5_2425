@@ -14,9 +14,11 @@ router.get("/", async (req, res) => {
       organizerName,
       startDate,
       completionDate,
+      organizerNic,
       page = 1,
       pageSize = 5,
     } = req.query;
+
 
     // build “where” for CharityProject fields
     const where = {};
@@ -44,20 +46,25 @@ router.get("/", async (req, res) => {
       warehouseFilter.name = { [Op.iLike]: `%${warehouse}%` };
     }
 
-    // for organizer name, concatenate firstName + lastName
-    const organizerWhere = organizerName
-      ? Sequelize.where(
-          Sequelize.fn(
-            'concat',
-            Sequelize.col('Organizer.firstName'),
-            ' ',
-            Sequelize.col('Organizer.lastName')
-          ),
-          { [Op.iLike]: `%${organizerName}%` }
-        )
-      : null;
+    const organizerWhere = {};
+    if (organizerNic) {
+      organizerWhere.nic = { [Op.eq]: organizerNic };
+    }
+    if (organizerName) {
+      // concat firstName + ' ' + lastName
+      organizerWhere[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('Organizer.firstName'),
+          ' ',
+          Sequelize.col('Organizer.lastName')
+        ),
+        { [Op.iLike]: `%${organizerName}%` }
+      );
+    }
 
     const offset = (Number(page) - 1) * Number(pageSize);
+
 
     const { count, rows } = await models.CharityProject.findAndCountAll({
       where,
@@ -75,14 +82,16 @@ router.get("/", async (req, res) => {
         {
           model: models.Organizer,
           attributes: ['nic', 'firstName', 'lastName', 'email'],
-          // apply organizerName filter if present
-          ...(organizerWhere ? { where: organizerWhere } : {}),
+          ...(Object.keys(organizerWhere).length > 0
+            ? { where: organizerWhere }
+            : {}),
         },
       ],
       limit: Number(pageSize),
       offset,
       order: [['id', 'ASC']],  // or pull from req.query if you still want ordering
     });
+
 
     return res.status(200).json({
       totalItems: count,
@@ -100,7 +109,7 @@ router.get("/", async (req, res) => {
 router.get('/displayTable', async (req, res) => {
   try {
     const {
-      id, projectName, status, warehouse, organizerName,
+      id, projectName, status, warehouse, organizerName, organizerNic,
       startDate, completionDate,
       isActive = '1', page = 1, pageSize = 5,
       sortField = 'id', sortOrder = 'ASC'
@@ -114,12 +123,22 @@ router.get('/displayTable', async (req, res) => {
 
     const statusFilter    = status    ? { state: { [Op.iLike]: `%${status}%` } } : {};
     const warehouseFilter = warehouse ? { name:  { [Op.iLike]: `%${warehouse}%` } } : {};
-    const organizerWhere = organizerName
-      ? Sequelize.where(
-          Sequelize.fn('concat', Sequelize.col('Organizer.firstName'), ' ', Sequelize.col('Organizer.lastName')),
-          { [Op.iLike]: `%${organizerName}%` }
-        )
-      : null;
+    const organizerWhere = {};
+    if (organizerNic) {
+      organizerWhere.nic = { [Op.eq]: organizerNic };
+    }
+    if (organizerName) {
+      // concat firstName + ' ' + lastName
+      organizerWhere[Op.and] = Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('Organizer.firstName'),
+          ' ',
+          Sequelize.col('Organizer.lastName')
+        ),
+        { [Op.iLike]: `%${organizerName}%` }
+      );
+    }
 
     const offset = (Number(page) - 1) * Number(pageSize);
     const order = [];
@@ -179,13 +198,15 @@ router.get('/displayTable', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, startDate, completionDate, warehouseID } = req.body;
+    const { projectName, startDate, completionDate, warehouseID } = req.body;
+
+    console.log(req.body)
     const organizerNic = req.cookies?.organizerInfo?.nic;
     if (!organizerNic) {
       return res.status(400).json({ error: 'Organizer not authenticated.' });
     }
     const project = await models.CharityProject.create({
-      name, startDate, completionDate,
+      name: projectName, startDate, completionDate,
       status: 1, warehouseID, organizerNic,
       isActive: '1', createdAt: new Date(), updatedAt: new Date()
     });
