@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Form, Modal, Button } from "react-bootstrap";
 import api from "../../utils/axios";
 import ClientCatalogModal from "../storePurchase/ClientCatalogModal";
-import UsedEquipmentSelect from "../equipment/UsedEquipmentSelect"
 import { Toast } from "primereact/toast";
+import EquipmentCatalogModal from "../storePurchase/EquipmentCatalogModal";
 
 export default function EditRepairForms({ repairID, showModal, closeModal, setRefreshRepairs }) {
   const [repairInfo, setRepairInfo] = useState({
@@ -326,11 +326,11 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
         selectedClient={repairInfo.clientId}
       />
 
-      <UsedEquipmentSelect
+      <EquipmentCatalogModal
         show={showEquipmentSheetModal}
         handleClose={() => setShowEquipmentSheetModal(false)}
-        handleSelectUsedEquipment={handleSelectUsedEquipment}
-        selectedUsedEquipment={repairInfo.equipmentSheet}
+        handleSelectEquipment={handleSelectUsedEquipment}
+        selectedEquipment={repairInfo.equipmentSheet}
       />
 
       <Toast ref={toast} />

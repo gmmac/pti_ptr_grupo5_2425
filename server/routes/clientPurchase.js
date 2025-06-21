@@ -78,7 +78,6 @@ router.get("/display-table", async (req, res) => {
 
     let orderClause = [];
 
-    console.log(sortField);
     if (sortField === "state") {
       orderClause.push([
         Sequelize.fn("LOWER", Sequelize.col("OrderStatus.state")),
@@ -104,10 +103,6 @@ router.get("/display-table", async (req, res) => {
       // Se não veio sortField, garantimos default
       orderClause.push([Sequelize.col("id"), "ASC"]);
     }
-
-    console.log("Final sortField:", sortField);
-    console.log("Final sortOrder:", sortOrder);
-    console.log("Final orderClause:", orderClause);
 
     const { count, rows } = await models.ClientPurchase.findAndCountAll({
       where,
