@@ -121,7 +121,6 @@ const handleSubmit = async () => {
       clientNIC: client.nic,
       totalPrice: Number(totalPrice),
       employeeID: employee?.nic,
-      pickupInStore: true,
       storeId: employee?.storeNIPC,
       address: "",
     });

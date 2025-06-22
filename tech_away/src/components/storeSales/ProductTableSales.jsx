@@ -60,13 +60,13 @@ export default function ProductTableSales({ filters, onAddToCart, cart }) {
       <Table responsive bordered hover className="align-middle">
         <thead>
           <tr>
-            <th>Add</th>
             <th>ID</th>
             <th>Type</th>
             <th>Brand</th>
             <th>Model</th>
             <th>Status</th>
             <th>Price (€)</th>
+            <th>Add</th>
           </tr>
         </thead>
         <tbody>
