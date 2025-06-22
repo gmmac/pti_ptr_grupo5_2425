@@ -3,28 +3,28 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
 
-    await queryInterface.bulkInsert('EquipmentSheetCharityProjects', [
-      {
-        equipmentSheetId: '12345678901234567890',
-        charityProjectId: 1,
-        quantity: 10,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        equipmentSheetId: '34567890123456789012',
-        charityProjectId: 1,
-        quantity: 5,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        equipmentSheetId: '45678901234567890123',
-        charityProjectId: 2,
-        quantity: 7,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
+    // await queryInterface.bulkInsert('EquipmentSheetCharityProjects', [
+      // {
+      //   equipmentSheetId: '12345678901234567890',
+      //   charityProjectId: 1,
+      //   quantity: 10,
+      //   createdAt: new Date(),
+      //   updatedAt: new Date()
+      // },
+      // {
+      //   equipmentSheetId: '34567890123456789012',
+      //   charityProjectId: 1,
+      //   quantity: 5,
+      //   createdAt: new Date(),
+      //   updatedAt: new Date()
+      // },
+      // {
+      //   equipmentSheetId: '45678901234567890123',
+      //   charityProjectId: 2,
+      //   quantity: 7,
+      //   createdAt: new Date(),
+      //   updatedAt: new Date()
+      // },
       // {
       //   equipmentSheetId: '45678901234567890123',
       //   charityProjectId: 2,
@@ -55,7 +55,7 @@ module.exports = {
       //   createdAt: new Date(),
       //   updatedAt: new Date()
       // }
-    ], {});
+    // ], {});
   },
 
   async down(queryInterface, Sequelize) {

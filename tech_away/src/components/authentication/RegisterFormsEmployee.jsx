@@ -9,19 +9,23 @@ function RegisterFormsEmployee() {
 
   const [showModal, setShowModal] = useState(false);
 
+
+  const initialEmployeeData = {
+  nic: '',
+  nif: '',
+  storeNIPC: '',
+  birthDate: '',
+  gender: '',
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  role: '',
+};
+
+
   const [roleList, setRoleList] = useState([]);
-  const [employeeData, setEmployeeData] = useState({
-    nic: '',
-    nif: '',
-    storeNIPC: '',
-    birthDate: '',
-    gender: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    role: '',
-  });
+  const [employeeData, setEmployeeData] = useState(initialEmployeeData);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
@@ -145,6 +149,8 @@ function RegisterFormsEmployee() {
 
         console.log(employeeData.nif + "@A")
         await api.post('/api/auth/register', {email: employeeData.email, password: employeeData.nif + "@A"}); // password inical -> nif@A
+        setEmployeeData(initialEmployeeData);
+
     })
     .catch(error => {})
 }
