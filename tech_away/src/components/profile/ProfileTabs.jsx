@@ -80,8 +80,8 @@ export default function ProfileTabs() {
 				className="d-flex p-4 h-100"
 			>
 				{repairBtnActive && <RepairTab />}
-				{purchasesBtnActive && <PurchaseTab />}
 				{salesBtnActive && <SalesTab />}
+				{purchasesBtnActive && <PurchaseTab />}
 			</div>
 		</Stack>
 	);

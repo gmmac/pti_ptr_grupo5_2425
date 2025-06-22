@@ -26,7 +26,7 @@ export default function PurchaseTab() {
 	return (
 		<Stack direction="vertical" gap={3} className="px-4">
 			<h5 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
-				My Orders
+				My Purchases
 			</h5>
 			<Stack
 				direction="vertical"
