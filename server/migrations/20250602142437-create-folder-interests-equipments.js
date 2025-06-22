@@ -16,8 +16,8 @@ module.exports = {
 					model: "FolderInterests",
 					key: "id",
 				},
+				onDelete: "CASCADE",
 				onUpdate: "CASCADE",
-				onDelete: "SET NULL",
 			},
 			interestId: {
 				type: Sequelize.INTEGER,

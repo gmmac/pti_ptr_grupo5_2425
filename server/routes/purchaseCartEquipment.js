@@ -74,6 +74,12 @@ router.post("/all-actual-cart", async (req, res) => {
 				.status(400)
 				.json({ error: "clientPurchaseId and cartId are required." });
 		}
+		await models.sequelize.query(`
+			SELECT setval(
+				pg_get_serial_sequence('"PurchaseCartEquipments"', 'id'),
+				(SELECT MAX(id) FROM "PurchaseCartEquipments")
+			)
+		`);
 
 		// Procura todos os usedEquipmentIds no carrinho
 		const cartEquipments = await models.ActualCartEquipment.findAll({
@@ -81,9 +87,7 @@ router.post("/all-actual-cart", async (req, res) => {
 		});
 
 		if (!cartEquipments.length) {
-			return res
-				.status(404)
-				.json({ error: "Cart is empty." });
+			return res.status(404).json({ error: "Cart is empty." });
 		}
 
 		let totalItems = 0;

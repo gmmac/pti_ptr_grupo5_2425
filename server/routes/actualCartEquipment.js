@@ -29,7 +29,7 @@ router.get("/:cartId", async (req, res) => {
 			where: { cartId: req.params.cartId },
 		});
 
-		if (!cartEquipment.length) return res.status(404).json(null); // dá return de null e não da erro no frontend
+		if (!cartEquipment.length) return res.status(200).json(null); // dá return de null e não da erro no frontend
 
 		const equipmentDetails = await Promise.all(
 			cartEquipment.map(async (item) => {
@@ -131,7 +131,9 @@ router.put("/:id", async (req, res) => {
 		});
 		if (!updated)
 			return res.status(404).json({ error: "ActualCartEquipment not found" });
-		res.status(200).json({ message: "ActualCartEquipment updated successfully" });
+		res
+			.status(200)
+			.json({ message: "ActualCartEquipment updated successfully" });
 	} catch (error) {
 		res.status(400).json({ error: error.message });
 	}
@@ -146,7 +148,9 @@ router.delete("/:id", async (req, res) => {
 
 		if (!deleted)
 			return res.status(404).json({ error: "ActualCartEquipment not found" });
-		res.status(200).json({ message: "ActualCartEquipment deleted successfully" });
+		res
+			.status(200)
+			.json({ message: "ActualCartEquipment deleted successfully" });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
