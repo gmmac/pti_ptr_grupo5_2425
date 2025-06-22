@@ -129,7 +129,6 @@ export default function OrderDetailsModal({
 									className="w-25 rounded-3"
 									style={{
 										objectFit: "cover",
-										// mixBlendMode: "darken",
 									}}
 								/>
 								<Stack direction="vertical">
@@ -180,12 +179,18 @@ export default function OrderDetailsModal({
 										</span>
 									</span>
 								) : (
-									<h6
-										className="m-0"
-										style={{ fontFamily: "var(--title-font)" }}
-									>
-										Pickup in store
-									</h6>
+									<span>
+										<h6
+											className="m-0"
+											style={{ fontFamily: "var(--title-font)" }}
+										>
+											Delivery Address:
+										</h6>
+										<span className="d-flex flex-row align-items-center justify-content-start gap-2">
+											<i className="pi pi-home"></i>
+											<p className="m-0">{order.address}</p>
+										</span>
+									</span>
 								)}
 							</Stack>
 						</Stack>

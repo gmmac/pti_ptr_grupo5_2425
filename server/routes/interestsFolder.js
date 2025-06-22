@@ -3,7 +3,15 @@ const router = express.Router();
 const models = require("../models");
 const { Op } = require("sequelize");
 
-router.get("/", async (req, res) => {});
+router.get("/", async (req, res) => {
+	try {
+		const interestFolders = await models.FolderInterest.findAll();
+		res.json(interestFolders);
+	} catch (error) {
+		console.error("Error fetching interest folders:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
 
 router.get("/:userNic", async (req, res) => {
 	try {

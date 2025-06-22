@@ -13,6 +13,11 @@ export const CartProvider = ({ children }) => {
 	const [isCartOpen, setIsCartOpen] = useState(false);
 	const [totalPrice, setTotalPrice] = useState(0);
 	const [cartItems, setCartItems] = useState([]);
+	const [shippingMethod, setShippingMethod] = useState("store");
+	const [shipping, setShipping] = useState({
+		address: "",
+		storeId: "",
+	});
 
 	const openCart = () => setIsCartOpen(true);
 	const closeCart = () => setIsCartOpen(false);
@@ -113,8 +118,6 @@ export const CartProvider = ({ children }) => {
 		api
 			.delete(`/api/actualCartEquipment/${id}`)
 			.then(() => {
-				console.log("item removido com sucesso");
-
 				fetchNumCartItems();
 				fetchCartItems();
 				fetchTotalPrice();
@@ -128,8 +131,6 @@ export const CartProvider = ({ children }) => {
 		api
 			.delete(`/api/actualCartEquipment/clearCart/${cartId}`)
 			.then(() => {
-				console.log("Carrinho limpo com sucesso");
-
 				fetchNumCartItems();
 				fetchCartItems();
 				fetchTotalPrice();
@@ -161,28 +162,27 @@ export const CartProvider = ({ children }) => {
 
 	const putPurchaseInBd = async () => {
 		try {
-			const clientPurchaseRes = await api.post(`/api/clientPurchase`, {
-				clientNIC: user.nic,
-				totalPrice: totalPrice,
-				// employeeID: opcional
-				pickupInStore: true,
-				address: "",
-				storeId: "000000000",
-			});
+			const { data: clientPurchaseRes } = await api.post(
+				"/api/clientPurchase",
+				{
+					clientNIC: user.nic,
+					totalPrice,
+					storeId: shipping.storeId || "",
+					address: shipping.address || "",
+				}
+			);
 
-			const clientPurchaseId = clientPurchaseRes.data.id;
-			console.log(clientPurchaseId);
+			const clientPurchaseId = clientPurchaseRes.id;
 
+			// Continua com a ligação dos equipamentos
 			await api.post("/api/purchaseCartEquipment/all-actual-cart", {
 				clientPurchaseId,
-				cartId: cartId,
+				cartId,
 			});
 
-			console.log("Compra registrada com sucesso!");
-
 			clearCart();
-		} catch (error) {
-			console.error("Erro ao registrar a compra:", error);
+		} catch (err) {
+			console.error("Erro ao registrar a compra:", err);
 		}
 	};
 
@@ -197,12 +197,17 @@ export const CartProvider = ({ children }) => {
 				openCart,
 				closeCart,
 				removeItemFromCart,
+				setTotalPrice,
 				totalPrice,
 				cartItems,
 				clearCart,
 				putPurchaseInBd,
 				fetchCartItems,
 				fetchTotalPrice,
+				shipping,
+				setShipping,
+				shippingMethod,
+				setShippingMethod,
 			}}
 		>
 			{cartId && (

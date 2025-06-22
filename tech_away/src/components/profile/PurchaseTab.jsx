@@ -12,9 +12,6 @@ export default function PurchaseTab() {
 		fetchPurchases();
 	}, [user]);
 
-	useEffect(() => {
-		console.log(purchases);
-	}, [purchases]);
 	const fetchPurchases = async () => {
 		try {
 			const res = await api.get(

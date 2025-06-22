@@ -131,6 +131,10 @@ router.get("/not-in-folder/:userNic/:folderInterestId", async (req, res) => {
 	try {
 		const { userNic, folderInterestId } = req.params;
 
+		if (!userNic || isNaN(Number(folderInterestId))) {
+			return res.status(400).json({ error: "Parâmetros inválidos." });
+		}
+
 		//todos os interestId já na pasta
 		const links = await models.FolderInterestEquipments.findAll({
 			where: { folderInterestId },

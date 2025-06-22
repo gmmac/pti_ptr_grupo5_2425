@@ -1,17 +1,65 @@
-import React, { useState } from "react";
-import { Stack, Col, Container, Row, Form, Button } from "react-bootstrap";
+import { useState, useEffect, useRef } from "react";
+import { Stack, Col, Container, Row, Button } from "react-bootstrap";
+
 import { useNavigate } from "react-router-dom";
 import OnCanvasCart from "../components/cart/OnCanvasCart";
 import Payment from "../components/payment/Payment";
 import Swirl from "../components/svg/Swirl";
+import ShippingDetails from "../components/checkoutOrderPage/ShippingDetails";
+import { useCart } from "../contexts/CartProvider";
 
 export default function CheckoutOrderPage() {
+	const cartContext = useCart();
+	if (!cartContext) return <p>Erro: CartContext não disponível</p>;
+
+	const {
+		shipping,
+		setShipping,
+		setTotalPrice,
+		shippingMethod,
+		setShippingMethod,
+	} = cartContext;
+
 	const navigate = useNavigate();
-	const [shippingMethod, setShippingMethod] = useState("store");
+
+	const [selectedStore, setSelectedStore] = useState(null);
+	const [address, setAddress] = useState("");
+
+	const DELIVERY_FEE = 3.25;
+	const previousMethod = useRef(shippingMethod);
 
 	const goBack = () => {
 		navigate(-1);
 	};
+
+	useEffect(() => {
+		// Atualizar os dados de shipping
+		if (shippingMethod === "store") {
+			setShipping({
+				...shipping,
+				storeId: selectedStore?.nipc,
+				address: "",
+			});
+		} else {
+			setShipping({
+				...shipping,
+				storeId: "",
+				address: address,
+			});
+		}
+
+		// Atualizar o preço apenas se houver mudança de método
+		if (previousMethod.current !== shippingMethod) {
+			if (shippingMethod === "home") {
+				setTotalPrice((prev) => prev + DELIVERY_FEE);
+			} else if (shippingMethod === "store") {
+				setTotalPrice((prev) => prev - DELIVERY_FEE);
+			}
+		}
+
+		// Guardar o método atual como o anterior
+		previousMethod.current = shippingMethod;
+	}, [shippingMethod, selectedStore, address]);
 
 	return (
 		<Container style={{ fontFamily: "var(--body-font)" }} className="mb-5">
@@ -34,6 +82,7 @@ export default function CheckoutOrderPage() {
 							height: "150%",
 							top: -160,
 							right: -600,
+							pointerEvents: "none",
 						}}
 					>
 						<Swirl
@@ -45,15 +94,10 @@ export default function CheckoutOrderPage() {
 							strokeWidth="40"
 						/>
 					</div>
-					<Stack
-						direction="horizontal"
-						className="px-2 py-5"
-						gap={3}
-						onClick={goBack}
-					>
+					<Stack direction="horizontal" className="px-2 py-5" gap={3}>
 						<Button
-						as="Link"
-							className="rounded-circle d-flex align-items-center justify-content-center"
+							variant="light"
+							onClick={goBack}
 							style={{
 								width: "35px",
 								height: "35px",
@@ -61,12 +105,14 @@ export default function CheckoutOrderPage() {
 								color: "white",
 								border: "none",
 							}}
+							className="rounded-circle d-flex align-items-center justify-content-center"
 						>
 							<i
 								className="pi pi-arrow-left"
 								style={{ fontSize: "1.3rem" }}
 							></i>
 						</Button>
+
 						<h5 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
 							Payment Checkout
 						</h5>
@@ -87,59 +133,14 @@ export default function CheckoutOrderPage() {
 					</Stack>
 				</Col>
 				<Col xs={12} md={7} lg={7} className="d-flex flex-column gap-4">
-					<Stack
-						className="p-4 flex-grow-1"
-						style={{
-							borderRadius: "var(--rounded-sm)",
-							backgroundColor: "var(--white)",
-							boxShadow: "var(--shadow-default)",
-						}}
-					>
-						<Stack direction="horizontal" gap={2}>
-							<h5
-								className="rounded-circle d-flex align-items-center justify-content-center"
-								style={{
-									width: "35px",
-									height: "35px",
-									backgroundColor: "var(--variant-two)",
-									color: "white",
-								}}
-							>
-								2
-							</h5>
-							<h5>Shipping Details</h5>
-						</Stack>
-						<Form className="mt-3">
-							<Form.Check
-								type="radio"
-								id="storePickup"
-								label="Pickup in Store"
-								name="shippingMethod"
-								checked={shippingMethod === "store"}
-								onChange={() => setShippingMethod("store")}
-							/>
-							<Form.Check
-								type="radio"
-								id="homeDelivery"
-								label="Home Delivery"
-								name="shippingMethod"
-								checked={shippingMethod === "home"}
-								onChange={() => setShippingMethod("home")}
-							/>
-							{shippingMethod === "home" && (
-								<div className="mt-3">
-									<Form.Group className="mb-2">
-										<Form.Label>Address</Form.Label>
-										<Form.Control
-											className="rounded-pill"
-											type="text"
-											placeholder="Number, Street"
-										/>
-									</Form.Group>
-								</div>
-							)}
-						</Form>
-					</Stack>
+					<ShippingDetails
+						shippingMethod={shippingMethod}
+						setShippingMethod={setShippingMethod}
+						selectedStore={selectedStore}
+						setSelectedStore={setSelectedStore}
+						address={address}
+						setAddress={setAddress}
+					/>
 					<Stack
 						className="p-4 flex-grow-1"
 						style={{
