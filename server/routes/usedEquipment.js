@@ -88,6 +88,159 @@ router.get("/in-stock", async (req, res) => {
 	}
 });
 
+router.get("/backoffice-in-stock", async (req, res) => {
+  try {
+    const {
+      page = 1,
+      pageSize = 8,
+      orderBy = "recent-date",
+      stateId,
+      storeId,
+      modelId,
+      typeId,
+      brandId,
+      equipmentId,
+    } = req.query;
+
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+    const limit = parseInt(pageSize);
+
+    const baseWhere = {
+      purchaseDate: null,
+      putOnSaleDate: { [Op.not]: null },
+    };
+
+    if (storeId) {
+      if (Array.isArray(storeId)) {
+        baseWhere.storeId = { [Op.in]: storeId };
+      } else {
+        baseWhere.storeId = storeId;
+      }
+    }
+
+    const whereArray = [baseWhere];
+
+    const addSequelizeWhereIn = (colPath, values) => {
+      if (!values) return null;
+      const arr = Array.isArray(values) ? values : [values];
+      const clean = arr.map((v) => parseInt(v, 10)).filter((v) => !isNaN(v));
+      if (clean.length) {
+        return Sequelize.where(Sequelize.col(colPath), { [Op.in]: clean });
+      }
+      return null;
+    };
+
+    // Aplicar filtros múltiplos
+    const filtersToApply = [
+      { col: "EquipmentStatus.id", val: stateId },
+      { col: "EquipmentSheet->EquipmentModel.id", val: modelId },
+      { col: "EquipmentSheet->EquipmentModel->Brand.id", val: brandId },
+      { col: "EquipmentSheet->EquipmentType.id", val: typeId },
+      { col: "EquipmentSheet.barcode", val: equipmentId },
+    ];
+
+    filtersToApply.forEach((f) => {
+      const w = addSequelizeWhereIn(f.col, f.val);
+      if (w) whereArray.push(w);
+    });
+
+    const { count, rows } = await models.UsedEquipment.findAndCountAll({
+      where: { [Op.and]: whereArray },
+      include: [
+        {
+          model: models.Store,
+          as: "Store",
+          attributes: ["nipc", "name"],
+        },
+        {
+          model: models.EquipmentStatus,
+          as: "EquipmentStatus",
+          attributes: ["id", "state"],
+        },
+        {
+          model: models.EquipmentSheet,
+          as: "EquipmentSheet",
+          attributes: ["barcode", "createdAt", "updatedAt"],
+          include: [
+            {
+              model: models.EquipmentModel,
+              as: "EquipmentModel",
+              attributes: ["id", "name", "releaseYear"],
+              include: [
+                {
+                  model: models.Brand,
+                  as: "Brand",
+                  attributes: ["id", "name"],
+                },
+              ],
+            },
+            {
+              model: models.EquipmentType,
+              as: "EquipmentType",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+      ],
+      limit,
+      offset,
+    });
+
+    const formattedData = rows.map((item) => ({
+      id: item.id,
+      price: item.price,
+      putOnSaleDate: item.putOnSaleDate,
+      purchaseDate: item.purchaseDate,
+      action: item.action,
+      EquipmentStatus: item.EquipmentStatus,
+      Store: item.Store,
+      EquipmentSheet: {
+        barcode: item.EquipmentSheet?.barcode,
+        createdAt: item.EquipmentSheet?.createdAt,
+        updatedAt: item.EquipmentSheet?.updatedAt,
+        EquipmentModel: {
+          ...item.EquipmentSheet?.EquipmentModel?.toJSON(),
+          Brand: item.EquipmentSheet?.EquipmentModel?.Brand,
+        },
+        EquipmentType: item.EquipmentSheet?.EquipmentType,
+      },
+    }));
+
+    // Ordenação manual
+    switch (orderBy) {
+      case "price-asc":
+        formattedData.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        formattedData.sort((a, b) => b.price - a.price);
+        break;
+      case "oldest-date":
+        formattedData.sort(
+          (a, b) => new Date(a.putOnSaleDate) - new Date(b.putOnSaleDate)
+        );
+        break;
+      case "recent-date":
+      default:
+        formattedData.sort(
+          (a, b) => new Date(b.putOnSaleDate) - new Date(a.putOnSaleDate)
+        );
+        break;
+    }
+
+    res.status(200).json({
+      totalItems: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: parseInt(page),
+      pageSize: parseInt(pageSize),
+      data: formattedData,
+    });
+  } catch (error) {
+    console.error("Error fetching backoffice-in-stock:", error);
+    res.status(500).json({ error: "Error fetching backoffice-in-stock." });
+  }
+});
+
+
 router.get("/", async (req, res) => {
 	try {
 		const {

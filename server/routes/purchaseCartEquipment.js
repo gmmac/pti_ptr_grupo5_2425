@@ -35,7 +35,35 @@ router.get("/order/:ID", async (req, res) => {
 	}
 });
 
-router.post("/", async (req, res) => {});
+router.post("/", async (req, res) => {
+  try {
+    const { clientPurchaseId, equipmentId } = req.body;
+
+    if (!clientPurchaseId || !equipmentId) {
+      return res
+        .status(400)
+        .json({ error: "clientPurchaseId and equipmentId are required." });
+    }
+
+    // Criar o vínculo
+    const newLine = await models.PurchaseCartEquipment.create({
+      clientPurchaseId,
+      equipmentId,
+    });
+
+    // Atualizar o UsedEquipment
+    await models.UsedEquipment.update(
+      { purchaseDate: new Date() },
+      { where: { id: equipmentId } }
+    );
+
+    res.status(201).json(newLine);
+  } catch (error) {
+    console.error("Error creating PurchaseCartEquipment:", error);
+    res.status(500).json({ error: "Error creating PurchaseCartEquipment." });
+  }
+});
+  
 
 router.post("/all-actual-cart", async (req, res) => {
 	try {
