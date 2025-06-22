@@ -53,9 +53,6 @@ export default function OrderDetailsModal({
 		}
 	}, [showDetails]);
 
-	useEffect(() => {
-		console.log(orderedEquipments);
-	}, [orderedEquipments]);
 
 	return (
 		<Modal

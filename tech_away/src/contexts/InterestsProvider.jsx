@@ -18,10 +18,6 @@ const InterestsProvider = ({ children }) => {
 		}
 	}, []);
 
-	useEffect(() => {
-		console.log("loadedInterests", loadedInterests);
-	}, [loadedInterests]);
-
 	const createFolder = async (folderName) => {
 		try {
 			await api.post(`/api/interestsFolder`, {
@@ -78,6 +74,7 @@ const InterestsProvider = ({ children }) => {
 
 	const fetchInterestsNotInFolder = async (folderId) => {
 		try {
+			if (!folderId || !user.nic) return;
 			const res = await api.get(
 				`/api/interest/not-in-folder/${user.nic}/${folderId}`
 			);

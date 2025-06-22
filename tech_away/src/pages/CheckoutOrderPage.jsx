@@ -10,7 +10,7 @@ import { useCart } from "../contexts/CartProvider";
 
 export default function CheckoutOrderPage() {
 	const cartContext = useCart();
-	if (!cartContext) return <p>Erro: CartContext não disponível</p>;
+	if (!cartContext) return <p>Loading</p>;
 
 	const {
 		shipping,
