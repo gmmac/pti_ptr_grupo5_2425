@@ -6,275 +6,176 @@ const { sequelize } = require("../models/index");
 
 router.get("/", async (req, res) => {
   try {
-      const {
-        id,
-        clientName,
-        employeeName,
-        purchasePrice,
-        modelName,
-        storeName,
-        usedEquipmentID,
-        nic,
-        createdAt,
-        onlyMyPurchases = 'false',
-        storePurchasesOnly = 'false',
-        allPrice,
-        page = 1,
-        pageSize = 5,
-        sortField = "id",
-        sortOrder = "ASC",
-      } = req.query;
+    const {
+      employeeName,
+      clientName,
+      modelName,
+      storeName,
+      id,
+      createdAt,
+      purchasePrice,
+      usedEquipmentID,
+      nic,
+      onlyMyPurchases = "false",
+      storePurchasesOnly = "false",
+      allPrice,
+      page = 1,
+      pageSize = 5,
+      sortField = "id",
+      sortOrder = "ASC",
+    } = req.query;
 
+    // --- WHERE principal ---
     const where = {};
-    const whereEmployee = {};
-    const whereClient = {};
-    const whereModel = {};
-    const whereStore = {};
-
-    // Dados do empregado logado
-    const employeeInfo = req.cookies?.employeeInfo;
-    const loggedEmployeeNic = employeeInfo?.nic;
-    const loggedStoreNIPC = employeeInfo?.storeNIPC;
-
-    // Filtro: só compras feitas pelo empregado logado
-    if (onlyMyPurchases === 'true' && loggedEmployeeNic) {
-      where.employeeID = loggedEmployeeNic;
+    if (onlyMyPurchases === "true" && req.cookies.employeeInfo?.nic) {
+      where.employeeID = req.cookies.employeeInfo.nic;
     }
-
-    // Filtro: só compras da loja logada
-    if (storePurchasesOnly === 'true' && loggedStoreNIPC) {
-      where.storeID = loggedStoreNIPC;
+    if (storePurchasesOnly === "true" && req.cookies.employeeInfo?.storeNIPC) {
+      where.storeID = req.cookies.employeeInfo.storeNIPC;
     }
-
     if (id) {
       where.id = sequelize.where(
         sequelize.cast(sequelize.col("StorePurchase.id"), "varchar"),
         { [Op.iLike]: `${id}%` }
       );
     }
-
     if (createdAt) {
+      const start = new Date(createdAt);
       where.createdAt = {
-        [Op.gte]: new Date(createdAt),
-        [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+        [Op.gte]: start,
+        [Op.lt]: new Date(start.getTime() + 86400000),
       };
     }
-
-
-      console.log(req.query)
-
-      if (id)
-        where.id = sequelize.where(
-          sequelize.cast(sequelize.col("StorePurchase.id"), "varchar"),
-          { [Op.iLike]: `${id}%` }
-        );
-      if (createdAt) {
-        where.createdAt = {
-          [Op.gte]: new Date(createdAt),
-          [Op.lt]: new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
-        };
-      }
-
-      if (modelName) whereModel.name = { [Op.iLike]: `%${modelName}%` };
-      if (storeName) whereStore.name = { [Op.iLike]: `%${storeName}%` };
-
-      if (usedEquipmentID) {
-        where.usedEquipmentID = {
-          [Op.eq]: parseInt(usedEquipmentID),
-        };
-      }
-
-      if (purchasePrice && parseFloat(purchasePrice) > 0) {
-        where.purchasePrice = { [Op.eq]: parseFloat(purchasePrice) };
-      } else {
-        // Força exibir apenas vendas (maiores que 0)
-        if(allPrice == "0"){
-          where.purchasePrice = { [Op.gt]: 0 };
-        }
-      }
-        
-
-    if (employeeName) {
-      whereEmployee[Op.and] = Sequelize.where(
-        Sequelize.fn(
-          'concat',
-          Sequelize.col('Employee.firstName'),
-          ' ',
-          Sequelize.col('Employee.lastName')
-        ),
-        {
-          [Op.iLike]: `%${employeeName}%`
-        }
-      );
+    if (purchasePrice) {
+      where.purchasePrice = { [Op.eq]: parseFloat(purchasePrice) };
+    } else if (!allPrice) {
+      where.purchasePrice = { [Op.gt]: 0 };
+    }
+    if (usedEquipmentID) {
+      where.usedEquipmentID = { [Op.eq]: parseInt(usedEquipmentID, 10) };
     }
 
-    if (clientName) {
-      whereClient[Op.and] = Sequelize.where(
-        Sequelize.fn(
-          'concat',
-          Sequelize.col('Client.firstName'),
-          ' ',
-          Sequelize.col('Client.lastName')
-        ),
-        {
-          [Op.iLike]: `%${clientName}%`
-        }
-      );
-    }
-
-    if (nic) {
-      whereClient.nic = nic;
-    }
-
-    if (modelName) {
-      whereModel.name = { [Op.iLike]: `%${modelName}%` };
-    }
-
-    if (storeName) {
-      whereStore.name = { [Op.iLike]: `%${storeName}%` };
-    }
-
-    const offset = (parseInt(page) - 1) * parseInt(pageSize);
+    // --- Construção de orderClause ---
+    const orderDir = ["-1","DESC"].includes(sortOrder.toString().toUpperCase()) ? "DESC" : "ASC";
     const orderClause = [];
-    if (sortField) {
-      orderClause.push([
-        Sequelize.col(sortField),
-        sortOrder == -1 ? "DESC" : "ASC",
-      ]);
+    switch (sortField) {
+      case "storeName":
+        orderClause.push([{ model: models.Store }, "name", orderDir]);
+        break;
+      case "employeeName":
+        orderClause.push([{ model: models.Employee }, "firstName", orderDir]);
+        break;
+      case "clientName":
+        orderClause.push([{ model: models.Client }, "firstName", orderDir]);
+        break;
+      case "modelName":
+        orderClause.push([
+          models.UsedEquipment,
+          models.EquipmentSheet,
+          models.EquipmentModel,
+          "name",
+          orderDir
+        ]);
+        break;
+      default:
+        orderClause.push([sequelize.col(sortField), orderDir]);
     }
 
+    // --- includes com filtros inline ---
+    const include = [
+      {
+        model: models.Employee,
+        attributes: ["firstName","lastName"],
+        required: true,
+        where: employeeName
+          ? sequelize.where(
+              sequelize.fn("concat",
+                sequelize.col("Employee.firstName"),
+                " ",
+                sequelize.col("Employee.lastName")
+              ),
+              { [Op.iLike]: `%${employeeName}%` }
+            )
+          : undefined
+      },
+      {
+        model: models.Client,
+        attributes: ["firstName","lastName","nic"],
+        // required: Boolean(clientName || nic),
+        where: {
+          ...(clientName && {
+            [Op.and]: sequelize.where(
+              sequelize.fn("concat",
+                sequelize.col("Client.firstName"),
+                " ",
+                sequelize.col("Client.lastName")
+              ),
+              { [Op.iLike]: `%${clientName}%` }
+            )
+          }),
+          ...(nic && { nic })
+        }
+      },
+      {
+        model: models.UsedEquipment,
+        required: true,
+        include: [{
+          model: models.EquipmentSheet,
+          required: true,
+          include: [{
+            model: models.EquipmentModel,
+            attributes: ["name"],
+            required: Boolean(modelName),
+            where: modelName
+              ? { name: { [Op.iLike]: `%${modelName}%` } }
+              : undefined
+          }]
+        }]
+      },
+      {
+        model: models.Store,
+        attributes: ["name"],
+        required: Boolean(storeName),
+        where: storeName
+          ? { name: { [Op.iLike]: `%${storeName}%` } }
+          : undefined
+      }
+    ];
+
+    // --- execução da query ---
+    const offset = (parseInt(page) - 1) * parseInt(pageSize);
     const { count, rows } = await models.StorePurchase.findAndCountAll({
       where,
-      include: [
-        {
-          model: models.Employee,
-          attributes: ["firstName", "lastName"],
-          where: Object.keys(whereEmployee).length > 0 ? whereEmployee : undefined,
-          required: Object.keys(whereEmployee).length > 0
-        },
-        {
-          model: models.Client,
-          attributes: ["firstName", "lastName", "nic"],
-          where: Object.keys(whereClient).length > 0 ? whereClient : undefined,
-          required: Object.keys(whereClient).length > 0
-        },
-        {
-          model: models.UsedEquipment,
-          include: [
-            {
-              model: models.EquipmentSheet,
-              include: [
-                {
-                  model: models.EquipmentModel,
-                  attributes: ["name"],
-                  where: Object.keys(whereModel).length > 0 ? whereModel : undefined,
-                  required: Object.keys(whereModel).length > 0
-                }
-              ]
-            }
-          ]
-        },
-        {
-          model: models.Store,
-          attributes: ["name"],
-          where: Object.keys(whereStore).length > 0 ? whereStore : undefined,
-          required: Object.keys(whereStore).length > 0
-        },
-      ],
-      limit: parseInt(pageSize),
-      offset,
+      include,
       order: orderClause,
+      limit: parseInt(pageSize),
+      offset
     });
 
-    const formattedData = rows
-      .filter(item => item.UsedEquipment?.EquipmentSheet?.EquipmentModel)
-      .map((item) => ({
-        id: item.id,
-        storeName: item.Store?.name,
-        purchasePrice: item.purchasePrice,
-        usedEquipmentID: item.usedEquipmentID,
-        employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
-        clientName: item.Client?.firstName + " " + item.Client?.lastName,
-        clientNIC: item.Client?.nic,
-        modelName: item.UsedEquipment.EquipmentSheet.EquipmentModel.name,
-        createdAt: item.createdAt,
-      }));
+    // --- formatação sem filter(...) extra ---
+    const data = rows.map(item => ({
+      id: item.id,
+      storeName: item.Store?.name,
+      purchasePrice: item.purchasePrice,
+      usedEquipmentID: item.usedEquipmentID,
+      employeeName: `${item.Employee?.firstName||""} ${item.Employee?.lastName||""}`.trim(),
+      clientName: `${item.Client?.firstName||""} ${item.Client?.lastName||""}`.trim(),
+      clientNIC: item.Client?.nic,
+      modelName: item.UsedEquipment?.EquipmentSheet?.EquipmentModel?.name,
+      createdAt: item.createdAt
+    }));
 
-    res.status(200).json({
+    res.json({
       totalItems: count,
-      totalPages: Math.ceil(count / pageSize),
+      totalPages: Math.ceil(count/parseInt(pageSize)),
       currentPage: parseInt(page),
       pageSize: parseInt(pageSize),
-      data: formattedData,
+      data
     });
-  } catch (error) {
-    console.log(error);
+  }
+  catch(err) {
+    console.error("Error fetching purchases:", err);
     res.status(500).json({ error: "Error fetching purchases." });
-  }
-});
-
-router.get("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Busca a compra
-    const purchase = await models.StorePurchase.findByPk(id);
-
-    if (!purchase) {
-      return res.status(404).json({ error: "Purchase not found." });
-    }
-
-    // Busca os dados do equipamento usado vinculado à compra
-    const usedEquipment = await models.UsedEquipment.findByPk(purchase.usedEquipmentID, {
-      attributes: ["statusID", "equipmentId"]
-    });
-
-    // Monta a resposta com dados extras do equipamento
-    const response = {
-      ...purchase.toJSON(),
-      statusID: usedEquipment?.statusID || null,
-      equipmentID: usedEquipment?.equipmentId || null
-    };
-
-    return res.status(200).json(response);
-  } catch (error) {
-    console.error("Error in GET /:id", error);
-    return res.status(500).json({ error: "Internal server error." });
-  }
-});
-
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { statusID, price, clientNic, equipmentBarcode } = req.body;
-
-    // 1. Verifica se a compra existe
-    const purchase = await models.StorePurchase.findByPk(id);
-    if (!purchase) {
-      return res.status(404).json({ error: "Purchase not found." });
-    }
-
-    // 2. Atualiza a compra
-    await purchase.update({
-      clientNIC: clientNic,
-      purchasePrice: price,
-      updatedAt: new Date()
-    });
-
-    // 3. Atualiza o equipamento usado
-    const usedEquipment = await models.UsedEquipment.findByPk(purchase.usedEquipmentID);
-    if (usedEquipment) {
-      await usedEquipment.update({
-        statusID: statusID,
-        equipmentId: equipmentBarcode,
-        updatedAt: new Date()
-      });
-    }
-
-    return res.status(200).json({ message: "Purchase updated successfully." });
-  } catch (error) {
-    console.error("Error in PUT /:id", error);
-    return res.status(500).json({ error: "Internal server error." });
   }
 });
 
@@ -501,8 +402,70 @@ router.post("/donate", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    // Busca a compra
+    const purchase = await models.StorePurchase.findByPk(id);
 
+    if (!purchase) {
+      return res.status(404).json({ error: "Purchase not found." });
+    }
+
+    // Busca os dados do equipamento usado vinculado à compra
+    const usedEquipment = await models.UsedEquipment.findByPk(purchase.usedEquipmentID, {
+      attributes: ["statusID", "equipmentId"]
+    });
+
+    // Monta a resposta com dados extras do equipamento
+    const response = {
+      ...purchase.toJSON(),
+      statusID: usedEquipment?.statusID || null,
+      equipmentID: usedEquipment?.equipmentId || null
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("Error in GET /:id", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { statusID, price, clientNic, equipmentBarcode } = req.body;
+
+    // 1. Verifica se a compra existe
+    const purchase = await models.StorePurchase.findByPk(id);
+    if (!purchase) {
+      return res.status(404).json({ error: "Purchase not found." });
+    }
+
+    // 2. Atualiza a compra
+    await purchase.update({
+      clientNIC: clientNic,
+      purchasePrice: price,
+      updatedAt: new Date()
+    });
+
+    // 3. Atualiza o equipamento usado
+    const usedEquipment = await models.UsedEquipment.findByPk(purchase.usedEquipmentID);
+    if (usedEquipment) {
+      await usedEquipment.update({
+        statusID: statusID,
+        equipmentId: equipmentBarcode,
+        updatedAt: new Date()
+      });
+    }
+
+    return res.status(200).json({ message: "Purchase updated successfully." });
+  } catch (error) {
+    console.error("Error in PUT /:id", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+});
 
 
 module.exports = router;
