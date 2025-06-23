@@ -41,7 +41,6 @@ export default function PaymentForm() {
 			},
 			redirect: "if_required", // só redireciona se necessário
 		});
-		console.log(paymentIntent?.status);
 
 		if (error) {
 			setMessage(error.message);

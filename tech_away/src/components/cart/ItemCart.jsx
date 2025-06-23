@@ -17,9 +17,6 @@ export default function ItemCart({ equipment, onRemove }) {
 		onRemove(equipment.lineId);
 		setShowModal(false);
 	};
-	useEffect(() => {
-		console.log(equipment);
-	}, []);
 	return (
 		<Container
 			className="p-2  border-bottom"

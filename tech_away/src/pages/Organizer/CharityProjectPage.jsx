@@ -20,7 +20,6 @@ export default function CharityProjectPage() {
         try {
           api.get(`/api/charityProject?id=${id}`)
           .then((response) => {
-              console.log(response.data)
               setProject(response.data.data[0]);
           })
         } catch (error) {

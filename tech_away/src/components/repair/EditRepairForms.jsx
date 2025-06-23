@@ -152,7 +152,6 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
   };
 
   const handleSubmit = async (e) => {
-    // console.log(payload)
     e.preventDefault();
 
     if (!validateFields()) return;

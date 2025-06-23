@@ -42,10 +42,6 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
   const dateFields = ['createdAt', 'updatedAt', 'startDate', 'completionDate'];
 
   useEffect(() => {
-    console.log(projectStatusInfo)
-  },[projectStatusInfo])
-
-  useEffect(() => {
     loadLazyData();
   }, [lazyState, refreshKey]);
 
@@ -58,8 +54,6 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
     Object.entries(filters).forEach(([key, meta]) => {
       if (meta.value) params[key] = meta.value;
     });
-
-    console.log(params)
 
     api.get('/api/charityProject/displayTable', { params })
       .then(res => {

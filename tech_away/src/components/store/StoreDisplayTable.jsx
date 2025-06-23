@@ -26,7 +26,6 @@ export default function StoreDisplayTable({ onDelete, onEdit, refreshKey, isActi
 
   useEffect(() => {
     loadData();
-    console.log(lazyState)
   }, [lazyState, refreshKey, isActiveFilter]);
 
   const loadData = () => {

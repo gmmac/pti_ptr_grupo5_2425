@@ -143,7 +143,6 @@ function RegisterFormsEmployee() {
           setErrors(newErrors);
       }
 
-        console.log(employeeData.nif + "@A")
         await api.post('/api/auth/register', {email: employeeData.email, password: employeeData.nif + "@A"}); // password inical -> nif@A
     })
     .catch(error => {})

@@ -116,7 +116,6 @@ const handleSubmit = async () => {
       return;
     }
 
-    // 1️⃣ Criar a compra primeiro
     const purchaseRes = await api.post("/api/clientPurchase/", {
       clientNIC: client.nic,
       totalPrice: Number(totalPrice),
@@ -128,13 +127,7 @@ const handleSubmit = async () => {
     const clientPurchaseId = purchaseRes.data.id;
     if (!clientPurchaseId) throw new Error("Purchase not created");
 
-    // 2️⃣ Só agora iterar e criar os equipamentos ligados à compra
     for (const item of cart) {
-      console.log("Sending to purchaseCartEquipment:", {
-        clientPurchaseId,
-        equipmentId: item.id,
-      });
-
       await api.post("/api/purchaseCartEquipment/", {
         clientPurchaseId,
         equipmentId: item.id,
@@ -150,8 +143,6 @@ const handleSubmit = async () => {
     alert("Error during submission, check console.");
   }
 };
-
-
 
   return (
     <>

@@ -45,7 +45,6 @@ export default function SelectStoreModal({
 	};
 
 	const handleConfirm = () => {
-		console.log(selectedRow);
 
 		setSelectedStore(selectedRow);
 		setShowModal(false);

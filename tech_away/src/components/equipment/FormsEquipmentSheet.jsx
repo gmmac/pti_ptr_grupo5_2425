@@ -47,7 +47,6 @@ export default function FormsEquipmentSheet({ showModal, closeModal, refreshTabl
 
 	useEffect(() => {
 			if (existingSheet) {
-				console.log(existingSheet)
 				setEquipmentSheet({
 					barcode: existingSheet.Barcode || "",
 					modelId: existingSheet.EquipmentModel?.id || "",

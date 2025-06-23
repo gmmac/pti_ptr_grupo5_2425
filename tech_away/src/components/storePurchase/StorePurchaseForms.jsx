@@ -54,14 +54,7 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
     api.get(`/api/equipmentSheet`)
         .then(res => setEquipmentList(res.data.data.map(e => e.Barcode)))
         .catch(error => console.error('Error fetching equipment:', error.message));
-        console.log(equipmentList)
-
     }, []);
-
-
-    useEffect(() => {
-        console.log(form)
-    }, [form])
 
     useEffect(() => {
         api.get(`/api/client/`)

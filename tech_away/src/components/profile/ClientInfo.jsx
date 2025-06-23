@@ -113,7 +113,7 @@ export default function ClientInfo({ userType = "client" }) {
 				newErrors[error.response.data.errorTag] =
 					"There is already a user with this " + error.response.data.errorTag;
 				setErrors(newErrors);
-				console.log("Erro ao atualizar os dados:", error.response.data);
+				console.log("Error updating details:", error.response.data);
 			});
 	};
 

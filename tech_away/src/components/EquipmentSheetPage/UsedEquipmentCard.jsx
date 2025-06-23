@@ -13,8 +13,6 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 
 	const handleAddToCart = () => {
 		if (!user) {
-			console.log("User not logged in, showing login modal");
-
 			setShowLoginModal(true);
 			return;
 		}

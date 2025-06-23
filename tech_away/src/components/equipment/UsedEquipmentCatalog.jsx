@@ -90,7 +90,7 @@ export default function UsedEquipmentCatalog() {
   }, [activeTab, currentPage, filters, refreshKey]);
 
   const handleEdit = (item) => {
-    console.log("Edit item", item);
+    return;
   };
 
   const handleToggleActivation = async (id) => {

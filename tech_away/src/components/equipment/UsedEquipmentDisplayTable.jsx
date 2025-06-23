@@ -70,7 +70,6 @@ export default function UsedEquipmentDisplayTable({ isActiveFilter, actionFilter
 
     try {
       const res = await api.get("/api/usedEquipment/displayTable", { params });
-      console.log(res.data.data)
       setData(res.data.data || []);
       setTotalRecords(res.data.totalItems || 0);
     } catch (err) {
@@ -239,7 +238,6 @@ useEffect(() => {
           header=""
           body={(rowData, options) => {
             const menuItems = [];
-            console.log(rowData)
             if (isActiveFilter === "new" && rowData.Purchase.purchasePrice != 0) {
               menuItems.push({
                 label: "Put on Sale",
