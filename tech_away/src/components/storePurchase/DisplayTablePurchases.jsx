@@ -126,6 +126,19 @@ export default function DisplayTablePurchases({ refreshTable, onlyMyPurchases, s
     setShow(true);
   };
 
+  const capitalizeFirstLetter = (value) => {
+        if(String(value) == "id") return "ID";
+        if(String(value) == "purchasePrice") return "Price";
+        if(String(value) == "storeName") return "Store";
+        if(String(value) == "employeeName") return "Employee";
+        if(String(value) == "clientName") return "Client Name";
+        if(String(value) == "clientNIC") return "Client NIC";
+        if(String(value) == "modelName") return "Equipment Model";
+        if(String(value) == "createdAt") return "Created at";
+        if(String(value) == "updatedAt") return "Updated at";
+        return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+    }
+
   return (
     <>
       {/* <ConfirmDialog /> */}
@@ -156,7 +169,7 @@ export default function DisplayTablePurchases({ refreshTable, onlyMyPurchases, s
             <Column
               key={index}
               field={column}
-              header={column}
+              header={capitalizeFirstLetter(column)}
               sortable
               filter
               showFilterMenu={false}
@@ -200,6 +213,9 @@ export default function DisplayTablePurchases({ refreshTable, onlyMyPurchases, s
                     (val) => typeof val === "string" || typeof val === "number"
                   );
                   return firstTextField ?? "N/A";
+                }
+                if (value && column == "purchasePrice"){
+                      return `${value}€`;
                 }
                 if (dateFields.includes(column) && value) {
                   const date = new Date(value);

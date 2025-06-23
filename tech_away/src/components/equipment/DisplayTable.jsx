@@ -131,6 +131,11 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
 
     const capitalizeFirstLetter = (value) => {
         if(String(value) == "id") return "ID";
+        if(String(value) == "createdAt") return "Created at";
+        if(String(value) == "updatedAt") return "Updated at";
+        if(String(value) == "releaseYear") return "Release Year";
+        if(String(value) == "EquipmentModel") return "Equipment Model";
+        if(String(value) == "EquipmentType") return "Equipment Type";
         return String(value).charAt(0).toUpperCase() + String(value).slice(1);
     }
 

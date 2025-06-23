@@ -86,8 +86,8 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
                 // Opcional: preencher clientData e equipmentData com mais detalhes, se desejar
             })
             .catch(err => {
-                console.error("Erro ao buscar dados da compra:", err.message);
-                setError("Erro ao carregar os dados da compra.");
+                console.error("Error fetching purchase details:", err.message);
+                setError("Error fetching purchase details.");
             });
         }
     }, [purchaseID, successMessage]);
@@ -198,10 +198,10 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
         // try {
             if (purchaseID) {
                 await api.put(`/api/storePurchase/${purchaseID}`, form);
-                setSuccessMessage("Venda atualizada com sucesso!");
+                setSuccessMessage("Purchase updated successfully!");
             } else {
                 await api.post('/api/storePurchase', form);
-                setSuccessMessage("Venda registada com sucesso!");
+                setSuccessMessage("Purchase created successfully!");
             }
 
             setError("");
@@ -302,19 +302,19 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
                             </Form.Group>
                         </Row>
 
-                        <Row className="mb-3">
+                        {/* <Row className="mb-3">
                             <Form.Group controlId="formPreco">
                                 <Form.Label>Price</Form.Label>
                                 <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Insert price" required />
                             </Form.Group>
-                        </Row>
+                        </Row> */}
 
                         
 
                         {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
                         <Button variant="primary" type="submit" disabled={!!error} className="mt-3 w-100 rounded-pill shadow-lg" style={{ backgroundColor: '#b5a8c9', borderColor: '#b5a8c9', color: 'white' }}>
-                            {purchaseID ? "Salvar Alterações" : "Registar Venda"}
+                            {purchaseID ? "Save Changes" : "Create Purchase"}
                         </Button>
                     </Form>
                 </Modal.Body>
