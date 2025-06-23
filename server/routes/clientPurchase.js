@@ -78,36 +78,31 @@ router.get("/display-table", async (req, res) => {
 
 		let orderClause = [];
 
-		console.log(sortField);
-		if (sortField === "state") {
-			orderClause.push([
-				Sequelize.fn("LOWER", Sequelize.col("OrderStatus.state")),
-				sortOrder == -1 ? "DESC" : "ASC",
-			]);
-		} else if (sortField === "employeeNIC") {
-			orderClause.push([
-				Sequelize.fn("LOWER", Sequelize.col("Employee.nic")),
-				sortOrder == -1 ? "DESC" : "ASC",
-			]);
-		} else if (sortField === "CreatedAt") {
-			orderClause.push([
-				Sequelize.col("createdAt"),
-				sortOrder === "1" || sortOrder === "ASC" ? "ASC" : "DESC",
-			]);
-		} else if (sortField) {
-			if (sortOrder == -1) {
-				orderClause.push([Sequelize.col(sortField), "DESC"]);
-			} else {
-				orderClause.push([Sequelize.col(sortField), "ASC"]);
-			}
-		} else {
-			// Se não veio sortField, garantimos default
-			orderClause.push([Sequelize.col("id"), "ASC"]);
-		}
-
-		console.log("Final sortField:", sortField);
-		console.log("Final sortOrder:", sortOrder);
-		console.log("Final orderClause:", orderClause);
+    if (sortField === "state") {
+      orderClause.push([
+        Sequelize.fn("LOWER", Sequelize.col("OrderStatus.state")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField === "employeeNIC") {
+      orderClause.push([
+        Sequelize.fn("LOWER", Sequelize.col("Employee.nic")),
+        sortOrder == -1 ? "DESC" : "ASC",
+      ]);
+    } else if (sortField === "CreatedAt") {
+      orderClause.push([
+        Sequelize.col("createdAt"),
+        sortOrder === "1" || sortOrder === "ASC" ? "ASC" : "DESC",
+      ]);
+    } else if (sortField) {
+      if (sortOrder == -1) {
+        orderClause.push([Sequelize.col(sortField), "DESC"]);
+      } else {
+        orderClause.push([Sequelize.col(sortField), "ASC"]);
+      }
+    } else {
+      // Se não veio sortField, garantimos default
+      orderClause.push([Sequelize.col("id"), "ASC"]);
+    }
 
 		const { count, rows } = await models.ClientPurchase.findAndCountAll({
 			where,
