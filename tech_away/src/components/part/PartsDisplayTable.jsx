@@ -117,6 +117,14 @@ export default function PartsDisplayTable({activeParts = "1", refreshAllTables=n
         });
     };
 
+    const capitalizeFirstLetter = (value) => {
+        if(String(value) == "id") return "ID";
+        if(String(value) == "arriveTime") return "Arrival Time";
+        if(String(value) == "createdAt") return "Created at";
+        if(String(value) == "updatedAt") return "Updated at";
+        return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+    }
+
     return (
         <>
             <div className="">
@@ -145,7 +153,7 @@ export default function PartsDisplayTable({activeParts = "1", refreshAllTables=n
                         <Column
                             key={index}
                             field={column}
-                            header={column}
+                            header={capitalizeFirstLetter(column)}
                             sortable
                             filter
 							showFilterMenu={false}
@@ -312,6 +320,26 @@ export default function PartsDisplayTable({activeParts = "1", refreshAllTables=n
                         .p-menu .p-menuitem-link {
                             text-decoration: none !important;
                             color: #374151 !important; /* Ajuste conforme seu tema */
+                        }
+                        .custom-icon-button {
+                            width: 2.5rem;
+                            height: 2.5rem;
+                            border-radius: 50% !important;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 0;
+                        }
+                        .custom-icon-button-withtext {
+                            height: 2.5rem;
+                            border-radius: 20% !important;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 0.2rem;
+                        }
+                        .custom-icon-button .pi {
+                            font-size: 1.1rem;
                         }
 						`}
 				</style>

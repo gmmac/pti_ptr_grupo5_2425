@@ -3,13 +3,13 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Menu } from "primereact/menu";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Modal, Form } from "react-bootstrap";
-import { Calendar } from 'primereact/calendar';
-import { ConfirmDialog } from 'primereact/confirmdialog';
 import api from "../../utils/axios";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
+import { Calendar } from 'primereact/calendar';
 
 export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refreshKey, canDelete = false }) {
   const [loading, setLoading] = useState(false);
@@ -33,85 +33,66 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
   });
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
-  const [organizerNic, setOrganizerNic] = useState(null);
+  const [showChangeStatus, setShowChangeStatus] = useState(false);
+  const [statusOptions, setStatusOptions] = useState([]);
+  const [projectStatusInfo, setProjectStatusInfo] = useState({ projectId: null, statusName: '' });
+  const [errorMessage, setErrorMessage] = useState('');
   const menuRefs = useRef([]);
+
   const dateFields = ['createdAt', 'updatedAt', 'startDate', 'completionDate'];
 
-  // Fetch user info once on mount
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await api.get('/api/auth/user-info', {
-          params: { userType: 'organizer' },
-          withCredentials: true
-        });
-        const user = response.data?.userInfo;
-        if (user?.nic) setOrganizerNic(user.nic);
-      } catch (err) {
-        console.error('Erro ao buscar usuário:', err);
-      }
-    };
-    fetchUserInfo();
-  }, []);
+    console.log(projectStatusInfo)
+  },[projectStatusInfo])
 
-  // Reload data when filters, paging, sorting, or organizerNic change
   useEffect(() => {
-    if (organizerNic !== null) {
-      loadLazyData();
-    }
-  }, [lazyState, refreshKey, organizerNic]);
+    loadLazyData();
+  }, [lazyState, refreshKey]);
 
-  const loadLazyData = async () => {
+  const loadLazyData = () => {
     setLoading(true);
-    try {
-      const { page, rows, sortField, sortOrder, filters } = lazyState;
-      const currentPage = (page ?? 0) + 1;
-      const pageSize = rows ?? 5;
-      const params = { page: currentPage, pageSize, sortField, sortOrder };
-      if (organizerNic && canDelete) params.organizerNic = organizerNic;
-      Object.entries(filters).forEach(([key, meta]) => {
-        if (meta.value) params[key] = meta.value;
-      });
+    const { page, rows, sortField, sortOrder, filters } = lazyState;
+    const currentPage = (page ?? 0) + 1;
+    const pageSize = rows ?? 5;
+    const params = { page: currentPage, pageSize, sortField, sortOrder };
+    Object.entries(filters).forEach(([key, meta]) => {
+      if (meta.value) params[key] = meta.value;
+    });
 
-      const res = await api.get('/api/charityProject/displayTable', { params });
-      const items = res.data.data || [];
-      setData(items);
-      setTotalRecords(res.data.totalItems || 0);
-      if (items.length) {
-        const keys = Object.keys(items[0]).filter(k => !['warehouseID', 'statusID'].includes(k));
-        setColumns(keys);
-      }
-    } catch (err) {
-      console.error('Erro ao carregar dados:', err);
-    } finally {
-      setLoading(false);
-    }
+    console.log(params)
+
+    api.get('/api/charityProject/displayTable', { params })
+      .then(res => {
+        const items = res.data.data || [];
+        setData(items);
+        setTotalRecords(res.data.totalItems || 0);
+        if (items.length) {
+          const keys = Object.keys(items[0]).filter(k => !['warehouseID','statusName', "statusID"].includes(k));
+          setColumns(keys);
+        }
+      })
+      .catch(err => console.error('Erro:', err))
+      .finally(() => setLoading(false));
   };
 
   const onPage = (event) => setLazyState(event);
   const onSort = (event) => setLazyState(event);
   const onFilter = (event) => { event.first = 0; setLazyState(event); };
 
-  // Change status modal logic
-  const [showChangeStatus, setShowChangeStatus] = useState(false);
-  const [statusOptions, setStatusOptions] = useState([]);
-  const [projectStatusInfo, setProjectStatusInfo] = useState({ projectId: null, statusName: '' });
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const changeProjectStatus = async (project) => {
+  // Open "Change Status" modal, fetch statuses
+  const changeProjectStatus = (project) => {
     setErrorMessage('');
     setProjectStatusInfo({ projectId: project.id, statusName: project.status });
-    try {
-      const res = await api.get('/api/projectStatus');
-      setStatusOptions(res.data.data || []);
-    } catch (err) {
-      console.error('Failed to fetch statuses', err);
-    }
+    api.get('/api/projectStatus')
+      
+      .then(res => setStatusOptions(res.data.data || []))
+      .catch(err => console.error('Failed to fetch statuses', err));
     setShowChangeStatus(true);
   };
 
-  const handleStatusChange = (e) => {
-    setProjectStatusInfo(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChanges = (e) => {
+    const { name, value } = e.target;
+    setProjectStatusInfo(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -121,12 +102,23 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
     try {
       await api.put(`/api/charityProject/${projectId}`, { statusName });
       setShowChangeStatus(false);
-      onEdit?.();
+      // trigger parent refresh
+      onEdit && onEdit();
+      // reload table
       loadLazyData();
     } catch (err) {
-      setErrorMessage(err.response?.data?.error || 'Erro ao atualizar status.');
+      const msg = err.response?.data?.error || 'Erro ao atualizar status.';
+      setErrorMessage(msg);
     }
   };
+
+  const capitalizeFirstLetter = (value) => {
+        if(String(value) == "id") return "ID";
+        if(String(value) == "organizerName") return "Organizer";
+        if(String(value) == "startDate") return "Start Date";
+        if(String(value) == "completionDate") return "Completion Date";
+        return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+    }
 
   return (
     <>
@@ -134,7 +126,9 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
       <div className="d-none d-lg-block">
         <DataTable
           value={data}
-          lazy filterDisplay="row" dataKey="id"
+          lazy
+          filterDisplay="row"
+          dataKey="id"
           paginator
           first={lazyState.first}
           rows={lazyState.rows}
@@ -145,60 +139,98 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
           sortOrder={lazyState.sortOrder}
           onFilter={onFilter}
           filters={lazyState.filters}
-          stripedRows removableSort
+          stripedRows
+          removableSort
           rowsPerPageOptions={[5,10,25,50]}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           currentPageReportTemplate="{first} to {last} of {totalRecords}"
         >
-          {columns.map((col, idx) => (
+          {columns.map((column, idx) => (
             <Column
               key={idx}
-              field={col}
-              header={col}
-              sortable filter showFilterMenu={false}
-              filterMatchMode={dateFields.includes(col) ? 'equals' : 'contains'}
-              filterElement={dateFields.includes(col) ? (options) => (
+              field={column}
+              header={capitalizeFirstLetter(column)}
+              sortable
+              filter
+              showFilterMenu={false}
+              filterMatchMode={dateFields.includes(column)? 'equals':'contains'}
+              filterElement={dateFields.includes(column)? options => (
                 <Calendar
-                  value={options.value ? new Date(options.value) : null}
+                  value={options.value? new Date(options.value): null}
                   onChange={e => {
                     const date = e.value;
                     if (date) date.setHours(12,0,0,0);
-                    const iso = date ? date.toISOString().split('T')[0] : '';
+                    const iso = date? date.toISOString().split('T')[0]: '';
                     options.filterCallback(iso, options.index);
-                    setLazyState(prev => ({
-                      ...prev,
-                      filters: { ...prev.filters, [col]: { ...prev.filters[col], value: iso } }
-                    }));
+                    const newFilters = { ...lazyState.filters };
+                    newFilters[column].value = iso;
+                    setLazyState({ ...lazyState, filters: newFilters });
                   }}
-                  dateFormat="dd/mm/yy" placeholder="Date" showIcon
+                  dateFormat="dd/mm/yy"
+                  placeholder="Date"
+                  showIcon
+                  panelStyle={{ borderRadius: '10px' }}
                 />
-              ) : undefined}
-              filterPlaceholder={dateFields.includes(col) ? undefined : 'Search'}
-              body={row => {
-                const val = row[col];
-                if (dateFields.includes(col) && val) return new Date(val).toLocaleDateString('pt-PT');
-                return typeof val === 'object' && val ? val.name || 'N/A' : val;
+              ): undefined}
+              filterPlaceholder={dateFields.includes(column)? undefined:'Search'}
+              body={rowData => {
+                const val = rowData[column];
+                if (typeof val === 'object' && val !== null) return val.name || 'N/A';
+                if (dateFields.includes(column) && val) {
+                  return new Date(val).toLocaleDateString('pt-PT');
+                }
+                return val;
               }}
             />
           ))}
 
-          <Column body={(rowData, options) => {
-            const menuItems = [
-              { label: 'See Details', icon: 'pi pi-info-circle', command: () => onOpenDetails(rowData.id) }
-            ];
-            if (canDelete) {
-              menuItems.push({ label: 'Change Status', icon: 'pi pi-sync', command: () => changeProjectStatus(rowData) });
-            }
-            return (
-              <>
-                <Menu model={menuItems} popup ref={el => menuRefs.current[options.rowIndex] = el} />
-                <Button icon="pi pi-ellipsis-v" text severity="secondary" onClick={e => menuRefs.current[options.rowIndex].toggle(e)} className="rounded-5" />
-              </>
-            );
-          }} />
-        </DataTable>
+                    <Column
+                    header=""
+                    body={(rowData, options) => {
+                        // podes afinar aqui: rowData.canDelete, status do projeto, etc.
 
-                        <style>
+                        const menuItems = [
+                          {
+                            label: 'See Details',
+                            icon: 'pi pi-info-circle',
+                            command: () => onOpenDetails(rowData.id),
+                          }
+                        ];
+
+                        // só adiciona quando permitido
+                        if (canDelete) {
+                          menuItems.push({
+                            label: "Change Status",
+                            icon: "pi pi-sync",
+                            command: () => changeProjectStatus(rowData),
+                          });
+                        }
+
+
+                        return (
+                        <>
+                            <Menu
+                            model={menuItems}
+                            popup
+                            ref={el => (menuRefs.current[options.rowIndex] = el)}
+                            />
+                            <Button
+                            icon="pi pi-ellipsis-v"
+                            text
+                            severity="secondary"
+                            onClick={e => menuRefs.current[options.rowIndex].toggle(e)}
+                            className="rounded-5"
+                            />
+                        </>
+                        );
+                    }}
+                    />
+
+
+
+                </DataTable>
+
+                <style>
                   {`
                     .p-paginator .p-paginator-pages .p-paginator-page {
                       border: 0 none;
@@ -263,28 +295,28 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
                                 }
                     `}
                 </style>
-      </div>
+            </div>
 
-      <Modal show={showChangeStatus} onHide={() => setShowChangeStatus(false)} dialogClassName="modal-xl">
-        <Modal.Header closeButton>
-          <Modal.Title>Change Project Status</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Status</Form.Label>
-              <Form.Select name="statusName" value={projectStatusInfo.statusName} onChange={handleStatusChange} className="rounded">
-                <option value="">Select a status...</option>
-                {statusOptions.map(s => <option key={s.id} value={s.state}>{s.state}</option>)}
-              </Form.Select>
-            </Form.Group>
-            {errorMessage && <div className="text-danger mb-3">{errorMessage}</div>}
-            <Button type="submit" className="w-100 rounded-pill" style={{ backgroundColor: 'var(--variant-two)', border: 'none' }}>
-              Update Status
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
+        <Modal show={showChangeStatus} onHide={() => setShowChangeStatus(false)} dialogClassName="modal-xl">
+          <Modal.Header closeButton>
+            <Modal.Title>Change Project Status</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form onSubmit={handleSubmit}>
+              <Form.Group className="mb-3">
+                <Form.Label>Status</Form.Label>
+                <Form.Select name="statusName" value={projectStatusInfo.statusName} onChange={handleChanges} className="rounded">
+                  <option value="">Select a status...</option>
+                  {statusOptions.map(s => <option key={s.id} value={s.state}>{s.state}</option>)}
+                </Form.Select>
+              </Form.Group>
+              {errorMessage && <div className="text-danger mb-3">{errorMessage}</div>}
+              <Button type="submit" className="w-100 rounded-pill" style={{ backgroundColor: 'var(--variant-two)', border: 'none' }}>
+                Update Status
+              </Button>
+            </Form>
+          </Modal.Body>
+        </Modal>
     </>
   );
 }

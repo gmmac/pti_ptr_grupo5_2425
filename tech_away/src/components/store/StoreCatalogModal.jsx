@@ -13,12 +13,7 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 4;
-  const [filters, setFilters] = useState({     
-    nipc: '',
-    name: '',
-    email: '',
-    phone: '',
-    address: '' });
+  const [filters, setFilters] = useState({ nipc: "", name: "", email: "", address: "", orderBy: "nipc", orderDirection: "ASC" });
 
   const fetchStores = async () => {
     setLoading(true);
@@ -43,11 +38,7 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
 
   const handleClosePopUp = () => {
     handleClose();
-    setFilters({     nipc: '',
-    name: '',
-    email: '',
-    phone: '',
-    address: '' });
+    setFilters({ nipc: "", name: "", email: "", address: "", orderBy: "nipc", orderDirection: "ASC" });
   };
 
     const handleStoreSelection = (store) => {
@@ -62,11 +53,7 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
     <Modal
       show={show}
       onHide={handleClosePopUp}
-      onExited={() => setFilters({     nipc: '',
-    name: '',
-    email: '',
-    phone: '',
-    address: '' })}
+      onExited={() => setFilters({ nipc: "", name: "", email: "", address: "", orderBy: "nipc", orderDirection: "ASC" })}
       size="xl"
       centered
     >
@@ -74,7 +61,7 @@ export default function StoreCatalogModal({ show, handleClose, handleSelectStore
         <Modal.Title>Catálogo de Lojas</Modal.Title>
       </Modal.Header>
       <Modal.Body style={{ minHeight: '450px' }}>
-        <StoreFilter onFilterChange={setFilters} filters={filters} />
+        <StoreFilter setFilters={setFilters} />
 
         {loading ? (
           <p>Loading Data...</p>

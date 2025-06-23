@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { Button, Container, Row, Col, Tabs, Tab } from "react-bootstrap";
 import SalesDisplayTable from "../storeSales/SalesDisplayTable";
+import NewSaleModal from "../storeSales/NewSaleModal";
 
 export default function EmployeeStoreSales() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+	const handleShow = () => setShow(true);
 
   const refreshTable = () => {
     setRefreshKey((prevKey) => prevKey + 1);
@@ -11,6 +16,11 @@ export default function EmployeeStoreSales() {
 
   return (
     <Container className="mt-4">
+      <Row className="mb-3">
+          <Col className="text-end">
+              <Button style={{ backgroundColor: "var(--variant-one)", border: "none" }} onClick={handleShow}>New Sale</Button>
+          </Col>
+      </Row>
       <Tabs
         id="sales-tabs"
         defaultActiveKey="all"
@@ -29,6 +39,8 @@ export default function EmployeeStoreSales() {
           <SalesDisplayTable filterType="pending" key={refreshKey + 3} refreshAllTables={refreshTable} />
         </Tab>
       </Tabs>
+
+      <NewSaleModal showModal={show} closeModal={handleClose} refreshTable={refreshTable}/>
     </Container>
   );
 }
