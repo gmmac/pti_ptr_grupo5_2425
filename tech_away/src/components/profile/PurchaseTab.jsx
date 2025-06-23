@@ -1,21 +1,30 @@
-import React, { useState, useEffect, use } from "react";
-import { Stack, Row, Col } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Stack, Form, Button } from "react-bootstrap";
 import api from "../../utils/axios";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 import OrderCard from "./OrderCard";
 
 export default function PurchaseTab() {
 	const [purchases, setPurchases] = useState([]);
+	const [filterDate, setFilterDate] = useState("");
 	const { user } = useAuth();
 
 	useEffect(() => {
-		fetchPurchases();
-	}, [user]);
+		if (user?.nic) {
+			fetchPurchases();
+		}
+	}, [user, filterDate]);
 
 	const fetchPurchases = async () => {
 		try {
+			const params = {};
+			if (filterDate) {
+				params.createdAt = filterDate;
+			}
+
 			const res = await api.get(
-				`/api/clientPurchase/client-orders/${user.nic}`
+				`/api/clientPurchase/client-orders/${user.nic}`,
+				{ params }
 			);
 			setPurchases(res.data);
 		} catch (error) {
@@ -28,15 +37,45 @@ export default function PurchaseTab() {
 			<h5 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
 				My Purchases
 			</h5>
+
+			<Form.Group className="mb-2" controlId="filterDate">
+				<Form.Label style={{ color: "var(--variant-two-dark" }}>
+					Filter by date
+				</Form.Label>
+				<Stack
+					style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
+					direction="horizontal"
+				>
+					<Form.Control
+						type="date"
+						className="rounded-pill"
+						value={filterDate}
+						onChange={(e) => setFilterDate(e.target.value)}
+					/>
+					<Button
+						variant="secondary"
+						className="rounded-pill w-25"
+						onClick={() => setFilterDate("")}
+						disabled={!filterDate}
+					>
+						Clear
+					</Button>
+				</Stack>
+			</Form.Group>
+
 			<Stack
 				direction="vertical"
 				className="pe-2"
 				gap={2}
-				style={{ overflowY: "auto", height: "450px" }}
+				style={{ overflowY: "auto", height: "350px" }}
 			>
-				{purchases.map((purchase) => (
-					<OrderCard key={purchase.id} order={purchase} />
-				))}
+				{purchases.length > 0 ? (
+					purchases.map((purchase) => (
+						<OrderCard key={purchase.id} order={purchase} />
+					))
+				) : (
+					<p className="text-muted text-center">No purchases found</p>
+				)}
 			</Stack>
 		</Stack>
 	);

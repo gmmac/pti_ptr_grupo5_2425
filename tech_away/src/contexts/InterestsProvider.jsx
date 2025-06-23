@@ -16,7 +16,7 @@ const InterestsProvider = ({ children }) => {
 		if (user && !userLoaded) {
 			setUserLoaded(true);
 		}
-	}, []);
+	}, [user]);
 
 	const createFolder = async (folderName) => {
 		try {
@@ -44,6 +44,7 @@ const InterestsProvider = ({ children }) => {
 	};
 
 	const fetchInterestFolders = async () => {
+		if (!user?.nic) return;
 		try {
 			const res = await api.get(`/api/interestsFolder/${user.nic}`);
 			setFolders(res.data);
@@ -53,6 +54,7 @@ const InterestsProvider = ({ children }) => {
 	};
 
 	const fetchInterests = async () => {
+		if (!user?.nic) return;
 		try {
 			let res;
 
@@ -73,6 +75,7 @@ const InterestsProvider = ({ children }) => {
 	};
 
 	const fetchInterestsNotInFolder = async (folderId) => {
+		if (!user?.nic) return;
 		try {
 			if (!folderId || !user.nic) return;
 			const res = await api.get(
