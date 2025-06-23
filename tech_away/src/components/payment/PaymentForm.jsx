@@ -11,7 +11,11 @@ export default function PaymentForm() {
 	const cartContext = useCart();
 	if (!cartContext) return <p>Erro: CartContext não disponível</p>;
 
-	const { totalPrice, putPurchaseInBd } = cartContext;
+	const { totalPrice, putPurchaseInBd, shipping, shippingMethod } = cartContext;
+
+	const isShippingValid =
+		(shippingMethod === "store" && shipping?.storeId) ||
+		(shippingMethod === "home" && shipping?.address?.trim() !== "");
 
 	const stripe = useStripe();
 	const elements = useElements();
@@ -62,7 +66,9 @@ export default function PaymentForm() {
 					onReady={() => setIsReady(true)} // <- ainda mais seguro
 				/>
 				<Button
-					disabled={!isReady || isProcessing || !stripe || !elements}
+					disabled={
+						!isReady || isProcessing || !stripe || !elements || !isShippingValid
+					}
 					id="submit"
 					className="rounded-pill py-2 fs-5"
 					style={{

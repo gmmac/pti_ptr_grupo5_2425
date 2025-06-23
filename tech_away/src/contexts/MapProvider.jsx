@@ -23,9 +23,15 @@ const containerStyle = {
 	width: "100%",
 	height: "400px",
 	borderRadius: "var(--rounded-sm)",
+	boxShadow: "var(--shadow-default)",
 };
 
-export default function MapProvider({ children, filters, setFilters }) {
+export default function MapProvider({
+	children,
+	filters,
+	setFilters,
+	onSelectStore,
+}) {
 	const [map, setMap] = useState(null);
 	const [center, setCenter] = useState(null);
 	const [stores, setStores] = useState([]);
@@ -42,7 +48,6 @@ export default function MapProvider({ children, filters, setFilters }) {
 			.then((res) => setStores(res.data.data))
 			.catch((error) => console.error("Error getting stores: ", error));
 	}, []);
-
 
 	// para a localização atual do utilizador
 	useEffect(() => {
@@ -74,31 +79,42 @@ export default function MapProvider({ children, filters, setFilters }) {
 	}, []);
 
 	const setSelectedStore = (nipc, name) => {
-		setFilters((prev) => {
-			const current = Array.isArray(prev.store) ? prev.store : [];
+		if (setFilters === undefined) {
+			if (onSelectStore) {
+				onSelectStore({ nipc, name });
+			}
+		} else {
+			setFilters((prev) => {
+				const current = Array.isArray(prev.store) ? prev.store : [];
 
-			// Evita duplicados
-			const alreadyExists = current.some((store) => store.id === nipc);
-			if (alreadyExists) return prev;
+				const alreadyExists = current.some((store) => store.id === nipc);
+				if (alreadyExists) return prev;
 
-			return {
-				...prev,
-				store: [...current, { id: nipc, name }],
-			};
-		});
+				return {
+					...prev,
+					store: [...current, { id: nipc, name }],
+				};
+			});
+		}
 	};
 
 	const clearStoreFromFilters = (nipc) => {
-		setFilters((prev) => {
-			const current = Array.isArray(prev.store) ? prev.store : [];
+		if (setFilters === undefined) {
+			if (onSelectStore) {
+				onSelectStore({});
+			}
+		} else {
+			setFilters((prev) => {
+				const current = Array.isArray(prev.store) ? prev.store : [];
 
-			const newStores = current.filter((store) => store.id !== nipc);
+				const newStores = current.filter((store) => store.id !== nipc);
 
-			return {
-				...prev,
-				store: newStores.length > 0 ? newStores : "",
-			};
-		});
+				return {
+					...prev,
+					store: newStores.length > 0 ? newStores : "",
+				};
+			});
+		}
 	};
 
 	if (loadError) return <div>Erro ao carregar o mapa</div>;
@@ -124,7 +140,7 @@ export default function MapProvider({ children, filters, setFilters }) {
 									position={{ lat, lng }}
 									onClick={() => {
 										setHoveredMarkerId(index);
-										setSelectedStore(store.nipc, store.name); // nome incluído
+										setSelectedStore(store.nipc, store.name);
 									}}
 								/>
 								{isHovered && (

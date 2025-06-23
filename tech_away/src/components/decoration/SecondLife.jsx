@@ -29,6 +29,7 @@ export default function SecondLife() {
 			<h1
 				style={{
 					fontSize: "64px",
+					fontFamily: "var(--title-font)",
 				}}
 				className="text-center"
 			>
@@ -49,7 +50,7 @@ export default function SecondLife() {
 					Tech
 				</span>
 			</h1>
-			<div style={{position:"relative",top:"30px", right:"50px"}}>
+			<div style={{ position: "relative", top: "30px", right: "50px" }}>
 				<Swirl
 					w="115%"
 					h="100%"

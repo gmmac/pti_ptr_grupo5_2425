@@ -3,6 +3,10 @@ import { Stack, Button, Modal, Form } from "react-bootstrap";
 import { useInterests } from "../../contexts/InterestsProvider";
 
 const FolderStack = () => {
+	const interestsContext = useInterests();
+
+	if (!interestsContext) return <p>Loading</p>;
+
 	const {
 		folders,
 		fetchInterestFolders,
@@ -10,7 +14,8 @@ const FolderStack = () => {
 		createFolder,
 		setFolderToOpen,
 		folderToOpen,
-	} = useInterests();
+	} = interestsContext;
+
 	const [showModal, setShowModal] = useState(false);
 	const [folderName, setFolderName] = useState("");
 

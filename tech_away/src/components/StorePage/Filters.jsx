@@ -8,13 +8,18 @@ import CustomAccordionFilters from "./CustomAccordionFilters";
 
 export default function Filters({ filters, setFilters }) {
 	const [types, SetTypes] = useState([]);
+	const [typeToSearch, SetTypeToSearch] = useState("");
 	const [models, setModels] = useState([]);
+	const [modelToSearch, setModelToSearch] = useState("");
 	const [brands, setBrands] = useState([]);
+	const [brandToSearch, setBrandToSearch] = useState("");
 	const isMobile = useContext(IsMobileContext);
 
 	useEffect(() => {
+		const query =
+			typeToSearch != "" ? `api/type?name=${typeToSearch}` : "api/type";
 		api
-			.get("api/type")
+			.get(query)
 			.then((res) => {
 				const typesObj = res.data.data;
 				const typesArray = Object.keys(typesObj).map((key) => ({
@@ -26,11 +31,13 @@ export default function Filters({ filters, setFilters }) {
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
-	}, []);
+	}, [typeToSearch]);
 
 	useEffect(() => {
+		const query =
+			modelToSearch != "" ? `api/model?name=${modelToSearch}` : "api/model";
 		api
-			.get("api/model")
+			.get(query)
 			.then((res) => {
 				const modelsObj = res.data.data;
 
@@ -43,11 +50,14 @@ export default function Filters({ filters, setFilters }) {
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
-	}, []);
+	}, [modelToSearch]);
 
 	useEffect(() => {
+		const query =
+			brandToSearch != "" ? `api/brand?name=${brandToSearch}` : "api/brand";
+
 		api
-			.get("api/brand")
+			.get(query)
 			.then((res) => {
 				const brandsObj = res.data.data;
 				const brandsArray = Object.keys(brandsObj).map((key) => ({
@@ -59,7 +69,7 @@ export default function Filters({ filters, setFilters }) {
 			.catch((error) => {
 				console.error("API error:", error.message);
 			});
-	}, []);
+	}, [brandToSearch]);
 
 	const clearFilters = () => {
 		setFilters({ orderBy: "", type: "", model: "", brand: "", store: "" });
@@ -104,6 +114,8 @@ export default function Filters({ filters, setFilters }) {
 				<SearchableSelect
 					label="Type"
 					options={types}
+					toSearch={typeToSearch}
+					setToSearch={SetTypeToSearch}
 					selected={filters.type}
 					onChange={(value) => setFilters({ ...filters, type: value })}
 				/>
@@ -111,6 +123,8 @@ export default function Filters({ filters, setFilters }) {
 				<SearchableSelect
 					label="Model"
 					options={models}
+					toSearch={modelToSearch}
+					setToSearch={setModelToSearch}
 					selected={filters.model}
 					onChange={(value) => setFilters({ ...filters, model: value })}
 				/>
@@ -118,6 +132,8 @@ export default function Filters({ filters, setFilters }) {
 				<SearchableSelect
 					label="Brand"
 					options={brands}
+					toSearch={brandToSearch}
+					setToSearch={setBrandToSearch}
 					selected={filters.brand}
 					onChange={(value) => setFilters({ ...filters, brand: value })}
 				/>

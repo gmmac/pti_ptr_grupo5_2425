@@ -32,12 +32,13 @@ export default function StorePage() {
 			if (typeof value === "object" && value !== null) return value.id;
 			return value;
 		};
+
 		api
 			.get("/api/equipmentSheet/in-stock", {
 				params: {
 					page: currentPage,
 					pageSize: itemsPerPage,
-					orderBy: filters.orderBy || "recent-date", // Use selected orderBy or default to createdAt
+					orderBy: filters.orderBy || "recent-date",
 					modelId: getId(filters.model),
 					typeId: getId(filters.type),
 					brandId: getId(filters.brand),
@@ -45,8 +46,16 @@ export default function StorePage() {
 				},
 			})
 			.then((res) => {
-				setEquipmentModelCatalog(res.data.data);
-				setTotalPages(res.data.totalPages);
+				const items = res.data.data;
+				const total = res.data.totalPages;
+
+				if (items.length === 0 && currentPage > 1) {
+					setCurrentPage(1);
+					return;
+				}
+
+				setEquipmentModelCatalog(items);
+				setTotalPages(total);
 			})
 			.catch((error) => {
 				console.error("API error:", error.message);
@@ -56,9 +65,6 @@ export default function StorePage() {
 	const handlePageChange = (pageNumber) => {
 		setCurrentPage(pageNumber);
 	};
-	useEffect(() => {
-		console.log(filters);
-	}, [filters]);
 
 	return (
 		<Container className="mb-navbar" style={{ fontFamily: "var(--body-font)" }}>
@@ -119,7 +125,7 @@ export default function StorePage() {
 					</Row>
 
 					{/* Paginação */}
-					{totalPages > 1 && (
+					{equipmentModelCatalog.length > 0 && totalPages > 1 && (
 						<PaginationControl
 							handlePageChange={handlePageChange}
 							currentPage={currentPage}

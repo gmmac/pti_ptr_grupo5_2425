@@ -23,7 +23,6 @@ export default function ComponentSelectorModalForm({
 
     (async () => {
       try {
-        console.log(routeName)
         const { data } = await api.get(`api/${routeName}`, {
           params: { pageSize: 5000 },
         });

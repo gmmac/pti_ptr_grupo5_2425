@@ -9,6 +9,10 @@ import DeleteFolderModal from "./DeletFolderModal";
 import ManageInterestsInFolder from "../interests/ManageInterestsInFolder";
 
 export default function FolderContent() {
+	const interestsContext = useInterests();
+
+	if (!interestsContext) return <p>Loading</p>;
+
 	const {
 		folderToOpen,
 		loadedInterests,
@@ -21,7 +25,7 @@ export default function FolderContent() {
 		interestsNotInFolder,
 		addInterestToFolder,
 		removeInterestFromFolder,
-	} = useInterests();
+	} = interestsContext;
 	const [selectedInterest, setSelectedInterest] = useState(null);
 	const [showDetails, setShowDetails] = useState(false);
 	const [showDelete, setShowDelete] = useState(false);
