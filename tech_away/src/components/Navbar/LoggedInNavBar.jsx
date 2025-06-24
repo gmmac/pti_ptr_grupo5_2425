@@ -170,7 +170,7 @@ export default function LoggedInNavBar() {
 								}}
 							>
 								<NavDropdown.Item onClick={handleProfile}>
-									Perfil
+									Profile
 								</NavDropdown.Item>
 								<NavDropdown.Item onClick={handleLogout}>
 									Logout
