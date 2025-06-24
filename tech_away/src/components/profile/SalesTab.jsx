@@ -106,7 +106,7 @@ export default function SalesTab() {
 										className="m-0"
 										style={{ fontFamily: "var(--title-font)" }}
 									>
-										Order ID: {purchase.id}
+										Sale Number #{purchase.id}
 									</h6>
 									<p className="m-0" style={{ opacity: "0.7" }}>
 										{new Date(purchase.createdAt).toLocaleDateString("pt-PT")}

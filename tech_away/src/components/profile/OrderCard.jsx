@@ -32,7 +32,7 @@ export default function OrderCard({ order }) {
 				>
 					<Stack direction="vertical" gap={2}>
 						<h6 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
-							Order ID: {order.id}
+							Order Number #{order.id}
 						</h6>
 						<p className="m-0" style={{ opacity: "0.7" }}>
 							{new Date(order.createdAt).toLocaleDateString("pt-PT")}
