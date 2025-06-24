@@ -130,7 +130,7 @@ export default function EditRepairForms({ repairID, showModal, closeModal, setRe
   const handleClose = () => {
     resetForm();
     closeModal();
-    setRefreshRepairs(true);
+    setRefreshRepairs(prev => !prev);
   };
 
   const showSuccess = () => {
