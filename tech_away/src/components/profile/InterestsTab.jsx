@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Stack } from "react-bootstrap";
 import FolderStack from "./FolderStack";
 import FolderContent from "./FolderContent";
-import CreateInterestModal from "../interests/createInterestModal";
+import CreateInterestModal from "../interests/CreateInterestModal";
 
 export default function InterestsTab() {
   const [showModal, setShowModal] = useState(false);
