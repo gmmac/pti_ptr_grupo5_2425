@@ -48,8 +48,7 @@ export default function EquipmentSheetCard(eSheet) {
 
 		toast.current?.show({
 			severity: "success",
-			summary: "Interesse adicionado",
-			detail: "O produto foi adicionado aos teus favoritos.",
+			summary: "Product added to My Interests",
 			life: 3000,
 		});
 	};
