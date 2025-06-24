@@ -130,7 +130,6 @@ const InterestsProvider = ({ children }) => {
 				clientNic: user.nic,
 			});
 			fetchInterests();
-			return res.data;
 		} catch (error) {
 			console.error("Error creating interest:", error);
 		}

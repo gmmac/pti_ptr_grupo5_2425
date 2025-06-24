@@ -220,6 +220,12 @@ router.post("/", async (req, res) => {
 			preferredStoreIDs,
 			description,
 		} = req.body;
+		await models.sequelize.query(`
+			SELECT setval(
+				pg_get_serial_sequence('"Interests"', 'id'),
+				(SELECT MAX(id) FROM "Interests")
+			)
+		`);
 
 		// Criação do Interest
 		const newInterest = await models.Interest.create({

@@ -76,6 +76,13 @@ router.get("/byClient/:nic", async (req, res) => {
 router.post("/", async (req, res) => {
 	try {
 		const { clientNic, interestId } = req.body;
+
+		await models.sequelize.query(`
+					SELECT setval(
+						pg_get_serial_sequence('"InterestNotification"', 'id'),
+						(SELECT MAX(id) FROM "InterestNotification")
+					)
+				`);
 		const newNotification = await models.InterestNotification.create({
 			clientNic,
 			interestId,
