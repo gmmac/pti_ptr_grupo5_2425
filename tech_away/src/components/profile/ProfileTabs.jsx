@@ -24,9 +24,11 @@ export default function ProfileTabs() {
 						boxShadow: repairBtnActive ? "var(--shadow-default)" : "",
 					}}
 					onClick={() => {
-						setRepairBtnActive(!repairBtnActive);
-						setSalesBtnActive(false);
-						setPurchasesBtnActive(false);
+						if (repairBtnActive == false) {
+							setRepairBtnActive(true);
+							setSalesBtnActive(false);
+							setPurchasesBtnActive(false);
+						}
 					}}
 				>
 					Repairs
@@ -43,9 +45,11 @@ export default function ProfileTabs() {
 						boxShadow: salesBtnActive ? "var(--shadow-default)" : "",
 					}}
 					onClick={() => {
-						setSalesBtnActive(!salesBtnActive);
-						setRepairBtnActive(false);
-						setPurchasesBtnActive(false);
+						if (salesBtnActive == false) {
+							setSalesBtnActive(true);
+							setRepairBtnActive(false);
+							setPurchasesBtnActive(false);
+						}
 					}}
 				>
 					Sales
@@ -62,9 +66,11 @@ export default function ProfileTabs() {
 						boxShadow: purchasesBtnActive ? "var(--shadow-default)" : "",
 					}}
 					onClick={() => {
-						setPurchasesBtnActive(!purchasesBtnActive);
-						setRepairBtnActive(false);
-						setSalesBtnActive(false);
+						if (purchasesBtnActive == false) {
+							setPurchasesBtnActive(true);
+							setRepairBtnActive(false);
+							setSalesBtnActive(false);
+						}
 					}}
 				>
 					Purchases

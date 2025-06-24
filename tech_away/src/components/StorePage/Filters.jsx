@@ -82,6 +82,12 @@ export default function Filters({ filters, setFilters }) {
 			types={types}
 			models={models}
 			brands={brands}
+			typeToSearch={typeToSearch}
+			setTypeToSearch={SetTypeToSearch}
+			modelToSearch={modelToSearch}
+			setModelToSearch={setModelToSearch}
+			brandToSearch={brandToSearch}
+			setBrandToSearch={setBrandToSearch}
 		/>
 	) : (
 		<Stack

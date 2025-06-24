@@ -9,12 +9,21 @@ export default function CustomAccordionFilters({
 	types,
 	models,
 	brands,
+	typeToSearch,
+	setTypeToSearch,
+	modelToSearch,
+	setModelToSearch,
+	brandToSearch,
+	setBrandToSearch,
 }) {
 	const [open, setOpen] = useState(false);
 	const dropdownRef = useRef(null);
 
 	const clearFilters = () => {
 		setFilters({ orderBy: "", type: "", model: "", brand: "" });
+		setTypeToSearch("");
+		setModelToSearch("");
+		setBrandToSearch("");
 	};
 
 	// Fecha ao clicar fora
@@ -66,7 +75,6 @@ export default function CustomAccordionFilters({
 						top: "100%",
 						left: 0,
 						backgroundColor: "var(--white)",
-
 						boxShadow: "var(--shadow-default)",
 						zIndex: 2000,
 					}}
@@ -89,6 +97,8 @@ export default function CustomAccordionFilters({
 							options={types}
 							selected={filters.type}
 							onChange={(value) => setFilters({ ...filters, type: value })}
+							toSearch={typeToSearch}
+							setToSearch={setTypeToSearch}
 						/>
 
 						<SearchableSelect
@@ -96,6 +106,8 @@ export default function CustomAccordionFilters({
 							options={models}
 							selected={filters.model}
 							onChange={(value) => setFilters({ ...filters, model: value })}
+							toSearch={modelToSearch}
+							setToSearch={setModelToSearch}
 						/>
 
 						<SearchableSelect
@@ -103,6 +115,8 @@ export default function CustomAccordionFilters({
 							options={brands}
 							selected={filters.brand}
 							onChange={(value) => setFilters({ ...filters, brand: value })}
+							toSearch={brandToSearch}
+							setToSearch={setBrandToSearch}
 						/>
 
 						<Button
