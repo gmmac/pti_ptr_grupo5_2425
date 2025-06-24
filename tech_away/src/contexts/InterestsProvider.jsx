@@ -109,6 +109,19 @@ const InterestsProvider = ({ children }) => {
 		}
 	};
 
+	const createFavoriteInteres = async (barcode) => {
+		// try {
+		
+		await api.post(`/api/interest`, {
+			equipmentSheetID: barcode,
+			clientNic: user.nic,
+		});
+		fetchInterests();
+
+		// } catch (error) {
+		// 	console.error("Error creating interest:", error);
+		// }
+	};
 	const createGenericInterest = async (newInterest) => {
 		try {
 			await api.post(`/api/interest`, {
@@ -228,7 +241,7 @@ const InterestsProvider = ({ children }) => {
 					interestId,
 				});
 			}
-			
+
 			fetchInterestsNotInFolder(folderToOpen?.id);
 			fetchInterests();
 		} catch (error) {
@@ -266,6 +279,7 @@ const InterestsProvider = ({ children }) => {
 				setFolderToOpen,
 				createFolder,
 				createGenericInterest,
+				createFavoriteInteres,
 				deleteInterest,
 				deleteInterestFolder,
 				editInterest,
@@ -280,9 +294,7 @@ const InterestsProvider = ({ children }) => {
 				numNotifications,
 				setNumNotifications,
 				markAsRead,
-
 				markAsUnread,
-
 				deleteNotification,
 			}}
 		>

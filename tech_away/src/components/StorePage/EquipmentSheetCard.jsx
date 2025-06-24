@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button, Image, Stack } from "react-bootstrap";
 import { Tag } from "primereact/tag";
 import api from "../../utils/axios";
+import { useInterests } from "../../contexts/InterestsProvider";
 
 export default function EquipmentSheetCard(eSheet) {
 	const [priceRange, setPriceRange] = useState("");
 	const navigate = useNavigate();
+	const { createFavoriteInteres } = useInterests();
 
 	useEffect(() => {
 		api
@@ -84,6 +86,10 @@ export default function EquipmentSheetCard(eSheet) {
 				<Button
 					className="rounded-circle"
 					style={{ backgroundColor: "var(--variant-two)", border: "none" }}
+					onClick={(event) => {
+						event.stopPropagation();
+						createFavoriteInteres(eSheet?.eSheet?.Barcode);
+					}}
 				>
 					<i className="pi pi-heart" style={{ color: "var(--white)" }}></i>
 				</Button>
