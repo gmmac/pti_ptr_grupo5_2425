@@ -98,7 +98,7 @@ export default function ItemCart({ equipment, onRemove }) {
 					lg={4}
 				>
 					<Image
-						src={`../../../public/assets/pc.jpg`}
+						src={`/assets/pc.jpg`}
 						width={100}
 						style={{
 							mixBlendMode: "darken",
