@@ -64,7 +64,7 @@ export default function EquipmentSheetCard(eSheet) {
 				/>
 			</Stack>
 			<Image
-				src="../../public/assets/pc.jpg"
+				src={`../../public/assets/equipmentSheetImages/${eSheet?.eSheet?.Barcode}.jpg`}
 				className="w-50"
 				style={{
 					mixBlendMode: "darken",
