@@ -12,7 +12,7 @@ module.exports = {
               updatedAt: new Date(),
             },
             {
-              clientNIC: "123456788",
+              clientNIC: "222444888",
               createdAt: new Date(),
               updatedAt: new Date(),
             },
@@ -22,32 +22,32 @@ module.exports = {
               updatedAt: new Date(),
             },
             {
-              clientNIC: "987654321",
+              clientNIC: "505202083",
               createdAt: new Date(),
               updatedAt: new Date(),
             },
             {
-              clientNIC: "987654323",
+              clientNIC: "686189004",
               createdAt: new Date(),
               updatedAt: new Date(),
             },
             {
-              clientNIC: "987654324",
+              clientNIC: "230980157",
               createdAt: new Date(),
               updatedAt: new Date(),
             },
             {
-              clientNIC: "987654325",
+              clientNIC: "281706294",
               createdAt: new Date(),
               updatedAt: new Date(),
             },
             {
-              clientNIC: "987654326",
+              clientNIC: "082745464",
               createdAt: new Date(),
               updatedAt: new Date(),
             },
             {
-              clientNIC: "222444888",
+              clientNIC: "158218186",
               createdAt: new Date(),
               updatedAt: new Date(),
             },
