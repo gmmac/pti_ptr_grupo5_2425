@@ -32,13 +32,12 @@ export default function DashboardTopGrid() {
 
 		api.get("/api/interest")
 			.then((res) => {
-				const total = res.data.totalItems;
-				
-				setTotalSInterests(res.data.totalItems ?? 0);
+				const total = res.data.length;		
+				setTotalSInterests(total ?? 0);
 			})
 			.catch((err) => {
 				console.error("Error fetching stock total:", err);
-				setTotalSoldEquipments(0); // fallback in case of error
+				setTotalSInterests(0); // fallback in case of error
 		});
 	}, []);
 
