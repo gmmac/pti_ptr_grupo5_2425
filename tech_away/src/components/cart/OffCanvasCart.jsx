@@ -15,6 +15,7 @@ export default function OffCanvasCart() {
 		isCartOpen,
 		closeCart,
 		clearCart,
+		unavailableItems,
 	} = useCart();
 	if (!isCartOpen) return null;
 
@@ -119,7 +120,7 @@ export default function OffCanvasCart() {
 						border: "none",
 						fontFamily: "var(--title-font)",
 					}}
-					disabled={numCartItems == 0}
+					disabled={numCartItems == 0 || unavailableItems}
 					onClick={() => {
 						closeCart();
 						navigate("/checkout-order");

@@ -19,6 +19,8 @@ export const CartProvider = ({ children }) => {
 		storeId: "",
 	});
 
+	const [unavailableItems, setUnavailableItems] = useState(false);
+
 	const openCart = () => setIsCartOpen(true);
 	const closeCart = () => setIsCartOpen(false);
 
@@ -88,6 +90,15 @@ export const CartProvider = ({ children }) => {
 		}
 	};
 
+	const checkIfItemIsAvailable = () => {
+		for (let i = 0; i < cartItems.length; i++) {
+			if (cartItems[i].purchaseDate) {
+				setUnavailableItems(true);
+				break;
+			}
+		}
+	};
+
 	const addItemToCart = async (equipmentId) => {
 		if (!cartId) return;
 
@@ -152,12 +163,13 @@ export const CartProvider = ({ children }) => {
 	};
 
 	const fetchCartItems = async () => {
-		try {
-			const response = await api.get(`/api/actualCartEquipment/${cartId}`);
-			setCartItems(response.data);
-		} catch (error) {
-			console.error("Erro ao buscar itens do carrinho:", error);
-		}
+		// try {
+		const response = await api.get(`/api/actualCartEquipment/${cartId}`);
+		setCartItems(response.data);
+		checkIfItemIsAvailable();
+		// } catch (error) {
+		// 	console.error("Erro ao buscar itens do carrinho:", error);
+		// }
 	};
 
 	const putPurchaseInBd = async () => {
@@ -208,6 +220,7 @@ export const CartProvider = ({ children }) => {
 				setShipping,
 				shippingMethod,
 				setShippingMethod,
+				unavailableItems,
 			}}
 		>
 			{cartId && (
