@@ -38,7 +38,6 @@ export default function RepairTab() {
 			});
 
 			setRepairs(res.data.data || []);
-			console.log("Repairs fetched:", res.data.data);
 		} catch (error) {
 			console.error("Erro ao carregar reparações:", error);
 		} finally {

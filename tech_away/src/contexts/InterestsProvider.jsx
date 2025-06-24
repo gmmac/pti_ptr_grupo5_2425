@@ -11,6 +11,7 @@ const InterestsProvider = ({ children }) => {
 	const [folders, setFolders] = useState([]);
 	const [folderToOpen, setFolderToOpen] = useState(null);
 	const [interestsNotInFolder, setInterestsNotInFolder] = useState([]);
+	const [notifications, setNotifications] = useState([]);
 
 	useEffect(() => {
 		if (user && !userLoaded) {

@@ -164,47 +164,47 @@ router.get("/", async (req, res) => {
 			[Op.or]: [{ [Op.ne]: "D" }, { [Op.is]: null }, { [Op.eq]: "S" }],
 		};
 
-    const { count, rows } = await models.UsedEquipment.findAndCountAll({
-      where,
-      include: [
-        {
-          model: models.EquipmentSheet,
-          where: sheetWhere,
-          attributes: ["barcode", "createdAt", "updatedAt"],
-          include: [
-            {
-              model: models.EquipmentModel,
-              as: "EquipmentModel",
-              attributes: ["id", "name", "releaseYear"],
-              include: [
-                {
-                  model: models.Brand,
-                  as: "Brand",
-                  attributes: ["id", "name"],
-                },
-              ],
-            },
-            {
-              model: models.EquipmentType,
-              as: "EquipmentType",
-              attributes: ["id", "name"],
-            },
-          ],
-        },
-        {
-          model: models.EquipmentStatus,
-          as: "EquipmentStatus",
-          attributes: ["id", "state"],
-        },
-        {
-          model: models.Store,
-          attributes: ["nipc", "name"],
-        },
-      ],
-      limit: parseInt(pageSize),
-      offset,
-      order: orderClause,
-    });
+		const { count, rows } = await models.UsedEquipment.findAndCountAll({
+			where,
+			include: [
+				{
+					model: models.EquipmentSheet,
+					where: sheetWhere,
+					attributes: ["barcode", "createdAt", "updatedAt"],
+					include: [
+						{
+							model: models.EquipmentModel,
+							as: "EquipmentModel",
+							attributes: ["id", "name", "releaseYear"],
+							include: [
+								{
+									model: models.Brand,
+									as: "Brand",
+									attributes: ["id", "name"],
+								},
+							],
+						},
+						{
+							model: models.EquipmentType,
+							as: "EquipmentType",
+							attributes: ["id", "name"],
+						},
+					],
+				},
+				{
+					model: models.EquipmentStatus,
+					as: "EquipmentStatus",
+					attributes: ["id", "state"],
+				},
+				{
+					model: models.Store,
+					attributes: ["nipc", "name"],
+				},
+			],
+			limit: parseInt(pageSize),
+			offset,
+			order: orderClause,
+		});
 
 		const formattedData = rows.map((item) => ({
 			id: item.id,
@@ -270,59 +270,62 @@ router.get("/totalSoldEquipments", async (req, res) => {
 	}
 });
 
-
 router.get("/displayTable", async (req, res) => {
-  try {
-    const query = req.query;
+	try {
+		const query = req.query;
 
-    // Filtros
-    const rawId = query.usedEquipmentId ?? query.id;
-    const id = /^\d+$/.test(rawId?.trim?.()) ? parseInt(rawId.trim()) : null;
+		// Filtros
+		const rawId = query.usedEquipmentId ?? query.id;
+		const id = /^\d+$/.test(rawId?.trim?.()) ? parseInt(rawId.trim()) : null;
 
-    const status = query.Status || query["EquipmentStatus.state"] || null;
-    const equipmentType = query.EquipmentType || query["EquipmentSheet.EquipmentType.name"] || null;
-    const store = query.Store || query["Store.name"] || null;
-    const brandModel = query.BrandModel || query["EquipmentSheet.brandModel"] || null;
-    const date = query['Purchase.purchaseDate'] || null
+		const status = query.Status || query["EquipmentStatus.state"] || null;
+		const equipmentType =
+			query.EquipmentType || query["EquipmentSheet.EquipmentType.name"] || null;
+		const store = query.Store || query["Store.name"] || null;
+		const brandModel =
+			query.BrandModel || query["EquipmentSheet.brandModel"] || null;
+		const date = query["Purchase.purchaseDate"] || null;
 
-    const statusFilter = status ? `%${status}%` : null;
-    const equipmentTypeFilter = equipmentType ? `%${equipmentType}%` : null;
-    const storeFilter = store ? `%${store}%` : null;
-    const brandModelFilter = brandModel ? `%${brandModel}%` : null;
-    const price = query.price ? parseFloat(query.price) : null;
-    const storePurchasePrice = query.storePurchasePrice ? parseFloat(query.storePurchasePrice) : null;
+		const statusFilter = status ? `%${status}%` : null;
+		const equipmentTypeFilter = equipmentType ? `%${equipmentType}%` : null;
+		const storeFilter = store ? `%${store}%` : null;
+		const brandModelFilter = brandModel ? `%${brandModel}%` : null;
+		const price = query.price ? parseFloat(query.price) : null;
+		const storePurchasePrice = query.storePurchasePrice
+			? parseFloat(query.storePurchasePrice)
+			: null;
 
-    const putOnSaleDate = query.putOnSaleDate || null;
-    const purchaseDate = query.purchaseDate || null;
-    const action = query.action || query.allTag || null;
+		const putOnSaleDate = query.putOnSaleDate || null;
+		const purchaseDate = query.purchaseDate || null;
+		const action = query.action || query.allTag || null;
 
-    // Paginação e ordenação
-    const sortField = query.sortField || "id";
-    const sortOrder = query.sortOrder === "-1" ? "DESC" : "ASC";
+		// Paginação e ordenação
+		const sortField = query.sortField || "id";
+		const sortOrder = query.sortOrder === "-1" ? "DESC" : "ASC";
 
-    const page = parseInt(query.page || 1);
-    const pageSize = parseInt(query.pageSize || 5);
-    const offset = (page - 1) * pageSize;
-    const limit = pageSize;
+		const page = parseInt(query.page || 1);
+		const pageSize = parseInt(query.pageSize || 5);
+		const offset = (page - 1) * pageSize;
+		const limit = pageSize;
 
-const filters = [
-  id,                     // $1
-  statusFilter,           // $2
-  equipmentTypeFilter,    // $3
-  storeFilter,            // $4
-  brandModelFilter,       // $5
-  price,                  // $6
-  putOnSaleDate,          // $7
-  purchaseDate,           // $8
-  date,                   // $9 - store purchase date
-  storePurchasePrice,     // $10 - novo filtro
-  action,                 // $11
-  sortField,              // $12
-  limit,                  // $13
-  offset                  // $14
-];
+		const filters = [
+			id, // $1
+			statusFilter, // $2
+			equipmentTypeFilter, // $3
+			storeFilter, // $4
+			brandModelFilter, // $5
+			price, // $6
+			putOnSaleDate, // $7
+			purchaseDate, // $8
+			date, // $9 - store purchase date
+			storePurchasePrice, // $10 - novo filtro
+			action, // $11
+			sortField, // $12
+			limit, // $13
+			offset, // $14
+		];
 
-    const sql = `
+		const sql = `
 SELECT 
   ue.id,
   ue.price,
@@ -442,7 +445,7 @@ LIMIT $13 OFFSET $14;
 
     `;
 
-const countSql = `
+		const countSql = `
 SELECT COUNT(DISTINCT ue.id) AS count
 FROM "UsedEquipments" ue
 JOIN "EquipmentSheets" es ON ue."equipmentId" = es.barcode
@@ -502,74 +505,71 @@ WHERE
 
 `;
 
-    // Executa queries
-    const results = await db.sequelize.query(sql, {
-      bind: filters,
-      type: Sequelize.QueryTypes.SELECT,
-    });
+		// Executa queries
+		const results = await db.sequelize.query(sql, {
+			bind: filters,
+			type: Sequelize.QueryTypes.SELECT,
+		});
 
-    const countFilters = filters.slice(0, 11);
+		const countFilters = filters.slice(0, 11);
 
+		const [countResult] = await db.sequelize.query(countSql, {
+			bind: countFilters,
+			type: Sequelize.QueryTypes.SELECT,
+		});
 
-    const [countResult] = await db.sequelize.query(countSql, {
-      bind: countFilters,
-      type: Sequelize.QueryTypes.SELECT,
-    });
+		// Formata a resposta
+		const formattedData = results.map((item) => ({
+			id: item.id,
+			price: item.price,
+			putOnSaleDate: item.putOnSaleDate,
+			purchaseDate: item.purchaseDate,
+			action: item.action,
+			EquipmentStatus: {
+				id: item.statusId,
+				state: item.statusState,
+			},
+			Store: {
+				nipc: item.storeNipc,
+				name: item.storeName,
+			},
+			EquipmentSheet: {
+				barcode: item.barcode,
+				brandModel: `${item.brandName} ${item.modelName}`,
+				EquipmentModel: {
+					id: item.modelId,
+					name: item.modelName,
+					releaseYear: item.releaseYear,
+					Brand: {
+						id: item.brandId,
+						name: item.brandName,
+					},
+				},
+				EquipmentType: {
+					id: item.typeId,
+					name: item.typeName,
+				},
+				createdAt: item.sheetCreatedAt,
+				updatedAt: item.sheetUpdatedAt,
+			},
+			Purchase: {
+				purchasePrice: item.purchasePrice ?? null,
+				purchaseDate: item.purchaseDate ?? null,
+			},
+		}));
 
-    // Formata a resposta
-    const formattedData = results.map(item => ({
-      id: item.id,
-      price: item.price,
-      putOnSaleDate: item.putOnSaleDate,
-      purchaseDate: item.purchaseDate,
-      action: item.action,
-      EquipmentStatus: {
-        id: item.statusId,
-        state: item.statusState,
-      },
-      Store: {
-        nipc: item.storeNipc,
-        name: item.storeName,
-      },
-      EquipmentSheet: {
-        barcode: item.barcode,
-        brandModel: `${item.brandName} ${item.modelName}`,
-        EquipmentModel: {
-          id: item.modelId,
-          name: item.modelName,
-          releaseYear: item.releaseYear,
-          Brand: {
-            id: item.brandId,
-            name: item.brandName,
-          },
-        },
-        EquipmentType: {
-          id: item.typeId,
-          name: item.typeName,
-        },
-        createdAt: item.sheetCreatedAt,
-        updatedAt: item.sheetUpdatedAt,
-      },
-      Purchase: {
-        purchasePrice: item.purchasePrice ?? null,
-        purchaseDate: item.purchaseDate ?? null,
-      },
-    }));
-
-    res.status(200).json({
-      totalItems: parseInt(countResult.count, 10),
-      totalPages: Math.ceil(countResult.count / limit),
-      currentPage: page,
-      pageSize: limit,
-      data: formattedData,
-    });
-
-  } catch (error) {
-    console.error("Error in /displayTable:", error);
-    res.status(500).json({ error: "Failed to load used equipment." });
-  }
+		res.status(200).json({
+			totalItems: parseInt(countResult.count, 10),
+			totalPages: Math.ceil(countResult.count / limit),
+			currentPage: page,
+			pageSize: limit,
+			data: formattedData,
+		});
+	} catch (error) {
+		console.error("Error in /displayTable:", error);
+		res.status(500).json({ error: "Failed to load used equipment." });
+	}
 });
-
 
 router.get("/usedEquipmentRepairs", async (req, res) => {
 	try {
@@ -650,7 +650,6 @@ router.get("/:ID", async (req, res) => {
 	}
 });
 
-
 router.get("/by-used-equiment-id/:ID", async (req, res) => {
 	try {
 		const { ID } = req.params;
@@ -719,86 +718,175 @@ router.get("/price-range/:equipmentId", async (req, res) => {
 	}
 });
 
-router.post('/', async (req, res) => {
-  const {
-    statusID,
-    price,
-    putOnSaleDate,
-    purchaseDate,
-    equipmentId,
-    storeId,
-    action
-  } = req.body;
+router.post("/", async (req, res) => {
+	const {
+		statusID,
+		price,
+		putOnSaleDate,
+		purchaseDate,
+		equipmentId,
+		storeId,
+		action,
+	} = req.body;
 
-  try {
-    // (Opcional) Verificar se as FK existem
-    const status = await models.EquipmentStatus.findByPk(statusID);
-    if (!status) {
-      return res.status(400).json({ error: 'Invalid Status' });
-    }
-    const sheet = await models.EquipmentSheet.findByPk(equipmentId);
-    if (!sheet) {
-      return res.status(400).json({ error: 'EquipmentSheet not found' });
-    }
-    const store = await models.Store.findByPk(storeId);
-    if (!store) {
-      return res.status(400).json({ error: 'Store not found' });
-    }
+	try {
+		// (Opcional) Verificar se as FK existem
+		const status = await models.EquipmentStatus.findByPk(statusID);
+		if (!status) {
+			return res.status(400).json({ error: "Invalid Status" });
+		}
+		const sheet = await models.EquipmentSheet.findByPk(equipmentId);
+		if (!sheet) {
+			return res.status(400).json({ error: "EquipmentSheet not found" });
+		}
+		const store = await models.Store.findByPk(storeId);
+		if (!store) {
+			return res.status(400).json({ error: "Store not found" });
+		}
 
-    // Criar novo registo em UsedEquipments
-    const used = await UsedEquipment.create({
-      statusID,
-      price,
-      putOnSaleDate,
-      purchaseDate,
-      equipmentId,
-      storeId,
-      action
-    });
+		// Criar novo registo em UsedEquipments
+		const used = await UsedEquipment.create({
+			statusID,
+			price,
+			putOnSaleDate,
+			purchaseDate,
+			equipmentId,
+			storeId,
+			action,
+		});
 
-    return res.status(201).json(used);
-  } catch (err) {
-    console.error('Erro ao criar UsedEquipment:', err);
-    return res.status(500).json({ error: 'Error creating equipment' });
-  }
+		return res.status(201).json(used);
+	} catch (err) {
+		console.error("Erro ao criar UsedEquipment:", err);
+		return res.status(500).json({ error: "Error creating equipment" });
+	}
 });
 
-
 router.patch("/:ID", async (req, res) => {
-  const { ID } = req.params;
-  const {
-    statusID,
-    price,
-    putOnSaleDate,
-    purchaseDate,
-    equipmentId,
-    storeId,
-    action,
-  } = req.body;
+	const { ID } = req.params;
+	const {
+		statusID,
+		price,
+		putOnSaleDate,
+		purchaseDate,
+		equipmentId,
+		storeId,
+		action,
+	} = req.body;
 
-  try {
-    const used = await models.UsedEquipment.findByPk(ID);
-    if (!used) {
-      return res.status(404).json({ error: "UsedEquipment not found." });
-    }
+	try {
+		const used = await models.UsedEquipment.findByPk(ID);
+		if (!used) {
+			return res.status(404).json({ error: "UsedEquipment not found." });
+		}
 
-    if (statusID !== undefined) used.statusID = statusID;
-    if (price !== undefined) used.price = price;
-    if (putOnSaleDate !== undefined) used.putOnSaleDate = putOnSaleDate;
-    if (purchaseDate !== undefined) used.purchaseDate = purchaseDate;
-    if (equipmentId !== undefined) used.equipmentId = equipmentId;
-    if (storeId !== undefined) used.storeId = storeId;
-    if (action !== undefined) used.action = action;
+		if (statusID !== undefined) used.statusID = statusID;
+		if (price !== undefined) used.price = price;
+		if (putOnSaleDate !== undefined) used.putOnSaleDate = putOnSaleDate;
+		if (purchaseDate !== undefined) used.purchaseDate = purchaseDate;
+		if (equipmentId !== undefined) used.equipmentId = equipmentId;
+		if (storeId !== undefined) used.storeId = storeId;
+		if (action !== undefined) used.action = action;
 
-    used.updatedAt = new Date();
+		used.updatedAt = new Date();
 
-    await used.save();
+		await used.save();
+		const sheetRes = await models.EquipmentSheet.findByPk(used.equipmentId, {
+			include: {
+				model: models.EquipmentModel,
+				attributes: ["brand_id", "releaseYear"],
+			},
+		});
 
-    res.status(200).json({ message: "updated", data: used });
-  } catch (err) {
-    console.error("Erro ao atualizar UsedEquipment:", err);
-    res.status(500).json({ error: "Error updating equipment." });
-  }
+		if (!sheetRes) {
+			console.warn("EquipmentSheet não encontrada para o equipamento usado.");
+			return res.status(200).json({ message: "updated", data: used });
+		}
+
+		const sheet = sheetRes.dataValues;
+		const brandID = sheet?.EquipmentModel?.dataValues?.brand_id;
+		const releaseYear = sheet?.EquipmentModel?.dataValues?.releaseYear;
+		const { model, type } = sheet;
+
+		const potentialInterests = await models.Interest.findAll({
+			where: {
+				[Op.and]: [
+					{
+						[Op.or]: [{ brandID: brandID }, { brandID: null }],
+					},
+					{
+						[Op.or]: [{ modelID: model }, { modelID: null }],
+					},
+					{
+						[Op.or]: [{ typeID: type }, { typeID: null }],
+					},
+					{
+						[Op.or]: [
+							{ equipmentSheetID: used.equipmentId },
+							{ equipmentSheetID: null },
+						],
+					},
+					{
+						[Op.or]: [
+							{ equipmentStatusID: used.statusID },
+							{ equipmentStatusID: null },
+						],
+					},
+					{
+						[Op.or]: [
+							{ minLaunchYear: null },
+							{ minLaunchYear: { [Op.lte]: releaseYear } },
+						],
+					},
+					{
+						[Op.or]: [
+							{ maxLaunchYear: null },
+							{ maxLaunchYear: { [Op.gte]: releaseYear } },
+						],
+					},
+					{
+						[Op.or]: [
+							{ minPrice: null },
+							{ minPrice: { [Op.lte]: used.price ?? 0 } },
+						],
+					},
+					{
+						[Op.or]: [
+							{ maxPrice: null },
+							{ maxPrice: { [Op.gte]: used.price ?? 0 } },
+						],
+					},
+				],
+			},
+		});
+
+		// Criar notificações
+		for (const interest of potentialInterests) {
+			const preferredStores = await models.PreferredStoresInterets.findAll({
+				where: { interestId: interest.id },
+			});
+
+			const preferredStoreIDs = preferredStores.map((ps) => ps.storeId);
+
+			const hasPreferredStores = preferredStoreIDs.length > 0;
+
+			const matchesPreferredStore =
+				!hasPreferredStores || preferredStoreIDs.includes(used.storeId);
+
+			if (matchesPreferredStore) {
+				await models.InterestNotification.create({
+					clientNic: interest.clientNic,
+					interestId: interest.id,
+					isRead: false,
+				});
+			}
+		}
+
+		res.status(200).json({ message: "updated", data: used });
+	} catch (err) {
+		console.error("Erro ao atualizar UsedEquipment:", err);
+		res.status(500).json({ error: "Error updating equipment." });
+	}
 });
 
 router.put("/:ID", (req, res) => {});
