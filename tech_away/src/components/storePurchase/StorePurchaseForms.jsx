@@ -285,24 +285,6 @@ export default function StorePurchaseForms({  show, handleClose, setRefreshPurch
                                 </Button>
                             </Col>
                         </Row>
-                        <Row className="mb-3">
-                            <Form.Group controlId="formEstado">
-                                <Form.Label>Equipment status</Form.Label>
-                                <Form.Control as="select" name="statusID" value={form.statusID} onChange={handleChange} required>
-                                    <option value="">Select...</option>
-                                    {statusList.map((s, idx) => <option key={idx} value={s.id}>{s.state}</option>)}
-                                </Form.Control>
-                            </Form.Group>
-                        </Row>
-
-                        {/* <Row className="mb-3">
-                            <Form.Group controlId="formPreco">
-                                <Form.Label>Price</Form.Label>
-                                <Form.Control type="number" name="price" value={form.price} onChange={handleChange} placeholder="Insert price" required />
-                            </Form.Group>
-                        </Row> */}
-
-                        
 
                         {error && <Alert variant="danger" className="text-center">{error}</Alert>}
 
