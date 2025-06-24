@@ -44,6 +44,15 @@ export const CartProvider = ({ children }) => {
 	};
 
 	useEffect(() => {
+		if (cartItems.length > 0) {
+			const isUnavailable = cartItems.some((item) => item.purchaseDate);
+			setUnavailableItems(isUnavailable);
+		} else {
+			setUnavailableItems(false); // reset quando carrinho estiver vazio
+		}
+	}, [cartItems]);
+
+	useEffect(() => {
 		if (user) {
 			api
 				.get(`/api/actualCart/clientCartID/${user.nic}`)
@@ -87,15 +96,6 @@ export const CartProvider = ({ children }) => {
 		} catch (error) {
 			console.error("Erro ao verificar se item já está no carrinho:", error);
 			return false;
-		}
-	};
-
-	const checkIfItemIsAvailable = () => {
-		for (let i = 0; i < cartItems.length; i++) {
-			if (cartItems[i].purchaseDate) {
-				setUnavailableItems(true);
-				break;
-			}
 		}
 	};
 
@@ -163,13 +163,12 @@ export const CartProvider = ({ children }) => {
 	};
 
 	const fetchCartItems = async () => {
-		// try {
-		const response = await api.get(`/api/actualCartEquipment/${cartId}`);
-		setCartItems(response.data);
-		checkIfItemIsAvailable();
-		// } catch (error) {
-		// 	console.error("Erro ao buscar itens do carrinho:", error);
-		// }
+		try {
+			const response = await api.get(`/api/actualCartEquipment/${cartId}`);
+			setCartItems(response.data);
+		} catch (error) {
+			console.error("Erro ao buscar itens do carrinho:", error);
+		}
 	};
 
 	const putPurchaseInBd = async () => {

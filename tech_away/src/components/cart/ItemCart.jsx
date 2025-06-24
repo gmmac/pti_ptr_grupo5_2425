@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import { Tag } from "primereact/tag";
 
-export default function ItemCart({ equipment, onRemove, addToFav }) {
+export default function ItemCart({ equipment, onRemove }) {
 	const [showModal, setShowModal] = useState(false);
 
 	const handleRemove = () => {
