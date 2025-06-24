@@ -62,7 +62,7 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 
 				{/* Imagem do equipamento */}
 				<Image
-					src="../../public/assets/ip.png"
+					src="/assets/ip.png"
 					className="w-50"
 					style={{
 						objectFit: "cover",

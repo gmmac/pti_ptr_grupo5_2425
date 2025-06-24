@@ -122,7 +122,7 @@ export default function OrderDetailsModal({
 								gap={2}
 							>
 								<Image
-									src="../../public/assets/ip.png"
+									src="/assets/ip.png"
 									className="w-25 rounded-3"
 									style={{
 										objectFit: "cover",
