@@ -2,7 +2,7 @@ import axios from 'axios';
 
 axios.defaults.baseURL =
   window.location.protocol + '//' +
-  window.location.hostname + ':' + 4005;
+  window.location.hostname;
 
 axios.defaults.withCredentials = true;
 
