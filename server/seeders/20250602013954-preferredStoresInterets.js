@@ -46,6 +46,20 @@ module.exports = {
 				createdAt: new Date("2025-06-24T17:38:27.517Z"),
 				updatedAt: new Date("2025-06-24T17:38:27.517Z"),
 			},
+			{
+				id: 7,
+				storeId: "486371589",
+				interestId: 12,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+			{
+				id: 8,
+				storeId: "486371589",
+				interestId: 11,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
 		]);
 	},
 

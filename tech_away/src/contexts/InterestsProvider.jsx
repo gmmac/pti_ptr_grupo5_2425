@@ -30,6 +30,7 @@ const InterestsProvider = ({ children }) => {
 	useEffect(() => {
 		if (user?.nic) {
 			fetchNotifications();
+			fetchInterests();
 		}
 	}, [user]);
 

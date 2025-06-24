@@ -18,6 +18,20 @@ module.exports = {
 				createdAt: new Date("2025-06-24T17:48:19.422Z"),
 				updatedAt: new Date("2025-06-24T17:48:19.422Z"),
 			},
+			{
+				id: 3,
+				name: "Laptops",
+				clientNIC: "123456789",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+			{
+				id: 4,
+				name: "Consoles",
+				clientNIC: "123456789",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
 		]);
 	},
 
