@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import {
 	Button,
 	Col,
@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import { Tag } from "primereact/tag";
 
-export default function ItemCart({ equipment, onRemove }) {
+export default function ItemCart({ equipment, onRemove, addToFav }) {
 	const [showModal, setShowModal] = useState(false);
 
 	const handleRemove = () => {
@@ -139,19 +139,6 @@ export default function ItemCart({ equipment, onRemove }) {
 							className="pi pi-times"
 							style={{ color: "var(--dark-grey)" }}
 						></i>
-					</Button>
-
-					<Button
-						className="rounded-circle d-flex justify-content-center align-items-center"
-						style={{
-							backgroundColor: "var(--variant-two)",
-							border: "none",
-							width: "35px",
-							height: "35px",
-							padding: 0,
-						}}
-					>
-						<i className="pi pi-heart"></i>
 					</Button>
 				</Col>
 			</Row>
