@@ -30,7 +30,6 @@ const InterestsProvider = ({ children }) => {
 	useEffect(() => {
 		if (user?.nic) {
 			fetchNotifications();
-			console.log(notifications);
 		}
 	}, [user]);
 
@@ -67,8 +66,6 @@ const InterestsProvider = ({ children }) => {
 	};
 
 	const markAsUnread = async (notificationId) => {
-		console.log(`/api/interestNotification/${notificationId}`);
-
 		try {
 			await api.put(`/api/interestNotification/${notificationId}`, {
 				isRead: false,
@@ -110,17 +107,21 @@ const InterestsProvider = ({ children }) => {
 	};
 
 	const createFavoriteInteres = async (barcode) => {
-		// try {
-		
-		await api.post(`/api/interest`, {
-			equipmentSheetID: barcode,
-			clientNic: user.nic,
-		});
-		fetchInterests();
+		try {
+			const res = await api.get(`/api/equipmentSheet/${barcode}`);
+			const equipmentSheetInfo = res.data.equipmentSheet;
 
-		// } catch (error) {
-		// 	console.error("Error creating interest:", error);
-		// }
+			await api.post(`/api/interest`, {
+				equipmentSheetID: barcode,
+				modelID: equipmentSheetInfo.EquipmentModel.id,
+				brandID: equipmentSheetInfo.EquipmentModel.Brand.id,
+				typeID: equipmentSheetInfo.EquipmentType.id,
+				clientNic: user.nic,
+			});
+			fetchInterests();
+		} catch (error) {
+			console.error("Error creating interest:", error);
+		}
 	};
 	const createGenericInterest = async (newInterest) => {
 		try {
