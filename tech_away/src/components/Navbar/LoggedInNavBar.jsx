@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
 	Container,
 	Navbar,
@@ -26,8 +26,7 @@ export default function LoggedInNavBar() {
 
 	const { user, logOut } = useAuth();
 	const { numCartItems, openCart } = useCart();
-	const context = useInterests();
-	const { numNotifications, openNotifications } = context || {};
+	const { openNotifications, numNotifications } = useInterests();
 
 	// Função para logout
 	const handleLogout = () => {

@@ -42,8 +42,8 @@ function LayoutPage() {
 			style={{ backgroundColor: "var(--light-grey)" }}
 		>
 			<CartProvider>
-				{renderNavBar()}
 				<InterestsProvider>
+					{renderNavBar()}
 					<div className="flex-grow-1 overflow-auto">
 						<Outlet />
 					</div>

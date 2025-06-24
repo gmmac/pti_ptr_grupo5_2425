@@ -287,7 +287,7 @@ const InterestsProvider = ({ children }) => {
 				deleteNotification,
 			}}
 		>
-			{user && <NotificationsOffCanvas />}
+			{user && isNotificationsOpen && <NotificationsOffCanvas />}
 			{children}
 		</InterestsContext.Provider>
 	);
