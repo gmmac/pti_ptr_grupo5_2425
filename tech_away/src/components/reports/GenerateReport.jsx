@@ -52,7 +52,7 @@ export default function GenerateReport() {
                 size="lg"
                 value={selectedType}
                 onChange={e => setSelectedType(e.target.value)}
-                className="rounded-pill w-100"
+                className="w-100"
               >
                 {types.map(type => (
                   <option key={type} value={type}>
