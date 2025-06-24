@@ -1140,6 +1140,15 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          name: "Iphone 15 Screen Protector",
+          equipmentId: "12345678901234567890",
+          price: 250,
+          arriveTime: 2, // 10 days
+          isActive: "1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );
