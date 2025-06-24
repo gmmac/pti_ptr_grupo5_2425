@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Image, Stack, Modal } from "react-bootstrap";
 import { Tag } from "primereact/tag";
+import { Toast } from "primereact/toast";
 import api from "../../utils/axios";
 import { useInterests } from "../../contexts/InterestsProvider";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
@@ -12,6 +13,7 @@ export default function EquipmentSheetCard(eSheet) {
 	const { createFavoriteInteres } = useInterests();
 	const { user } = useAuth();
 	const [showLoginModal, setShowLoginModal] = useState(false);
+	const toast = useRef(null);
 
 	const handleCloseModal = () => setShowLoginModal(false);
 	const handleGoToLogin = () => navigate("/login");
@@ -43,6 +45,13 @@ export default function EquipmentSheetCard(eSheet) {
 			return;
 		}
 		createFavoriteInteres(eSheet?.eSheet?.Barcode);
+
+		toast.current?.show({
+			severity: "success",
+			summary: "Interesse adicionado",
+			detail: "O produto foi adicionado aos teus favoritos.",
+			life: 3000,
+		});
 	};
 
 	return (
@@ -86,6 +95,10 @@ export default function EquipmentSheetCard(eSheet) {
 				</Stack>
 				<Image
 					src={`../../public/assets/equipmentSheetImages/${eSheet?.eSheet?.Barcode}.jpg`}
+					onError={(e) => {
+						e.target.onerror = null;
+						e.target.src = "/assets/placeholder.jpg";
+					}}
 					style={{
 						mixBlendMode: "darken",
 						height: "129px",
@@ -144,6 +157,7 @@ export default function EquipmentSheetCard(eSheet) {
 					</Button>
 				</Modal.Footer>
 			</Modal>
+			<Toast ref={toast} />
 		</>
 	);
 }
