@@ -113,6 +113,8 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
             message: (<> Are you sure you want to {active == "1" ? "delete" : "restore"} this {model}?<br />This action can erase other items associated with this {model}.</>),
             header: "Confirmation",
             icon: "pi pi-exclamation-triangle",
+            acceptClassName: "p-button-rounded p-button-danger custom-confirm-yes",
+            rejectClassName: "p-button-rounded custom-confirm-no",
             accept: () => handleDelete(id),
         });
     };
@@ -336,6 +338,22 @@ export default function DisplayTable({ model, active = "1", refreshAllTables=nul
                         }
                         .custom-icon-button .pi {
                             font-size: 1.1rem;
+                        }
+
+                        .custom-confirm-yes {
+                            border-radius: 6px !important;
+                            margin-left: 1rem
+                        }
+
+                        .custom-confirm-no {
+                            color: #6b7280 !important; /* Tailwind gray-500 */
+                            border: none !important;
+                            background: #e5e7eb !important; /* cinza claro no fundo */
+                            border-radius: 6px !important;
+                        }
+
+                        .custom-confirm-no:hover {
+                            background: #d1d5db !important; /* ligeiro highlight no hover */
                         }
 						`}
 				</style>

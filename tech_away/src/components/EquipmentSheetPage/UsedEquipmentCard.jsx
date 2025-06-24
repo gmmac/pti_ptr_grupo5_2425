@@ -12,11 +12,6 @@ export default function UsedEquipmentCard({ usedEquipment, barcode }) {
 	const [showLoginModal, setShowLoginModal] = useState(false);
 	const navigate = useNavigate();
 
-
-	useEffect(() => {
-		console.log(usedEquipment);
-	},[]);
-
 	const handleAddToCart = () => {
 		if (!user) {
 			setShowLoginModal(true);
