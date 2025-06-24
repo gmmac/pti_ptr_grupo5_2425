@@ -31,14 +31,47 @@ router.get("/byClient/:nic", async (req, res) => {
 	try {
 		const notifications = await models.InterestNotification.findAll({
 			where: { clientNic: req.params.nic },
-			include: [{ model: models.Interest, as: "interest" }],
+			include: [
+				{
+					model: models.Interest,
+					as: "interest",
+					include: [
+						{ model: models.Brand, as: "brand", attributes: ["name"] },
+						{
+							model: models.EquipmentModel,
+							as: "model",
+							attributes: ["name"],
+						},
+						{
+							model: models.EquipmentType,
+							as: "type",
+							attributes: ["name"],
+						},
+						{
+							model: models.EquipmentStatus,
+							as: "equipmentStatus",
+							attributes: ["state"],
+						},
+						{
+							model: models.PreferredStoresInterets,
+							as: "preferredStores",
+							include: [
+								{
+									model: models.Store,
+									as: "store",
+									attributes: ["name"],
+								},
+							],
+						},
+					],
+				},
+			],
 		});
 		res.json(notifications);
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
 });
-
 // POST new notification
 router.post("/", async (req, res) => {
 	try {

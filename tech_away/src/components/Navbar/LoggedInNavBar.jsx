@@ -26,7 +26,8 @@ export default function LoggedInNavBar() {
 
 	const { user, logOut } = useAuth();
 	const { numCartItems, openCart } = useCart();
-	const { numNotifications, openNotifications } = useInterests();
+	const context = useInterests();
+	const { numNotifications, openNotifications } = context || {};
 
 	// Função para logout
 	const handleLogout = () => {
@@ -140,19 +141,22 @@ export default function LoggedInNavBar() {
 										backgroundColor: "var(--variant-two)",
 										border: "none",
 									}}
+									onClick={openNotifications}
 								>
 									<i
 										className="pi pi-bell p-overlay-badge px-2"
 										style={{ color: "var(--dark-grey)", fontSize: "20px" }}
 									>
-										<Badge
-											value={1}
-											style={{
-												fontSize: "10px",
-												backgroundColor: "var(--white)",
-												color: "var(--dark-grey)",
-											}}
-										/>
+										{numNotifications > 0 && (
+											<Badge
+												value={numNotifications}
+												style={{
+													fontSize: "10px",
+													backgroundColor: "var(--white)",
+													color: "var(--dark-grey)",
+												}}
+											/>
+										)}
 									</i>
 								</Button>
 							</Nav.Item>
