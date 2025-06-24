@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Container, Row, Col, Stack } from "react-bootstrap";
 import LoginForms from "../../components/authentication/LoginForms";
-import WelcomeBackLg from "../../components/decoration/welcomeBackLg";
+import WelcomeBackLg from "../../components/decoration/WelcomeBackLg";
 import { IsMobileContext } from "../../contexts/IsMobileContext";
 import WelcomeBackSm from "../../components/decoration/WelcomeBackSm";
 export default function LoginPageClient() {
