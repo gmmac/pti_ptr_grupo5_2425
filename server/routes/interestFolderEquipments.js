@@ -19,7 +19,12 @@ router.post("/", async (req, res) => {
 	if (!folderInterestId || !interestId) {
 		return res.status(400).json({ error: "Campos obrigatórios em falta." });
 	}
-
+	await models.sequelize.query(`
+				SELECT setval(
+					pg_get_serial_sequence('"FolderInterestEquipments"', 'id'),
+					(SELECT MAX(id) FROM "FolderInterestEquipments")
+				)
+			`);
 	try {
 		const newItem = await models.FolderInterestEquipments.create({
 			folderInterestId,

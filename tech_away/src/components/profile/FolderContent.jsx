@@ -95,7 +95,7 @@ export default function FolderContent() {
 						</p>
 					</Stack>
 				)}
-				<Row className="g-4">
+				<Row className="g-4" style={{maxHeight:"500px", overflowY:"auto"}}>
 					{Array.isArray(loadedInterests) && loadedInterests.length > 0 ? (
 						loadedInterests.map((interest, index) => (
 							<Col key={index} xs={12} sm={6} md={4} lg={3}>

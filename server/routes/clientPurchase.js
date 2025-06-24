@@ -272,9 +272,25 @@ router.post("/", async (req, res) => {
 router.get("/client-orders/:ID", async (req, res) => {
 	try {
 		const clientId = req.params.ID;
+		const { createdAt } = req.query; // recebe ?createdAt=YYYY-MM-DD
+
+		const whereClause = {
+			clientNIC: clientId,
+		};
+
+		if (createdAt) {
+			const date = new Date(createdAt);
+			const nextDay = new Date(date);
+			nextDay.setDate(date.getDate() + 1);
+
+			whereClause.createdAt = {
+				[Op.gte]: date,
+				[Op.lt]: nextDay,
+			};
+		}
 
 		const cartsIds = await models.ClientPurchase.findAll({
-			where: { clientNIC: clientId },
+			where: whereClause,
 			include: {
 				model: models.OrderStatus,
 				attributes: ["state"],

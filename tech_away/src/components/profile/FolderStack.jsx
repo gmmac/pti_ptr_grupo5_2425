@@ -141,6 +141,7 @@ const FolderStack = () => {
 									setFolderName("");
 									setShowModal(false);
 								}}
+								disabled={!folderName.trim()}
 							>
 								Create
 							</Button>

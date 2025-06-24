@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
 	Container,
 	Navbar,
@@ -11,8 +11,8 @@ import { useLocation, Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
 import { useCart } from "../../contexts/CartProvider";
+import { useInterests } from "../../contexts/InterestsProvider";
 import { Badge } from "primereact/badge";
-import "../../styles/variables.css";
 
 const navItems = [
 	{ name: "Shop", path: "/store" },
@@ -26,6 +26,7 @@ export default function LoggedInNavBar() {
 
 	const { user, logOut } = useAuth();
 	const { numCartItems, openCart } = useCart();
+	const { openNotifications, numNotifications } = useInterests();
 
 	// Função para logout
 	const handleLogout = () => {
@@ -119,14 +120,42 @@ export default function LoggedInNavBar() {
 										className="pi pi-shopping-cart p-overlay-badge px-2"
 										style={{ color: "var(--dark-grey)", fontSize: "20px" }}
 									>
-										<Badge
-											value={numCartItems}
-											style={{
-												fontSize: "10px",
-												backgroundColor: "var(--white)",
-												color: "var(--dark-grey)",
-											}}
-										/>
+										{numCartItems > 0 && (
+											<Badge
+												value={numCartItems}
+												style={{
+													fontSize: "10px",
+													backgroundColor: "var(--white)",
+													color: "var(--dark-grey)",
+												}}
+											/>
+										)}
+									</i>
+								</Button>
+							</Nav.Item>
+							<Nav.Item>
+								<Button
+									className="rounded-pill"
+									style={{
+										backgroundColor: "var(--variant-two)",
+										border: "none",
+									}}
+									onClick={openNotifications}
+								>
+									<i
+										className="pi pi-bell p-overlay-badge px-2"
+										style={{ color: "var(--dark-grey)", fontSize: "20px" }}
+									>
+										{numNotifications > 0 && (
+											<Badge
+												value={numNotifications}
+												style={{
+													fontSize: "10px",
+													backgroundColor: "var(--white)",
+													color: "var(--dark-grey)",
+												}}
+											/>
+										)}
 									</i>
 								</Button>
 							</Nav.Item>

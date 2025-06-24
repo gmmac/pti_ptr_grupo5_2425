@@ -36,12 +36,12 @@ export default function OurStores() {
 				{isMobile ? <SecondLifeSm /> : <SecondLife />}
 
 				<Row>
-					<Col xs={12} md={storeInfo ? 6 : 12}>
+					<Col xs={12} sm={12} md={storeInfo ? 6 : 12} className="mt-sm-3">
 						<MapProvider onSelectStore={(store) => setSelectedStore(store)} />
 					</Col>
 
 					{storeInfo && (
-						<Col xs={12} md={6}>
+						<Col xs={12} sm={12} md={6} className="mt-sm-3">
 							<Stack
 								gap={3}
 								direction="vertical"
