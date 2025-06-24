@@ -3,6 +3,7 @@ import { Table, Button, Stack } from "react-bootstrap";
 import PaginationControl from "../pagination/PaginationControl";
 import api from "../../utils/axios";
 import { useAuthEmployee } from "../../contexts/AuthenticationProviders/EmployeeAuthProvider";
+import ProductCardSales from "./ProductCardSales";
 
 export default function ProductTableSales({ filters, onAddToCart, cart }) {
   const [products, setProducts] = useState([]);
@@ -57,7 +58,7 @@ export default function ProductTableSales({ filters, onAddToCart, cart }) {
 
   return (
     <div>
-      <Table responsive bordered hover className="align-middle">
+      <Table responsive="sm" bordered hover className="align-middle d-none d-lg-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -111,6 +112,14 @@ export default function ProductTableSales({ filters, onAddToCart, cart }) {
           )}
         </tbody>
       </Table>
+      {products.map((p) => (
+        <ProductCardSales
+          key={p.id}
+          product={p}
+          onAddToCart={onAddToCart}
+          cart={cart}
+        />
+      ))}
 
       {totalPages > 1 && (
         <Stack className="mt-2 justify-content-center" direction="horizontal">

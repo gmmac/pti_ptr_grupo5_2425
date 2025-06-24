@@ -13,6 +13,8 @@ import { useAuthEmployee } from "../../contexts/AuthenticationProviders/Employee
 import SalesDetailsModal from "./SalesDetailsModal";
 import { Dialog } from "primereact/dialog";
 import { Tooltip } from 'primereact/tooltip';
+import IsMobileHookDisplayTable from "../../contexts/IsMobileHookDisplayTable";
+import SalesCardList from "./SalesCardList";
 
 
 export default function SalesDisplayTable({ filterType, active = "1", refreshAllTables=null}) {
@@ -20,6 +22,7 @@ export default function SalesDisplayTable({ filterType, active = "1", refreshAll
     const [totalRecords, setTotalRecords] = useState(0);
     const [statusWarning, setStatusWarning] = useState(null);
 
+    const isMobile = IsMobileHookDisplayTable();
 
     const { employee } = useAuthEmployee();
 
@@ -186,6 +189,31 @@ export default function SalesDisplayTable({ filterType, active = "1", refreshAll
         <>
             <div className="">
               <Tooltip target=".custom-icon-button" position="top" />
+              {isMobile ? (
+                <SalesCardList
+                  data={data}
+                  stateOptions={stateOptions}
+                  filters={lazyState.filters}
+                  onFilterChange={(field, value) => {
+                        const newFilters = { ...lazyState.filters };
+                        newFilters[field] = { value, matchMode: "contains" }; 
+                        if (field === "state") newFilters[field].matchMode = "equals";
+                        if (field === "CreatedAt") newFilters[field].matchMode = "equals";
+                        setLazyState({
+                          ...lazyState,
+                          filters: newFilters,
+                          first: 0
+                        });
+                      }}
+                  onPageChange={(e) => setLazyState({ ...lazyState, ...e })}
+                  totalRecords={totalRecords}
+                  lazyState={lazyState}
+                  onEdit={handleEdit}
+                  onDelete={confirmDelete}
+                  onChangeStatus={openChangeStatusModal}
+                />
+
+              ) : (
                 <DataTable
                     value={data}
                     lazy
@@ -325,6 +353,7 @@ export default function SalesDisplayTable({ filterType, active = "1", refreshAll
                         }}
                     />
                 </DataTable>
+              )}
             <style>
               {`
                 .p-paginator .p-paginator-pages .p-paginator-page {
