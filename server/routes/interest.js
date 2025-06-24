@@ -220,6 +220,12 @@ router.post("/", async (req, res) => {
 			preferredStoreIDs,
 			description,
 		} = req.body;
+		await models.sequelize.query(`
+			SELECT setval(
+				pg_get_serial_sequence('"Interests"', 'id'),
+				(SELECT MAX(id) FROM "Interests")
+			)
+		`);
 
 		// Criação do Interest
 		const newInterest = await models.Interest.create({
@@ -236,6 +242,12 @@ router.post("/", async (req, res) => {
 			description: description || null,
 		});
 
+		await models.sequelize.query(`
+			SELECT setval(
+				pg_get_serial_sequence('"PreferredStoresInterets"', 'id'),
+				(SELECT MAX(id) FROM "PreferredStoresInterets")
+			)
+		`);
 		if (preferredStoreIDs && Array.isArray(preferredStoreIDs)) {
 			for (const storeId of preferredStoreIDs) {
 				await models.PreferredStoresInterets.create({
@@ -286,6 +298,12 @@ router.put("/:id", async (req, res) => {
 			},
 			{ where: { id } }
 		);
+		await models.sequelize.query(`
+			SELECT setval(
+				pg_get_serial_sequence('"PreferredStoresInterets"', 'id'),
+				(SELECT MAX(id) FROM "PreferredStoresInterets")
+			)
+		`);
 
 		// Atualiza as preferred stores (remove e insere de novo)
 		await models.PreferredStoresInterets.destroy({ where: { interestId: id } });

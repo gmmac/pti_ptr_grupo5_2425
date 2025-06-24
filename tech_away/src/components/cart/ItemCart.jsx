@@ -17,6 +17,7 @@ export default function ItemCart({ equipment, onRemove }) {
 		onRemove(equipment.lineId);
 		setShowModal(false);
 	};
+
 	return (
 		<Container
 			className="p-2  border-bottom"
@@ -98,10 +99,10 @@ export default function ItemCart({ equipment, onRemove }) {
 					lg={4}
 				>
 					<Image
-						src={`../../../public/assets/pc.jpg`}
-						width={100}
+						src={`../../public/assets/equipmentSheetImages/${equipment.equipmentId}.jpg`}
 						style={{
 							mixBlendMode: "darken",
+							height: "90px",
 						}}
 					/>
 				</Col>

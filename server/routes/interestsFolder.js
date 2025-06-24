@@ -31,10 +31,19 @@ router.get("/:userNic", async (req, res) => {
 router.post("/", async (req, res) => {
 	try {
 		const { name, clientNIC } = req.body;
+
+		await models.sequelize.query(`
+			SELECT setval(
+				pg_get_serial_sequence('"FolderInterests"', 'id'),
+				(SELECT MAX(id) FROM "FolderInterests")
+			)
+		`);
+
 		const newFolder = await models.FolderInterest.create({
 			name,
 			clientNIC,
 		});
+
 		res.status(201).json(newFolder);
 	} catch (error) {
 		console.error("Error creating interest folder:", error);
