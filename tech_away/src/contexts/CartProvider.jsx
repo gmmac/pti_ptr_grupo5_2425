@@ -19,6 +19,8 @@ export const CartProvider = ({ children }) => {
 		storeId: "",
 	});
 
+	const [unavailableItems, setUnavailableItems] = useState(false);
+
 	const openCart = () => setIsCartOpen(true);
 	const closeCart = () => setIsCartOpen(false);
 
@@ -40,6 +42,15 @@ export const CartProvider = ({ children }) => {
 			life: 2000,
 		});
 	};
+
+	useEffect(() => {
+		if (cartItems.length > 0) {
+			const isUnavailable = cartItems.some((item) => item.purchaseDate);
+			setUnavailableItems(isUnavailable);
+		} else {
+			setUnavailableItems(false); // reset quando carrinho estiver vazio
+		}
+	}, [cartItems]);
 
 	useEffect(() => {
 		if (user) {
@@ -208,6 +219,7 @@ export const CartProvider = ({ children }) => {
 				setShipping,
 				shippingMethod,
 				setShippingMethod,
+				unavailableItems,
 			}}
 		>
 			{cartId && (
