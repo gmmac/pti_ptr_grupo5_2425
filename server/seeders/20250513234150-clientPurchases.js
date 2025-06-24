@@ -9,7 +9,7 @@ module.exports = {
 				{
 					id: 1,
 					clientNIC: "895235746",
-					employeeID: "123456789",
+					employeeID: "748593201",
 					total: 1079.98,
 					orderStatusID: 1,
 					address: "",
@@ -20,7 +20,7 @@ module.exports = {
 				{
 					id: 2,
 					clientNIC: "895235746",
-					employeeID: "123456789",
+					employeeID: "384750192",
 					total: 2199.99,
 					orderStatusID: 1,
 					address: "",

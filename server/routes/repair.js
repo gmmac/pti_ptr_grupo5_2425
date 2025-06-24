@@ -52,13 +52,13 @@ router.get("/displayTable", async (req, res) => {
     if (employeeName) {
       where[Op.and] = Sequelize.where(
         Sequelize.fn(
-          'concat',
-          Sequelize.col('Employee.firstName'),
-          ' ',
-          Sequelize.col('Employee.lastName')
+          "concat",
+          Sequelize.col("Employee.firstName"),
+          " ",
+          Sequelize.col("Employee.lastName")
         ),
         {
-          [Op.iLike]: `%${employeeName}%`
+          [Op.iLike]: `%${employeeName}%`,
         }
       );
     }
@@ -66,13 +66,13 @@ router.get("/displayTable", async (req, res) => {
     if (clientName) {
       where[Op.and] = Sequelize.where(
         Sequelize.fn(
-          'concat',
-          Sequelize.col('Client.firstName'),
-          ' ',
-          Sequelize.col('Client.lastName')
+          "concat",
+          Sequelize.col("Client.firstName"),
+          " ",
+          Sequelize.col("Client.lastName")
         ),
         {
-          [Op.iLike]: `%${clientName}%`
+          [Op.iLike]: `%${clientName}%`,
         }
       );
     }
@@ -109,10 +109,10 @@ router.get("/displayTable", async (req, res) => {
             {
               model: models.EquipmentModel,
               attributes: ["name"],
-              where: whereModel
-            }
-          ]
-        }
+              where: whereModel,
+            },
+          ],
+        },
       ],
       limit: parseInt(pageSize),
       offset,
@@ -120,7 +120,7 @@ router.get("/displayTable", async (req, res) => {
     });
 
     const formattedData = rows
-      .filter(item => item.EquipmentSheet?.EquipmentModel)
+      .filter((item) => item.EquipmentSheet?.EquipmentModel)
       .map((item) => ({
         id: item.id,
         employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
@@ -144,7 +144,6 @@ router.get("/displayTable", async (req, res) => {
   }
 });
 
-
 router.get("/displayTable/:clientNIC", async (req, res) => {
   try {
     const {
@@ -165,10 +164,10 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
       clientId: clientNIC,
     };
 
-    if(activeRepairs === "true"){
-      where.statusID = { [Op.ne]: 2 }
-    }else{
-      where.statusID = { [Op.eq]: 2 }
+    if (activeRepairs === "true") {
+      where.statusID = { [Op.ne]: 2 };
+    } else {
+      where.statusID = { [Op.eq]: 2 };
     }
 
     const whereRepairStatus = {};
@@ -190,13 +189,13 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
     if (employeeName) {
       where[Op.and] = Sequelize.where(
         Sequelize.fn(
-          'concat',
-          Sequelize.col('firstName'),
-          ' ',
-          Sequelize.col('lastName')
+          "concat",
+          Sequelize.col("firstName"),
+          " ",
+          Sequelize.col("lastName")
         ),
         {
-          [Op.iLike]: `%${employeeName}%`
+          [Op.iLike]: `%${employeeName}%`,
         }
       );
     }
@@ -228,10 +227,10 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
             {
               model: models.EquipmentModel,
               attributes: ["name"],
-              where: whereModel
-            }
-          ]
-        }
+              where: whereModel,
+            },
+          ],
+        },
       ],
       limit: parseInt(pageSize),
       offset,
@@ -239,7 +238,7 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
     });
 
     const formattedData = rows
-      .filter(item => item.EquipmentSheet?.EquipmentModel)
+      .filter((item) => item.EquipmentSheet?.EquipmentModel)
       .map((item) => ({
         id: item.id,
         employeeName: item.Employee?.firstName + " " + item.Employee?.lastName,
@@ -260,47 +259,46 @@ router.get("/displayTable/:clientNIC", async (req, res) => {
   }
 });
 
-
 router.post("/", async (req, res) => {
-	// try {
-		const {
-			description,
-			clientId,
-			statusID,
-			equipmentSheet,
-			budget,
-			estimatedDeliverDate,
-		} = req.body;
-		
-		const employeeId = req.cookies.employeeInfo.nic;
-    // console.log(equipmentSheet)
-		const repair = await models.Repair.create({
-			statusID,
-			description,
-			budget,
-      currentCost: 0,
-			estimatedDeliverDate,
-			employeeId,
-			clientId,
-			equipmentSheetID: equipmentSheet.Barcode,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		});
+  // try {
+  const {
+    description,
+    clientId,
+    statusID,
+    equipmentSheet,
+    budget,
+    estimatedDeliverDate,
+  } = req.body;
 
-		await models.RepairStatusLog.create({
-			statusId: 1,
-			description: 'Repair order created',
-			repairId: repair.id,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		});
+  const employeeId = req.cookies.employeeInfo.nic;
 
-		res.status(200).json({
-			data: repair,
-		});
-	// } catch (error) {
-	// res.status(500).json({ error: "Error creating repair." });
-	// }
+  const repair = await models.Repair.create({
+    statusID,
+    description,
+    budget,
+    currentCost: 0,
+    estimatedDeliverDate,
+    employeeId,
+    clientId,
+    equipmentSheetID: equipmentSheet.Barcode,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  await models.RepairStatusLog.create({
+    statusId: 1,
+    description: "Repair order created",
+    repairId: repair.id,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  res.status(200).json({
+    data: repair,
+  });
+  // } catch (error) {
+  // res.status(500).json({ error: "Error creating repair." });
+  // }
 });
 
 router.get("/:id", async (req, res) => {
@@ -336,44 +334,43 @@ router.get("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-	try {
-		const { id } = req.params;
-		const {
-			description,
-			clientId,
-			statusID,
-			equipmentSheet,
-			budget,
-			estimatedDeliverDate,
-		} = req.body;
+  try {
+    const { id } = req.params;
+    const {
+      description,
+      clientId,
+      statusID,
+      equipmentSheet,
+      budget,
+      estimatedDeliverDate,
+    } = req.body;
 
-		// Verifica se a repair existe
-		const repair = await models.Repair.findByPk(id);
-		if (!repair) {
-			return res.status(404).json({ error: "Repair not found." });
-		}
+    // Verifica se a repair existe
+    const repair = await models.Repair.findByPk(id);
+    if (!repair) {
+      return res.status(404).json({ error: "Repair not found." });
+    }
 
-		// Atualiza os campos
-		await repair.update({
-			description,
-			clientId,
-			statusID: statusID ?? repair.statusID, // caso venha undefined
-			equipmentSheetID: equipmentSheet.Barcode,
-			budget,
-			estimatedDeliverDate,
-			updatedAt: new Date(),
-		});
+    // Atualiza os campos
+    await repair.update({
+      description,
+      clientId,
+      statusID: statusID ?? repair.statusID, // caso venha undefined
+      equipmentSheetID: equipmentSheet.Barcode,
+      budget,
+      estimatedDeliverDate,
+      updatedAt: new Date(),
+    });
 
-		res.status(200).json({
-			message: "Repair updated successfully.",
-			data: repair,
-		});
-	} catch (error) {
-		console.error("PUT /repair/:id error:", error);
-		res.status(500).json({ error: "Error updating repair." });
-	}
+    res.status(200).json({
+      message: "Repair updated successfully.",
+      data: repair,
+    });
+  } catch (error) {
+    console.error("PUT /repair/:id error:", error);
+    res.status(500).json({ error: "Error updating repair." });
+  }
 });
-
 
 router.delete("/:id", async (req, res) => {
   try {

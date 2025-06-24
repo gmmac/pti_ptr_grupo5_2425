@@ -33,7 +33,6 @@ export default function DashboardTopGrid() {
 			.then((res) => {
 				const total = res.data.totalItems;
 				
-				console.log("printt: ",res)
 				setTotalSInterests(res.data.totalItems ?? 0);
 			})
 			.catch((err) => {

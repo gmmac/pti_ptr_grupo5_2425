@@ -12,6 +12,9 @@ import { Dropdown } from 'primereact/dropdown';
 import { useAuthEmployee } from "../../contexts/AuthenticationProviders/EmployeeAuthProvider";
 import SalesDetailsModal from "./SalesDetailsModal";
 import { Dialog } from "primereact/dialog";
+import { Tooltip } from 'primereact/tooltip';
+import IsMobileHookDisplayTable from "../../contexts/IsMobileHookDisplayTable";
+import SalesCardList from "./SalesCardList";
 
 
 export default function SalesDisplayTable({ filterType, active = "1", refreshAllTables=null}) {
@@ -19,6 +22,7 @@ export default function SalesDisplayTable({ filterType, active = "1", refreshAll
     const [totalRecords, setTotalRecords] = useState(0);
     const [statusWarning, setStatusWarning] = useState(null);
 
+    const isMobile = IsMobileHookDisplayTable();
 
     const { employee } = useAuthEmployee();
 
@@ -184,6 +188,32 @@ export default function SalesDisplayTable({ filterType, active = "1", refreshAll
     return (
         <>
             <div className="">
+              <Tooltip target=".custom-icon-button" position="top" />
+              {isMobile ? (
+                <SalesCardList
+                  data={data}
+                  stateOptions={stateOptions}
+                  filters={lazyState.filters}
+                  onFilterChange={(field, value) => {
+                        const newFilters = { ...lazyState.filters };
+                        newFilters[field] = { value, matchMode: "contains" }; 
+                        if (field === "state") newFilters[field].matchMode = "equals";
+                        if (field === "CreatedAt") newFilters[field].matchMode = "equals";
+                        setLazyState({
+                          ...lazyState,
+                          filters: newFilters,
+                          first: 0
+                        });
+                      }}
+                  onPageChange={(e) => setLazyState({ ...lazyState, ...e })}
+                  totalRecords={totalRecords}
+                  lazyState={lazyState}
+                  onEdit={handleEdit}
+                  onDelete={confirmDelete}
+                  onChangeStatus={openChangeStatusModal}
+                />
+
+              ) : (
                 <DataTable
                     value={data}
                     lazy
@@ -288,37 +318,42 @@ export default function SalesDisplayTable({ filterType, active = "1", refreshAll
                             return (
                                 <div style={{ display: "flex", gap: "0.3rem", justifyContent: "center" }}>
                                   <Button
-                                      icon="pi pi-info-circle"
-                                      rounded
-                                      text
-                                      severity="secondary"
-                                      aria-label="Edit"
-                                      className="custom-icon-button"
-                                      onClick={() => handleEdit(rowData)}
-                                    />
-                                    <Button
-                                      icon="pi pi-sync"
-                                      rounded
-                                      text
-                                      severity="secondary"
-                                      aria-label="Change Status"
-                                      className="custom-icon-button"
-                                      onClick={() => openChangeStatusModal(rowData)}
-                                    />
-                                    <Button
-                                        icon="pi pi-trash"
-                                        text
-                                        severity="danger"
-                                        aria-label="Delete Sale"
-                                        style={{color: "var(--danger)"}}
-                                        className="custom-icon-button"
-                                        onClick={() => confirmDelete(rowData.id)}
-                                    /> 
+                                    icon="pi pi-info-circle"
+                                    rounded
+                                    text
+                                    severity="secondary"
+                                    aria-label="Edit"
+                                    className="custom-icon-button"
+                                    onClick={() => handleEdit(rowData)}
+                                    data-pr-tooltip="View details of this sale"
+                                  />
+                                  <Button
+                                    icon="pi pi-sync"
+                                    rounded
+                                    text
+                                    severity="secondary"
+                                    aria-label="Change Status"
+                                    className="custom-icon-button"
+                                    onClick={() => openChangeStatusModal(rowData)}
+                                    data-pr-tooltip="Change status of this sale"
+                                  />
+                                  <Button
+                                    icon="pi pi-trash"
+                                    text
+                                    severity="danger"
+                                    aria-label="Delete Sale"
+                                    style={{ color: "var(--danger)" }}
+                                    className="custom-icon-button"
+                                    onClick={() => confirmDelete(rowData.id)}
+                                    data-pr-tooltip="Delete this sale"
+                                  />
                                 </div>
+
                             );
                         }}
                     />
                 </DataTable>
+              )}
             <style>
               {`
                 .p-paginator .p-paginator-pages .p-paginator-page {

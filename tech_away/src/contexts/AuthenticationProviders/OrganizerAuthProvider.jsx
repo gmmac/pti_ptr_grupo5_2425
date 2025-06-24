@@ -23,12 +23,6 @@ const OrganizerAuthProviderWrapper = ({ children }) => {
 
 const useOrganizerAuthExtension = () => {
   const baseAuth = useGenericAuth();
-
-
-  useEffect(() => {
-    console.log("Organizer ", baseAuth.user)
-  
-  }, [baseAuth.user])
   
   const isOrganizer = () => {
     return baseAuth.getUserType() === "organizer";

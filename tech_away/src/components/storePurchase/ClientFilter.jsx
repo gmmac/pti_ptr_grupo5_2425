@@ -18,8 +18,6 @@ export default function ClientFilter({ setFilters }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLocalFilters((prev) => ({ ...prev, [name]: value }));
-
-        console.log(localFilters)
     };
 
     const handleSubmit = (e) => {

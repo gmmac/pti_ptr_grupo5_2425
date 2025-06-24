@@ -37,7 +37,6 @@ export default function CreateEmployeeRole() {
         let newErrors = { ...errors };
         await api.post('/api/employee-roles', { role: formData.role })
             .then(response => {
-                console.log(response);
                 alert('Role created successfully!');
                 setFormData({ role: '' });
             })

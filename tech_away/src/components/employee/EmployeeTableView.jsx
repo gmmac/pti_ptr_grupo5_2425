@@ -23,10 +23,6 @@ export default function EmployeeTableView({ employees, onEdit, onDelete }) {
     setSelectedEmployee(null);
   };
 
-  useEffect(() => {
-    console.log(selectedEmployee)
-  }, [selectedEmployee])
-
   return (
     <>
       <Container fluid className="p-3">

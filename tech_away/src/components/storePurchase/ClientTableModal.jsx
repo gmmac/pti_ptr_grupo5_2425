@@ -30,7 +30,7 @@ export default function ClientTableModal({clients, selectedClient, handleClientS
                 variant={selectedClient === client.nic ? "secondary" : "primary"} 
                 onClick={() => handleClientSelection(client)}
                 >
-                    {selectedClient === client.nic ? "Deselect" : "Select"}
+                    {selectedClient === client.nic ? "Unselect" : "Select"}
                 </Button>
             </td>
             </tr>

@@ -228,8 +228,7 @@ const InterestsProvider = ({ children }) => {
 					interestId,
 				});
 			}
-
-			console.log("Interesses adicionados com sucesso.");
+			
 			fetchInterestsNotInFolder(folderToOpen?.id);
 			fetchInterests();
 		} catch (error) {

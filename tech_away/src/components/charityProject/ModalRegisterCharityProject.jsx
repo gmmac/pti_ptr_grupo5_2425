@@ -16,14 +16,6 @@ export default function RegisterCharityProject({ showModal, closeModal, setRefre
     const [selectedWarehouse, setSelectedWarehouse] = useState(null);
     const [errors, setErrors] = useState({});
 
-    useEffect(() => {
-        console.log(charityProject);
-    }, [charityProject]);
-
-    useEffect(() => {
-        console.log(errors);
-    }, [errors]);
-
     const handleChanges = (e) => {
         const { name, value } = e.target;
         setCharityProject((prev) => ({ ...prev, [name]: value }));

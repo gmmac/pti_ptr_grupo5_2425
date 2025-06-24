@@ -152,6 +152,16 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
         loadLazyData();
     };
 
+    const capitalizeFirstLetter = (value) => {
+        if(String(value) == "id") return "ID";
+        if(String(value) == "employeeName") return "Employee";
+        if(String(value) == "clientName") return "Client";
+        if(String(value) == "state") return "Status";
+        if(String(value) == "modelName") return "Equipment Model";
+        if(String(value) == "createdAt") return "Created at";
+        return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+    }
+
     return (
         <>
             <div className="">
@@ -180,7 +190,7 @@ export default function EmployeeRepairsCatalog({refreshRepairs}) {
                         <Column
                             key={index}
                             field={column}
-                            header={column}
+                            header={capitalizeFirstLetter(column)}
                             sortable
                             filter
 							showFilterMenu={false}

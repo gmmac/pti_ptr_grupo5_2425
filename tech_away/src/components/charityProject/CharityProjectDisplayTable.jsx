@@ -42,10 +42,6 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
   const dateFields = ['createdAt', 'updatedAt', 'startDate', 'completionDate'];
 
   useEffect(() => {
-    console.log(projectStatusInfo)
-  },[projectStatusInfo])
-
-  useEffect(() => {
     loadLazyData();
   }, [lazyState, refreshKey]);
 
@@ -58,8 +54,6 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
     Object.entries(filters).forEach(([key, meta]) => {
       if (meta.value) params[key] = meta.value;
     });
-
-    console.log(params)
 
     api.get('/api/charityProject/displayTable', { params })
       .then(res => {
@@ -112,6 +106,14 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
     }
   };
 
+  const capitalizeFirstLetter = (value) => {
+        if(String(value) == "id") return "ID";
+        if(String(value) == "organizerName") return "Organizer";
+        if(String(value) == "startDate") return "Start Date";
+        if(String(value) == "completionDate") return "Completion Date";
+        return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+    }
+
   return (
     <>
       {/* <ConfirmDialog /> */}
@@ -141,7 +143,7 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
             <Column
               key={idx}
               field={column}
-              header={column}
+              header={capitalizeFirstLetter(column)}
               sortable
               filter
               showFilterMenu={false}
