@@ -36,7 +36,6 @@ const InterestsProvider = ({ children }) => {
 
 	const fetchNotifications = async () => {
 		if (!user?.nic) return;
-		console.log(`/api/interestNotification/byClient/${user.nic}`);
 
 		try {
 			const res = await api.get(

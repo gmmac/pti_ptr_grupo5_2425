@@ -45,7 +45,6 @@ export default function OrderDetailsModal({
 
 	useEffect(() => {
 		fetchOrderedEquipments();
-		console.log(orderedEquipments);
 	}, [showDetails]);
 
 	useEffect(() => {
