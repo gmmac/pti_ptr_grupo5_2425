@@ -99,7 +99,11 @@ export default function ItemCart({ equipment, onRemove }) {
 					lg={4}
 				>
 					<Image
-						src={`../../public/assets/equipmentSheetImages/${equipment.equipmentId}.jpg`}
+						src={`/assets/equipmentSheetImages/${equipment.equipmentId}.jpg`}
+						onError={(e) => {
+							e.target.onerror = null;
+							e.target.src = "/assets/equipmentSheetImages/placeholder.png";
+						}}
 						style={{
 							mixBlendMode: "darken",
 							height: "90px",

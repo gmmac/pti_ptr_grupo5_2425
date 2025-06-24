@@ -20,7 +20,7 @@ module.exports = {
 			},
 			{
 				id: 3,
-				name: "Laptops",
+				name: "Smartphones",
 				clientNIC: "123456789",
 				createdAt: new Date(),
 				updatedAt: new Date(),

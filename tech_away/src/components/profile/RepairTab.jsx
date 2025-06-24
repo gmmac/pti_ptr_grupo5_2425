@@ -109,7 +109,7 @@ export default function RepairTab() {
 											className="m-0"
 											style={{ fontFamily: "var(--title-font)" }}
 										>
-											Order ID: {repair.id}
+											Repair Number #{repair.id}
 										</h6>
 										<p className="text-muted">By {repair.employeeName}</p>
 										<Button

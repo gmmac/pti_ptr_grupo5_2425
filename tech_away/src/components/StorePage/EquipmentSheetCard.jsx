@@ -93,10 +93,10 @@ export default function EquipmentSheetCard(eSheet) {
 					/>
 				</Stack>
 				<Image
-					src={`../../public/assets/equipmentSheetImages/${eSheet?.eSheet?.Barcode}.jpg`}
+					src={`/assets/equipmentSheetImages/${eSheet?.eSheet?.Barcode}.jpg`}
 					onError={(e) => {
 						e.target.onerror = null;
-						e.target.src = "/assets/placeholder.jpg";
+						e.target.src = "/assets/equipmentSheetImages/placeholder.png";
 					}}
 					style={{
 						mixBlendMode: "darken",
