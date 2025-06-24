@@ -55,8 +55,6 @@ export default function NewPartForms({ partID, showModal, closeModal, refreshTab
 	};
 
 	const handleSelectEquipment = (equipmentSheet) => {
-		console.log("Selected equipment:", equipmentSheet);
-		console.log("Selected equipment:", equipmentSheet.Barcode);
 		setPart((prev) => ({
 			...prev,
 			equipmentId: equipmentSheet.Barcode,
