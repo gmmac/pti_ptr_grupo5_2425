@@ -25,6 +25,34 @@ module.exports = {
 				createdAt: new Date("2025-06-24T17:48:25.239Z"),
 				updatedAt: new Date("2025-06-24T17:48:25.239Z"),
 			},
+			{
+				id: 4,
+				folderInterestId: 4,
+				interestId: 11,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+			{
+				id: 5,
+				folderInterestId: 3,
+				interestId: 12,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+			{
+				id: 6,
+				folderInterestId: 3,
+				interestId: 10,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+			{
+				id: 7,
+				folderInterestId: 3,
+				interestId: 13,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
 		]);
 	},
 
