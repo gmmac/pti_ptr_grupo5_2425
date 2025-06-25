@@ -50,7 +50,7 @@ export default function ProjectReport({ reportType = 'projects', handleChangePag
 
     if (report.donationsByStore?.length) {
       sheets['DonationsByStore'] = report.donationsByStore.map(d => ({
-        NIPC: d.NIPC,
+        NIPC: d.storeNIPC,
         Store: d.storeName,
         Donations: d.donationCount
       }));
@@ -130,7 +130,7 @@ export default function ProjectReport({ reportType = 'projects', handleChangePag
         title="Donations by Store"
         data={report.donationsByStore}
         columns={[
-          { key: 'NIPC',      label: 'NIPC'     },
+          { key: 'storeNIPC',      label: 'NIPC'     },
           { key: 'storeName', label: 'Store'    },
           { key: 'donationCount', label: 'Donations' }
         ]}
