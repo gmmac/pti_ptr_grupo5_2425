@@ -63,7 +63,7 @@ export default function UsedEquipmentCard({ usedEquipment, barcode }) {
 
 				{/* Imagem do equipamento */}
 				<Image
-					src={`../../public/assets/equipmentSheetImages/${barcode}.jpg`}
+					src={`/assets/equipmentSheetImages/${barcode}.jpg`}
 					className="w-50"
 					style={{
 						objectFit: "cover",
