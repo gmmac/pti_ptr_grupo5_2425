@@ -7,7 +7,7 @@ module.exports = {
       {
         name: 'Armazém Central',
         totalSlots: 100,
-        availableSlots: 96,
+        availableSlots: 100,
         createdAt: new Date(),
         updatedAt: new Date(),
         isActive: "1",

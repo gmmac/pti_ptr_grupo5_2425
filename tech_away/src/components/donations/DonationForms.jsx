@@ -28,8 +28,9 @@ export default function DonationForms({ show, handleClose, equipment, handleDona
     const fetchClientNicFromEquipment = async (equipmentId) => {
       try {
         const res = await api.get('/api/storePurchase', {
-          params: { usedEquipmentID: equipmentId },
+          params: { id: equipmentId, allPrice: "1" },
         });
+
         const purchase = res.data?.data?.[0];
         if (purchase?.clientNIC) {
           setClientData({ nic: purchase.clientNIC });
@@ -116,6 +117,7 @@ export default function DonationForms({ show, handleClose, equipment, handleDona
       setError('Please select a charity project.');
       return;
     }
+    console.log(form)
 
     try {
       await api.post('/api/storePurchase/donate', form);

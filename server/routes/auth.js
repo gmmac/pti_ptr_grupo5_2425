@@ -95,7 +95,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  try {
+  // try {
     const { email, password, userType } = req.body;
     // Login User
     const response = await axios.post(process.env.AUTH0_API_URL + "/oauth/token", {
@@ -158,15 +158,15 @@ router.post("/login", async (req, res) => {
       }
     }
 
-  } catch (error) {
-    console.error(error);
+  // } catch (error) {
+  //   console.error(error);
   
-    if (error.response?.status === 403) {
-      return res.status(401).json({ message: "Invalid Credentials" });
-    }
+  //   if (error.response?.status === 403) {
+  //     return res.status(401).json({ message: "Invalid Credentials" });
+  //   }
   
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+  //   return res.status(500).json({ message: "Internal Server Error" });
+  // }
   
 
 });

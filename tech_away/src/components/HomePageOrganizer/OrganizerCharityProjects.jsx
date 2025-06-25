@@ -132,6 +132,7 @@ export default function OrganizerCharityProjects() {
                   onRefresh={toggleRefresh}
                   onDelete={handleDelete}
                   canDelete={true}
+                  organizerID={getOrganizerID()}
                   />
                 )
               )}

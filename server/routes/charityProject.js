@@ -18,7 +18,6 @@ router.get("/", async (req, res) => {
       pageSize = 5,
     } = req.query;
 
-    // build “where” for CharityProject fields
     const where = {};
     if (id) {
       where.id = { [Op.eq]: parseInt(id, 10) };
@@ -100,11 +99,13 @@ router.get("/", async (req, res) => {
 router.get('/displayTable', async (req, res) => {
   try {
     const {
-      id, projectName, status, warehouse, organizerName,
+      id, projectName, status, warehouse, organizerName, organizerNic,
       startDate, completionDate,
       isActive = '1', page = 1, pageSize = 5,
       sortField = 'id', sortOrder = 'ASC'
     } = req.query;
+
+    console.log(req.query)
 
     const where = { isActive: { [Op.like]: isActive } };
     if (id)            where.id = Sequelize.where(Sequelize.cast(Sequelize.col('CharityProject.id'), 'varchar'), { [Op.iLike]: `${id}%` });
@@ -114,12 +115,23 @@ router.get('/displayTable', async (req, res) => {
 
     const statusFilter    = status    ? { state: { [Op.iLike]: `%${status}%` } } : {};
     const warehouseFilter = warehouse ? { name:  { [Op.iLike]: `%${warehouse}%` } } : {};
-    const organizerWhere = organizerName
-      ? Sequelize.where(
-          Sequelize.fn('concat', Sequelize.col('Organizer.firstName'), ' ', Sequelize.col('Organizer.lastName')),
+    
+    const organizerFilter = {};
+    if (organizerName) {
+      organizerFilter[Op.and] = organizerFilter[Op.and] || [];
+      organizerFilter[Op.and].push(
+        Sequelize.where(
+          Sequelize.fn('concat',
+            Sequelize.col('Organizer.firstName'), ' ',
+            Sequelize.col('Organizer.lastName')
+          ),
           { [Op.iLike]: `%${organizerName}%` }
         )
-      : null;
+      );
+    }
+    if (organizerNic) {
+      organizerFilter.nic = { [Op.iLike]: `%${organizerNic}%` };
+    }
 
     const offset = (Number(page) - 1) * Number(pageSize);
     const order = [];
@@ -156,7 +168,7 @@ router.get('/displayTable', async (req, res) => {
       include: [
         { model: models.ProjectStatus, attributes: ['id','state'], where: statusFilter },
         { model: models.Warehouse,     attributes: ['id','name'],  where: warehouseFilter },
-        { model: models.Organizer,     attributes: ['nic','firstName','lastName','email'], ...(organizerWhere?{ where:organizerWhere }:{}) }
+        { model: models.Organizer,     attributes: ['nic','firstName','lastName','email'],  ...(Object.keys(organizerFilter).length ? { where: organizerFilter } : {}) }
       ],
       limit: Number(pageSize), offset, order
     });
@@ -179,13 +191,13 @@ router.get('/displayTable', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, startDate, completionDate, warehouseID } = req.body;
+    const { projectName, startDate, completionDate, warehouseID } = req.body;
     const organizerNic = req.cookies?.organizerInfo?.nic;
     if (!organizerNic) {
       return res.status(400).json({ error: 'Organizer not authenticated.' });
     }
     const project = await models.CharityProject.create({
-      name, startDate, completionDate,
+      name: projectName, startDate, completionDate,
       status: 1, warehouseID, organizerNic,
       isActive: '1', createdAt: new Date(), updatedAt: new Date()
     });

@@ -3,83 +3,14 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert('CharityProjects', [
-      {
-        startDate: new Date('2025-01-10'),
-        completionDate: new Date('2025-07-17'),
-        name: "Campanha de Inverno",
-        organizerNic: '122454888',
-        status: 2,
-        warehouseID: 1,
-        isActive: "1",
-        createdAt: new Date('2025-01-01'),
-        updatedAt: new Date('2025-01-11')
-      },
-      {
-        startDate: new Date('2022-10-01'),
-        completionDate: new Date('2023-05-20'),
-        name: "Recolha Escolar 2024",
-        organizerNic: '122454888',
-        status: 3,
-        warehouseID: 1,
-        isActive: "1",
-        createdAt: new Date('2022-10-01'),
-        updatedAt: new Date('2023-05-20')
-      },
-      {
-        startDate: new Date('2026-05-20'),
-        completionDate: new Date('2029-05-20'),
-        name: "Apoio Humanitário África",
-        organizerNic: '123456789',
-        status: 1,
-        warehouseID: 3,
-        isActive: "1",
-        createdAt: new Date('2025-05-12'),
-        updatedAt: new Date('2025-06-12')
-      },
-      {
-        startDate: new Date('2025-03-20'),
-        completionDate: new Date('2025-10-20'),
-        name: "Projeto Gaming Comunitário",
-        organizerNic: '987654321',
-        status: 2,
-        warehouseID: 1,
-        isActive: "1",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        startDate: new Date('2025-06-01'),
-        completionDate: new Date('2025-12-31'),
-        name: "Natal Solidário",
-        organizerNic: '111222333',
-        status: 1,
-        warehouseID: 2,
-        isActive: "1",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        startDate: new Date('2024-07-15'),
-        completionDate: new Date('2024-09-30'),
-        name: "Kit Escolar para Todos",
-        organizerNic: '511124359',
-        status: 3,
-        warehouseID: 3,
-        isActive: "1",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        startDate: new Date('2023-11-01'),
-        completionDate: new Date('2024-01-10'),
-        name: "Doações de Inverno",
-        organizerNic: '111479985',
-        status: 3,
-        warehouseID: 2,
-        isActive: "1",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
+{ id: 1, name: "Projeto Gaming Comunitário", startDate: "2023-05-10T23:00:00.000Z", completionDate: "2026-09-17T23:00:00.000Z", organizerNic: "122454888", status: 2, warehouseID: 4, isActive: "1", createdAt: "2025-06-24T19:45:29.178Z", updatedAt: "2025-06-24T19:46:48.548Z" },
+{ id: 2, name: "Caridade 100%", startDate: "2025-06-09T23:00:00.000Z", completionDate: "2025-07-09T23:00:00.000Z", organizerNic: "111479985", status: 2, warehouseID: 1, isActive: "1", createdAt: "2025-06-24T23:43:58.021Z", updatedAt: "2025-06-24T23:49:19.394Z" },
+{ id: 3, name: "Projeto Mobile End", startDate: "2024-08-06T23:00:00.000Z", completionDate: "2024-11-06T00:00:00.000Z", organizerNic: "111479985", status: 3, warehouseID: 1, isActive: "1", createdAt: "2025-06-25T02:57:46.847Z", updatedAt: "2025-06-25T03:04:04.535Z" },
+{ id: 4, name: "Projeto Sete Sóis", startDate: "2022-05-19T23:00:00.000Z", completionDate: "2022-06-19T23:00:00.000Z", organizerNic: "511124359", status: 3, warehouseID: 3, isActive: "1", createdAt: "2025-06-25T03:35:04.230Z", updatedAt: "2025-06-25T04:28:20.051Z" },
+{ id: 5, name: "Projeto Estrela do Amanhã", startDate: "2025-06-24T23:00:00.000Z", completionDate: "2025-06-29T23:00:00.000Z", organizerNic: "511124359", status: 2, warehouseID: 12, isActive: "1", createdAt: "2025-06-25T04:29:10.023Z", updatedAt: "2025-06-25T04:29:19.704Z" },
+{ id: 6, name: "Margens do Tejo", startDate: "2025-05-05T23:00:00.000Z", completionDate: "2025-05-12T23:00:00.000Z", organizerNic: "511124359", status: 1, warehouseID: 4, isActive: "1", createdAt: "2025-06-25T04:30:55.088Z", updatedAt: "2025-06-25T04:30:55.088Z" },
+{ id: 7, name: "Projeto Marreco Voador", startDate: "2025-06-16T23:00:00.000Z", completionDate: "2025-06-25T23:00:00.000Z", organizerNic: "111222333", status: 1, warehouseID: 15, isActive: "1", createdAt: "2025-06-25T04:32:13.704Z", updatedAt: "2025-06-25T04:32:13.704Z" },
+
     ]);
   },
 

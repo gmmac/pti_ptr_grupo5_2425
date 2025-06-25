@@ -35,6 +35,8 @@ export default function PaymentForm() {
 
 		setIsProcessing(true);
 
+		console.log('VITE_URL =', import.meta.env.VITE_URL);
+
 		const { error, paymentIntent } = await stripe.confirmPayment({
 			elements,
 			confirmParams: {

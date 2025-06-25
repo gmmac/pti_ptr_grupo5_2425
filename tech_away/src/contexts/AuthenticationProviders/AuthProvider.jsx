@@ -69,6 +69,7 @@ const AuthProvider = ({ children, userType="client", loginPath }) => {
         password: formData.password,
         userType,
       });
+
   
       await fetchUser();
   

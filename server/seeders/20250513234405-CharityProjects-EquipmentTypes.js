@@ -4,34 +4,14 @@ module.exports = {
   async up(queryInterface, Sequelize) {
 
     await queryInterface.bulkInsert('CharityProjectEquipmentTypes', [
-      {
-        equipmentTypeId: 2,
-        charityProjectId: 2,
-        quantity: 10,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        equipmentTypeId: 3,
-        charityProjectId: 2,
-        quantity: 5,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        equipmentTypeId: 6,
-        charityProjectId: 3,
-        quantity: 7,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        equipmentTypeId: 1,
-        charityProjectId: 1,
-        quantity: 20,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
+{ charityProjectId: 1, equipmentTypeId: 2, quantity: 1, createdAt: "2025-06-24T23:30:51.956Z", updatedAt: "2025-06-24T23:30:51.956Z" },
+{ charityProjectId: 1, equipmentTypeId: 4, quantity: 6, createdAt: "2025-06-24T23:30:51.956Z", updatedAt: "2025-06-24T23:30:51.956Z" },
+{ charityProjectId: 1, equipmentTypeId: 13, quantity: 1, createdAt: "2025-06-24T23:30:51.956Z", updatedAt: "2025-06-24T23:30:51.956Z" },
+{ charityProjectId: 1, equipmentTypeId: 14, quantity: 1, createdAt: "2025-06-24T23:30:51.956Z", updatedAt: "2025-06-24T23:30:51.956Z" },
+{ charityProjectId: 3, equipmentTypeId: 1, quantity: 10, createdAt: "2025-06-25T03:12:21.699Z", updatedAt: "2025-06-25T03:12:21.699Z" },
+{ charityProjectId: 3, equipmentTypeId: 5, quantity: 7, createdAt: "2025-06-25T03:12:21.699Z", updatedAt: "2025-06-25T03:12:21.699Z" },
+{ charityProjectId: 3, equipmentTypeId: 7, quantity: 8, createdAt: "2025-06-25T03:12:21.699Z", updatedAt: "2025-06-25T03:12:21.699Z" },
+
     ], {});
   },
 
