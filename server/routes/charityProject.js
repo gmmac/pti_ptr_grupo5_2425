@@ -179,13 +179,13 @@ router.get('/displayTable', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, startDate, completionDate, warehouseID } = req.body;
+    const { projectName, startDate, completionDate, warehouseID } = req.body;
     const organizerNic = req.cookies?.organizerInfo?.nic;
     if (!organizerNic) {
       return res.status(400).json({ error: 'Organizer not authenticated.' });
     }
     const project = await models.CharityProject.create({
-      name, startDate, completionDate,
+      name: projectName, startDate, completionDate,
       status: 1, warehouseID, organizerNic,
       isActive: '1', createdAt: new Date(), updatedAt: new Date()
     });
