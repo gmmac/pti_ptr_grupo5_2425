@@ -14,7 +14,7 @@ module.exports = {
         { name: "Lenovo", isActive: "1", createdAt: new Date(),updatedAt: new Date(),},
         { name: "Asus", isActive: "1",createdAt: new Date(),updatedAt: new Date(),},
         { name: "Microsoft", isActive: "1",createdAt: new Date(),updatedAt: new Date(),},
-        { name: "Nitendo", isActive: "1",createdAt: new Date(),updatedAt: new Date(),},
+        { name: "Nintendo", isActive: "1",createdAt: new Date(),updatedAt: new Date(),},
         { name: "GoPro", isActive: "1",createdAt: new Date(),updatedAt: new Date(),},
         { name: "Xiaomi", isActive: "1",createdAt: new Date(),updatedAt: new Date(),},
         { name: "Corsair", isActive: "1",createdAt: new Date(),updatedAt: new Date(),},

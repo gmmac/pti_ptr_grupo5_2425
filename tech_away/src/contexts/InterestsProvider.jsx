@@ -1,6 +1,7 @@
 import { useContext, createContext, useState, useEffect, use } from "react";
 import { useAuth } from "./AuthenticationProviders/AuthProvider";
 import api from "../utils/axios";
+import NotificationsOffCanvas from "../components/notifications/NotificationsOffCanvas";
 
 const InterestsContext = createContext();
 
@@ -12,11 +13,86 @@ const InterestsProvider = ({ children }) => {
 	const [folderToOpen, setFolderToOpen] = useState(null);
 	const [interestsNotInFolder, setInterestsNotInFolder] = useState([]);
 
+	// Notificações Related
+	const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+	const [notifications, setNotifications] = useState([]);
+	const [numNotifications, setNumNotifications] = useState(0);
+
+	const openNotifications = () => setIsNotificationsOpen(true);
+	const closeNotifications = () => setIsNotificationsOpen(false);
+
 	useEffect(() => {
 		if (user && !userLoaded) {
 			setUserLoaded(true);
 		}
-	}, []);
+	}, [user]);
+
+	useEffect(() => {
+		if (user?.nic) {
+			fetchNotifications();
+			fetchInterests();
+		}
+	}, [user]);
+
+	const fetchNotifications = async () => {
+		if (!user?.nic) return;
+
+		try {
+			const res = await api.get(
+				`/api/interestNotification/byClient/${user.nic}`
+			);
+			setNotifications(res.data);
+			setNumNotifications(res.data.length);
+		} catch (error) {
+			console.error("Error fetching notifications:", error);
+		}
+	};
+
+	const markAsRead = async (notificationId) => {
+		try {
+			await api.put(`/api/interestNotification/${notificationId}`, {
+				isRead: true,
+			});
+			setNotifications((prev) =>
+				prev.map((notification) =>
+					notification.id === notificationId
+						? { ...notification, isRead: true }
+						: notification
+				)
+			);
+		} catch (error) {
+			console.error("Error marking notification as read:", error);
+		}
+	};
+
+	const markAsUnread = async (notificationId) => {
+		try {
+			await api.put(`/api/interestNotification/${notificationId}`, {
+				isRead: false,
+			});
+			setNotifications((prev) =>
+				prev.map((notification) =>
+					notification.id === notificationId
+						? { ...notification, isRead: false }
+						: notification
+				)
+			);
+		} catch (error) {
+			console.error("Error marking notification as unread:", error);
+		}
+	};
+
+	const deleteNotification = async (notificationId) => {
+		try {
+			await api.delete(`/api/interestNotification/${notificationId}`);
+			setNotifications((prev) =>
+				prev.filter((notification) => notification.id !== notificationId)
+			);
+			setNumNotifications((prev) => prev - 1);
+		} catch (error) {
+			console.error("Error deleting notification:", error);
+		}
+	};
 
 	const createFolder = async (folderName) => {
 		try {
@@ -30,6 +106,23 @@ const InterestsProvider = ({ children }) => {
 		}
 	};
 
+	const createFavoriteInteres = async (barcode) => {
+		try {
+			const res = await api.get(`/api/equipmentSheet/${barcode}`);
+			const equipmentSheetInfo = res.data.equipmentSheet;
+
+			await api.post(`/api/interest`, {
+				equipmentSheetID: barcode,
+				modelID: equipmentSheetInfo.EquipmentModel.id,
+				brandID: equipmentSheetInfo.EquipmentModel.Brand.id,
+				typeID: equipmentSheetInfo.EquipmentType.id,
+				clientNic: user.nic,
+			});
+			fetchInterests();
+		} catch (error) {
+			console.error("Error creating interest:", error);
+		}
+	};
 	const createGenericInterest = async (newInterest) => {
 		try {
 			await api.post(`/api/interest`, {
@@ -37,13 +130,13 @@ const InterestsProvider = ({ children }) => {
 				clientNic: user.nic,
 			});
 			fetchInterests();
-			return res.data;
 		} catch (error) {
 			console.error("Error creating interest:", error);
 		}
 	};
 
 	const fetchInterestFolders = async () => {
+		if (!user?.nic) return;
 		try {
 			const res = await api.get(`/api/interestsFolder/${user.nic}`);
 			setFolders(res.data);
@@ -53,6 +146,7 @@ const InterestsProvider = ({ children }) => {
 	};
 
 	const fetchInterests = async () => {
+		if (!user?.nic) return;
 		try {
 			let res;
 
@@ -73,6 +167,7 @@ const InterestsProvider = ({ children }) => {
 	};
 
 	const fetchInterestsNotInFolder = async (folderId) => {
+		if (!user?.nic) return;
 		try {
 			if (!folderId || !user.nic) return;
 			const res = await api.get(
@@ -146,7 +241,7 @@ const InterestsProvider = ({ children }) => {
 					interestId,
 				});
 			}
-			
+
 			fetchInterestsNotInFolder(folderToOpen?.id);
 			fetchInterests();
 		} catch (error) {
@@ -184,6 +279,7 @@ const InterestsProvider = ({ children }) => {
 				setFolderToOpen,
 				createFolder,
 				createGenericInterest,
+				createFavoriteInteres,
 				deleteInterest,
 				deleteInterestFolder,
 				editInterest,
@@ -191,8 +287,18 @@ const InterestsProvider = ({ children }) => {
 				addInterestToFolder,
 				removeInterestFromFolder,
 				interestsNotInFolder,
+				openNotifications,
+				closeNotifications,
+				notifications,
+				setNotifications,
+				numNotifications,
+				setNumNotifications,
+				markAsRead,
+				markAsUnread,
+				deleteNotification,
 			}}
 		>
+			{user && isNotificationsOpen && <NotificationsOffCanvas />}
 			{children}
 		</InterestsContext.Provider>
 	);

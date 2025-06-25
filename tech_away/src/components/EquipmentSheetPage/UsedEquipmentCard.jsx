@@ -4,8 +4,9 @@ import { Button, Stack, Image, Modal } from "react-bootstrap";
 import { Tag } from "primereact/tag";
 import { useCart } from "../../contexts/CartProvider";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
+import { useEffect } from "react";
 
-export default function UsedEquipmentCard({ usedEquipment }) {
+export default function UsedEquipmentCard({ usedEquipment, barcode }) {
 	const { user } = useAuth();
 	const { addItemToCart } = useCart();
 	const [showLoginModal, setShowLoginModal] = useState(false);
@@ -62,7 +63,7 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 
 				{/* Imagem do equipamento */}
 				<Image
-					src="/assets/ip.png"
+					src={`../../public/assets/equipmentSheetImages/${barcode}.jpg`}
 					className="w-50"
 					style={{
 						objectFit: "cover",
@@ -88,16 +89,6 @@ export default function UsedEquipmentCard({ usedEquipment }) {
 					</h5>
 
 					<Stack direction="horizontal" gap={2}>
-						<Button
-							className="px-3 rounded-pill d-flex justify-content-center align-items-center"
-							style={{
-								backgroundColor: "var(--variant-two)",
-								border: "none",
-								color: "var(--white)",
-							}}
-						>
-							<i className="pi pi-heart" style={{ fontSize: "1.2rem" }}></i>
-						</Button>
 						<Button
 							className="px-3 rounded-pill d-flex justify-content-center align-items-center"
 							style={{

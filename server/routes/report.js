@@ -247,21 +247,37 @@ router.get('/projects', async (req, res, next) => {
     });
 
 
-    const donationsByStore = await models.StorePurchase.findAll({
-      where: { purchasePrice: 0 },
-      attributes: [
-        [ Sequelize.col('Store.nipc'),          'NIPC'         ],
-        [ Sequelize.col('Store.name'),          'storeName'    ],
-        [ Sequelize.fn('COUNT', Sequelize.col('StorePurchase.id')), 'donationCount' ]
-      ],
-      include: [{
-        model: models.Store,
-        attributes: []
-      }],
-      group: ['Store.nipc', 'Store.name'],
-      order: [[ Sequelize.literal('"donationCount"'), 'DESC' ]],
-      raw: true
-    });
+    // const donationsByStore = await models.StorePurchase.findAll({
+    //   where: { purchasePrice: 0 },
+    //   attributes: [
+    //     [ Sequelize.col('Store.nipc'),          'NIPC'         ],
+    //     [ Sequelize.col('Store.name'),          'storeName'    ],
+    //     [ Sequelize.fn('COUNT', Sequelize.col('StorePurchase.id')), 'donationCount' ]
+    //   ],
+    //   include: [{
+    //     model: models.Store,
+    //     attributes: []
+    //   }],
+    //   group: ['Store.nipc', 'Store.name'],
+    //   order: [[ Sequelize.literal('"donationCount"'), 'DESC' ]],
+    //   raw: true
+    // });
+    
+const donationsByStore = await models.UsedEquipment.findAll({
+  where: { action: 'D' },
+  attributes: [
+    [Sequelize.col('Store.nipc'), 'storeNIPC'],
+    [Sequelize.col('Store.name'), 'storeName'],
+    [Sequelize.fn('COUNT', Sequelize.col('UsedEquipment.id')), 'donationCount']
+  ],
+  include: [{
+    model: models.Store,
+    attributes: []
+  }],
+  group: ['Store.nipc', 'Store.name'],
+  order: [[Sequelize.literal('"donationCount"'), 'DESC']],
+  raw: true
+});
 
 
     const projectsByStatus = await models.CharityProject.findAll({

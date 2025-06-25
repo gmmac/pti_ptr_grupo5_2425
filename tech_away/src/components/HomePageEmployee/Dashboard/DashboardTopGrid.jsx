@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import DashboardStatCard from "./DashboardStatCard";
 import api from "../../../utils/axios";
+import { PrimeIcons } from 'primereact/api';
 
 export default function DashboardTopGrid() {
 	const [productsOnSale, setProductsOnSale] = useState(null);
@@ -31,13 +32,12 @@ export default function DashboardTopGrid() {
 
 		api.get("/api/interest")
 			.then((res) => {
-				const total = res.data.totalItems;
-				
-				setTotalSInterests(res.data.totalItems ?? 0);
+				const total = res.data.length;		
+				setTotalSInterests(total ?? 0);
 			})
 			.catch((err) => {
 				console.error("Error fetching stock total:", err);
-				setTotalSoldEquipments(0); // fallback in case of error
+				setTotalSInterests(0); // fallback in case of error
 		});
 	}, []);
 
@@ -48,18 +48,28 @@ export default function DashboardTopGrid() {
 			<Col xs={12} sm={10} md={6} lg={4} className="mb-3">
 				<DashboardStatCard 
 					value={totalInterests !== null ? totalInterests : "Loading..."}
-					label="Saved Products" />
+					label="Saved Products" 
+					icon={PrimeIcons.HEART} 
+					bgColor="#E0DDF0" 
+					iconColor="#7D5BA6"
+				/>
 			</Col>
 			<Col xs={12} sm={10} md={6} lg={4} className="mb-3">
 				<DashboardStatCard
 					value={productsOnSale !== null ? productsOnSale : "Loading..."}
 					label="Products in Stock"
+					icon={PrimeIcons.BOX} 
+					bgColor="#C7D7CE" 
+					iconColor="#5B7D6B"
 				/>
 			</Col>
 			<Col xs={12} sm={10} md={6} lg={4} className="mb-3">
 				<DashboardStatCard 
 					value={totalSoldEquipments !== null ? totalSoldEquipments : "Loading..."} 
 					label="Sales" 
+					icon={PrimeIcons.SHOPPING_BAG} 
+					bgColor="#E0DDF0" 
+					iconColor="#7D5BA6"
 				/>
 			</Col>
 		</Row>

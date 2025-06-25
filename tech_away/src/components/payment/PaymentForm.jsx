@@ -11,7 +11,8 @@ export default function PaymentForm() {
 	const cartContext = useCart();
 	if (!cartContext) return <p>Erro: CartContext não disponível</p>;
 
-	const { totalPrice, putPurchaseInBd, shipping, shippingMethod } = cartContext;
+	const { totalPrice, putPurchaseInBd, shipping, shippingMethod, unavailableItems } = cartContext;
+		cartContext;
 
 	const isShippingValid =
 		(shippingMethod === "store" && shipping?.storeId) ||
@@ -68,7 +69,12 @@ export default function PaymentForm() {
 				/>
 				<Button
 					disabled={
-						!isReady || isProcessing || !stripe || !elements || !isShippingValid
+						!isReady ||
+						isProcessing ||
+						!stripe ||
+						!elements ||
+						!isShippingValid ||
+						unavailableItems
 					}
 					id="submit"
 					className="rounded-pill py-2 fs-5"

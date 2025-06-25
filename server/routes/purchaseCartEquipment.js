@@ -130,6 +130,26 @@ router.get("/:ID", async (req, res) => {});
 
 router.put("/:ID", async (req, res) => {});
 
-router.delete("/:ID", async (req, res) => {});
+router.delete("/:ID", async (req, res) => {
+  try {
+    const cartItem = await models.PurchaseCartEquipment.findByPk(req.params.ID);
+
+    if (!cartItem) {
+      return res.status(404).json({ error: "PurchaseCartEquipment not found" });
+    }
+
+    await models.UsedEquipment.update(
+      { purchaseDate: null },
+      { where: { id: cartItem.equipmentId } }
+    );
+
+    await cartItem.destroy();
+
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting PurchaseCartEquipment:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router;

@@ -53,7 +53,6 @@ export default function OrderDetailsModal({
 		}
 	}, [showDetails]);
 
-
 	return (
 		<Modal
 			show={showDetails}
@@ -75,7 +74,7 @@ export default function OrderDetailsModal({
 					className="justify-content-between align-items-center"
 				>
 					<h4 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
-						Order ID: {order.id}
+						Order Number #{order.id}
 					</h4>
 					<Button
 						style={{
@@ -122,7 +121,12 @@ export default function OrderDetailsModal({
 								gap={2}
 							>
 								<Image
-									src="/assets/ip.png"
+									src={`/assets/equipmentSheetImages/${equipment?.usedEquipments?.equipmentId}.jpg`}
+									onError={(e) => {
+										e.target.onerror = null;
+										e.target.src =
+											"/assets/equipmentSheetImages/placeholder.png";
+									}}
 									className="w-25 rounded-3"
 									style={{
 										objectFit: "cover",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Modal, Button, Stack, Form } from "react-bootstrap";
 import api from "../../utils/axios";
 import { useAuth } from "../../contexts/AuthenticationProviders/AuthProvider";
@@ -43,75 +43,104 @@ export default function SalesTab() {
 			<h5 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
 				My Sales
 			</h5>
-
-			<Form.Group className="mb-4 " controlId="filterDate">
-				<Form.Label style={{color:"var(--variant-two-dark"}}>Filter by date</Form.Label>
-				<Form.Control
-					className="rounded-pill"
-					type="date"
-					value={filterDate}
-					onChange={(e) => setFilterDate(e.target.value)}
-				/>
-			</Form.Group>
-
-			{data.length === 0 && !loading && <p>No purchases found.</p>}
-
-			<Stack gap={3}>
-				{data.map((purchase) => (
+			<div>
+				<Form.Group className="mb-4 " controlId="filterDate">
+					<Form.Label style={{ color: "var(--variant-two-dark" }}>
+						Filter by date
+					</Form.Label>
 					<Stack
-						key={purchase.id}
-						direction="vertical"
-						gap={2}
-						style={{
-							backgroundColor: "#eae6f0",
-							padding: "20px",
-							borderRadius: "16px",
-							maxHeight: "130px",
-						}}
-						className="p-4"
+						style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
+						direction="horizontal"
 					>
-						<Stack
-							direction="horizontal"
-							gap={2}
-							className="justify-content-between align-items-center"
-							style={{
-								color: "var(--dark-grey)",
-								fontFamily: "var(--body-font)",
-							}}
+						<Form.Control
+							className="rounded-pill"
+							type="date"
+							value={filterDate}
+							onChange={(e) => setFilterDate(e.target.value)}
+						/>
+						<Button
+							variant="secondary"
+							className="rounded-pill w-25"
+							onClick={() => setFilterDate("")}
+							disabled={!filterDate}
 						>
-							<Stack direction="vertical" gap={2}>
-								<h6 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
-									Order ID: {purchase.id}
-								</h6>
-								<p className="m-0" style={{ opacity: "0.7" }}>
-									{new Date(purchase.createdAt).toLocaleDateString("pt-PT")}
-								</p>
-								<Button
-									onClick={() => openDetails(purchase)}
-									className="rounded-pill w-50 text-start p-0"
-									style={{
-										backgroundColor: "transparent",
-										border: "none",
-									}}
-								>
-									<i
-										className="pi pi-eye"
-										style={{ color: "var(--dark-grey)" }}
-									></i>
-									<span className="ms-2" style={{ color: "var(--dark-grey)" }}>
-										View details
-									</span>
-								</Button>
-							</Stack>
-							<Stack direction="vertical" gap={2} className="text-end">
-								<h6 className="m-0">
-									{parseFloat(purchase.purchasePrice).toFixed(2)} €
-								</h6>
+							Clear
+						</Button>
+					</Stack>
+				</Form.Group>
+
+				{data.length === 0 && !loading && (
+					<p className="text-center">No sales found.</p>
+				)}
+
+				<Stack
+					direction="vertical"
+					className="pe-2"
+					gap={2}
+					style={{ overflowY: "auto", maxHeight: "350px" }}
+				>
+					{data.map((purchase) => (
+						<Stack
+							key={purchase.id}
+							direction="vertical"
+							gap={2}
+							style={{
+								backgroundColor: "#eae6f0",
+								padding: "20px",
+								borderRadius: "16px",
+								maxHeight: "130px",
+							}}
+							className="p-4"
+						>
+							<Stack
+								direction="horizontal"
+								gap={2}
+								className="justify-content-between align-items-center"
+								style={{
+									color: "var(--dark-grey)",
+									fontFamily: "var(--body-font)",
+								}}
+							>
+								<Stack direction="vertical" gap={2}>
+									<h6
+										className="m-0"
+										style={{ fontFamily: "var(--title-font)" }}
+									>
+										Sale Number #{purchase.id}
+									</h6>
+									<p className="m-0" style={{ opacity: "0.7" }}>
+										{new Date(purchase.createdAt).toLocaleDateString("pt-PT")}
+									</p>
+									<Button
+										onClick={() => openDetails(purchase)}
+										className="rounded-pill w-50 text-start p-0"
+										style={{
+											backgroundColor: "transparent",
+											border: "none",
+										}}
+									>
+										<i
+											className="pi pi-eye"
+											style={{ color: "var(--dark-grey)" }}
+										></i>
+										<span
+											className="ms-2"
+											style={{ color: "var(--dark-grey)" }}
+										>
+											View details
+										</span>
+									</Button>
+								</Stack>
+								<Stack direction="vertical" gap={2} className="text-end">
+									<h6 className="m-0">
+										{parseFloat(purchase.purchasePrice).toFixed(2)} €
+									</h6>
+								</Stack>
 							</Stack>
 						</Stack>
-					</Stack>
-				))}
-			</Stack>
+					))}
+				</Stack>
+			</div>
 
 			{/* Modal com detalhes */}
 			<Modal

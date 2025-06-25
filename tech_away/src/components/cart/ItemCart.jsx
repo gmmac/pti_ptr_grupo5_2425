@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import {
 	Button,
 	Col,
@@ -17,6 +17,7 @@ export default function ItemCart({ equipment, onRemove }) {
 		onRemove(equipment.lineId);
 		setShowModal(false);
 	};
+
 	return (
 		<Container
 			className="p-2  border-bottom"
@@ -98,10 +99,14 @@ export default function ItemCart({ equipment, onRemove }) {
 					lg={4}
 				>
 					<Image
-						src={`/assets/pc.jpg`}
-						width={100}
+						src={`/assets/equipmentSheetImages/${equipment.equipmentId}.jpg`}
+						onError={(e) => {
+							e.target.onerror = null;
+							e.target.src = "/assets/equipmentSheetImages/placeholder.png";
+						}}
 						style={{
 							mixBlendMode: "darken",
+							height: "90px",
 						}}
 					/>
 				</Col>
@@ -134,19 +139,6 @@ export default function ItemCart({ equipment, onRemove }) {
 							className="pi pi-times"
 							style={{ color: "var(--dark-grey)" }}
 						></i>
-					</Button>
-
-					<Button
-						className="rounded-circle d-flex justify-content-center align-items-center"
-						style={{
-							backgroundColor: "var(--variant-two)",
-							border: "none",
-							width: "35px",
-							height: "35px",
-							padding: 0,
-						}}
-					>
-						<i className="pi pi-heart"></i>
 					</Button>
 				</Col>
 			</Row>

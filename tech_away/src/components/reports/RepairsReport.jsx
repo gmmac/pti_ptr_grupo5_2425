@@ -52,9 +52,6 @@ export default function RepairsReport({ reportType = 'repairs', handleChangePage
         Count: s.repairCount
       }));
     }
-    if (report.avgEstimateDeliveryTime) {
-      sheets['AverageTimeStatus1to6'] = [report.avgEstimateDeliveryTime];
-    }
     exportReportToExcel(sheets, reportType);
   };
 
@@ -124,16 +121,6 @@ export default function RepairsReport({ reportType = 'repairs', handleChangePage
         columns={[
           { key: 'state',      label: 'Status'   },
           { key: 'repairCount',label: 'Count'    }
-        ]}
-      />
-
-      <ReportSection
-        title="Average Time to finish a repair"
-        data={report.avgEstimateDelivaryDate}
-        columns={[
-          { key: 'seconds', label: 'Seconds' },
-          { key: 'hours',   label: 'Hours'   },
-          { key: 'days',    label: 'Days'    }
         ]}
       />
     </div>

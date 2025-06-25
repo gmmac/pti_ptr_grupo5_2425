@@ -10,7 +10,7 @@ export default function OnCanvasCart() {
 		return <p>Erro: CartContext não disponível</p>;
 	}
 
-	const { removeItemFromCart, totalPrice, cartItems } =
+	const { removeItemFromCart, totalPrice, cartItems, unavailableItems } =
 		cartContext;
 
 	return (

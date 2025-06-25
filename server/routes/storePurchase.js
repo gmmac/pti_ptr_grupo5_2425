@@ -25,7 +25,8 @@ router.get("/", async (req, res) => {
       sortOrder = "ASC",
     } = req.query;
 
-    // --- WHERE principal ---
+    console.log(req.query)
+
     const where = {};
     if (onlyMyPurchases === "true" && req.cookies.employeeInfo?.nic) {
       where.employeeID = req.cookies.employeeInfo.nic;
@@ -52,7 +53,7 @@ router.get("/", async (req, res) => {
       where.purchasePrice = { [Op.gt]: 0 };
     }
     if (usedEquipmentID) {
-      where.usedEquipmentID = { [Op.eq]: parseInt(usedEquipmentID, 10) };
+      where.usedEquipmentID = { [Op.eq]: parseInt(usedEquipmentID) };
     }
 
     // --- Construção de orderClause ---
@@ -118,10 +119,10 @@ router.get("/", async (req, res) => {
       },
       {
         model: models.UsedEquipment,
-        required: true,
+        // required: true,
         include: [{
           model: models.EquipmentSheet,
-          required: true,
+          // required: true,
           include: [{
             model: models.EquipmentModel,
             attributes: ["name"],
@@ -164,6 +165,13 @@ router.get("/", async (req, res) => {
       modelName: item.UsedEquipment?.EquipmentSheet?.EquipmentModel?.name,
       createdAt: item.createdAt
     }));
+
+
+    console.log("BBBBBBBBBBBBB", id)
+    console.log(where)
+    // console.log("AAAAAAA", data)
+    // console.log("ASASASASAS", rows)
+
 
     res.json({
       totalItems: count,
@@ -217,7 +225,6 @@ router.get("/getDonations", async (req, res) => {
     const offset = (parseInt(page, 10) - 1) * parseInt(pageSize, 10);
     const limit  = parseInt(pageSize, 10);
 
-    // filtro opcional por projeto
     const where = {};
     if (charityProjectId) {
       where.charityProjectId = { [Op.eq]: Number(charityProjectId) };
@@ -272,6 +279,74 @@ router.get("/getDonations", async (req, res) => {
       limit
     });
 
+
+  //   const formatted = rows.map(item => ({
+  //     Project: {
+  //         id: item.UsedEquipment.CharityProjects[0].dataValues.id,
+  //         name: item.UsedEquipment.CharityProjects[0].dataValues.name
+  //       },
+  //       Warehouse:{
+  //         id: item.UsedEquipment.CharityProjects[0].dataValues.Warehouse.id,
+  //         name: item.UsedEquipment.CharityProjects[0].dataValues.Warehouse.name,
+  //       },
+  //       Equipment: {
+  //         usedEquipmentId: item.UsedEquipment.id,
+  //         barcode: item.UsedEquipment.EquipmentSheet.barcode,
+  //         brandModel: `${item.UsedEquipment.EquipmentSheet.EquipmentModel.Brand.name} ${item.UsedEquipment.EquipmentSheet.EquipmentModel.name}`,
+  //         type: item.UsedEquipment.EquipmentSheet.EquipmentType.name
+  //       },
+  //   //     Purchase: {
+  //   //       id: item.UsedEquipment.StorePurchases[0].dataValues.id
+  //   // }
+  // ))
+
+
+  const formatted = rows.map(item => {
+    const project = item.UsedEquipment.CharityProjects[0];
+    const warehouse = project.Warehouse;
+    const sheet = item.UsedEquipment.EquipmentSheet;
+    const model = sheet.EquipmentModel;
+    const brand = model.Brand;
+    const type = sheet.EquipmentType;
+
+    return {
+      Project: {
+        id: project.id,
+        name: project.name
+      },
+      Warehouse: {
+        id: warehouse.id,
+        name: warehouse.name
+      },
+      Equipment: {
+        usedEquipmentId: item.UsedEquipment.id,
+        barcode: sheet.barcode,
+        brandModel: `${brand.name} ${model.name}`,
+        type: type.name
+      },
+      Purchase: {
+        id: item.UsedEquipment.StorePurchases[0].id,
+        purchase_date: item.UsedEquipment.StorePurchases[0].createdAt,
+        Client: {
+          nic: item.UsedEquipment.StorePurchases[0].dataValues.Client.dataValues.nic,
+          name: `${item.UsedEquipment.StorePurchases[0].dataValues.Client.dataValues.firstName} ${item.UsedEquipment.StorePurchases[0].dataValues.Client.dataValues.lastName}`,
+        },
+        Employee: {
+          nic:  item.UsedEquipment.StorePurchases[0].dataValues.Employee.nic,
+          name: `${item.UsedEquipment.StorePurchases[0].dataValues.Employee.firstName} ${item.UsedEquipment.StorePurchases[0].dataValues.Employee.lastName}`,
+        },
+        Store: {
+          nipc: item.UsedEquipment.StorePurchases[0].dataValues.Store.nipc,
+          name: item.UsedEquipment.StorePurchases[0].dataValues.Store.name,
+        }
+      }
+    };
+  });
+
+
+
+    // console.log(formatted)
+
     const formattedAll = rows.flatMap(item => {
       const ue = item.UsedEquipment;
       const project = ue.CharityProjects[0];
@@ -311,7 +386,7 @@ router.get("/getDonations", async (req, res) => {
       totalPages:  Math.ceil(count / pageSize),
       currentPage: parseInt(page, 10),
       pageSize:    parseInt(pageSize, 10),
-      data:        formattedAll
+      data:        formatted
     });
   } catch (err) {
     console.error("Error: ", err);

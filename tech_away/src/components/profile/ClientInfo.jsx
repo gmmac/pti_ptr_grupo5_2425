@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Stack, Form, Row, Col, Card, Button } from "react-bootstrap";
-import { PencilSquare, XCircleFill } from "react-bootstrap-icons";
+import { Stack, Form, Row, Col, Button } from "react-bootstrap";
 import api from "../../utils/axios";
 
 export default function ClientInfo({ userType = "client" }) {
@@ -83,7 +82,8 @@ export default function ClientInfo({ userType = "client" }) {
 					today.getDate() >= birthDate.getDate());
 
 			if (age < 16 || (age === 16 && !isBirthdayPassed)) {
-				newErrors[name] = "You must be at least 16 years old to have an account.";
+				newErrors[name] =
+					"You must be at least 16 years old to have an account.";
 			} else {
 				newErrors[name] = "";
 			}
@@ -132,202 +132,211 @@ export default function ClientInfo({ userType = "client" }) {
 			className="p-4"
 			gap={3}
 		>
-			<Stack direction="horizontal" className="justify-content-between">
-				<h4 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
-					Personal <br /> Information
-				</h4>
-				{isEditing ? (
-					<Stack
-						direction="horizontal"
-						gap={2}
-						style={{ color: "var(--white)" }}
-					>
-						<Button
-							onClick={handleSaveChanges}
-							disabled={changedFields.length == 0}
-							className="rounded-pill"
-							style={{ backgroundColor: "var(--variant-one)", border: "none" }}
-						>
-							<Stack direction="horizontal" gap={2}>
-								<i className="pi pi-bookmark"></i>
-								<span>Save</span>
+			{!formData || !formData.nic ? (
+				<>Loading..</>
+			) : (
+				<>
+					<Stack direction="horizontal" className="justify-content-between">
+						<h4 className="m-0" style={{ fontFamily: "var(--title-font)" }}>
+							Personal <br /> Information
+						</h4>
+						{isEditing ? (
+							<Stack
+								direction="horizontal"
+								gap={2}
+								style={{ color: "var(--white)" }}
+							>
+								<Button
+									onClick={handleSaveChanges}
+									disabled={changedFields.length == 0}
+									className="rounded-pill"
+									style={{
+										backgroundColor: "var(--variant-one)",
+										border: "none",
+									}}
+								>
+									<Stack direction="horizontal" gap={2}>
+										<i className="pi pi-bookmark"></i>
+										<span>Save</span>
+									</Stack>
+								</Button>
+								<Button
+									onClick={() => {
+										setFormData(originalData); // Volta a colocar os valores originais nos inputs
+										setChangedFields([]);
+										setErrors({});
+										setIsEditing(false);
+									}}
+									className="rounded-pill"
+									variant="secondary"
+								>
+									<Stack direction="horizontal" gap={2}>
+										<i className="pi pi-undo"></i>
+										<span>Cancel</span>
+									</Stack>
+								</Button>
 							</Stack>
-						</Button>
-						<Button
-							onClick={() => {
-								setFormData(originalData); // Volta a colocar os valores originais nos inputs
-								setChangedFields([]);
-								setErrors({});
-								setIsEditing(false);
-							}}
-							className="rounded-pill"
-							variant="secondary"
-						>
-							<Stack direction="horizontal" gap={2}>
-								<i className="pi pi-undo"></i>
-								<span>Cancel</span>
-							</Stack>
-						</Button>
+						) : (
+							<Button
+								className="rounded-pill px-3"
+								style={{
+									color: "var(--white)",
+									border: "none",
+									backgroundColor: "var(--variant-two)",
+								}}
+								onClick={handleEditClick}
+							>
+								<Stack direction="horizontal" gap={2}>
+									<i className="pi pi-pencil"></i>
+									<span>Edit</span>
+								</Stack>
+							</Button>
+						)}
 					</Stack>
-				) : (
-					<Button
-						className="rounded-pill px-3"
-						style={{
-							color: "var(--white)",
-							border: "none",
-							backgroundColor: "var(--variant-two)",
-						}}
-						onClick={handleEditClick}
-					>
-						<Stack direction="horizontal" gap={2}>
-							<i className="pi pi-pencil"></i>
-							<span>Edit</span>
-						</Stack>
-					</Button>
-				)}
-			</Stack>
 
-			<Form>
-				{/* Personal Information Card */}
+					<Form>
+						{/* Personal Information Card */}
 
-				<Row>
-					<Col md={6}>
-						<Form.Group className="mb-3">
-							<Form.Label>First Name</Form.Label>
-							<Form.Control
-								className="profile-input"
-								type="text"
-								name="firstName"
-								value={formData.firstName || ""}
-								disabled={!isEditing} // Controla se o campo é editável
-								onChange={handleInputChange}
-								isInvalid={!!errors.firstName}
-							/>
-							<Form.Control.Feedback type="invalid">
-								{errors.firstName}
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
-					<Col md={6}>
-						<Form.Group className="mb-3">
-							<Form.Label>Last Name</Form.Label>
-							<Form.Control
-								className="profile-input"
-								type="text"
-								name="lastName"
-								value={formData.lastName || ""}
-								disabled={!isEditing}
-								onChange={handleInputChange}
-								isInvalid={!!errors.lastName}
-							/>
-							<Form.Control.Feedback type="invalid">
-								{errors.lastName}
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
-					<Col md={12}>
-						<Form.Group className="mb-3">
-							<Form.Label>Birth Date</Form.Label>
-							<Form.Control
-								className="profile-input"
-								type="date"
-								name="birthDate"
-								value={
-									formData.birthDate ? formData.birthDate.split("T")[0] : ""
-								}
-								disabled={!isEditing}
-								onChange={handleInputChange}
-								isInvalid={!!errors.birthDate}
-							/>
-							<Form.Control.Feedback type="invalid">
-								{errors.birthDate}
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
-				</Row>
-				<Row>
-					<Col md={6}>
-						<Form.Group className="mb-3">
-							<Form.Label>Phone</Form.Label>
-							<Form.Control
-								className="profile-input"
-								type="tel"
-								name="phone"
-								value={formData.phone || ""}
-								disabled={!isEditing}
-								onChange={handleInputChange}
-								isInvalid={!!errors.phone}
-							/>
-							<Form.Control.Feedback type="invalid">
-								{errors.phone}
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
-					<Col md={6}>
-						<Form.Group className="mb-3">
-							<Form.Label>Email</Form.Label>
-							<Form.Control
-								className="profile-input"
-								type="email"
-								name="email"
-								value={formData.email || ""}
-								disabled
-								onChange={handleInputChange}
-							/>
-						</Form.Group>
-					</Col>
-				</Row>
-				<Row>
-					<Col md={6}>
-						<Form.Group className="mb-3">
-							<Form.Label>NIC</Form.Label>
-							<Form.Control
-								className="profile-input"
-								type="text"
-								name="nic"
-								value={formData.nic || ""}
-								disabled
-								onChange={handleInputChange}
-							/>
-						</Form.Group>
-					</Col>
-					<Col md={6}>
-						<Form.Group className="mb-3">
-							<Form.Label>NIF</Form.Label>
-							<Form.Control
-								className="profile-input"
-								type="text"
-								name="nif"
-								value={formData.nif || ""}
-								disabled={!isEditing}
-								onChange={handleInputChange}
-								isInvalid={!!errors.nif}
-							/>
-							<Form.Control.Feedback type="invalid">
-								{errors.nif}
-							</Form.Control.Feedback>
-						</Form.Group>
-					</Col>
-				</Row>
+						<Row>
+							<Col md={6}>
+								<Form.Group className="mb-3">
+									<Form.Label>First Name</Form.Label>
+									<Form.Control
+										className="profile-input"
+										type="text"
+										name="firstName"
+										value={formData.firstName || ""}
+										disabled={!isEditing} // Controla se o campo é editável
+										onChange={handleInputChange}
+										isInvalid={!!errors.firstName}
+									/>
+									<Form.Control.Feedback type="invalid">
+										{errors.firstName}
+									</Form.Control.Feedback>
+								</Form.Group>
+							</Col>
+							<Col md={6}>
+								<Form.Group className="mb-3">
+									<Form.Label>Last Name</Form.Label>
+									<Form.Control
+										className="profile-input"
+										type="text"
+										name="lastName"
+										value={formData.lastName || ""}
+										disabled={!isEditing}
+										onChange={handleInputChange}
+										isInvalid={!!errors.lastName}
+									/>
+									<Form.Control.Feedback type="invalid">
+										{errors.lastName}
+									</Form.Control.Feedback>
+								</Form.Group>
+							</Col>
+							<Col md={12}>
+								<Form.Group className="mb-3">
+									<Form.Label>Birth Date</Form.Label>
+									<Form.Control
+										className="profile-input"
+										type="date"
+										name="birthDate"
+										value={
+											formData.birthDate ? formData.birthDate.split("T")[0] : ""
+										}
+										disabled={!isEditing}
+										onChange={handleInputChange}
+										isInvalid={!!errors.birthDate}
+									/>
+									<Form.Control.Feedback type="invalid">
+										{errors.birthDate}
+									</Form.Control.Feedback>
+								</Form.Group>
+							</Col>
+						</Row>
+						<Row>
+							<Col md={6}>
+								<Form.Group className="mb-3">
+									<Form.Label>Phone</Form.Label>
+									<Form.Control
+										className="profile-input"
+										type="tel"
+										name="phone"
+										value={formData.phone || ""}
+										disabled={!isEditing}
+										onChange={handleInputChange}
+										isInvalid={!!errors.phone}
+									/>
+									<Form.Control.Feedback type="invalid">
+										{errors.phone}
+									</Form.Control.Feedback>
+								</Form.Group>
+							</Col>
+							<Col md={6}>
+								<Form.Group className="mb-3">
+									<Form.Label>Email</Form.Label>
+									<Form.Control
+										className="profile-input"
+										type="email"
+										name="email"
+										value={formData.email || ""}
+										disabled
+										onChange={handleInputChange}
+									/>
+								</Form.Group>
+							</Col>
+						</Row>
+						<Row>
+							<Col md={6}>
+								<Form.Group className="mb-3">
+									<Form.Label>NIC</Form.Label>
+									<Form.Control
+										className="profile-input"
+										type="text"
+										name="nic"
+										value={formData.nic || ""}
+										disabled
+										onChange={handleInputChange}
+									/>
+								</Form.Group>
+							</Col>
+							<Col md={6}>
+								<Form.Group className="mb-3">
+									<Form.Label>NIF</Form.Label>
+									<Form.Control
+										className="profile-input"
+										type="text"
+										name="nif"
+										value={formData.nif || ""}
+										disabled={!isEditing}
+										onChange={handleInputChange}
+										isInvalid={!!errors.nif}
+									/>
+									<Form.Control.Feedback type="invalid">
+										{errors.nif}
+									</Form.Control.Feedback>
+								</Form.Group>
+							</Col>
+						</Row>
 
-				{userType !== "organizer" && (
-					<Row>
-						<Col md={12}>
-							<Form.Group className="mb-3">
-								<Form.Label>Address</Form.Label>
-								<Form.Control
-									className="profile-input"
-									type="text"
-									name="address"
-									value={formData.address || ""}
-									disabled={!isEditing}
-									onChange={handleInputChange}
-								/>
-							</Form.Group>
-						</Col>
-					</Row>
-				)}
-			</Form>
+						{userType !== "organizer" && (
+							<Row>
+								<Col md={12}>
+									<Form.Group className="mb-3">
+										<Form.Label>Address</Form.Label>
+										<Form.Control
+											className="profile-input"
+											type="text"
+											name="address"
+											value={formData.address || ""}
+											disabled={!isEditing}
+											onChange={handleInputChange}
+										/>
+									</Form.Group>
+								</Col>
+							</Row>
+						)}
+					</Form>
+				</>
+			)}
 		</Stack>
 	);
 }

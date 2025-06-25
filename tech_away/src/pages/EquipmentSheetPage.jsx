@@ -112,7 +112,7 @@ export default function EquipmentSheetPage() {
 					{usedEquipmentList && usedEquipmentList.length > 0 ? (
 						usedEquipmentList.map((usedEquipment, index) => (
 							<Col key={index} xs={12} sm={6} md={6} lg={4}>
-								<UsedEquipmentCard usedEquipment={usedEquipment} />
+								<UsedEquipmentCard usedEquipment={usedEquipment} barcode={barcode}/>
 							</Col>
 						))
 					) : (
