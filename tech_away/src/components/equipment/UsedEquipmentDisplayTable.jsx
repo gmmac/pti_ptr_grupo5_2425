@@ -238,14 +238,14 @@ useEffect(() => {
           header=""
           body={(rowData, options) => {
             const menuItems = [];
-            if (isActiveFilter === "new" && rowData.Purchase.purchasePrice != 0) {
+            if (isActiveFilter === "new" && (rowData.Purchase.purchasePrice != 0 && rowData.Purchase.purchasePrice != null )) {
               menuItems.push({
                 label: "Put on Sale",
                 icon: "pi pi-cart-plus",
                 command: () => handleOpenPriceModal(rowData),
               });
             }
-            if (isActiveFilter === "new" && rowData.Purchase.purchasePrice == 0) {
+            if (isActiveFilter === "new" && (rowData.Purchase.purchasePrice == 0 ||rowData.Purchase.purchasePrice == null )) {
               menuItems.push({
                 label: "Donate",
                 icon: "pi pi-gift",

@@ -11,7 +11,7 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Calendar } from 'primereact/calendar';
 
-export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refreshKey, canDelete = false }) {
+export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refreshKey, organizerID, canDelete = false }) {
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [lazyState, setLazyState] = useState({
@@ -50,7 +50,7 @@ export default function CharityProjectDisplayTable({ onEdit, onOpenDetails, refr
     const { page, rows, sortField, sortOrder, filters } = lazyState;
     const currentPage = (page ?? 0) + 1;
     const pageSize = rows ?? 5;
-    const params = { page: currentPage, pageSize, sortField, sortOrder };
+    const params = { page: currentPage, pageSize, sortField, sortOrder, organizerNic: organizerID };
     Object.entries(filters).forEach(([key, meta]) => {
       if (meta.value) params[key] = meta.value;
     });

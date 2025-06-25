@@ -25,7 +25,8 @@ router.get("/", async (req, res) => {
       sortOrder = "ASC",
     } = req.query;
 
-    // --- WHERE principal ---
+    console.log(req.query)
+
     const where = {};
     if (onlyMyPurchases === "true" && req.cookies.employeeInfo?.nic) {
       where.employeeID = req.cookies.employeeInfo.nic;
@@ -52,7 +53,7 @@ router.get("/", async (req, res) => {
       where.purchasePrice = { [Op.gt]: 0 };
     }
     if (usedEquipmentID) {
-      where.usedEquipmentID = { [Op.eq]: parseInt(usedEquipmentID, 10) };
+      where.usedEquipmentID = { [Op.eq]: parseInt(usedEquipmentID) };
     }
 
     // --- Construção de orderClause ---
@@ -118,10 +119,10 @@ router.get("/", async (req, res) => {
       },
       {
         model: models.UsedEquipment,
-        required: true,
+        // required: true,
         include: [{
           model: models.EquipmentSheet,
-          required: true,
+          // required: true,
           include: [{
             model: models.EquipmentModel,
             attributes: ["name"],
@@ -164,6 +165,13 @@ router.get("/", async (req, res) => {
       modelName: item.UsedEquipment?.EquipmentSheet?.EquipmentModel?.name,
       createdAt: item.createdAt
     }));
+
+
+    console.log("BBBBBBBBBBBBB", id)
+    console.log(where)
+    // console.log("AAAAAAA", data)
+    // console.log("ASASASASAS", rows)
+
 
     res.json({
       totalItems: count,
@@ -372,9 +380,10 @@ router.get("/getDonations", async (req, res) => {
       }));
     });
 
+
     res.json({
-      totalItems:  count/3,
-      totalPages:  Math.ceil((count / pageSize)/3),
+      totalItems:  count,
+      totalPages:  Math.ceil(count / pageSize),
       currentPage: parseInt(page, 10),
       pageSize:    parseInt(pageSize, 10),
       data:        formatted
@@ -382,6 +391,7 @@ router.get("/getDonations", async (req, res) => {
   } catch (err) {
     console.error("Error: ", err);
     return res.status(500).json({ error: 'Error fetching donations.' });
+  }
 });
 
 

@@ -15,7 +15,8 @@ export default function CharityProjectCatalog({
   onOpenDetails,
   onRefresh,
   onDelete,
-  canDelete
+  canDelete,
+  organizerID
 }) {
   const [deleting, setDeleting] = useState(false);
   const [confirmationData, setConfirmationData] = useState({
@@ -57,6 +58,7 @@ export default function CharityProjectCatalog({
         onOpenDetails={onOpenDetails}
         onDelete={onDelete}
         canDelete={canDelete}
+        organizerID={organizerID}
       />
       <CharityProjectCardView
         projects={charityProjects}
